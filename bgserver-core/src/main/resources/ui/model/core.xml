@@ -1,0 +1,140 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  * https://bg.work
+  ~  *  *
+  ~  *  * GNU Lesser General Public License Usage
+  ~  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  * General Public License version 3 as published by the Free Software
+  ~  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  * project of this file. Please review the following information to
+  ~  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *
+  ~  */
+  -->
+<ui>
+    <model name="corp" app="core">
+        <view type="list">
+            <field name="id"></field>
+            <field name="name"></field>
+        </view>
+        <view type="create">
+            <field name="name"></field>
+        </view>
+        <view type="edit">
+            <field name="name"></field>
+        </view>
+    </model>
+
+    <model name="partner" app="core">
+        <view type="list">
+            <field name="id"></field>
+            <field name="userName"></field>
+            <field name="name"></field>
+            <field name="partnerRoles.name"></field>
+            <field name="nickName"></field>
+            <field name="mobile"></field>
+        </view>
+
+        <view type="searchBox">
+            <field name="userName" type="criteriaStringEqual"></field>
+            <field name="name" type="criteriaStringEqual"></field>
+            <field name="nickName" type="criteriaStringEqual"></field>
+            <field name="mobile" type="criteriaMobileEqual"></field>
+            <field name="email" type="criteriaStringILike"></field>
+        </view>
+
+        <view type="create">
+            <field name="userName" style="head" type="singleLineText"></field>
+            <field name="password" style="head" type="singleLineText"></field>
+            <field name="name" style="subHead" type="singleLineText"></field>
+            <field name="nickName" style="subHead" type="singleLineText"></field>
+            <field name="birthday" type="date"></field>
+            <field name="mobile" type="mobile"></field>
+            <field name="userIcon" type="avatar"></field>
+            <field name="telephone" type="telephone"></field>
+            <field name="email" type="email"></field>
+            <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
+            <field name="userTitle" colSpan="2" type="multiLineText"></field>
+            <field name="userComment" colSpan="2" type="multiLineText"></field>
+            <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <!--<field name="one2oneField" style="one2oneView">-->
+                <!--<view app="" model="">-->
+                    <!--<field></field>-->
+
+                <!--</view>-->
+            <!--</field>-->
+        </view>
+
+        <view type="edit">
+            <field name="userName" style="head" type="singleLineText"></field>
+            <field name="password" style="head" type="singleLineText"></field>
+            <field name="name" style="subHead" type="singleLineText"></field>
+            <field name="nickName" style="subHead" type="singleLineText"></field>
+            <field name="birthday" type="date"></field>
+            <field name="mobile" type="mobile"></field>
+            <field name="userIcon" type="imageUpload"></field>
+            <field name="telephone" type="telephone"></field>
+            <field name="email" type="email"></field>
+            <field name="userTitle" colSpan="2" type="multiLineText"></field>
+            <field name="userComment" colSpan="2" type="multiLineText"></field>
+        </view>
+        <view type="detail">
+
+        </view>
+
+    </model>
+
+    <model name="partnerRole" app="core">
+        <view type="list">
+            <field name="id"></field>
+            <field name="name"></field>
+            <field name="isSuper">
+            </field>
+        </view>
+
+        <view type="create">
+            <field name="name" style="head" type="singleLineText"></field>
+            <field name="isSuper" style="subHead" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"系统超级管理员"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+        </view>
+
+        <view type="edit">
+            <field name="name"></field>
+            <field name="isSuper"></field>
+        </view>
+        <view type="detail">
+            <field name="name"></field>
+            <field name="isSuper"></field>
+        </view>
+    </model>
+
+    <model name="partnerRoleModel" app="core">
+        <view type="list">
+            <field name="id"></field>
+            <field name="name"></field>
+        </view>
+
+        <view type="create">
+            <field name="name"></field>
+        </view>
+
+        <view type="edit">
+            <field name="name"></field>
+        </view>
+    </model>
+</ui>

@@ -1,0 +1,54 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  * https://bg.work
+  ~  *  *
+  ~  *  * GNU Lesser General Public License Usage
+  ~  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  * General Public License version 3 as published by the Free Software
+  ~  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  * project of this file. Please review the following information to
+  ~  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *
+  ~  */
+  -->
+<ui>
+    <menu name="main" app="core" title="公司管理">
+        <menuItem title="公司信息" model="partner" viewType="main">
+
+        </menuItem>
+
+        <menu name="partner" app="core" title="公司员工">
+            <menuItem title="员工列表" model="partner" viewType="list">
+
+            </menuItem>
+            <menuItem title="添加员工" model="partner" viewType="create">
+
+            </menuItem>
+        </menu>
+
+        <menu name="partnerRole" app="core" title="角色管理">
+            <menuItem title="角色列表" model="partnerRole" viewType="list">
+
+            </menuItem>
+            <menuItem title="添加角色" model="partnerRole" viewType="create">
+
+            </menuItem>
+        </menu>
+
+
+        <menu name="partnerRoleModel" app="core" title="角色模型">
+
+        </menu>
+
+        <menuItem title="模型列表" model="partnerRoleModel" viewType="list">
+
+        </menuItem>
+
+        <menuItem title="添加模型" model="partnerRoleModel" viewType="create">
+
+        </menuItem>
+    </menu>
+</ui>

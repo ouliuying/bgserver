@@ -1,0 +1,130 @@
+/*
+author: ouliuying
+*/
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    background: #f6f6f6;
+}
+
+html {
+    min-height: 100%;
+}
+
+.bg-login-bg {
+    background: #4083fc;
+    height: 198px;
+    padding-top: 60px;
+    padding-bottom: 120px;
+}
+
+.bg-login-bg h1,
+.bg-login-bg h3 {
+    color: white;
+    text-align: center;
+    margin: 0px;
+    Letter-spacing: 5px;
+}
+
+.bg-login-bg h1 {
+    padding-bottom: 20px;
+    Letter-spacing: 15px;
+}
+
+.bg-login-bg h3 span {
+    color: yellow;
+    Letter-spacing: 2px;
+    font: bold;
+}
+
+.bg-login-area {
+    position: absolute;
+    background: white;
+    padding: 50px 20px;
+    margin-top: -160px;
+    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid #e4e4e4;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.bg-login-icon {
+    color: #4083fc;
+    display: inline-block;
+}
+
+.bg-login-icon::after {
+    content: ' ';
+    display: block;
+    clear: both;
+}
+
+.bg-login-icon svg {
+    color: #4083fc;
+    fill: #4083fc;
+    width: 100px;
+    height: 100px;
+}
+
+.bg-login-small-title {
+    display: none;
+    color: #2c2c2c;
+    padding: 18px 0px 27px 0px;
+}
+
+.bg-login-form {
+    margin-top: 28px;
+}
+
+.bg-login-form-group {
+    position: relative;
+}
+
+.bg-login-form-group input {
+    border: 0px;
+    border-bottom: 1px solid #e4e4e4;
+    width: 332px;
+    outline: none;
+    line-height: 32px;
+    font-size: 14px;
+    padding-left: 80px;
+}
+
+.bg-login-form-group label {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+.bg-login-form-group input:focus {
+    outline: none;
+}
+
+.bg-login-form-btn {
+    background: #4083fc;
+    color: white;
+    outline: none;
+    border: none;
+    display: inline-block;
+    margin-top: 28px;
+    padding: 0px 30px;
+    line-height: 32px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bg-login-form-btn:hover {
+    background: red;
+}
+
+.bg-login-form-reg {
+    font-size: 12px;
+    color: #4083fc;
+    position: absolute;
+    bottom: 12px;
+    right: 15px;
+}

@@ -1,0 +1,52 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  * https://bg.work
+  ~  *  *
+  ~  *  * GNU Lesser General Public License Usage
+  ~  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  * General Public License version 3 as published by the Free Software
+  ~  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  * project of this file. Please review the following information to
+  ~  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *
+  ~  */
+  -->
+
+<ui>
+    <action viewType="create" app="*" model="*">
+        <group name="main">
+            <trigger title="保存" name="doCreate"></trigger>
+            <trigger title="重置" name="doCancel"></trigger>
+        </group>
+    </action>
+
+    <action viewType="edit" app="*" model="*">
+        <group name="main">
+            <trigger title="保存" name="doSave"></trigger>
+            <trigger title="重置" name="doReload"></trigger>
+        </group>
+    </action>
+
+    <action viewType="list" app="*" model="*">
+
+        <group name="main">
+            <trigger title="添加" name="toAdd"></trigger>
+        </group>
+
+        <group name="opAction">
+            <trigger title="详情" name="toDetail"></trigger>
+            <trigger title="删除" name="doDelete"></trigger>
+        </group>
+
+    </action>
+
+    <action viewType="detail" app="*" model="*">
+        <group name="main">
+            <trigger title="编辑" name="toEdit"></trigger>
+        </group>
+    </action>
+
+</ui>
