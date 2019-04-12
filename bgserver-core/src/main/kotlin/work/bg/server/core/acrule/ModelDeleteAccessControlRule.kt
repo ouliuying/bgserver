@@ -17,6 +17,10 @@
 
 package work.bg.server.core.acrule
 
-interface ModelCreateFieldsValueFilterRule<T> :ModelCreateAccessControlRule<T>{
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.mq.ModelDataObject
 
+interface ModelDeleteAccessControlRule<T>:AccessControlRule<T> {
+    open operator fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data:T?): Pair<Boolean,String>
+    open var config:String
 }

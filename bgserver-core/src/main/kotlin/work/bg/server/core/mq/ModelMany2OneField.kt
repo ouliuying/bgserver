@@ -25,7 +25,8 @@ class ModelMany2OneField(model:ModelBase?,
                          title:String?,
                          override val targetModelTable: String?=null,
                          override val targetModelFieldName: String?=null,
-                         override val foreignKey: FieldForeignKey?=null
-                         ):ModelField(model,name,fieldType,title),Many2OneField {
+                         override val foreignKey: FieldForeignKey?=null,
+                         defaultValue:Any?=null
+                         ):ModelField(model,name,fieldType,title,defaultValue=defaultValue),Many2OneField {
 
 }

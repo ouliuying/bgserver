@@ -16,21 +16,21 @@
   -->
 <ui>
     <inherit>
-            <xpath expression="/ui/model[@app='core'][@name='partner']/view/list" op="append" app="core">
-                <field name="department"></field>
-            </xpath>
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view/list" op="append" app="core">
+            <field name="department"></field>
+        </xpath>
 
+        <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">
+            <field name="department"></field>
+        </xpath>
 
+        <xpath expression="/ui/model[@app='core'][@name='partnerRole']/view/edit" op="append" app="core">
+            <field name="department"></field>
+        </xpath>
 
-            <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">
-                <field name="department"></field>
-            </xpath>
-
-
-
-            <xpath expression="/ui/model[@app='core'][@name='partnerRole']/view/edit" op="append" app="core">
-                <field name="department"></field>
-            </xpath>
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
+            <field name="departments.name" type="many2OneDataSetSelect"></field>
+        </xpath>
 
     </inherit>
 

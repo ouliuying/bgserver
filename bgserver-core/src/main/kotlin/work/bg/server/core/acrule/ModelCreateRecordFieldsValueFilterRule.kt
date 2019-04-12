@@ -17,9 +17,6 @@
 
 package work.bg.server.core.acrule
 
-import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.ModelDataObject
-
-interface ModelCreateRecordFieldsValueCheckControlRule<T>:ModelCreateAccessControlRule<T> {
+interface ModelCreateRecordFieldsValueFilterRule<T> :ModelCreateAccessControlRule<T>{
 
 }

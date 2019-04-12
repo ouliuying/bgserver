@@ -18,5 +18,5 @@
 package work.bg.server.core.mq.billboard
 
 interface FieldDefaultValueBillboard {
-    open fun look(glass:Any?):Any
+    open fun looked(glass:Any?):Any
 }

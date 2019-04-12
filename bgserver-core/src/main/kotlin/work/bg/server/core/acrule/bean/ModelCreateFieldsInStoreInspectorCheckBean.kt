@@ -18,7 +18,7 @@
 package work.bg.server.core.acrule.bean
 
 import org.springframework.stereotype.Component
-import work.bg.server.core.acrule.ModelCreateRecordFieldsValueCheckInStoreControlRule
+import work.bg.server.core.acrule.ModelCreateRecordFieldsValueCheckInStoreRule
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
@@ -26,8 +26,8 @@ import work.bg.server.core.model.AccessControlModel
 import work.bg.server.core.mq.FieldValueArray
 import work.bg.server.core.mq.ModelDataObject
 @Component
-class PartnerModelCreateFieldsInStoreInspectorCheckBean:
-        ModelCreateRecordFieldsValueCheckInStoreControlRule<Array<ModelFieldInspector>> {
+class ModelCreateFieldsInStoreInspectorCheckBean:
+        ModelCreateRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>> {
         private lateinit var _config:String
         override  var config: String
             get() {
@@ -46,7 +46,17 @@ class PartnerModelCreateFieldsInStoreInspectorCheckBean:
                                 targetFieldValues.setValue(fv.field,fv.value)
                             }
                         }
-                         if((modelData.model as AccessControlModel).rawCount(targetFieldValues)>0){
+                         val m =modelData.model as AccessControlModel
+                        if(partnerCache!=null){
+                            if(it.isolationType==ModelFieldUnique.IsolationType.IN_CORP){
+                                targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
+                            }
+                            else if(it.isolationType==ModelFieldUnique.IsolationType.IN_PARTNER){
+                                targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
+                                targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)
+                            }
+                        }
+                        if(m.rawCount(targetFieldValues)>0){
                              return Pair(false,it.advice)
                          }
                     }

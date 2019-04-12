@@ -17,7 +17,7 @@
 
 package work.bg.server.core.mq
 
-open class BinaryOperatorField constructor(val leftField:FieldBase?, val rightField:FieldBase?, val operator:String, name:String="", fieldType:FieldType=FieldType.NONE, model:ModelBase?=null, length:Int?=null):FieldBase(name,fieldType,model,length){
+open class BinaryOperatorField constructor(val leftField:FieldBase?, val rightField:FieldBase?, val operator:String, name:String="",title:String?=null, fieldType:FieldType=FieldType.NONE, model:ModelBase?=null, length:Int?=null):FieldBase(name,title,fieldType,model,length){
 
 
     operator  fun plus(field:BinaryOperatorField):BinaryOperatorField{ //+operator

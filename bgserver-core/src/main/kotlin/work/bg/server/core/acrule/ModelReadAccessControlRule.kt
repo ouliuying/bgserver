@@ -17,6 +17,12 @@
 
 package work.bg.server.core.acrule
 
-interface ModelCreateRecordFieldsValueCheckInStoreControlRule<T>:ModelCreateAccessControlRule<T>{
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.mq.ModelBase
+import work.bg.server.core.mq.ModelExpression
 
+
+interface ModelReadAccessControlRule<T>:AccessControlRule<T> {
+     operator fun invoke(model: ModelBase, partnerCache: PartnerCache,criteria:ModelExpression?):ModelExpression?
+     var config:String
 }

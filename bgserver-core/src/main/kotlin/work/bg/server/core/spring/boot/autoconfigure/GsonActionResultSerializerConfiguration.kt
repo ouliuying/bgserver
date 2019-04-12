@@ -80,15 +80,9 @@ class GsonActionResultSerializerConfiguration {
     class ModelDataDeserializerAdapter: JsonDeserializer<ModelData>{
         override fun deserialize(json: JsonElement?,
                                  typeOfT: Type?,
-                                 context: JsonDeserializationContext?): ModelData {
+                                 context: JsonDeserializationContext?): ModelData? {
             var jsonObj=json?.asJsonObject
-            var mfvc=fillModelDataObject(jsonObj)
-            if(mfvc!=null){
-                return mfvc
-            }
-            else{
-                throw  ModelErrorException(json?.toString()+"格式错误！")
-            }
+            return fillModelDataObject(jsonObj)
         }
 
         private fun fillModelDataObject(jsonObj:JsonObject?):ModelData?{
@@ -99,7 +93,13 @@ class GsonActionResultSerializerConfiguration {
                 var toField=jsonObj?.get("toField")?.asJsonObject
                 var fromIdValue=jsonObj?.get("fromIdValue")?.asLong
                 var record=jsonObj?.get("record")
-                return this.fillModelDataObjectImp(app,model,fromField,toField,fromIdValue,record?.asJsonObject)
+                if(record.isJsonArray){
+                    return this.fillModelDataArrayImp(app,model,fromField,toField,fromIdValue,record.asJsonArray)
+                }
+                else if(record.isJsonObject){
+                    return this.fillModelDataObjectImp(app,model,fromField,toField,fromIdValue,record.asJsonObject)
+                }
+
             }
             return null
         }
@@ -224,7 +224,7 @@ class GsonActionResultSerializerConfiguration {
                                     var toField=jsonObj?.get("toField")?.asJsonObject
                                     var fromIdValue=jsonObj?.get("fromIdValue")?.asLong
                                     var record=jsonObj?.get("record")
-                                    var modelKey=AppModel.ref?.getModel(appName!!,modelName!!)
+                                    var modelKey=AppModel.ref?.getModel(app!!, model!!)
                                     if(record!=null)
                                     {
                                         if(record.isJsonArray){
@@ -345,7 +345,12 @@ class GsonActionResultSerializerConfiguration {
                             jo.add(it.field.propertyName,this.buildModelData(it.value,typeOfSrc,context))
                         }
                         else->{
-                            jo.add(it.field.propertyName,context?.serialize(it.value!!))
+                            if(it.value!=null){
+                                jo.add(it.field.propertyName,context?.serialize(it.value))
+                            }
+                            else{
+                                jo.add(it.field.propertyName,null as JsonElement?)
+                            }
                         }
                     }
                 }
@@ -535,7 +540,7 @@ class GsonActionResultSerializerConfiguration {
             val obj = JsonObject()
             if (value != null) {
                 obj.addProperty("errorCode",value.errorCode.code)
-                obj.addProperty("description", value.errorCode.description)
+                obj.addProperty("description", value.description?:value.errorCode.description)
                 if (value.bag.count() > 0) {
                     val subObj = JsonObject()
                     value.bag.forEach { t, u ->

@@ -18,15 +18,14 @@
 package work.bg.server.core.acrule.bean
 
 import org.springframework.stereotype.Component
-import work.bg.server.core.acrule.ModelCreateRecordFieldsInitializeRule
+import work.bg.server.core.acrule.ModelCreateRecordFieldsValueInitializeRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.FieldValue
 import work.bg.server.core.mq.ModelDataObject
 import work.bg.server.core.mq.ModelField
 
 @Component
-class ModelCreateFieldsSetIsolationFieldsBean:ModelCreateRecordFieldsInitializeRule<Any> {
+class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueInitializeRule<Any> {
     private lateinit var _config:String
     override  var config: String
         get() {

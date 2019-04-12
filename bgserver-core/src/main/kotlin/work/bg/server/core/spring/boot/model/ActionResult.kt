@@ -19,6 +19,7 @@ package work.bg.server.core.spring.boot.model
 import work.bg.server.errorcode.ErrorCode
 open class ActionResult(errorCode:ErrorCode) {
     var errorCode:ErrorCode=ErrorCode.SUCCESS
+    var description:String?=null
     var bag:MutableMap<String,Any> = mutableMapOf()
     init {
         this.errorCode=errorCode

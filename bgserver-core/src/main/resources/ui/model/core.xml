@@ -17,6 +17,23 @@
 <ui>
     <model name="corp" app="core">
         <view type="list">
+            <ref>
+<!--                <actions>-->
+<!--                    <action>-->
+<!--                        <group name="main" refType = "main"/>-->
+<!--                    </action>-->
+<!--                </actions>-->
+<!--                <menus>-->
+<!--                    <menu>-->
+
+<!--                    </menu>-->
+<!--                </menus>-->
+<!--                <views>-->
+<!--                    <view type="" ownerField="" refType="all">-->
+
+<!--                    </view>-->
+<!--                </views>-->
+            </ref>
             <field name="id"></field>
             <field name="name"></field>
         </view>
@@ -27,9 +44,51 @@
             <field name="name"></field>
         </view>
     </model>
+    <model name="corpPartnerRel" app="core">
+        <view type="list">
+            <field name="isDefaultCorp" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"默认公司"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="partner" >
+            </field>
 
+            <field name="partnerRole">
+            </field>
+
+        </view>
+
+        <view type="edit">
+
+        </view>
+
+        <view type="create">
+
+        </view>
+    </model>
     <model name="partner" app="core">
         <view type="list">
+            <ref>
+                <actions>
+                        <action>
+                            <group name="main"></group>
+                        </action>
+                        <action>
+                            <group name="opAction"></group>
+                        </action>
+                </actions>
+                <menus>
+
+                </menus>
+                <views>
+                    <view type="searchBox" refType="embedded"></view>
+                </views>
+            </ref>
             <field name="id"></field>
             <field name="userName"></field>
             <field name="name"></field>
@@ -47,6 +106,17 @@
         </view>
 
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
             <field name="userName" style="head" type="singleLineText"></field>
             <field name="password" style="head" type="singleLineText"></field>
             <field name="name" style="subHead" type="singleLineText"></field>
@@ -57,20 +127,30 @@
             <field name="telephone" type="telephone"></field>
             <field name="email" type="email"></field>
             <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
+            <field name="setCurrentCorpAsDefault" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"设定当前公司为默认"
+                    }
+                  ]]>
+                </meta>
+            </field>
             <field name="userTitle" colSpan="2" type="multiLineText"></field>
             <field name="userComment" colSpan="2" type="multiLineText"></field>
             <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
             <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
             <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <!--<field name="one2oneField" style="one2oneView">-->
-                <!--<view app="" model="">-->
-                    <!--<field></field>-->
-
-                <!--</view>-->
-            <!--</field>-->
         </view>
 
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"></group>
+                    </action>
+                </actions>
+            </ref>
             <field name="userName" style="head" type="singleLineText"></field>
             <field name="password" style="head" type="singleLineText"></field>
             <field name="name" style="subHead" type="singleLineText"></field>
@@ -84,7 +164,24 @@
             <field name="userComment" colSpan="2" type="multiLineText"></field>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="userName" style="head" type="static"></field>
+            <field name="password" style="head" type="static"></field>
+            <field name="name" style="subHead" type="static"></field>
+            <field name="nickName" style="subHead" type="static"></field>
+            <field name="birthday" type="static"></field>
+            <field name="mobile" type="static"></field>
+            <field name="userIcon" type="static"></field>
+            <field name="telephone" type="static"></field>
+            <field name="email" type="static"></field>
+            <field name="userTitle" colSpan="2" type="static"></field>
+            <field name="userComment" colSpan="2" type="static"></field>
         </view>
 
     </model>

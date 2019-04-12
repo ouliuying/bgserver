@@ -23,7 +23,9 @@ import com.google.gson.JsonParser
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.model.AppModel
 
-class JsonClauseResolver(val obj:JsonObject,val model:ModelBase,val context:ModelExpressionContext?=null){
+class JsonClauseResolver(val obj:JsonObject,
+                         val model:ModelBase,
+                         val context:ModelExpressionContext?=null){
     private  var relationModels:ArrayList<ModelBase> = arrayListOf()
     init {
         this.model.fields.forEach {
@@ -54,8 +56,8 @@ class JsonClauseResolver(val obj:JsonObject,val model:ModelBase,val context:Mode
         }
     }
 
-    fun criteria():ModelExpression{
-        return this.createCriteriaFromObject(this.obj)!!
+    fun criteria():ModelExpression?{
+        return this.createCriteriaFromObject(this.obj)
     }
     private fun createCriteriaFromObject(obj:JsonObject):ModelExpression?{
         var op=obj["op"].asString

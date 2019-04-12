@@ -55,7 +55,7 @@ class BasePartnerAppShortcut(tableName:String,schemaName:String):ContextModel(ta
         dataObjectArray?.data?.forEach {
             var mobj=it.getValue(BasePartnerAppShortcut.ref.app) as ModelDataObject?
             if(mobj!=null){
-                var name=mobj?.data?.getValue(BaseApp.ref.name) as String
+                var name=mobj.data.getValue(BaseApp.ref.name) as String
                 apps.add(name)
             }
         }

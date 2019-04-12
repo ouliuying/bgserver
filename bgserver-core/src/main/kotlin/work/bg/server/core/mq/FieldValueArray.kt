@@ -37,4 +37,10 @@ class FieldValueArray: ArrayList<FieldValue>(){
             -1
         }
     }
+    fun containFieldKey(field:FieldBase):Boolean{
+        var fv=this.firstOrNull {
+            it.field.isSame(field)
+        }
+        return fv!=null
+    }
 }

@@ -30,7 +30,11 @@ class ModelDataObject(override var data: FieldValueArray = FieldValueArray(),
         return true
     }
 
-
+    fun hasNormalField():Boolean{
+        return data.count {
+            !it.field.isSame(model!!.fields.getIdField()!!) && it.field is ModelField
+        }>0
+    }
     fun setFieldValue(propertyName:String,value:String?){
         var fieldValue = this.data.firstOrNull {
             it.field.propertyName==propertyName

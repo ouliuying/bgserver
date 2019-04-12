@@ -23,13 +23,14 @@ import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import work.bg.server.core.model.*
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.specialized.ConstRelRegistriesField
 import java.time.Duration
 
-@Service
+@Component
 class PartnerCacheRegistry{
     private var partnersCache: LoadingCache<PartnerCacheKey, PartnerCache>?=null
     @Value("\${partner.cache.max-size}")

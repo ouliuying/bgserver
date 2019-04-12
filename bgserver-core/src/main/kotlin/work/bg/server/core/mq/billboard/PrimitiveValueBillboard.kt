@@ -20,7 +20,7 @@ package work.bg.server.core.mq.billboard
 class PrimitiveValueBillboard(val value:Any, override val constant: Boolean=false):
         FieldDefaultValueBillboard,
         ConstantFieldBillboard {
-    override fun look(glass:Any?): Any {
+    override fun looked(glass:Any?): Any {
         return glass?:this.value
     }
 }

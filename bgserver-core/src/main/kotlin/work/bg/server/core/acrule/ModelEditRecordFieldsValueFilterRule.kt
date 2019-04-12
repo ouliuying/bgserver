@@ -15,17 +15,7 @@
  *
  */
 
-package work.bg.server.core.acrule.inspector
+package work.bg.server.core.acrule
 
-import work.bg.server.core.mq.ModelField
-
-class ModelFieldUnique(override vararg val targetFields: ModelField,
-                       override val advice: String,val isolationType:IsolationType):ModelFieldInspector {
-
-
-    enum class IsolationType(val typ:Int){
-        IN_GLOBAL(0),
-        IN_CORP(1),
-        IN_PARTNER(2)
-    }
+interface ModelEditRecordFieldsValueFilterRule<T>:ModelEditAccessControlRule<T> {
 }

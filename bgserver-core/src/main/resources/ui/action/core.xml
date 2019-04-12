@@ -36,8 +36,9 @@
             <trigger title="添加" name="toAdd"></trigger>
         </group>
 
+
         <group name="opAction">
-            <trigger title="详情" name="toDetail"></trigger>
+            <trigger title="详情" name="toDetail" viewType="detail"></trigger>
             <trigger title="删除" name="doDelete"></trigger>
         </group>
 

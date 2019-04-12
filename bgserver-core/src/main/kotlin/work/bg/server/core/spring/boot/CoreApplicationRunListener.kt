@@ -25,6 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
 import util.MethodInvocation
 import work.bg.server.core.spring.boot.model.AppModel
+import work.bg.server.core.ui.UICache
 import java.util.*
 
 class CoreApplicationRunListener(val app:SpringApplication,vararg val args:String):SpringApplicationRunListener {
@@ -55,7 +56,9 @@ class CoreApplicationRunListener(val app:SpringApplication,vararg val args:Strin
 
     override fun started(context: ConfigurableApplicationContext?) {
         var appModel=(context as ApplicationContext).getBean(AppModel::class.java)
+        var uiCache =(context as ApplicationContext).getBean(UICache::class.java)
         MethodInvocation(appModel, "initialize")()
+        MethodInvocation(uiCache, "loadUI")()
     }
 
     override fun starting() {

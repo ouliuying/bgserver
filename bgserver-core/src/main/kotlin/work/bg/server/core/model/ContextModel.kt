@@ -26,19 +26,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheRegistry
+import work.bg.server.core.context.JsonClauseResolver
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.model.ActionResult
 import work.bg.server.core.spring.boot.model.ReadActionParam
-import work.bg.server.core.ui.ModelView
-import work.bg.server.core.ui.UICache
+import work.bg.server.core.ui.*
 import work.bg.server.errorcode.ErrorCode
 
 abstract  class ContextModel(tableName:String,schemaName:String):AccessControlModel(tableName,schemaName) {
     @Autowired
     var partnerCacheRegistry:PartnerCacheRegistry?=null
     @Autowired
-    val gson: Gson?=null
+    lateinit var gson: Gson
     init {
 
     }
@@ -80,11 +80,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar=ActionResult()
         if(modelData!=null){
             var ret=this.acCreate(modelData,pc)
-            if(ret.first!=null){
+            if(ret.first!=null && ret.first!!>0){
                 ar.bag["id"]=ret.first!!
                 return ar
             }
+            ar.description=ret.second
         }
+        print(ar.description)
         ar.errorCode=ErrorCode.CREATEMODELFAIL
         return ar
     }
@@ -102,144 +104,268 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 attachedFields = attachFields,
                 pageIndex = param.pageIndex,
                 pageSize = param.pageSize)
-
-
         return ar
     }
     @Action(name="delete")
-    open fun deleteAction(@RequestBody modelData:ModelData?,pc:PartnerCache): ActionResult?{
-        var ar=ActionResult()
-
-
+    open fun deleteAction(@RequestBody data:JsonObject, pc:PartnerCache): ActionResult?{
+        var ar = ActionResult()
+        val id = data["id"]?.asLong
+        id?.let {
+            var fdarr = FieldValueArray()
+            val idField = this.fields!!.getIdField()!!
+            fdarr.setValue(idField,id)
+            var  mo = ModelDataObject(model=this,data=fdarr)
+            val criteria = eq(idField,id)
+            var ret= this.acDelete(mo,criteria=criteria,useAccessControl = true,partnerCache = pc)
+            ret?.first?.let {
+                if(it>0){
+                  return ar
+                }
+                ar.description=ret.second
+                ar.errorCode=ErrorCode.UNKNOW
+            }
+        }
         return ar
     }
-    @Action(name="feedViewField")
-    open fun feedViewFieldAction(@RequestBody param: JsonArray, pc:PartnerCache):ActionResult?{
-        //todo remove constant word
-        var ar=ActionResult()
-        if(param.count()>0){
-            param.forEach {
-                var viewFieldType=(it as JsonObject)["viewFieldType"].asString
-                when{
-                    viewFieldType.compareTo(ModelView.Field.ViewFieldType.many2OneDataSetSelect,
-                            true)==0->{
-                        if(!it.has("parentName")){
-                            var name=it["name"].asString
-                            var field=this.fields.getFieldByPropertyName(name)
-                            if(field!=null){
-                                var tf=this.getTargetModelField(field)
-                                if(tf!=null){
-                                    if(tf.first!=null){
-                                        var acModel=tf.first as AccessControlModel
-                                        var modelData=acModel.acRead(
-                                                *acModel.fields.getAllPersistFields().values.toTypedArray(),criteria = null,partnerCache = pc, pageIndex = 1,pageSize=10
-                                        )
-                                        var feedData=this.gson?.toJsonTree(modelData)
-                                        it.add("feedData",feedData)
 
-                                    }
-                                }
-                            }
+    @Action(name="loadModelViewType")
+    open fun loadModelViewType(@RequestBody data:JsonObject, pc:PartnerCache):ActionResult{
+        var ar=ActionResult()
+        val app =this.meta.appName
+        val model = this.meta.name
+        val viewType = data["viewType"]?.asString?:""
+        val reqData = data["reqData"]?.asJsonObject
+        val ownerField = data["ownerField"]?.asJsonObject
+        ar.bag = this.loadMainViewType(app,model,viewType,ownerField,pc,reqData)
+        return ar
+    }
+    private fun loadMainViewType(app:String,model:String,viewType:String,ownerField:JsonObject?,pc:PartnerCache,reqData:JsonObject?):MutableMap<String,Any>{
+        var reqRefType= if(ownerField!=null) ModelViewRefType.Sub else ModelViewRefType.Main
+        var mv=pc.getAccessControlModelView(app,model,viewType)
+        var bag = mutableMapOf<String,Any>()
+        if(mv!=null){
+            mv=this.fillModelViewMeta(mv,bag,pc,reqData)
+            var mvData = this.loadModelViewData(mv,bag, pc, reqData)
+            bag["view"] = mv
+            if(mvData!=null){
+                bag["data"]=mvData
+            }
+            var actionNameArray = arrayListOf<String>()
+            mv.refActionGroups.forEach {
+                if(it.refType==ModelViewRefType.All){
+                    actionNameArray.add(it.groupName)
+                }
+                else if(it.refType == reqRefType){
+                    actionNameArray.add(it.groupName)
+                }
+            }
+            var triggerGroups = this.loadModelViewActionTriggerGroups(mv,actionNameArray.toTypedArray(),pc,reqData)
+            if(triggerGroups!=null){
+                bag["triggerGroups"]=triggerGroups
+            }
+            mv.refViews.forEach {
+                var refMV= this.loadRefViewType(it,pc,reqData,reqRefType)
+                refMV?.let {
+                    if(bag.containsKey("subViews")){
+                        (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
+                    }
+                    else{
+                        var subViews = arrayListOf<Map<String,Any>>()
+                        subViews.add(refMV)
+                        bag["subViews"]=subViews
+                    }
+                }
+            }
+        }
+        return bag
+    }
+
+    private fun loadRefViewType(refView:ModelView.RefView, pc:PartnerCache, reqData:JsonObject?, reqRefType:String):Map<String,Any>?{
+        var mv=pc.getAccessControlModelView(refView.app,refView.model,refView.viewType)
+        if(mv!=null){
+            var bag = mutableMapOf<String,Any>()
+            bag["refView"]=refView
+            if(reqRefType==ModelViewRefType.Main || refView.refType==ModelViewRefType.Embedded){
+                bag["view"] = mv
+                mv=this.fillModelViewMeta(mv,bag,pc,reqData)
+                var mvData = this.loadModelViewData(mv, bag,pc, reqData)
+                if(mvData!=null){
+                    bag["data"]=mvData
+                }
+                var actionNameArray = arrayListOf<String>()
+                mv.refActionGroups.forEach {
+                    if(it.refType==ModelViewRefType.All){
+                        actionNameArray.add(it.groupName)
+                    }
+                    else if(it.refType == ModelViewRefType.Sub){
+                        actionNameArray.add(it.groupName)
+                    }
+                }
+                var triggerGroups = this.loadModelViewActionTriggerGroups(mv,actionNameArray.toTypedArray(),pc,reqData)
+                if(triggerGroups!=null){
+                    bag["triggerGroups"]=triggerGroups
+                }
+                mv.refViews.forEach {
+                    var refMV= this.loadRefViewType(it,pc,reqData,ModelViewRefType.Sub)
+                    refMV?.let {
+                        if(bag.containsKey("subViews")){
+                            (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
                         }
                         else{
-                            var pname=it["parentName"].asString
-                            var field=this.fields.getFieldByPropertyName(pname)
-                            if(field!=null){
-                                var tf=this.getTargetModelField(field)
-                                if(tf!=null) {
-                                    var subModel=tf.first as ContextModel?
-                                    if(subModel!=null){
-                                        var name=it["name"].asString
-                                        var field=subModel.fields.getFieldByPropertyName(name)
-                                        if(field!=null){
-                                            var subtf=subModel.getTargetModelField(field)
-                                            if(subtf!=null){
-                                                if(subtf.first!=null){
-                                                    var acModel=subtf.first as AccessControlModel
-                                                    var modelData=acModel.acRead(
-                                                            *acModel.fields.getAllPersistFields().values.toTypedArray(),criteria = null,partnerCache = pc, pageIndex = 1,pageSize=10
-                                                    )
-                                                    var feedData=this.gson?.toJsonTree(modelData)
-                                                    it.add("feedData",feedData)
+                            var subViews = arrayListOf<Map<String,Any>>()
+                            subViews.add(refMV)
+                            bag["subViews"]=subViews
+                        }
+                    }
+                }
+            }
+            return bag
+        }
+        return null
+    }
+    /**
+     * actions end
+     */
 
-                                                }
-                                            }
-                                        }
+
+    protected open fun loadModelViewActionTriggerGroups(mv:ModelView,actionNames:Array<String>,pc:PartnerCache,reqData: JsonObject?):Array<TriggerGroup>?{
+        var triggerGroups = arrayListOf<TriggerGroup>()
+        actionNames.forEach {
+            val tg=pc.getAccessControlModelViewActionGroup(mv.app!!,mv.model!!,mv.viewType!!,it)
+            if(tg!=null){
+                triggerGroups.add(tg)
+            }
+        }
+        return triggerGroups.toTypedArray()
+    }
+    protected  open fun fillModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData: JsonObject?):ModelView{
+        when(mv.viewType){
+            ModelView.ViewType.CREATE->{
+                return this.fillCreateModelViewMeta(mv,viewData,pc,reqData)
+            }
+            ModelView.ViewType.DETAIL->{
+
+            }
+            ModelView.ViewType.EDIT->{
+
+            }
+            ModelView.ViewType.LIST->{
+
+            }
+        }
+        return mv
+    }
+
+    protected  open fun fillCreateModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData: JsonObject?):ModelView{
+        mv.fields.forEach {
+            when(it.type){
+                ModelView.Field.ViewFieldType.many2OneDataSetSelect,ModelView.Field.ViewFieldType.many2ManyDataSetSelect->{
+                    if(it.relationData!=null && it.meta==null){
+                        var tModel = this.appModel.getModel(it.relationData!!.targetApp,it.relationData!!.targetModel)
+                        if(tModel!=null){
+                            var idField = tModel.fields.getIdField()
+                            var toField = tModel.getFieldByPropertyName(it.relationData!!.toName!!)
+                            if(idField!=null && toField!=null){
+                                var dataArray=(tModel as ContextModel).acRead(idField,toField,
+                                        partnerCache = pc,
+                                        criteria = null,
+                                        pageIndex = 1,
+                                        pageSize = 10)
+                                if(dataArray!=null){
+                                    var jArr = JsonArray()
+                                    dataArray.data.forEach {fvIT->
+                                        var id = fvIT.getValue(idField)
+                                        var toValue = fvIT.getValue(toField)
+                                        var jo=JsonObject()
+                                        jo.addProperty(idField.propertyName,id?.toString())
+                                        jo.addProperty(toField.name,toValue?.toString())
+                                        jArr.add(jo)
                                     }
+                                    var metaObj=JsonObject()
+                                    metaObj.add("options",jArr)
+                                    it.meta=metaObj
                                 }
                             }
                         }
                     }
                 }
             }
-            ar.bag["feedData"]=param
-        }
-        return ar
-    }
-
-    @Action(name="loadModelViewType")
-    fun loadModelViewType(@RequestBody data:JsonObject, pc:PartnerCache):ActionResult{
-        var ar=ActionResult()
-        val app =this.meta.appName
-        val model = this.meta.name
-        val viewType = data["viewType"].asString
-        val reqData = data["reqData"].asJsonObject
-        var mv=pc.getAccessControlModelView(app,model,viewType)
-        if(mv!=null){
-            mv=this.fillModelViewMeta(mv,pc,reqData)
-            var mvData = this.loadModelViewData(mv, pc, reqData)
-            ar.bag["view"] = mv
-            if(mvData!=null){
-                ar.bag["data"]=mvData
-            }
-        }
-        return ar
-    }
-    private fun fillModelViewMeta(mv:ModelView,pc:PartnerCache,reqData: JsonObject):ModelView{
-        when(mv.viewType){
-            ModelView.ViewType.CREATE->{
-                return this.fillCreateModelViewMeta(mv,pc,reqData)
-            }
-            ModelView.ViewType.DETAIL->{
-
-            }
-            ModelView.ViewType.EDIT->{
-
-            }
-            ModelView.ViewType.LIST->{
-
-            }
         }
         return mv
     }
-    private fun fillCreateModelViewMeta(mv:ModelView,pc:PartnerCache,reqData: JsonObject):ModelView{
 
-        return mv
-    }
-    private fun loadModelViewData(mv:ModelView,pc:PartnerCache,reqData:JsonObject):JsonObject?{
+    protected open fun loadModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject?{
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-               return this.loadCreateModelViewData(mv,pc,reqData)
+               return this.loadCreateModelViewData(mv,viewData,pc,reqData)
             }
             ModelView.ViewType.DETAIL->{
-
+                return this.loadDetailModelViewData(mv,viewData,pc,reqData)
             }
             ModelView.ViewType.EDIT->{
-
+                return this.loadEditModelViewData(mv,viewData,pc,reqData)
             }
             ModelView.ViewType.LIST->{
-
+                return this.loadListModelViewData(mv,viewData,pc,reqData)
             }
         }
         return null
     }
-    private fun loadCreateModelViewData(mv:ModelView,pc:PartnerCache,reqData:JsonObject):JsonObject? {
+    protected open fun loadCreateModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject? {
+
+        return JsonObject()
+    }
+
+    protected open fun loadDetailModelViewData(mv:ModelView,
+                                               viewData:MutableMap<String,Any>,
+                                               pc:PartnerCache,
+                                               reqData:JsonObject?):JsonObject?{
+        val id = reqData?.get("id")?.asInt
+        id?.let {
+            val idField = this.fields.getIdField()
+            idField?.let { idf->
+                var data = this.acRead(criteria = eq(idf,it), partnerCache = pc)
+                data?.let {
+                    if(it.data.count()>0){
+                        return this.gson.toJsonTree(it.firstOrNull()) as JsonObject
+                    }
+                }
+            }
+        }
         return null
     }
 
+    protected open fun loadEditModelViewData(mv:ModelView,
+                                               viewData:MutableMap<String,Any>,
+                                               pc:PartnerCache,
+                                               reqData:JsonObject?):JsonObject?{
+        val id = reqData?.get("id")?.asInt
+        id?.let {
+            val idField = this.fields.getIdField()
+            idField?.let { idf->
+                var data = this.acRead(criteria = eq(idf,it), partnerCache = pc)
+                data?.let {
+                    if(it.data.count()>0){
+                        return this.gson.toJsonTree(it.firstOrNull()) as JsonObject
+                    }
+                }
+            }
+        }
+        return null
+    }
 
-    /**
-     * actions end
-     */
-
+    protected  open fun loadListModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject?{
+        val pageIndex = reqData?.get("pageIndex")?.asInt?:1
+        val pageSize = reqData?.get("pageSize")?.asInt?:10
+        val jCriteria = reqData?.get("criteria")?.asJsonObject
+        //TODO parse javascript criteria
+        var criteria = null as ModelExpression?
+        jCriteria?.let {
+            criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
+        }
+        var data = this.acRead(partnerCache = pc,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
+        var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
+        viewData["totalCount"]=totalCount
+        return if(data!=null) this.gson.toJsonTree(data) as JsonObject? else null
+    }
 }

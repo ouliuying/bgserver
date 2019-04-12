@@ -33,7 +33,6 @@ import work.bg.server.core.RefSingleton
 import work.bg.server.core.spring.boot.model.AppModel
 import org.dom4j.io.SAXReader
 import org.dom4j.Element
-import org.dom4j.dom.DOMElement
 
 //@ConditionalOnBean(value = [AppModel::class])
 @Component
@@ -63,7 +62,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     override fun afterPropertiesSet() {
         var bean=this.registry.getBean(UICache::class.java) as UICache
         UICache.ref=bean
-        bean.loadUI()
+       // bean.loadUI()
     }
 
     override fun setApplicationContext(applicationContext: ApplicationContext) {
@@ -128,16 +127,48 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         this.buildModel(modelFiles)
         this.buildAction(actionFiles)
     }
-    fun getMenu(appName:String,menuName:String):MenuTree?
+    fun getMenu(app:String,menu:String):MenuTree?
     {
-        return this.menuTrees[appName]?.menus?.get(menuName)
+        return this.menuTrees[app]?.menus?.get(menu)
     }
     fun getAppModelView(app:String):AppModelView?{
         return this.modelViews[app]
     }
-    fun getModelView(appName: String,modelName:String,viewType:String):ModelView?{
-        return this.modelViews[appName]?.modelViews?.get(modelName)?.get(viewType)
+    fun getModelView(app: String,model:String,viewType:String):ModelView?{
+        return this.modelViews[app]?.modelViews?.get(model)?.get(viewType)
     }
+    fun getViewAction(app:String,model:String,viewType:String,groupName:String):ViewAction?{
+        val appVA = this.viewActions[app]
+        if(appVA!=null){
+            val modelVA = appVA.modelActions[model]
+            if(modelVA!=null){
+                val viewTypeVA = modelVA[viewType]
+                if(viewTypeVA!=null){
+                    val va = viewTypeVA.firstOrNull {
+                        it.groups.keys.contains(groupName)
+                    }
+                    if(va!=null){
+                        return va
+                    }
+                }
+            }
+        }
+        if(app!="*" && model!="*"){
+            var va = this.getViewAction("*",model,viewType,groupName)
+            if(va!=null){
+                return va
+            }
+        }
+        if(app=="*" && model!="*"){
+            var va = this.getViewAction("*","*",viewType,groupName)
+            if(va!=null){
+                return va
+            }
+        }
+        return null
+    }
+
+
     private fun buildAction(files:List<UIFile>){
         files.forEach {
             var viewActionConfigMap= mutableMapOf<String,UIFile>()
@@ -543,7 +574,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         try {
             var viewType=viewNode?.attributeValue("type")
             var mv=ModelView(app,model,viewType)
-            (viewNode?.elements() as List<Element?>)?.forEach {it ->
+            (viewNode?.elements("field") as List<Element?>)?.forEach {it ->
                 if(it!=null){
                     var name=it.attributeValue("name")
                     var style=it.attributeValue("style")
@@ -592,6 +623,60 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                        // print(f.meta)
                     }
                 }
+            }
+
+            (viewNode?.selectNodes("ref/actions/action") as List<Element>?)?.forEach {
+                val aApp = it.attributeValue("app")?:app
+                val aModel = it.attributeValue("model")?:model
+                val aViewType = it.attributeValue("viewType")?:viewType
+                val groupElems = it.selectNodes("group") as List<Element>?
+                groupElems?.forEach {
+                    val groupName =it.attributeValue("name")
+                    val refType =  it.attributeValue("refType")
+                    if(!groupName.isNullOrEmpty()){
+                        mv.refActionGroups.add(ModelView.RefActionGroup(aApp!!,
+                                aModel!!,aViewType!!,groupName, if(refType.isNullOrEmpty()) ModelViewRefType.Main else refType))
+                    }
+                }
+            }
+
+            (viewNode?.selectNodes("ref/actions/menu") as List<Element>?)?.forEach {
+                val aApp = it.attributeValue("app")?:app
+                val name = it.attributeValue("name")
+                val refType = it.attributeValue("refType")
+                mv.refMenus.add(
+                        ModelView.RefMenu(aApp!!,name,if(refType.isNullOrEmpty()) ModelViewRefType.Main else refType)
+                )
+            }
+
+            (viewNode?.selectNodes("ref/views/view") as List<Element>?)?.forEach {
+                var vApp = it.attributeValue("app")
+                var vModel = it.attributeValue("model")
+                val viewType = it.attributeValue("type")
+                val refType = it.attributeValue("refType")
+                var title = it.attributeValue("title")
+                var style = it.attributeValue("style")
+                val ownerField = it.attributeValue("ownerField")
+                if(!ownerField.isNullOrEmpty()){
+                    var ownerFieldObj = mv.fields.firstOrNull { fd->
+                        fd.name == ownerField
+                    }
+                    if(ownerFieldObj!=null){
+                        vApp=vApp?:ownerFieldObj.app
+                        vModel=vModel?:ownerFieldObj.model
+                        title=title?:ownerFieldObj.title
+                        style = style?:ownerFieldObj.style
+                    }
+                }
+                if(vApp.isNullOrEmpty()){
+                    vApp=app
+                }
+                if(vModel.isNullOrEmpty()){
+                    vModel=model
+                }
+                mv.refViews.add(
+                        ModelView.RefView(vApp,vModel,viewType,ownerField?:"",title?:"",style?:"",if(!refType.isNullOrEmpty()) refType else ModelViewRefType.All)
+                )
             }
             return mv
         }

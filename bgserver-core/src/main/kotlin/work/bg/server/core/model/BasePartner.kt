@@ -17,36 +17,25 @@
 
 package work.bg.server.core.model
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import work.bg.server.core.ModelDataRespository
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.spring.boot.model.AppModel
-import work.bg.server.core.spring.boot.model.ModelWebContext
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import work.bg.server.core.constant.SessionTag
 
-import work.bg.server.core.PartnerContext
-
-import util.MD5
 import work.bg.server.errorcode.ErrorCode
-import work.bg.server.errorcode.jsonFormat
-import com.google.gson.Gson
-import org.springframework.boot.web.servlet.server.Session
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import work.bg.server.core.RefSingleton
-import work.bg.server.core.acrule.ACUIFilter
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldRequired
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCacheKey
+import work.bg.server.core.model.billboard.PartnerTagBillboard
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.specialized.ConstRelRegistriesField
 import work.bg.server.core.spring.boot.model.ActionResult
-import work.bg.server.core.ui.UICache
-import java.math.BigInteger
-import kotlin.reflect.full.memberProperties
 
 
 @Model(name = "partner",title="员工")
@@ -99,11 +88,14 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             "user_comment",
             FieldType.TEXT,
             "用户注释")
+
     val tag=ModelField(null,
             "tag",
             FieldType.BIGINT,
             "用户标识",
-            index = arrayListOf(FieldIndex(unique = true)))
+            index = arrayListOf(FieldIndex(unique = true)),
+            defaultValue = PartnerTagBillboard())
+
     val telephone=ModelField(null,
             "telephone",
             FieldType.STRING,
@@ -120,6 +112,7 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             "access_token_key",
             FieldType.STRING,
             "Token")
+
     val corps=ModelMany2ManyField(null,
             "corp_id",
             FieldType.BIGINT,
@@ -128,6 +121,7 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             "corp_id",
     "public.base_corp",
             "id")
+
     val partnerRoles=ModelMany2ManyField(null,
             "partner_role_id",
             FieldType.BIGINT,
@@ -137,9 +131,34 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
     "public.base_partner_role",
             "id")
 
+    val setCurrentCorpAsDefault by lazy {ProxyRelationModelField<Int>(null,
+            BaseCorpPartnerRel.ref.isDefaultCorp,
+            "set_current_corp_as_default",
+            BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
+            "设定当前公司为默认")}
+
     constructor():this("base_partner","public")
     init {
 
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.userName,this.password,advice = "用户名或密码必须输入的信息！"),
+                ModelFieldRequired(this.email,advice = "用户邮箱必须输入的信息！"),
+                ModelFieldRequired(this.mobile,advice = "用户手机必须输入的信息！"),
+                ModelFieldNotNullOrEmpty(this.userName,this.password,advice = "用户名或密码不能为空！"),
+                ModelFieldRequired(this.email,advice = "用户邮箱不能我为空！"),
+                ModelFieldRequired(this.mobile,advice = "用户手机不能我为空！")
+        )
+    }
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.userName,advice = "用户名必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
+                ModelFieldUnique(this.mobile,advice = "用户手机号必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
+                ModelFieldUnique(this.email,advice = "用户邮箱必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL)
+        )
     }
     @Action(name="login")
     fun login(@RequestParam userName:String,@RequestParam password:String,@RequestParam devType:Int,session:HttpSession):ActionResult?{

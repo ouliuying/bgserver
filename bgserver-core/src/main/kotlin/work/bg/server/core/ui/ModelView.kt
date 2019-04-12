@@ -19,9 +19,14 @@ package work.bg.server.core.ui
 
 import com.google.gson.JsonObject
 import org.dom4j.dom.DOMElement
+import work.bg.server.core.mq.*
+import work.bg.server.core.spring.boot.model.AppModel
 
 class ModelView(val app:String?,val model:String?,val viewType:String?) {
     var fields:ArrayList<Field> = arrayListOf()
+    var refActionGroups:ArrayList<RefActionGroup> = arrayListOf()
+    var refMenus:ArrayList<RefMenu> = arrayListOf()
+    var refViews:ArrayList<RefView> = arrayListOf()
     var visible=1
     var enable = 1
     var meta:JsonObject?=null
@@ -39,9 +44,83 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                  type:String,
                  title:String,
                  icon:String):Field{
+
         var f=Field(this,name,style,rowSpan,colSpan,type)
         f.title=title
+        if(f.title.isNullOrEmpty()){
+            if(name.indexOf(".")>-1){
+                var (propertyName,toPropertyName) = name.split(".")
+                val fd = AppModel.ref.getModel(app!!,model!!)?.fields?.getFieldByPropertyName(propertyName)
+                f.title =if(fd?.title != null) fd!!.title!! else ""
+            }
+            else{
+                val fd = AppModel.ref.getModel(app!!,model!!)?.fields?.getFieldByPropertyName(name)
+                f.title =if(fd?.title != null) fd!!.title!! else ""
+            }
+        }
         f.icon=icon
+        if(name.indexOf(".")>-1){
+            try {
+                val model= AppModel.ref.getModel(this.app!!,this.model!!)
+                var (propertyName,toPropertyName) = name.split(".")
+                f.name=propertyName
+                val mField = model?.getFieldByPropertyName(propertyName)
+                if(mField!=null){
+                    f.relationData=when(mField){
+                        is Many2ManyField->{
+                            val rModel = AppModel.ref.getModel(mField.relationModelTable!!)
+                            val rField = rModel?.fields?.getField(mField.relationModelFieldName)
+                            var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
+                            var tField=tModel?.fields?.getField(mField.targetModelFieldName)
+                            if(rModel!=null && rField!=null && tModel!=null && tField!=null){
+                                 RelationData(tModel.meta.appName,tModel.meta.name,tField.propertyName,
+                                        rModel.meta.appName,rModel.meta.name,rField.propertyName,RelationType.Many2Many,toPropertyName)
+                            }
+                            else{
+                                null
+                            }
+                        }
+                        is Many2OneField->{
+                            var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
+                            var tField=tModel?.fields?.getField(mField.targetModelFieldName)
+                            if(tModel!=null && tField!=null){
+                                RelationData(tModel.meta.appName,tModel.meta.name,tField.propertyName,
+                                       "","","",RelationType.Many2One,toPropertyName)
+                            }
+                            else{
+                                null
+                            }
+                        }
+                        is One2ManyField->{
+                            var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
+                            var tField=tModel?.fields?.getField(mField.targetModelFieldName)
+                            if(tModel!=null && tField!=null){
+                                RelationData(tModel.meta.appName,tModel.meta.name,tField.propertyName,
+                                        "","","",RelationType.One2Many,toPropertyName)
+                            }
+                            else{
+                                null
+                            }
+                        }
+                        is One2OneField->{
+                            var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
+                            var tField=tModel?.fields?.getField(mField.targetModelFieldName)
+                            if(tModel!=null && tField!=null){
+                                RelationData(tModel.meta.appName,tModel.meta.name,tField.propertyName,
+                                        "","","",if(mField.isVirtualField) RelationType.VirtualOne2One else RelationType.One2One,toPropertyName)
+                            }
+                            else{
+                                null
+                            }
+                        }
+                        else-> null
+                    }
+                }
+            }
+            catch (ex:Exception){
+
+            }
+        }
         this.fields.add(f)
         return f
     }
@@ -56,6 +135,15 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
             cpyChildren.add(it.createCopy())
         }
         mv.fields=cpyChildren
+        this.refActionGroups.forEach {
+            mv.refActionGroups.add(it.createCopy())
+        }
+        this.refMenus.forEach {
+            mv.refMenus.add(it.createCopy())
+        }
+        this.refViews.forEach {
+            mv.refViews.add(it.createCopy())
+        }
         return mv
     }
     enum class  RelationType(type:Int){
@@ -75,7 +163,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                             val toName:String?=null)
 
      class Field(private val modelView:ModelView,
-                 val name:String,
+                 var name:String,
                  val style:String,
                  val rowSpan:Int,
                  val colSpan:Int,
@@ -90,12 +178,14 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          }
          object ViewFieldType{
              const val many2OneDataSetSelect="many2OneDataSetSelect"
+             const val many2ManyDataSetSelect = "many2ManyDataSetSelect"
          }
          var title:String=""
          var icon:String=""
          var visible:Int=1
          var enable = 1
          var relationData:RelationData?=null
+         var targetFields:Array<Field>?=null
          var fieldView:ModelView?=null
          var meta:JsonObject?=null
          fun createCopy():Field{
@@ -113,5 +203,50 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          val app=this.modelView.app
          val viewType=this.modelView.viewType
     }
+    class RefActionGroup(val app:String,
+                         val model:String,
+                         val viewType:String,
+                         val groupName:String,
+                         val refType:String){
+        fun createCopy():RefActionGroup{
+            return RefActionGroup(
+                    app,
+                    model,
+                    viewType,
+                    groupName,
+                    refType
+            )
+        }
+    }
+    class RefView(val app:String,
+                  val model:String,
+                  val viewType:String,
+                  val fieldName:String,
+                  val title:String,
+                  val style:String,
+                  val refType:String){
+        fun createCopy():RefView{
+            return RefView(
+                    app,
+                    model,
+                    viewType,
+                    fieldName,
+                    title,
+                    style,
+                    refType
+            )
+        }
+    }
 
+    class RefMenu(val app:String,
+                  val name:String,
+                  val refType:String){
+        fun createCopy():RefMenu{
+            return RefMenu(
+                    app,
+                    name,
+                    refType
+            )
+        }
+    }
 }

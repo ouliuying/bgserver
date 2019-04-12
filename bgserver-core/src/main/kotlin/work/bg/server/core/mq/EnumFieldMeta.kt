@@ -17,4 +17,4 @@
 
 package work.bg.server.core.mq
 
-class EnumFeildMeta(val value:Any,val title:String)
+class EnumFieldMeta(val value:Any, val title:String)

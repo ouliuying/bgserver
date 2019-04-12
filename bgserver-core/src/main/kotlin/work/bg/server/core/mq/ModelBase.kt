@@ -206,7 +206,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
             else->null
         }
     }
-    protected open fun delete(modelData: ModelData, criteria:ModelExpression?=null):Long?{
+   open fun delete(modelData: ModelData, criteria:ModelExpression?=null):Long?{
         var rData=work.bg.server.core.mq.delete(modelData.model!!).where(criteria).render(null)
         var parameters=this.fieldValueToParameters(rData?.second)
         var ret= if(parameters!=null)
@@ -227,7 +227,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     }
 
 
-    protected open fun update(modelDataObject: ModelDataObject, criteria:ModelExpression?=null):Long?{
+    open fun update(modelDataObject: ModelDataObject, criteria:ModelExpression?=null):Long?{
         var rData=mqUpdate(*modelDataObject.data.toTypedArray(),setModel = modelDataObject.model!!).where(criteria).render(null)
         var parameters=this.fieldValueToParameters(rData?.second)
         var uRet= if(parameters!=null)
@@ -242,7 +242,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     }
 
 
-    protected open fun create(modelDataObject:ModelDataObject):Long?{
+    open fun create(modelDataObject:ModelDataObject):Long?{
         var rData=mqCreate(*modelDataObject.data.toTypedArray(),model=modelDataObject.model!!).render(null)
         var parameters=this.fieldValueToParameters(rData?.second)
         return if (parameters!=null){
@@ -262,7 +262,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
 
     }
 
-    protected open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Map<String,FieldValue>?=null):ModelDataArray?{
+    open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Map<String,FieldValue>?=null):ModelDataArray?{
         var kParameters=this.fieldValueToParameters(parameters)
         if(kParameters!=null)
             return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<ModelDataArray?> {
@@ -283,7 +283,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 mda
             })
     }
-    protected  open fun queryCount(select:SelectStatement):Int{
+    open fun queryCount(select:SelectStatement):Int{
         var render = select.render(null)
         var kParameters=this.fieldValueToParameters(render!!.second)
         var sql=render!!.first
@@ -299,7 +299,23 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
             })
     }
 
-    protected open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Array<FieldValue>?=null):ModelDataArray?{
+   open fun queryMax(select:SelectStatement):Long?{
+        var render = select.render(null)
+        var kParameters=this.fieldValueToParameters(render!!.second)
+        var sql=render!!.first
+        return if(kParameters!=null)
+            return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<Long?> {
+                it.next()
+                it.getLong(1)
+            })
+        else
+            return this.namedParameterJdbcTemplate?.query(sql, ResultSetExtractor<Long?> {
+                it.next()
+                it.getLong(1)
+            })
+    }
+
+    open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Array<FieldValue>?=null):ModelDataArray?{
         return if(parameters!=null && !parameters.isEmpty()){
             var mParameters= mutableMapOf<String,FieldValue>()
             parameters.forEach {
@@ -313,7 +329,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         }
     }
 
-    protected open fun executeSql(sql:String,parameters:Map<String,FieldValue>?=null):Boolean?{
+    open fun executeSql(sql:String,parameters:Map<String,FieldValue>?=null):Boolean?{
 
         var tParameters=this.fieldValueToParameters(parameters)
         return if (tParameters!=null)
@@ -330,7 +346,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         }
     }
 
-    protected open fun executeSql(sql:String,parameters:Array<FieldValue>?=null):Boolean?{
+    open fun executeSql(sql:String,parameters:Array<FieldValue>?=null):Boolean?{
         return if(parameters!=null){
             var mParameters= mutableMapOf<String,FieldValue>()
             parameters.forEach {

@@ -17,6 +17,6 @@
 
 package work.bg.server.core.mq
 
-class ModelEnumField constructor(model:ModelBase, name:String, fieldTyp:FieldType,title:String?, override val enumMetas: Array<EnumFeildMeta>,val defautlValue:EnumFeildMeta?=null,val ignoreValue:EnumFeildMeta?=null):ModelField(model,name,fieldTyp,title),EnumField{
+class ModelEnumField constructor(model:ModelBase, name:String, fieldTyp:FieldType, title:String?, override val enumMetas: Array<EnumFieldMeta>, val defautlValue:EnumFieldMeta?=null, val ignoreValue:EnumFieldMeta?=null):ModelField(model,name,fieldTyp,title),EnumField{
 
 }

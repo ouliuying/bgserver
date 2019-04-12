@@ -18,15 +18,13 @@
 package work.bg.server.core.cache
 
 import work.bg.server.core.acrule.AccessControlRule
+import work.bg.server.core.acrule.ModelEditAccessControlRule
 import work.bg.server.core.model.*
 import work.bg.server.core.spring.boot.model.AppModel
 import java.util.concurrent.locks.StampedLock
 import work.bg.server.core.context.ModelExpressionContext
 import work.bg.server.core.mq.*
-import work.bg.server.core.ui.MenuNode
-import work.bg.server.core.ui.MenuTree
-import work.bg.server.core.ui.ModelView
-import work.bg.server.core.ui.UICache
+import work.bg.server.core.ui.*
 
 class PartnerCache(partnerData:Map<String,Any?>?,
                    val partnerID:Long,
@@ -94,6 +92,24 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     inline  fun <reified T>  getModelCreateAccessControlRules(model:ModelBase):List<T>?{
         return this.currRole?.getModelCreateAccessControlRules(model)
     }
+    inline  fun <reified T> getModelReadAccessControlRules(model:ModelBase):List<T>?{
+        return this.currRole?.getModelReadAccessControlRules(model)
+    }
+    inline fun <reified T> getModelEditAccessControlRules(model:ModelBase):List<T>?{
+        return this.currRole?.getModelEditAccessControlRules(model)
+    }
+    inline fun <reified T> getModelDeleteAccessControlRules(model:ModelBase):List<T>?{
+        return this.currRole?.getModelDeleteAccessControlRules(model)
+    }
+    fun  checkEditBelongToPartner(model:ModelBase):Boolean{
+         val editRule = this.getEditModelRule(model.meta.appName,model.meta.name)
+         return  if(editRule?.checkBelongToPartner!=null) editRule?.checkBelongToPartner > 0 else false
+    }
+
+    fun  checkReadBelongToPartner(model:ModelBase):Boolean{
+        val readRule = this.getReadModelRule(model.meta.appName,model.meta.name)
+        return  if(readRule?.checkBelongToPartner!=null) readRule?.checkBelongToPartner > 0 else false
+    }
 
     private  fun buildCorpCache(corpID:Long,
                                 corpObject:ModelDataObject,
@@ -107,11 +123,21 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         return CorpCache(corpID,name, mapOf(role.id to role))
     }
 
-
-    fun getCreateModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule?{
+    fun getModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule?{
         return this.currRole?.appRules?.get(app)?.modelRules?.get(model)
     }
-
+    fun getCreateModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule.CreateAction?{
+        return this.currRole?.appRules?.get(app)?.modelRules?.get(model)?.createAction
+    }
+    fun getDeleteModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule.DeleteAction?{
+        return this.currRole?.appRules?.get(app)?.modelRules?.get(model)?.deleteAction
+    }
+    fun getEditModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule.EditAction?{
+        return this.currRole?.appRules?.get(app)?.modelRules?.get(model)?.editAction
+    }
+    fun getReadModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule.ReadAction?{
+        return this.currRole?.appRules?.get(app)?.modelRules?.get(model)?.readAction
+    }
 
     fun getContextValue(contextKey:String):Pair<Boolean,Any?>{
         return this.modelExpressionContext.valueFromContextKey(contextKey)
@@ -259,6 +285,57 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                 return this.applyViewRule(cloneMV,vRule)
             }
             return mv
+        }
+        return null
+    }
+
+    fun getAccessControlModelViewActionGroup(app:String,model:String,viewType:String,groupName:String):TriggerGroup?{
+        var va = UICache.ref.getViewAction(app,model,viewType,groupName)
+        //todo add access control
+        if(va!=null){
+            var tg = va.groups[groupName]
+            var tgRule = this.getActionGroupRule(tg,app,model,viewType)?.groupRules?.get(groupName)
+            if(tg!=null && tgRule!=null){
+                var cloneTG = tg.createCopy()
+                if(tgRule.visible==0){
+                    return null
+                }
+                tg.enable=tgRule.enable
+                tgRule.triggerRules.forEach { t, u ->
+                    var t=cloneTG.triggers.firstOrNull {tit->
+                        tit.name==u.name && tit.app == u.app && tit.model==u.model && tit.viewType == u.viewType
+                    }
+                    if(t!=null){
+                        t.enable=u.enable
+                        t.visible=u.visible
+                    }
+                }
+                return cloneTG
+            }
+            return tg
+        }
+        return null
+    }
+    fun getActionGroupRule(tg:TriggerGroup?,app:String,model:String,viewType:String):CorpPartnerRoleCache.ActionRule?{
+        if(tg==null){
+            return null
+        }
+        if(this.currRole?.actionRules!=null){
+            return this.getActionGroupRuleImp(tg,app,model,viewType)
+        }
+        return null
+    }
+    private fun getActionGroupRuleImp(tg:TriggerGroup,app:String,model:String,viewType:String):CorpPartnerRoleCache.ActionRule?{
+        var tag ="$app.$model.$viewType"
+        var ar= this.currRole?.actionRules?.get(tag)
+        if(ar!=null){
+            return ar
+        }
+        if(app!="*" && model!="*"){
+            return this.getActionGroupRuleImp(tg,"*",model,viewType)
+        }
+        if(app=="*" && model!="*"){
+            return this.getActionGroupRuleImp(tg,"*","*",viewType)
         }
         return null
     }

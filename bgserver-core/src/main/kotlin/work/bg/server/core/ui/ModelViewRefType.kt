@@ -15,8 +15,13 @@
  *
  */
 
-package work.bg.server.core.mq
+package work.bg.server.core.ui
 
-class ModelFunctionField constructor(model:ModelBase,name:String,title:String?,override val depFields:Array<in ModelField>):ModelField(model,name,FieldType.NONE,title),FunctionField{
-
+class ModelViewRefType {
+    companion object {
+        const val All = "all"
+        const val Main = "main"
+        const val Sub = "sub"
+        const val Embedded = "embedded"
+    }
 }

@@ -27,11 +27,12 @@ class DepartmentPartner:BasePartner() {
     companion object : RefSingleton<BasePartner> {
         override lateinit var ref: BasePartner
     }
-    val department = ModelMany2OneField(null,
+    val departments = ModelMany2ManyField(null,
             "department_id",
             FieldType.BIGINT,
             "部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
+            relationModelTable = "public.department_partner_rel",
+            relationModelFieldName = "department_id")
 }

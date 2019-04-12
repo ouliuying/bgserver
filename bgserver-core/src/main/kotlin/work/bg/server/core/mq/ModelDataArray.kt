@@ -22,4 +22,10 @@ class ModelDataArray(override var data:ArrayList<FieldValueArray> = arrayListOf(
     override  fun isArray(): Boolean {
         return true
     }
+    fun firstOrNull():ModelDataObject?{
+        if(this.data.count()>0){
+            return ModelDataObject(this.data.first(),this.model,this.fields)
+        }
+        return null
+    }
 }

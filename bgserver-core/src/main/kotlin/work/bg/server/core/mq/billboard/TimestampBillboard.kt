@@ -22,7 +22,7 @@ import java.util.Date
 class TimestampBillboard(override  val constant:Boolean=false):
         FieldDefaultValueBillboard,
         ConstantFieldBillboard{
-    override fun look(glass:Any?): Date {
+    override fun looked(glass:Any?): Date {
        return (glass as Date?)?: Date()
     }
 }

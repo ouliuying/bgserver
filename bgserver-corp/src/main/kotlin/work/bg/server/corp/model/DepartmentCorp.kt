@@ -19,22 +19,20 @@ package work.bg.server.corp.model
 
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.BaseCorp
-import work.bg.server.core.mq.FieldForeignKey
 import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ForeignKeyAction
 import work.bg.server.core.mq.ModelOne2ManyField
+import work.bg.server.core.mq.One2ManyField
 import work.bg.server.core.spring.boot.annotation.Model
 
-@Model("departmentCorp", "公司")
-class DepartmentCorp:BaseCorp() {
-        companion object : RefSingleton<DepartmentCorp> {
-                override lateinit var ref: DepartmentCorp
-        }
-        val departments = ModelOne2ManyField(null,
-                "department_corp_id",
-                FieldType.BIGINT,
-                "部门",
-                targetModelTable = "public.corp_department",
-                targetModelFieldName = "corp_id",
-                foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+@Model("corp", "公司")
+class DepartmentCorp :BaseCorp(){
+    companion object : RefSingleton<DepartmentCorp> {
+        override lateinit var ref: DepartmentCorp
+    }
+
+    val departments = ModelOne2ManyField(null,
+            "department_id",FieldType.BIGINT,
+            "部门",
+            targetModelTable = "public.department",
+            targetModelFieldName = "id")
 }

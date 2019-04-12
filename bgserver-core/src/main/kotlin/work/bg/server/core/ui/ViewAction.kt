@@ -22,12 +22,15 @@ data class Trigger(val name:String,
                    var app:String,
                    var model:String,
                    var viewType:String){
+    var enable:Int=1
+    var visible:Int=1
     fun createCopy():Trigger{
         return Trigger(name,title,app,model,viewType)
     }
 }
 data class TriggerGroup(val name:String,
                         var triggers:ArrayList<Trigger> = arrayListOf()){
+    var enable:Int=1
     fun createCopy():TriggerGroup{
         var tg=TriggerGroup(name)
         this.triggers.forEach {

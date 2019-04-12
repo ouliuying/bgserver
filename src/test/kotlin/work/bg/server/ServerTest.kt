@@ -96,6 +96,21 @@ class HttpRequestTest {
         }
         print(obj)
     }
+
+    @Test
+    fun addDepartment(){
+        var inputStream=this.javaClass.classLoader.getResourceAsStream("add_department.json")
+        var path=System.getProperty("user.dir")
+        print(path)
+        var bts=inputStream.readBytes()
+        var json=String(bts)
+        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        if(obj!=null){
+            BasePartner.ref?.safeCreate(obj)
+        }
+        print(obj)
+    }
+
     @Test
     fun addAppShortcut(){
         var inputStream=this.javaClass.classLoader.getResourceAsStream("app_shortcut.json")
@@ -145,5 +160,18 @@ class HttpRequestTest {
             var json=gson?.toJson(modelView)
             print(json)
         }
+    }
+    @Test
+    fun addPartnerRelData(){
+        var inputStream=this.javaClass.classLoader.getResourceAsStream("test_add_partner_rel_data.json")
+        var path=System.getProperty("user.dir")
+        print(path)
+        var bts=inputStream.readBytes()
+        var json=String(bts)
+        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        if(obj!=null){
+            BasePartner.ref?.safeCreate(obj)
+        }
+        print(obj)
     }
 }

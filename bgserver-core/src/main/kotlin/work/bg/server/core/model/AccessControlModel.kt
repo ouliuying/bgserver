@@ -22,6 +22,7 @@ package work.bg.server.core.model
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.DefaultTransactionDefinition
 import work.bg.server.core.cache.PartnerCache
@@ -30,16 +31,12 @@ import work.bg.server.core.mq.`in` as selectIn
 import work.bg.server.core.mq.join.JoinModel
 import work.bg.server.core.mq.join.leftJoin
 import org.springframework.transaction.TransactionDefinition
-import work.bg.server.core.acrule.ModelCreateFieldsValueFilterRule
-import work.bg.server.core.acrule.ModelCreateRecordFieldsInitializeRule
-import work.bg.server.core.acrule.ModelCreateRecordFieldsValueCheckControlRule
-import work.bg.server.core.acrule.ModelCreateRecordFieldsValueCheckInStoreControlRule
-import work.bg.server.core.acrule.bean.ModelCreateFieldsInspectorCheckBean
-import work.bg.server.core.acrule.bean.ModelCreateFieldsSetIsolationFieldsBean
-import work.bg.server.core.acrule.bean.PartnerModelCreateFieldsInStoreInspectorCheckBean
+import work.bg.server.core.acrule.*
+import work.bg.server.core.acrule.bean.*
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.constant.ModelReservedKey
 import work.bg.server.core.exception.ModelErrorException
+import work.bg.server.core.mq.aggregation.MaxExpression
 import work.bg.server.core.mq.billboard.CurrCorpBillboard
 import work.bg.server.core.mq.billboard.CurrPartnerBillboard
 import work.bg.server.core.mq.billboard.FieldDefaultValueBillboard
@@ -70,15 +67,30 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected lateinit var txManager:PlatformTransactionManager
 
     @Autowired
-    protected  lateinit var createRecordSetIsolationFields: ModelCreateFieldsSetIsolationFieldsBean
-
+    protected  lateinit var createRecordSetIsolationFields: ModelCreateFieldsSetIsolationFieldsValueBean
+    @Autowired
+    protected  lateinit var createFieldsProcessProxyModelField: ModelCreateFieldsProcessProxyModelFieldBeanValue
     @Autowired
     protected lateinit var modelCreateFieldsInspectorCheck: ModelCreateFieldsInspectorCheckBean
 
     @Autowired
-    protected lateinit var partnerModelCreateFieldsInStoreInspectorCheck: PartnerModelCreateFieldsInStoreInspectorCheckBean
+    protected lateinit var modelEditFieldsInspectorCheck: ModelEditFieldsInspectorCheckBean
 
+    @Autowired
+    protected lateinit var modelEditFieldsBelongToPartnerCheck: ModelEditFieldsBelongToPartnerCheckBean
 
+    @Autowired
+    protected lateinit var modelCreateFieldsInStoreInspectorCheck: ModelCreateFieldsInStoreInspectorCheckBean
+
+    @Autowired
+    protected lateinit var modelEditFieldsInStoreInspectorCheck: ModelEditFieldsInStoreInspectorCheckBean
+
+    @Autowired
+    protected  lateinit var  modelDeleteFieldsBelongToPartnerCheck:ModelDeleteFieldsBelongToPartnerCheckBean
+    @Autowired
+    protected lateinit var readCorpIsolation:ModelReadCorpIsolationBean
+    @Autowired
+    protected lateinit var readPartnerIsolation:ModelReadPartnerIsolationBean
 
     /*Corp Isolation Fields Begin*/
     val createTime=ModelField(null,"create_time",FieldType.DATETIME,"添加时间",defaultValue = TimestampBillboard(constant = true))
@@ -117,7 +129,6 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         return true
     }
-
 
     fun acRead(vararg fields:FieldBase,
                model:ModelBase?=null,
@@ -168,12 +179,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
     open fun beforeRead(criteria:ModelExpression?,useAccessControl:Boolean,partnerCache: PartnerCache?=null):ModelExpression?{
         if (useAccessControl && partnerCache!=null){
-            if(!this.skipCorpIsolationFields()){
-                var readCriteria=eq(this.createCorpID,partnerCache.corpID)
-                if(criteria!=null){
-                    readCriteria=and(criteria,readCriteria!!)
+            if(partnerCache.checkReadBelongToPartner(this)){
+                var ruleCriteria=criteria
+                ruleCriteria = this.readCorpIsolation(this,partnerCache,ruleCriteria)
+                ruleCriteria = this.readPartnerIsolation(this,partnerCache,ruleCriteria)
+                val isolationRules = partnerCache.getModelReadAccessControlRules<ModelReadIsolationRule<*>>(this)
+                isolationRules?.forEach {
+                    ruleCriteria = it(this,partnerCache,ruleCriteria)
                 }
-                return smartReconcileCriteria(readCriteria)
+                return  return smartReconcileCriteria(ruleCriteria)
             }
         }
         else if(useAccessControl){
@@ -181,7 +195,24 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return criteria
     }
-
+    open fun filterAcModelFields(fields:Array<FieldBase>,model:ModelBase,partnerCache: PartnerCache?):Array<FieldBase>{
+        if(partnerCache!=null){
+            var rFields = arrayListOf<FieldBase>()
+            val rule=partnerCache.getModelRule(model.meta.appName,model.meta.name)
+            rule?.let {
+                fields.forEach {f->
+                    val fr = it.fieldRules[f.propertyName]
+                    if(fr!=null){
+                        if(fr.readAction.enable>0){
+                            rFields.add(f)
+                        }
+                    }
+                }
+                return rFields.toArray() as Array<FieldBase>
+            }
+        }
+        return fields
+    }
     open fun rawRead(vararg fields:FieldBase,
                      model:ModelBase?=null,
                      criteria:ModelExpression?,
@@ -208,6 +239,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return null
         }
 
+        var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.let {
+            if(it.readAction.enable<1){
+                return null
+            }
+        }
         var fs=ArrayList<FieldBase>()
         var o2ofs=ArrayList<FieldBase>()
         var o2mfs=ArrayList<AttachedField>()
@@ -216,7 +253,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(fields.isEmpty()){
             var pFields= model?.fields?.getAllPersistFields()?.values?.toTypedArray()
             if(partnerCache!=null){
-               // pFields=partnerCache.acFilterReadFields(pFields!!)
+                pFields=this.filterAcModelFields(pFields,model=this,partnerCache=partnerCache)
             }
             if(pFields!=null){
                 pFields?.forEach {
@@ -242,11 +279,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
         else{
-            var pFields: Array<FieldBase>?=null
+            var pFields: Array<FieldBase>?= fields as Array<FieldBase>?
             pFields = if(useAccessControl){
                // partnerCache?.acFilterReadFields(fields as Array<FieldBase>)
                 pFields
-            } else fields as Array<FieldBase>?
+            } else fields
             pFields?.forEach {
                 when(it){
                         is One2OneField ->{
@@ -322,6 +359,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(pageIndex!=null){
             limit= pageSize ?: this.pageSize
             offset=(pageIndex-1)*limit
+            if(offset<0){
+                offset=0
+            }
             if(newOrderBy==null){
                 newOrderBy=model?.fields?.getDefaultOrderBy()
             }
@@ -855,6 +895,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(useAccessControl && partnerCache==null){
             return Pair(0,"权限接口没有提供操作用户信息")
         }
+        var errorMessage="添加失败" as String?
         val def = DefaultTransactionDefinition()
         def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
         val status = txManager?.getTransaction(def)
@@ -869,8 +910,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 txManager?.commit(status)
                 return Pair(id,null)
             }
+            errorMessage=errMsg
         } catch (ex: Exception) {
             logger.error(ex.message)
+            errorMessage=ex.message
         }
         try
         {
@@ -879,36 +922,56 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         catch(ex:Exception)
         {
+            errorMessage=ex.message
             logger.error(ex.message)
         }
-
-        return Pair(0,"添加失败")
+        return Pair(0,errorMessage)
     }
 
     open fun getCreateFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null):FieldValue?{
-
-            return when(value){
-                is ModelDataObject->{
-                    return if(value.idFieldValue!=null){
-                         FieldValue(field,value.idFieldValue?.value)
+            return when (field) {
+                is ProxyRelationModelField<*> -> null
+                else -> when(value){
+                    is ModelDataObject->{
+                        return if(value.idFieldValue!=null){
+                            FieldValue(field,value.idFieldValue?.value)
+                        } else{
+                            null//FieldValue(field,null)
+                        }
                     }
-                    else{
-                         FieldValue(field,null)
+                    is FieldDefaultValueBillboard->{
+                        when(value){
+                            is CurrCorpBillboard-> FieldValue(field,value.looked(partnerCache))
+                            is CurrPartnerBillboard->FieldValue(field,value.looked(partnerCache))
+                            else-> FieldValue(field,value.looked(null))
+                        }
                     }
-                }
-                is FieldDefaultValueBillboard->{
-                    when(value){
-                        is CurrCorpBillboard-> FieldValue(field,value.look(partnerCache))
-                        is CurrPartnerBillboard->FieldValue(field,value.look(partnerCache))
-                        else-> FieldValue(field,value.look(null))
+                    else->{
+                        if(value!=null) FieldValue(field,value) else null
                     }
-                }
-                else->{
-                     FieldValue(field,value)
                 }
             }
-
     }
+
+
+    open fun getEditFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null):FieldValue?{
+        return when (field) {
+            is ProxyRelationModelField<*> -> null
+            else -> when(value){
+                is ModelDataObject->{
+                        null
+                }
+                is FieldDefaultValueBillboard->{
+                   null
+
+                }
+                else->{
+                    if(value!=null) FieldValue(field,value) else null
+                }
+            }
+        }
+    }
+
 
     open fun rawCreate(data:ModelData,
                        useAccessControl: Boolean=false,
@@ -934,7 +997,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var obj=ModelDataObject(d,model=modelDataArray.model,fields = modelDataArray.fields)
             obj.context=modelDataArray.context
             var ret=(modelDataArray.model as AccessControlModel).rawCreateObject(obj,useAccessControl,partnerCache)
-            if(ret.first==null || ret.second!=null){
+            if(ret.first==null|| ret.second!=null){
                 return ret
             }
         }
@@ -968,7 +1031,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun runCreateFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
 
-        var modelRule = partnerCache.getCreateModelRule(model.meta.appName,model.meta.name)
+        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.let {
+            if(it.createAction.enable<1){
+
+            }
+        }
         modelRule?.fieldRules?.forEach { _, u ->
             if(u.createAction.enable==1) {
                 if(u.createAction.setValue!=null){
@@ -981,13 +1049,38 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
 
-        var filterRules = partnerCache.getModelCreateAccessControlRules<ModelCreateFieldsValueFilterRule<*>>(model)
+        var filterRules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueFilterRule<*>>(model)
 
         filterRules?.forEach {
             it(modelDataObject,partnerCache,null)
         }
 
     }
+
+    protected  open fun runEditFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
+        val model = modelDataObject.model?:this
+
+        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.fieldRules?.forEach { _, u ->
+            if(u.editAction.enable==1) {
+                if(u.editAction.setValue!=null){
+                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.setValue,partnerCache))
+                } else if(u.editAction.defalut!=null && !modelDataObject.hasFieldValue(u.field)){
+                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.defalut,partnerCache))
+                }
+            } else{
+                modelDataObject.removeFieldValue(u.field)
+            }
+        }
+
+        var filterRules = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueFilterRule<*>>(model)
+
+        filterRules?.forEach {
+            it(modelDataObject,partnerCache,null)
+        }
+
+    }
+
     protected open  fun getValueFromPartnerContextConstKey(value:String?,partnerCache:PartnerCache):String? {
         if(value.isNullOrEmpty()){
             return value
@@ -1008,13 +1101,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
     protected open fun runCreateFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
         val model = modelDataObject.model?:this
+
+        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.let {
+            if(it.createAction.enable<1){
+                return Pair(false,"没有添加权限")
+            }
+        }
+
         var inspectors=this.getModelCreateFieldsInspectors()
         var ret = modelCreateFieldsInspectorCheck(modelDataObject,partnerCache,inspectors)
         if(!ret.first){
             return ret
         }
 
-        var modelCreateFieldsChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckControlRule<*>>(model)
+        var modelCreateFieldsChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckRule<*>>(model)
 
         modelCreateFieldsChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
@@ -1025,13 +1126,65 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
 
         inspectors = this.getModelCreateFieldsInStoreInspectors()
-        ret =partnerModelCreateFieldsInStoreInspectorCheck(modelDataObject,partnerCache,inspectors)
+        ret =modelCreateFieldsInStoreInspectorCheck(modelDataObject,partnerCache,inspectors)
         if(!ret.first){
             return ret
         }
 
-        var modelCreateFieldsInStoreChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckInStoreControlRule<*>>(model)
+        var modelCreateFieldsInStoreChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckInStoreRule<*>>(model)
         modelCreateFieldsInStoreChecks?.forEach {
+            ret = it(modelDataObject,partnerCache,null)
+            if(!ret.first){
+                return ret
+            }
+        }
+
+        return Pair(true,null)
+    }
+
+    protected  open fun getModelEditFieldsInspectors():Array<ModelFieldInspector>?{
+        return null
+    }
+    protected  open fun getModelEditFieldsInStoreInspectors():Array<ModelFieldInspector>?{
+        return null
+    }
+    protected open fun runEditFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
+        val model = modelDataObject.model?:this
+
+        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.let {
+            if(it.editAction.enable<1){
+                return Pair(false,"没有更新权限")
+            }
+        }
+        var inspectors=this.getModelEditFieldsInspectors()
+        var ret = modelEditFieldsInspectorCheck(modelDataObject,partnerCache,inspectors)
+        if(!ret.first){
+            return ret
+        }
+
+        var modelEditFieldsChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckRule<*>>(model)
+
+        modelEditFieldsChecks?.forEach {
+            ret = it(modelDataObject,partnerCache,null)
+            if(!ret.first){
+                return ret
+            }
+        }
+
+        ret = modelEditFieldsBelongToPartnerCheck(modelDataObject,partnerCache,null)
+        if(!ret.first){
+            return ret
+        }
+
+        inspectors = this.getModelEditFieldsInStoreInspectors()
+        ret =modelEditFieldsInStoreInspectorCheck(modelDataObject,partnerCache,inspectors)
+        if(!ret.first){
+            return ret
+        }
+
+        var modelEditFieldsInStoreChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckInStoreRule<*>>(model)
+        modelEditFieldsInStoreChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
             if(!ret.first){
                 return ret
@@ -1044,8 +1197,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected open fun runCreateFieldsInitializeRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
         this.createRecordSetIsolationFields(modelDataObject,partnerCache)
+        this.createFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
 
-        var rules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsInitializeRule<*>>(model)
+        var rules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueInitializeRule<*>>(model)
         rules?.forEach {
             it(modelDataObject,partnerCache,null)
         }
@@ -1076,7 +1230,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var ret= this.beforeCreateObject(modelDataObject,useAccessControl,partnerCache)
         if(!ret.first){
-            Pair(null,ret.second)
+            return Pair(null,ret.second)
         }
 
 //        var (result,errorMsg)=this.beforeCreateCheck(modelDataObject,useAccessControl = useAccessControl,partnerCache = partnerCache)
@@ -1100,6 +1254,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             var idField=it.value?.model?.fields?.getIdField()
                             it.value.data.add(FieldValue(idField!!,id?.first))
                         }
+                        else if(it.value.hasNormalField()){
+                            it.value.context=modelDataObject.context
+                            var id=(it.value.model as AccessControlModel?)?.rawEdit(it.value,null,useAccessControl,partnerCache)
+                            if(id==null ||id.second!=null){
+                                return id?:Pair(null,"创建失败")
+                            }
+                        }
                     }
                 }
             }
@@ -1119,7 +1280,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return try {
             var fVCShadow=ModelDataObject(model=modelDataObject.model)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
-                if((it is ModelFunctionField) || (it is ModelOne2ManyField)
+                if((it is FunctionField<*>) || (it is ModelOne2ManyField)
                         ||(it is ModelMany2ManyField)){
                     return@forEach
                 }
@@ -1129,11 +1290,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
                 if (fv == null) {
                     if (oit.defaultValue != null) {
-                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue)
-                        if(acFV!=null){
-                            fVCShadow.data.add(acFV)
-                        }
+                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache)
+                            acFV?.let { fVCShadow.data.add(acFV) }
                     }
+                }
+                else{
+                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache)
+                    tFV?.let { fVCShadow.data.add(tFV) }
                 }
             }
             var nID=this.create(fVCShadow)
@@ -1160,7 +1323,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             fv.value.context=modelDataObject.context
                             var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,useAccessControl,partnerCache)
                             if (o2m==null || o2m.second!=null){
-                                return  Pair(null,"创建失败")
+                                return  Pair(null,o2m?.second?:"创建失败")
                             }
                         }
                         else if(fv.value is ModelDataArray){
@@ -1242,9 +1405,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //        return Pair(true,null)
 //    }
 
-    protected  open fun beforeEditCheck(filedValueCollection:ModelData,
+    protected  open fun beforeEditCheck(modelDataObject:ModelDataObject,
                                      useAccessControl: Boolean,
                                      partnerCache:PartnerCache?):Pair<Boolean,String?>{
+
+        if(useAccessControl || partnerCache!=null){
+            if(partnerCache==null){
+                return Pair(false,"权限接口没有提供操作用户信息")
+            }
+            //this.runCreateFieldsInitializeRules(modelDataObject,partnerCache)
+            var ret = this.runEditFieldsCheckRules(modelDataObject,partnerCache)
+            if(!ret.first){
+                return ret
+            }
+            this.runEditFieldsFilterRules(modelDataObject,partnerCache)
+        }
         return Pair(true,null)
     }
 
@@ -1315,20 +1490,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return Pair(null,errorMsg)
         }
 
-//        if(useAccessControl)
-//        {
-//            var rules=partnerCache?.acGetEditRules(modelDataObject.model)
-//            rules?.forEach {
-//                var (ok,errorMsg)=it.check(modelDataObject,context=partnerCache?.modelExpressionContext!!)
-//                if(!ok){
-//                    return Pair(null,errorMsg)
-//                }
-//            }
-//           // return  return Pair(null,errorMsg)
-//        }
-
         return try {
-
             var tCriteria=criteria
             var idFV=modelDataObject.idFieldValue
             if(idFV!=null){
@@ -1350,13 +1512,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             modelDataObject.data.forEach {
                 when(it.field){
-
                     is Many2OneField,is One2OneField->{
-
                         if(it.field is One2OneField && it.field.isVirtualField){
                             return@forEach
                         }
-
                         if(it.value is ModelDataObject){
                             if(it.value.idFieldValue==null){
                                 it.value.context=modelDataObject.context
@@ -1382,7 +1541,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var fVCShadow=ModelDataObject(model=modelDataObject.model,fields = modelDataObject.fields)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
 
-                if((it is ModelFunctionField) || (it is ModelOne2ManyField)
+                if((it is FunctionField<*>) || (it is ModelOne2ManyField)
                         ||(it is ModelMany2ManyField)){
                     return@forEach
                 }
@@ -1394,7 +1553,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     fv.field.getFullName() == oit.getFullName()
                 }
                 if (fv != null) {
-                    var acFV=this.getACEditFieldValue(fv.field, fv.value,useAccessControl,partnerCache)
+                    var acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache)
                     if(acFV!=null){
                         fVCShadow.data.add(acFV)
                     }
@@ -1517,10 +1676,33 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
 
-    protected  open fun beforeDeleteCheck(modelData: ModelData,
+    protected  open fun beforeDeleteCheck(modelData: ModelDataObject,
                                        criteria:ModelExpression?,
                                        useAccessControl: Boolean,
                                        partnerCache:PartnerCache?):Pair<Boolean,String?>{
+        val model = modelData.model
+        model?.let {
+            var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
+            modelRule?.let {
+                if(it.deleteAction.enable<1){
+                    return Pair(false,"无删除权限")
+                }
+            }
+        }
+
+        if(partnerCache!=null){
+            var ret= modelDeleteFieldsBelongToPartnerCheck(modelData,partnerCache,null)
+            if(!ret.first){
+                return ret
+            }
+            var ruleTypes = partnerCache.getModelDeleteAccessControlRules<ModelDeleteAccessControlRule<*>>(model!!)
+            ruleTypes?.forEach {
+                ret=it(modelData,partnerCache,null)
+                if(!ret.first){
+                    return ret
+                }
+            }
+        }
         return Pair(true,null)
     }
 
@@ -1621,12 +1803,33 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
 
-    open fun rawCount(fieldValueArray:FieldValueArray):Int{
+    open fun rawCount(fieldValueArray:FieldValueArray, partnerCache:PartnerCache?=null,useAccessControl: Boolean=false):Int{
         var expArr = fieldValueArray.map {
             eq(it.field,it.value)!!
         }.toTypedArray()
         var expressions = and(*expArr)
+        expressions=this.beforeRead(expressions,useAccessControl,partnerCache)
         var statement = select(fromModel = this).count().where(expressions)
         return this.queryCount(statement)
     }
+
+    open fun rawCount(criteria:ModelExpression?,partnerCache:PartnerCache?=null,useAccessControl: Boolean=false):Int{
+        val c=this.beforeRead(criteria,useAccessControl,partnerCache)
+        var statement = select(fromModel = this).count().where(c)
+        return this.queryCount(statement)
+    }
+    open fun acCount(criteria:ModelExpression?,partnerCache:PartnerCache):Int{
+        return this.rawCount(criteria,partnerCache,true)
+    }
+
+    open fun rawMax(field:FieldBase,criteria:ModelExpression?=null,partnerCache:PartnerCache?=null,useAccessControl: Boolean=false):Long?{
+        val c=this.beforeRead(criteria,useAccessControl,partnerCache)
+        var statement = select(fromModel = this).max(MaxExpression(field)).where(c)
+        return this.queryMax(statement)
+    }
+
+    open fun acMax(field:FieldBase,partnerCache:PartnerCache,criteria:ModelExpression?=null):Long?{
+        return this.rawMax(field,criteria,partnerCache,true)
+    }
+
 }

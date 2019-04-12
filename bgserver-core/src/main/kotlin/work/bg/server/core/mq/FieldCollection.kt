@@ -93,9 +93,7 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
     fun getPartnerRoleField():FieldBase?{
         return getField(FieldConstant.partner_role)
     }
-    fun getPartnerRoleModelField():FieldBase?{
-        return getField(FieldConstant.partner_role_model)
-    }
+
     fun getField(name:String?):FieldBase?{
         if(!name?.contains(".")!!){
             return this.fieldSet["${this.model.fullTableName}.$name"]
@@ -175,7 +173,7 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
             this.cachedPersistFields= mutableMapOf()
             this.cachedPersistFieldsExcludeVirtualOne2OneField= mutableMapOf()
             this.fieldSet.forEach{
-                if((it.value !is FunctionField) && (it.value !is RefRelationField) && it.value !is One2ManyField){
+                if((it.value !is FunctionField<*>) && (it.value !is RefRelationField) && it.value !is One2ManyField){
                         this.cachedPersistFields?.set(it.key,it.value)
                     if(it.value !is ModelOne2OneField || !(it.value as ModelOne2OneField).isVirtualField){
                         cachedPersistFieldsExcludeVirtualOne2OneField?.set(it.key,it.value)
@@ -195,6 +193,7 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
         }
         return sortTypeFields(*names.toTypedArray())
     }
+
     fun sortTypeFields(vararg fullFieldNames:String?):Triple<Map<String,FieldBase>,Map<String,FieldBase>,Map<String,FieldBase>>?{
         var persistFields= mutableMapOf<String,FieldBase>()
         var funFields= mutableMapOf<String,FieldBase>()
@@ -202,7 +201,7 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
         this.fieldSet.forEach{
             if(fullFieldNames.contains(it.key)){
                 when(it){
-                    is FunctionField->{
+                    is FunctionField<*>->{
                         funFields[it.key] = it.value
                     }
                     is RefRelationField->{

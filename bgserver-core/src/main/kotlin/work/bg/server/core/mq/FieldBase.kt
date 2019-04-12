@@ -20,6 +20,7 @@ package work.bg.server.core.mq
 import work.bg.server.core.constant.ModelReservedKey
 
 abstract  class  FieldBase constructor(open var name:String,
+                                       open var title:String?,
                                        open var fieldType:FieldType,
                                        open var model:ModelBase?,
                                        open var length:Int?=null):ModelExpression(){

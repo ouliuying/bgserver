@@ -38,17 +38,5 @@
             </menuItem>
         </menu>
 
-
-        <menu name="partnerRoleModel" app="core" title="角色模型">
-
-        </menu>
-
-        <menuItem title="模型列表" model="partnerRoleModel" viewType="list">
-
-        </menuItem>
-
-        <menuItem title="添加模型" model="partnerRoleModel" viewType="create">
-
-        </menuItem>
     </menu>
 </ui>

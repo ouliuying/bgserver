@@ -23,12 +23,18 @@ import org.dom4j.DocumentHelper
 import org.dom4j.Element
 import org.dom4j.io.SAXReader
 import work.bg.server.core.acrule.ModelCreateAccessControlRule
+import work.bg.server.core.acrule.ModelDeleteAccessControlRule
+import work.bg.server.core.acrule.ModelEditAccessControlRule
+import work.bg.server.core.acrule.ModelReadAccessControlRule
 import work.bg.server.core.mq.ModelBase
 import work.bg.server.core.spring.boot.model.AppModel
 import java.awt.MenuItem
 
 class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false,val acRule:String?=null) {
     lateinit var modelCreateAccessControlRules:MutableMap<String, MutableList<ModelCreateAccessControlRule<*>>>
+    lateinit var modelReadAccessControlRules:MutableMap<String,MutableList<ModelReadAccessControlRule<*>>>
+    lateinit var modelEditAccessControlRules:MutableMap<String,MutableList<ModelEditAccessControlRule<*>>>
+    lateinit var modelDeleteAccessControlRules:MutableMap<String,MutableList<ModelDeleteAccessControlRule<*>>>
     var appRules = mutableMapOf<String,AppRule>()
     var menuRules = mutableMapOf<String,MenuRule>()
     var viewRules = mutableMapOf<String,ViewRule>()
@@ -50,6 +56,46 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             }
         }
         return typeCreateRules
+    }
+    inline fun <reified T> getModelReadAccessControlRules(model:ModelBase):List<T>{
+        var name = model.meta.tag
+        var rules = modelReadAccessControlRules[name]
+        var typeReadRules = mutableListOf<T>()
+        rules?.forEach {
+            when (it) {
+                is T -> {
+                    typeReadRules.add(it)
+                }
+            }
+        }
+        return typeReadRules
+    }
+
+    inline fun <reified T> getModelEditAccessControlRules(model:ModelBase):List<T>{
+        var name = model.meta.tag
+        var rules = modelEditAccessControlRules[name]
+        var typeEditRules = mutableListOf<T>()
+        rules?.forEach {
+            when (it) {
+                is T -> {
+                    typeEditRules.add(it)
+                }
+            }
+        }
+        return typeEditRules
+    }
+    inline  fun <reified T> getModelDeleteAccessControlRules(model:ModelBase):List<T>{
+        var name = model.meta.tag
+        var rules = modelDeleteAccessControlRules[name]
+        var typeEditRules = mutableListOf<T>()
+        rules?.forEach {
+            when (it) {
+                is T -> {
+                    typeEditRules.add(it)
+                }
+            }
+        }
+        return typeEditRules
     }
     private  fun parseAcRule(){
         if(this.acRule!=null){
@@ -78,6 +124,9 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     }
     private fun cacheAcRule(){
         this.modelCreateAccessControlRules= mutableMapOf()
+        this.modelReadAccessControlRules = mutableMapOf()
+        this.modelEditAccessControlRules= mutableMapOf()
+        this.modelDeleteAccessControlRules= mutableMapOf()
         this.appRules.forEach { t, u ->
             val app=u.app
             u.modelRules.forEach { t, u ->
@@ -95,6 +144,44 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                         this.modelCreateAccessControlRules[tag] =beans
                     }
                 }
+                u.readAction.ruleBeans?.forEach {
+                    var tag = "${app}.${model}"
+                    var bean =  this.createReadAccessControlRuleBean(it)
+                    if(bean!=null && this.modelReadAccessControlRules.containsKey(tag)){
+                        this.modelReadAccessControlRules[tag]?.add(bean)
+                    }
+                    else if(bean!=null){
+                        var beans = mutableListOf<ModelReadAccessControlRule<*>>()
+                        beans.add(bean)
+                        this.modelReadAccessControlRules[tag] =beans
+                    }
+                }
+
+                u.editAction.ruleBeans?.forEach {
+                    var tag = "${app}.${model}"
+                    var bean =  this.createEditAccessControlRuleBean(it)
+                    if(bean!=null && this.modelReadAccessControlRules.containsKey(tag)){
+                        this.modelEditAccessControlRules[tag]?.add(bean)
+                    }
+                    else if(bean!=null){
+                        var beans = mutableListOf<ModelEditAccessControlRule<*>>()
+                        beans.add(bean)
+                        this.modelEditAccessControlRules[tag] =beans
+                    }
+                }
+
+                u.deleteAction.ruleBeans?.forEach {
+                    var tag = "${app}.${model}"
+                    var bean =  this.createDeleteAccessControlRuleBean(it)
+                    if(bean!=null && this.modelDeleteAccessControlRules.containsKey(tag)){
+                        this.modelDeleteAccessControlRules[tag]?.add(bean)
+                    }
+                    else if(bean!=null){
+                        var beans = mutableListOf<ModelDeleteAccessControlRule<*>>()
+                        beans.add(bean)
+                        this.modelDeleteAccessControlRules[tag] =beans
+                    }
+                }
             }
         }
     }
@@ -110,8 +197,69 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             null
         }
     }
-
+    private  fun createReadAccessControlRuleBean(rb:ModelRule.RuleBean):ModelReadAccessControlRule<*>?{
+        var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
+        return if(bt!=null){
+            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelReadAccessControlRule<*>?)
+            bean?.config = rb.config
+            bean
+        }
+        else{
+            null
+        }
+    }
+    private  fun createEditAccessControlRuleBean(rb:ModelRule.RuleBean):ModelEditAccessControlRule<*>?{
+        var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
+        return if(bt!=null){
+            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelEditAccessControlRule<*>?)
+            bean?.config = rb.config
+            bean
+        }
+        else{
+            null
+        }
+    }
+    private  fun createDeleteAccessControlRuleBean(rb:ModelRule.RuleBean):ModelDeleteAccessControlRule<*>?{
+        var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
+        return if(bt!=null){
+            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelDeleteAccessControlRule<*>?)
+            bean?.config = rb.config
+            bean
+        }
+        else{
+            null
+        }
+    }
     private fun buildActionRule(actionElem:Element){
+        val app = actionElem?.attributeValue("app")
+        var model = actionElem?.attributeValue("model")
+        var viewType = actionElem?.attributeValue("viewType")
+        if(!app.isNullOrEmpty() && !model.isNullOrEmpty() && !viewType.isNullOrEmpty()){
+            var groups = mutableMapOf<String,ActionRule.GroupRule>()
+            actionElem.elements("group").forEach {
+                var gElem = it as Element
+                var enable = if ((gElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
+                var visible = if ((gElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+                var gName = gElem.attributeValue("name")
+                var triggers =  mutableMapOf<String,ActionRule.TriggerRule>()
+                gElem.elements("trigger").forEach { tIT->
+                    var tElem = tIT as Element
+                    var tName=tElem.attributeValue("name")
+                    var tApp=tElem.attributeValue("app")?:app
+                    var tModel=tElem.attributeValue("model")?:app
+                    var tViewType=tElem.attributeValue("viewType")?:app
+                    var enable = if ((tElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
+                    var visible = if ((tElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+
+                    triggers[tName]=ActionRule.TriggerRule(tApp,tModel,tViewType,tName,enable,visible)
+                }
+                var g=ActionRule.GroupRule(name,enable,visible,triggers)
+                groups[gName]=g
+            }
+            var aRule = ActionRule(app,model,viewType,groups)
+            var tag="$app.$model.$viewType"
+            this.actionRules[tag]= aRule
+        }
 
     }
     private fun buildMenuRule(menuElem:Element){
@@ -232,6 +380,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             val deleteElem = modelElem.selectSingleNode("setting/delete")
             var modelRule = ModelRule(model)
             val createEnable = if((createElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val createCheckBelongToPartner = if((createElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             var ruleBeans = arrayListOf<ModelRule.RuleBean>()
             createElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -239,9 +388,10 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 val config = beanElem.attributeValue("config")
                 ruleBeans.add(ModelRule.RuleBean(name,config))
             }
-            modelRule.createAction = ModelRule.CreateAction(createEnable,ruleBeans.toTypedArray())
+            modelRule.createAction = ModelRule.CreateAction(createEnable,createCheckBelongToPartner,ruleBeans.toTypedArray())
 
             val editEnable = if((editElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val editCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             editElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -249,10 +399,11 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 val config = beanElem.attributeValue("config")
                 ruleBeans.add(ModelRule.RuleBean(name,config))
             }
-            modelRule.editAction = ModelRule.EditAction(editEnable,ruleBeans.toTypedArray())
+            modelRule.editAction = ModelRule.EditAction(editEnable,editCheckBelongToPartner,ruleBeans.toTypedArray())
 
 
             val readEnable = if((readElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val readCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             readElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -260,9 +411,10 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 val config = beanElem.attributeValue("config")
                 ruleBeans.add(ModelRule.RuleBean(name,config))
             }
-            modelRule.readAction = ModelRule.ReadAction(readEnable,ruleBeans.toTypedArray())
+            modelRule.readAction = ModelRule.ReadAction(readEnable,readCheckBelongToPartner,ruleBeans.toTypedArray())
 
             val deleteEnable = if((deleteElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val deleteCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             deleteElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -270,7 +422,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 val config = beanElem.textTrim
                 ruleBeans.add(ModelRule.RuleBean(name,config))
             }
-            modelRule.deleteAction = ModelRule.DeleteAction(deleteEnable,ruleBeans.toTypedArray())
+            modelRule.deleteAction = ModelRule.DeleteAction(deleteEnable,deleteCheckBelongToPartner,ruleBeans.toTypedArray())
 
             modelElem.selectNodes("fields/field").forEach {
                 val fieldElem = it as Element
@@ -321,19 +473,20 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
         }
         open class ModelRuleAction(val enable:Int,
+                                   val checkBelongToPartner:Int=1,
                                    val ruleBeans:Array<RuleBean> = arrayOf()){
 
         }
-        class DeleteAction(enable:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,ruleBeans){
+        class DeleteAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class CreateAction(enable:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,ruleBeans){
+        class CreateAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class EditAction(enable:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,ruleBeans){
+        class EditAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class ReadAction(enable:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,ruleBeans){
+        class ReadAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
 
@@ -346,28 +499,19 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
 
-            open class FieldRuleAction(val enable:Int,val defalut:String?=null,val setValue:String?=null){
-
-            }
-            class DeleteAction(enable:Int):FieldRuleAction(enable){
-
-            }
-            class CreateAction(enable:Int, default: String?,setValue: String?):FieldRuleAction(enable,default,setValue){
-
-            }
-            class EditAction(enable:Int,setValue:String?):FieldRuleAction(enable,setValue=setValue){
-
-            }
-            class ReadAction(enable:Int):FieldRuleAction(enable){
-
-            }
+            open class FieldRuleAction(val enable:Int,val defalut:String?=null,val setValue:String?=null)
+            class DeleteAction(enable:Int):FieldRuleAction(enable)
+            class CreateAction(enable:Int, default: String?,setValue: String?):FieldRuleAction(enable,default,setValue)
+            class EditAction(enable:Int,setValue:String?):FieldRuleAction(enable,setValue=setValue)
+            class ReadAction(enable:Int):FieldRuleAction(enable)
         }
 
     }
 
 
-    class  ActionRule{
-
+    class  ActionRule(val app:String,val model:String,val viewType:String,val groupRules:Map<String,GroupRule> = mutableMapOf()){
+        class GroupRule(val name:String,val enable:Int,val visible:Int, val triggerRules:Map<String,TriggerRule> = mutableMapOf())
+        class TriggerRule(val app:String,val model:String,val viewType:String,val name:String,val enable:Int,val visible:Int)
     }
 
     class MenuRule(val name:String,val model:String,val viewType:String,val app:String,val type:MenuType,val visible:Int){

@@ -49,11 +49,14 @@ class Department:ContextModel("corp_department",
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
-    val partners=ModelOne2ManyField(null,
-            "partner_department_id",
+    val partners=ModelMany2ManyField(null,
+            "partner_id",
             FieldType.BIGINT,"员工",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "department_id")
+            targetModelFieldName = "id",
+            relationModelTable = "public.department_partner_rel",
+            relationModelFieldName = "partner_id")
+
     val parent=ModelMany2OneField(null,"parent_id",
             FieldType.BIGINT,
             "上级部门",

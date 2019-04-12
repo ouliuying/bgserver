@@ -20,12 +20,12 @@ package work.bg.server.core.mq
 open class  ModelField constructor(model:ModelBase?,
                                    name:String,
                                    fieldType:FieldType,
-                                   val title:String?=null,
+                                   title:String?=null,
                                    length:Int?=null,
                                    val defaultValue:Any?=null,
                                    val index:ArrayList<FieldIndex>?=null,
                                    val primaryKey:FieldPrimaryKey?=null,
-                                   val comment:String?=null):BinaryOperatorField(null,null,"",name,fieldType,model,length){
+                                   val comment:String?=null):BinaryOperatorField(null,null,"",name,title,fieldType,model,length){
       init {
 
       }

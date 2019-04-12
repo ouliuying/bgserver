@@ -262,7 +262,7 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
         //var sql=StringBuilder()
         runSql("CREATE TABLE IF NOT EXISTS ${bakeSqlKeyword(model?.fullTableName!!)}();")
         model?.fields?.forEach {
-            if((it !is ModelFunctionField) && (it !is ModelOne2ManyField) && (it !is ModelMany2ManyField) && (it !is ModelOne2OneField)) {
+            if((it !is FunctionField<*>) && (it !is ModelOne2ManyField) && (it !is ModelMany2ManyField) && (it !is ModelOne2OneField)) {
                 if(!isTableColumnExist(model,it)){
                     runSql("ALTER TABLE ${bakeSqlKeyword(model.fullTableName)} ADD  COLUMN   IF NOT EXISTS  ${bakeSqlKeyword(it.name)} ${this.getColumnTypeExpression(it)};")
                 }

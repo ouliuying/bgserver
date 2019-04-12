@@ -18,7 +18,7 @@
 package work.bg.server.core.acrule.bean
 
 import org.springframework.stereotype.Component
-import work.bg.server.core.acrule.ModelCreateRecordFieldsValueCheckRule
+import work.bg.server.core.acrule.ModelEditRecordFieldsValueCheckRule
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldMustCoexist
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
@@ -27,30 +27,24 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.mq.FieldType
 import work.bg.server.core.mq.ModelDataObject
 import work.bg.server.core.mq.ModelField
+
 @Component
-class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule<Array<ModelFieldInspector>>{
+class ModelEditFieldsInspectorCheckBean:ModelEditRecordFieldsValueCheckRule<Array<ModelFieldInspector>> {
     private lateinit var _config:String
-    override  var config: String
-        get() {
-            return this._config
-        }
-        set(value) {
-            this._config=value
-        }
     override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
         data?.forEach {
             when(it){
-                is ModelFieldRequired->{
+                is ModelFieldRequired ->{
                     if(!this.fieldsExist(it.targetFields,modelData)){
                         return Pair(false,it.advice)
                     }
                 }
-                is ModelFieldNotNullOrEmpty->{
+                is ModelFieldNotNullOrEmpty ->{
                     if(!this.fieldsNotNullOrEmpty(it.targetFields,modelData)){
                         return Pair(false,it.advice)
                     }
                 }
-                is ModelFieldMustCoexist->{
+                is ModelFieldMustCoexist ->{
                     if(!this.fieldsCoexist(it.targetFields,modelData)){
                         return Pair(false,it.advice)
                     }
@@ -59,7 +53,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         }
         return Pair(true,"")
     }
-    private fun fieldsExist(fields:Array<out ModelField>,modelData:ModelDataObject):Boolean{
+    private fun fieldsExist(fields:Array<out ModelField>, modelData:ModelDataObject):Boolean{
         fields.forEach {
             var fv=modelData.data.filter {mFV->
                 mFV.field.isSame(it)
@@ -71,15 +65,15 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         return true
     }
 
-    private fun fieldsCoexist(fields:Array<out ModelField>,modelData:ModelDataObject):Boolean{
+    private fun fieldsCoexist(fields:Array<out ModelField>, modelData:ModelDataObject):Boolean{
         val existCount = modelData.data.count m@{
-           return fields.firstOrNull {
-               m@it.isSame(it)
-           }!=null
+            return fields.firstOrNull {
+                m@it.isSame(it)
+            }!=null
         }
         return (existCount==0||existCount==fields.count())
     }
-    private  fun fieldsNotNullOrEmpty(fields:Array<out ModelField>,modelData:ModelDataObject):Boolean{
+    private  fun fieldsNotNullOrEmpty(fields:Array<out ModelField>, modelData:ModelDataObject):Boolean{
         fields.forEach {
             var fv=modelData.data.filter {mFV->
                 mFV.field.isSame(it)
@@ -90,7 +84,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
             if(fv[0].field.fieldType!= FieldType.STRING && fv[0].value==null){
                 return false
             }
-            else if(fv[0].field.fieldType==FieldType.STRING){
+            else if(fv[0].field.fieldType== FieldType.STRING){
                 if(fv[0].value==null || (fv[0].value as String).isNullOrEmpty()){
                     return false
                 }
@@ -99,4 +93,9 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         }
         return true
     }
+    override var config: String
+        get() = _config//To change initializer of created properties use File | Settings | File Templates.
+        set(value) {
+            _config=value
+        }
 }

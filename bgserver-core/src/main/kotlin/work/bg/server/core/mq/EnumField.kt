@@ -20,5 +20,5 @@
 package work.bg.server.core.mq
 
 interface EnumField {
-       val enumMetas:Array<EnumFeildMeta>
+       val enumMetas:Array<EnumFieldMeta>
 }

@@ -21,6 +21,8 @@ package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.mq.*
+import work.bg.server.core.mq.billboard.CurrCorpBillboard
+import work.bg.server.core.mq.billboard.CurrPartnerBillboard
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model("corpPartnerRel")
@@ -39,6 +41,7 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
             "公司",
             "public.base_corp",
             "id",
+            defaultValue = CurrCorpBillboard(),
             foreignKey= FieldForeignKey(action =ForeignKeyAction.CASCADE))
     val partner=ModelMany2OneField(null,
             "partner_id",
@@ -46,6 +49,7 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
             "用户",
             "public.base_partner",
             "id",
+            defaultValue = CurrPartnerBillboard(),
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
     val partnerRole=ModelMany2OneField(null,
             "partner_role_id",
