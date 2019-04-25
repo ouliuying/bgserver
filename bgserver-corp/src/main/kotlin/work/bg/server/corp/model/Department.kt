@@ -20,6 +20,7 @@ package work.bg.server.corp.model
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
+import work.bg.server.core.mq.billboard.CurrCorpBillboard
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.spring.boot.model.AppModel
 
@@ -48,6 +49,7 @@ class Department:ContextModel("corp_department",
             null,
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
+            defaultValue = CurrCorpBillboard(),
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
     val partners=ModelMany2ManyField(null,
             "partner_id",

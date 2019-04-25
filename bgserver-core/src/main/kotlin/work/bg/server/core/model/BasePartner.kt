@@ -17,6 +17,7 @@
 
 package work.bg.server.core.model
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
@@ -27,6 +28,10 @@ import work.bg.server.core.constant.SessionTag
 import work.bg.server.errorcode.ErrorCode
 import org.springframework.web.bind.annotation.RequestParam
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
+import work.bg.server.core.acrule.ModelReadFieldFilterRule
+import work.bg.server.core.acrule.bean.ModelEditPartnerInnerRecordFieldsValueFilterBean
+import work.bg.server.core.acrule.bean.ModelReadPartnerInnerFilterBean
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
@@ -45,7 +50,10 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
     companion object :RefSingleton<BasePartner>{
         override lateinit var ref: BasePartner
     }
-
+    @Autowired
+    lateinit var readPartnerInnerFilterBean:ModelReadPartnerInnerFilterBean
+    @Autowired
+    lateinit var editPartnerInnerFilterBean:ModelEditPartnerInnerRecordFieldsValueFilterBean
     val id=ModelField(null,
             "id",
             FieldType.BIGINT,
@@ -130,12 +138,13 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             "partner_role_id",
     "public.base_partner_role",
             "id")
-
+    //function fields
     val setCurrentCorpAsDefault by lazy {ProxyRelationModelField<Int>(null,
             BaseCorpPartnerRel.ref.isDefaultCorp,
             "set_current_corp_as_default",
             BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
             "设定当前公司为默认")}
+
 
     constructor():this("base_partner","public")
     init {
@@ -159,6 +168,14 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
                 ModelFieldUnique(this.mobile,advice = "用户手机号必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
                 ModelFieldUnique(this.email,advice = "用户邮箱必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL)
         )
+    }
+
+    override fun getModelReadAccessFieldFilterRule(): ModelReadFieldFilterRule? {
+        return this.readPartnerInnerFilterBean
+    }
+
+    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*>? {
+        return this.editPartnerInnerFilterBean
     }
     @Action(name="login")
     fun login(@RequestParam userName:String,@RequestParam password:String,@RequestParam devType:Int,session:HttpSession):ActionResult?{

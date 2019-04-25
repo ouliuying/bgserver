@@ -188,6 +188,23 @@
 
     <model name="partnerRole" app="core">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"></group>
+                    </action>
+                    <action>
+                        <group name="opAction"></group>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
             <field name="id"></field>
             <field name="name"></field>
             <field name="isSuper">
@@ -195,6 +212,17 @@
         </view>
 
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
             <field name="name" style="head" type="singleLineText"></field>
             <field name="isSuper" style="subHead" type="singleCheckbox">
                 <meta>
@@ -220,18 +248,5 @@
         </view>
     </model>
 
-    <model name="partnerRoleModel" app="core">
-        <view type="list">
-            <field name="id"></field>
-            <field name="name"></field>
-        </view>
 
-        <view type="create">
-            <field name="name"></field>
-        </view>
-
-        <view type="edit">
-            <field name="name"></field>
-        </view>
-    </model>
 </ui>

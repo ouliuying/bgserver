@@ -25,7 +25,8 @@ import work.bg.server.core.spring.boot.annotation.ModelScan
 
 
 @SpringBootApplication
-@ModelScan(packageNames = ["work.bg.server.core.model","work.bg.server.corp.model"])
+@ModelScan(packageNames = ["work.bg.server.core.model",
+    "work.bg.server.corp.model"])
 class ServerApplication{
     private val logger = LogFactory.getLog(javaClass)
     init {

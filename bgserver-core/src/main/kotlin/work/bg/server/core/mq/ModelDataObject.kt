@@ -35,6 +35,12 @@ class ModelDataObject(override var data: FieldValueArray = FieldValueArray(),
             !it.field.isSame(model!!.fields.getIdField()!!) && it.field is ModelField
         }>0
     }
+    fun getFieldValue(field:FieldBase):Any?{
+        var fieldValue = this.data.firstOrNull {
+            it.field.isSame(field)
+        }
+        return if(fieldValue!=null) fieldValue.value else null
+    }
     fun setFieldValue(propertyName:String,value:String?){
         var fieldValue = this.data.firstOrNull {
             it.field.propertyName==propertyName

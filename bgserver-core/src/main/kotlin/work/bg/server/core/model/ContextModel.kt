@@ -134,13 +134,20 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val app =this.meta.appName
         val model = this.meta.name
         val viewType = data["viewType"]?.asString?:""
+        val viewRefType =data["viewRefType"]?.asString
         val reqData = data["reqData"]?.asJsonObject
         val ownerField = data["ownerField"]?.asJsonObject
-        ar.bag = this.loadMainViewType(app,model,viewType,ownerField,pc,reqData)
+        ar.bag = this.loadMainViewType(app,model,viewType,ownerField,pc,reqData,viewRefType)
         return ar
     }
-    private fun loadMainViewType(app:String,model:String,viewType:String,ownerField:JsonObject?,pc:PartnerCache,reqData:JsonObject?):MutableMap<String,Any>{
-        var reqRefType= if(ownerField!=null) ModelViewRefType.Sub else ModelViewRefType.Main
+
+    private fun loadMainViewType(app:String,model:String,
+                                 viewType:String,
+                                 ownerField:JsonObject?,
+                                 pc:PartnerCache,
+                                 reqData:JsonObject?,viewRefType:String?=null):MutableMap<String,Any>{
+        var reqRefType= viewRefType?:if(ownerField!=null) ModelViewRefType.Sub else ModelViewRefType.Main
+
         var mv=pc.getAccessControlModelView(app,model,viewType)
         var bag = mutableMapOf<String,Any>()
         if(mv!=null){
@@ -152,10 +159,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             }
             var actionNameArray = arrayListOf<String>()
             mv.refActionGroups.forEach {
-                if(it.refType==ModelViewRefType.All){
-                    actionNameArray.add(it.groupName)
-                }
-                else if(it.refType == reqRefType){
+                if(it.refTypes.contains(reqRefType)){
                     actionNameArray.add(it.groupName)
                 }
             }
@@ -185,7 +189,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         if(mv!=null){
             var bag = mutableMapOf<String,Any>()
             bag["refView"]=refView
-            if(reqRefType==ModelViewRefType.Main || refView.refType==ModelViewRefType.Embedded){
+            if(reqRefType==ModelViewRefType.Main || refView.refTypes.contains(ModelViewRefType.Embedded)){
                 bag["view"] = mv
                 mv=this.fillModelViewMeta(mv,bag,pc,reqData)
                 var mvData = this.loadModelViewData(mv, bag,pc, reqData)
@@ -194,10 +198,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
                 var actionNameArray = arrayListOf<String>()
                 mv.refActionGroups.forEach {
-                    if(it.refType==ModelViewRefType.All){
-                        actionNameArray.add(it.groupName)
-                    }
-                    else if(it.refType == ModelViewRefType.Sub){
+                    if(it.refTypes.contains(ModelViewRefType.Sub)){
                         actionNameArray.add(it.groupName)
                     }
                 }

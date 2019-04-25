@@ -15,15 +15,13 @@
  *
  */
 
-package work.bg.server.core.ui
+package work.bg.server.core.acrule
 
-class ModelViewRefType {
-    companion object {
-        const val Main = "main"
-        const val Sub = "sub"
-        const val Embedded = "embedded"
-        const val SingleSelection = "singleSelection"
-        val allRefTypes:ArrayList<String>
-        get() = arrayListOf(Main, Sub, Embedded, SingleSelection)
-    }
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.mq.FieldBase
+import work.bg.server.core.mq.ModelDataObject
+
+interface ModelReadFieldFilterRule :ModelReadAccessControlRule<Unit>{
+    open operator fun invoke(field:FieldBase, partnerCache: PartnerCache, data:Any?): Pair<Boolean,String>
+    open var config:String
 }

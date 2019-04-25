@@ -17,18 +17,12 @@
 
 package work.bg.server.core.cache
 
-import com.sun.javafx.collections.ElementObservableListDecorator
 import org.apache.commons.logging.LogFactory
 import org.dom4j.DocumentHelper
 import org.dom4j.Element
-import org.dom4j.io.SAXReader
-import work.bg.server.core.acrule.ModelCreateAccessControlRule
-import work.bg.server.core.acrule.ModelDeleteAccessControlRule
-import work.bg.server.core.acrule.ModelEditAccessControlRule
-import work.bg.server.core.acrule.ModelReadAccessControlRule
+import work.bg.server.core.acrule.*
 import work.bg.server.core.mq.ModelBase
 import work.bg.server.core.spring.boot.model.AppModel
-import java.awt.MenuItem
 
 class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false,val acRule:String?=null) {
     lateinit var modelCreateAccessControlRules:MutableMap<String, MutableList<ModelCreateAccessControlRule<*>>>
@@ -197,10 +191,10 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             null
         }
     }
-    private  fun createReadAccessControlRuleBean(rb:ModelRule.RuleBean):ModelReadAccessControlRule<*>?{
+    private  fun createReadAccessControlRuleBean(rb:ModelRule.RuleBean):ModelReadAccessAttachCriterialRule<*>?{
         var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
         return if(bt!=null){
-            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelReadAccessControlRule<*>?)
+            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelReadAccessAttachCriterialRule<*>?)
             bean?.config = rb.config
             bean
         }

@@ -36,16 +36,43 @@
 
     <model name="department" app="corp">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"></group>
+                    </action>
+                </actions>
+            </ref>
             <field name="id"></field>
-            <field name="name"></field>
+            <field name="name" type="singleLineText"></field>
+            <field name="parent.name" type="many2OneDataSetSelect"></field>
+            <field name="comment" type="multiLineText"></field>
         </view>
-
         <view type="create">
-            <field name="name"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name = "parent.name" type="many2OneDataSetSelect"></field>
+            <field name="comment" type="multiLineText"></field>
         </view>
-
         <view type="edit">
-            <field name="name"></field>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name = "parent.name" type="many2OneDataSetSelect"></field>
+            <field name="comment" type="multiLineText"></field>
+        </view>
+        <view type="detail">
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name = "parent.name" type="many2OneDataSetSelect"></field>
+            <field name="comment" type="multiLineText"></field>
         </view>
     </model>
 

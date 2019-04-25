@@ -42,6 +42,10 @@
             <trigger title="删除" name="doDelete"></trigger>
         </group>
 
+        <group name="selSingleItemAction">
+            <trigger title="选定" name="doSelSingleItem"></trigger>
+        </group>
+
     </action>
 
     <action viewType="detail" app="*" model="*">

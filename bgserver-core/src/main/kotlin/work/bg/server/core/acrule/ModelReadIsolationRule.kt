@@ -17,8 +17,6 @@
 
 package work.bg.server.core.acrule
 
-import work.bg.server.core.mq.ModelExpression
-
-interface ModelReadIsolationRule<T>:ModelReadAccessControlRule<T> {
+interface ModelReadIsolationRule<T>:ModelReadAccessAttachCriterialRule<T> {
 
 }

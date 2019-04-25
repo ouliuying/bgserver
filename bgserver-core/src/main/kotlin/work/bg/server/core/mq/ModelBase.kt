@@ -31,6 +31,7 @@ import java.sql.ResultSet
 import work.bg.server.core.mq.update as mqUpdate
 import work.bg.server.core.mq.create as mqCreate
 import work.bg.server.core.spring.boot.model.AppModel
+import java.lang.StringBuilder
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
@@ -113,7 +114,9 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     open fun skipCorpIsolationFields():Boolean{
         return false
     }
-
+    open fun isSame(model:ModelBase):Boolean{
+        return this.meta.tag == model.meta.tag
+    }
     protected open fun query(vararg fields:FieldBase,
                              fromModel:ModelBase,
                              joinModels:Array<JoinModel>?=null,
@@ -263,6 +266,16 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     }
 
     open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Map<String,FieldValue>?=null):ModelDataArray?{
+        var sb = StringBuilder()
+        parameters?.let {
+            it.forEach { t, u ->
+                sb.append("  $t =")
+                u.value?.let {
+                    sb.append("${it.toString()}")
+                }
+            }
+        }
+        this.logger.debug("sql = ${sql}, values = ${sb.toString()}")
         var kParameters=this.fieldValueToParameters(parameters)
         if(kParameters!=null)
             return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<ModelDataArray?> {

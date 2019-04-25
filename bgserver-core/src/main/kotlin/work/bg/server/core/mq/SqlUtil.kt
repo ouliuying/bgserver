@@ -22,6 +22,5 @@ class SqlUtil{
         fun escapeSqlString(value:String):String{
             return value.replace("\'","\'\'")
         }
-
     }
 }

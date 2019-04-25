@@ -33,6 +33,7 @@ import work.bg.server.core.RefSingleton
 import work.bg.server.core.spring.boot.model.AppModel
 import org.dom4j.io.SAXReader
 import org.dom4j.Element
+import work.bg.server.core.constant.ModelReservedKey
 
 //@ConditionalOnBean(value = [AppModel::class])
 @Component
@@ -214,6 +215,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             }
         }
     }
+
     private fun addViewAction(va:ViewAction){
 
         if(this.viewActions.containsKey(va.app)){
@@ -251,6 +253,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             this.viewActions[va.app]=amva
         }
     }
+
     private  fun buildViewAction(element:Element?){
         if(element!=null){
             val app=element.attributeValue("app")
@@ -355,12 +358,14 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             }
         }
     }
+
     private  fun addMenuTree(menuTree:MenuTree){
         var amt = AppMenuTree(menuTree.app, mutableMapOf())
         var mmap = amt.menus as MutableMap
         mmap[menuTree.name]=menuTree
         this.menuTrees[amt.appName]=amt
     }
+
     private  fun buildMenuTree(menu:Element?,parentApp:String?=null):MenuTree?{
         if(menu!=null){
             try {
@@ -462,7 +467,6 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         }
     }
 
-
     private  fun preAppend(anchorNodes:List<Element?>,
                         opNodes:List<Element?>?){
         if(opNodes!=null && !opNodes.isEmpty()){
@@ -531,6 +535,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             }
         }
     }
+
     private fun buildModelViews(element:Element?){
         var views=element?.elements() as List<Element?>?
         var model=element?.attributeValue("name")
@@ -633,9 +638,10 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 groupElems?.forEach {
                     val groupName =it.attributeValue("name")
                     val refType =  it.attributeValue("refType")
+                    var refTypes = if(refType.isNullOrEmpty())  arrayListOf(ModelViewRefType.Main) else arrayListOf(*refType.split('|').toTypedArray())
                     if(!groupName.isNullOrEmpty()){
                         mv.refActionGroups.add(ModelView.RefActionGroup(aApp!!,
-                                aModel!!,aViewType!!,groupName, if(refType.isNullOrEmpty()) ModelViewRefType.Main else refType))
+                                aModel!!,aViewType!!,groupName, refTypes))
                     }
                 }
             }
@@ -644,8 +650,9 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 val aApp = it.attributeValue("app")?:app
                 val name = it.attributeValue("name")
                 val refType = it.attributeValue("refType")
+                var refTypes = if(refType.isNullOrEmpty()) arrayListOf(ModelViewRefType.Main) else arrayListOf(*refType.split('|').toTypedArray())
                 mv.refMenus.add(
-                        ModelView.RefMenu(aApp!!,name,if(refType.isNullOrEmpty()) ModelViewRefType.Main else refType)
+                        ModelView.RefMenu(aApp!!,name,refTypes)
                 )
             }
 
@@ -654,6 +661,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 var vModel = it.attributeValue("model")
                 val viewType = it.attributeValue("type")
                 val refType = it.attributeValue("refType")
+                var refTypes = if(refType.isNullOrEmpty()) arrayListOf(ModelViewRefType.Main) else arrayListOf(*refType.split('|').toTypedArray())
                 var title = it.attributeValue("title")
                 var style = it.attributeValue("style")
                 val ownerField = it.attributeValue("ownerField")
@@ -675,7 +683,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     vModel=model
                 }
                 mv.refViews.add(
-                        ModelView.RefView(vApp,vModel,viewType,ownerField?:"",title?:"",style?:"",if(!refType.isNullOrEmpty()) refType else ModelViewRefType.All)
+                        ModelView.RefView(vApp,vModel,viewType,ownerField?:"",title?:"",style?:"",refTypes)
                 )
             }
             return mv

@@ -207,16 +207,18 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                          val model:String,
                          val viewType:String,
                          val groupName:String,
-                         val refType:String){
+                         var refTypes:ArrayList<String> = arrayListOf()){
+
         fun createCopy():RefActionGroup{
             return RefActionGroup(
                     app,
                     model,
                     viewType,
                     groupName,
-                    refType
+                    refTypes
             )
         }
+
     }
     class RefView(val app:String,
                   val model:String,
@@ -224,7 +226,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                   val fieldName:String,
                   val title:String,
                   val style:String,
-                  val refType:String){
+                  var refTypes:ArrayList<String> = arrayListOf()){
         fun createCopy():RefView{
             return RefView(
                     app,
@@ -233,19 +235,19 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                     fieldName,
                     title,
                     style,
-                    refType
+                    refTypes
             )
         }
     }
 
     class RefMenu(val app:String,
                   val name:String,
-                  val refType:String){
+                  var refTypes:ArrayList<String> = arrayListOf()){
         fun createCopy():RefMenu{
             return RefMenu(
                     app,
                     name,
-                    refType
+                    refTypes
             )
         }
     }
