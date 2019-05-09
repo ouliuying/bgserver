@@ -29,7 +29,7 @@
 <!--                    </menu>-->
 <!--                </menus>-->
 <!--                <views>-->
-<!--                    <view type="" ownerField="" refType="all">-->
+<!--                    <view type="" ownerField="" refType="main">-->
 
 <!--                    </view>-->
 <!--                </views>-->
@@ -191,10 +191,10 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"></group>
+                        <group name="main" refType="main|singleSelection|sub"></group>
                     </action>
                     <action>
-                        <group name="opAction"></group>
+                        <group name="opAction" refType="main"></group>
                     </action>
                     <action>
                         <group name="selSingleItemAction" refType="singleSelection"></group>
@@ -209,6 +209,8 @@
             <field name="name"></field>
             <field name="isSuper">
             </field>
+            <field name="accessControlRule">
+            </field>
         </view>
 
         <view type="create">
@@ -221,6 +223,8 @@
                 <menus>
                 </menus>
                 <views>
+                    <view fieldName="partners" refType="main|sub" type="list"></view>
+                    <view fieldName="apps" refType="main|sub" type="list"></view>
                 </views>
             </ref>
             <field name="name" style="head" type="singleLineText"></field>
@@ -233,18 +237,54 @@
                   ]]>
                 </meta>
             </field>
+            <field name="accessControlRule">
+            </field>
+            <field name="partners" style="relation"></field>
+            <field name="apps" style="relation"></field>
             <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
             <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
             <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
         </view>
 
         <view type="edit">
+            <ref>
+                <views>
+                    <view fieldName="partners" refType="main|sub" type="list"></view>
+                    <view fieldName="apps" refType="main|sub" type="list"></view>
+                </views>
+                <actions>
+                    <group name="main"  refType = "main"></group>
+                </actions>
+                <menus>
+
+                </menus>
+            </ref>
             <field name="name"></field>
             <field name="isSuper"></field>
+            <field name="accessControlRule">
+            </field>
+            <field name="partners" style="relation"></field>
+            <field name="apps" style="relation"></field>
         </view>
         <view type="detail">
+            <ref>
+                <views>
+                    <view fieldName="partners" refType="main|sub" type="list"></view>
+                    <view fieldName="apps" refType="main|sub" type="list"></view>
+                </views>
+                <actions>
+                    <group name="main"  refType = "main"></group>
+                </actions>
+                <menus>
+
+                </menus>
+            </ref>
             <field name="name"></field>
             <field name="isSuper"></field>
+            <field name="accessControlRule">
+            </field>
+            <field name="partners" style="relation"></field>
+            <field name="apps" style="relation"></field>
         </view>
     </model>
 

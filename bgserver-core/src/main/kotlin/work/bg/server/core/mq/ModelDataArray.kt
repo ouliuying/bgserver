@@ -28,4 +28,13 @@ class ModelDataArray(override var data:ArrayList<FieldValueArray> = arrayListOf(
         }
         return null
     }
+    fun toModelDataObjectArray():ArrayList<ModelDataObject>{
+        var arr = arrayListOf<ModelDataObject>()
+        data.forEach {
+            arr.add(
+                    ModelDataObject(it,this.model,this.fields)
+            )
+        }
+        return arr
+    }
 }

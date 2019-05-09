@@ -41,6 +41,12 @@
                     <action>
                         <group name="selSingleItemAction" refType="singleSelection"></group>
                     </action>
+                    <action>
+                        <group name="main" refType="main|sub|singleSelection"></group>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
                 </actions>
             </ref>
             <field name="id"></field>
@@ -58,21 +64,97 @@
                 <menus>
                 </menus>
                 <views>
+                    <view type="list" ownerField="partners" app="corp" model="departmentPartnerRel" refType="sub|main">
+                    </view>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
             <field name = "parent.name" type="many2OneDataSetSelect"></field>
             <field name="comment" type="multiLineText"></field>
+            <field name="partners" style="relation"></field>
         </view>
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" ownerField="children" refType="sub|main">
+                    </view>
+                    <view type="list" ownerField="partners" refType="sub|main">
+                    </view>
+                    <view type="edit" ownerField="parent" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+
             <field name="name" type="singleLineText" style="head"></field>
             <field name = "parent.name" type="many2OneDataSetSelect"></field>
             <field name="comment" type="multiLineText"></field>
+            <field name="children" style="relation"></field>
+            <field name="partners" style="relation"></field>
+            <field name="parent" style="relation"></field>
         </view>
         <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" ownerField="children" refType="sub|main">
+                    </view>
+                    <view type="list" ownerField="partners" refType="sub|main">
+                    </view>
+                    <view type="detail" ownerField="parent" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
             <field name="name" type="singleLineText" style="head"></field>
             <field name = "parent.name" type="many2OneDataSetSelect"></field>
             <field name="comment" type="multiLineText"></field>
+            <field name="children" style="relation"></field>
+            <field name="partners" style="relation"></field>
+            <field name="parent" style="relation"></field>
+        </view>
+    </model>
+
+    <model name="departmentPartnerRel" app="corp">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.id"></field>
+            <field name="partner.userName"></field>
+            <field name="partner.name"></field>
+            <field name="partner.nickName"></field>
+            <field name="partner.userComment"></field>
+        </view>
+        <view type="edit">
+
+        </view>
+        <view type="detail">
+
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.userName" type="many2OneDataSetSelect"></field>
         </view>
     </model>
 

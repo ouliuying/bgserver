@@ -18,11 +18,13 @@
 package work.bg.server.core.ui
 
 import com.google.gson.JsonObject
+import org.apache.commons.logging.LogFactory
 import org.dom4j.dom.DOMElement
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.model.AppModel
 
 class ModelView(val app:String?,val model:String?,val viewType:String?) {
+    private val logger = LogFactory.getLog(javaClass)
     var fields:ArrayList<Field> = arrayListOf()
     var refActionGroups:ArrayList<RefActionGroup> = arrayListOf()
     var refMenus:ArrayList<RefMenu> = arrayListOf()
@@ -59,10 +61,14 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
             }
         }
         f.icon=icon
-        if(name.indexOf(".")>-1){
+        if(name.indexOf(".")>-1 || f.style==Field.Style.relation){
             try {
                 val model= AppModel.ref.getModel(this.app!!,this.model!!)
-                var (propertyName,toPropertyName) = name.split(".")
+                var tName=name
+                if(tName.indexOf(".")<0){
+                    tName += "."
+                }
+                var (propertyName,toPropertyName) = tName.split(".")
                 f.name=propertyName
                 val mField = model?.getFieldByPropertyName(propertyName)
                 if(mField!=null){
@@ -72,11 +78,14 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                             val rField = rModel?.fields?.getField(mField.relationModelFieldName)
                             var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
                             var tField=tModel?.fields?.getField(mField.targetModelFieldName)
+
                             if(rModel!=null && rField!=null && tModel!=null && tField!=null){
+
                                  RelationData(tModel.meta.appName,tModel.meta.name,tField.propertyName,
                                         rModel.meta.appName,rModel.meta.name,rField.propertyName,RelationType.Many2Many,toPropertyName)
                             }
                             else{
+                                logger.error("m2m ${this.app} ${this.model} $propertyName relation failed")
                                 null
                             }
                         }
@@ -88,6 +97,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                        "","","",RelationType.Many2One,toPropertyName)
                             }
                             else{
+                                logger.error("m2o ${this.app} ${this.model} $propertyName relation failed")
                                 null
                             }
                         }
@@ -99,6 +109,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                         "","","",RelationType.One2Many,toPropertyName)
                             }
                             else{
+                                logger.error("o2m ${this.app} ${this.model} $propertyName relation failed")
                                 null
                             }
                         }
@@ -110,6 +121,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                         "","","",if(mField.isVirtualField) RelationType.VirtualOne2One else RelationType.One2One,toPropertyName)
                             }
                             else{
+                                logger.error("o2o ${this.app} ${this.model} $propertyName relation failed")
                                 null
                             }
                         }

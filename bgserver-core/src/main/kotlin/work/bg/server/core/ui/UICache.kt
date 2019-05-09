@@ -130,13 +130,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     }
     fun getMenu(app:String,menu:String):MenuTree?
     {
-        return this.menuTrees[app]?.menus?.get(menu)
+        return this.menuTrees[app]?.menus?.get(menu)?.createCopy()
     }
     fun getAppModelView(app:String):AppModelView?{
         return this.modelViews[app]
     }
     fun getModelView(app: String,model:String,viewType:String):ModelView?{
-        return this.modelViews[app]?.modelViews?.get(model)?.get(viewType)
+        return this.modelViews[app]?.modelViews?.get(model)?.get(viewType)?.createCopy()
     }
     fun getViewAction(app:String,model:String,viewType:String,groupName:String):ViewAction?{
         val appVA = this.viewActions[app]
@@ -149,7 +149,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                         it.groups.keys.contains(groupName)
                     }
                     if(va!=null){
-                        return va
+                        return va.createCopy()
                     }
                 }
             }
@@ -157,13 +157,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         if(app!="*" && model!="*"){
             var va = this.getViewAction("*",model,viewType,groupName)
             if(va!=null){
-                return va
+                return va.createCopy()
             }
         }
         if(app=="*" && model!="*"){
             var va = this.getViewAction("*","*",viewType,groupName)
             if(va!=null){
-                return va
+                return va.createCopy()
             }
         }
         return null

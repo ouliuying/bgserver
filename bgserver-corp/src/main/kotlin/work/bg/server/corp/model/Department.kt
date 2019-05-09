@@ -65,4 +65,10 @@ class Department:ContextModel("corp_department",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+    val children = ModelOne2ManyField(null,
+            "deparentment_id",
+            FieldType.BIGINT,
+            title = "下级部门",
+            targetModelTable = "public.corp_department",
+            targetModelFieldName = "id")
 }

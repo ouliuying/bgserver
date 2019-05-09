@@ -21,7 +21,7 @@ class  GroupBy constructor(vararg val fields:FieldBase,val havingCriteria: Model
     override fun accept(visitor: ModelExpressionVisitor,parent:ModelExpression?): Boolean {
        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         visitor.visit(this,parent)
-        return true;
+        return true
     }
 
     override fun render(parent:ModelExpression?): Pair<String, Map<String, Any?>>? {

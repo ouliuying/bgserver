@@ -22,6 +22,7 @@ package work.bg.server.core.model
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
@@ -35,6 +36,7 @@ import work.bg.server.core.ui.*
 import work.bg.server.errorcode.ErrorCode
 
 abstract  class ContextModel(tableName:String,schemaName:String):AccessControlModel(tableName,schemaName) {
+    private val logger = LogFactory.getLog(javaClass)
     @Autowired
     var partnerCacheRegistry:PartnerCacheRegistry?=null
     @Autowired
@@ -42,6 +44,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     init {
 
     }
+
     /**
      *  actions begin
      */
@@ -106,6 +109,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 pageSize = param.pageSize)
         return ar
     }
+
+
     @Action(name="delete")
     open fun deleteAction(@RequestBody data:JsonObject, pc:PartnerCache): ActionResult?{
         var ar = ActionResult()
@@ -137,8 +142,18 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val viewRefType =data["viewRefType"]?.asString
         val reqData = data["reqData"]?.asJsonObject
         val ownerField = data["ownerField"]?.asJsonObject
+        val (ownerFieldValue,toField) = this.getOwnerFieldAndRefField(ownerField,app,model)
         ar.bag = this.loadMainViewType(app,model,viewType,ownerField,pc,reqData,viewRefType)
         return ar
+    }
+    private fun getOwnerFieldAndRefField(ownerField: JsonObject?,app:String,model:String):Pair<FieldValue?,FieldBase?>{
+        ownerField?.let {
+            val ownerApp = it["app"]?.asString
+            val ownerModel = it["model"]?.asString
+            val ownerFieldName = it["name"]?.asString
+            val ownerValue = it["value"]?.asLong
+        }
+        return Pair(null,null)
     }
 
     private fun loadMainViewType(app:String,model:String,
@@ -147,12 +162,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                  pc:PartnerCache,
                                  reqData:JsonObject?,viewRefType:String?=null):MutableMap<String,Any>{
         var reqRefType= viewRefType?:if(ownerField!=null) ModelViewRefType.Sub else ModelViewRefType.Main
-
         var mv=pc.getAccessControlModelView(app,model,viewType)
         var bag = mutableMapOf<String,Any>()
         if(mv!=null){
-            mv=this.fillModelViewMeta(mv,bag,pc,reqData)
-            var mvData = this.loadModelViewData(mv,bag, pc, reqData)
+            mv=this.fillModelViewMeta(mv,bag,pc,ownerField,reqData)
+            var mvData = this.loadModelViewData(mv,bag, pc,ownerField, reqData)
             bag["view"] = mv
             if(mvData!=null){
                 bag["data"]=mvData
@@ -168,7 +182,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 bag["triggerGroups"]=triggerGroups
             }
             mv.refViews.forEach {
-                var refMV= this.loadRefViewType(it,pc,reqData,reqRefType)
+                var refMV= this.loadRefViewType(it,pc,reqData,ownerField,reqRefType)
                 refMV?.let {
                     if(bag.containsKey("subViews")){
                         (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -184,15 +198,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return bag
     }
 
-    private fun loadRefViewType(refView:ModelView.RefView, pc:PartnerCache, reqData:JsonObject?, reqRefType:String):Map<String,Any>?{
+    private fun loadRefViewType(refView:ModelView.RefView, pc:PartnerCache,ownerField:JsonObject?, reqData:JsonObject?, reqRefType:String):Map<String,Any>?{
         var mv=pc.getAccessControlModelView(refView.app,refView.model,refView.viewType)
         if(mv!=null){
             var bag = mutableMapOf<String,Any>()
             bag["refView"]=refView
-            if(reqRefType==ModelViewRefType.Main || refView.refTypes.contains(ModelViewRefType.Embedded)){
+            if(refView.refTypes.contains(ModelViewRefType.Embedded)){
                 bag["view"] = mv
-                mv=this.fillModelViewMeta(mv,bag,pc,reqData)
-                var mvData = this.loadModelViewData(mv, bag,pc, reqData)
+                mv=this.fillModelViewMeta(mv,bag,pc,ownerField,reqData)
+                var mvData = this.loadModelViewData(mv, bag,pc, ownerField,reqData)
                 if(mvData!=null){
                     bag["data"]=mvData
                 }
@@ -207,7 +221,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     bag["triggerGroups"]=triggerGroups
                 }
                 mv.refViews.forEach {
-                    var refMV= this.loadRefViewType(it,pc,reqData,ModelViewRefType.Sub)
+                    var refMV= this.loadRefViewType(it,pc,ownerField,reqData,ModelViewRefType.Sub)
                     refMV?.let {
                         if(bag.containsKey("subViews")){
                             (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -228,7 +242,6 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
      * actions end
      */
 
-
     protected open fun loadModelViewActionTriggerGroups(mv:ModelView,actionNames:Array<String>,pc:PartnerCache,reqData: JsonObject?):Array<TriggerGroup>?{
         var triggerGroups = arrayListOf<TriggerGroup>()
         actionNames.forEach {
@@ -239,10 +252,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return triggerGroups.toTypedArray()
     }
-    protected  open fun fillModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData: JsonObject?):ModelView{
+
+    protected  open fun fillModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData: JsonObject?):ModelView{
+
+
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-                return this.fillCreateModelViewMeta(mv,viewData,pc,reqData)
+                return this.fillCreateModelViewMeta(mv,viewData,pc,ownerField,reqData)
             }
             ModelView.ViewType.DETAIL->{
 
@@ -257,7 +273,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return mv
     }
 
-    protected  open fun fillCreateModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData: JsonObject?):ModelView{
+    protected  open fun fillCreateModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData: JsonObject?):ModelView{
         mv.fields.forEach {
             when(it.type){
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect,ModelView.Field.ViewFieldType.many2ManyDataSetSelect->{
@@ -267,20 +283,14 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             var idField = tModel.fields.getIdField()
                             var toField = tModel.getFieldByPropertyName(it.relationData!!.toName!!)
                             if(idField!=null && toField!=null){
-                                var dataArray=(tModel as ContextModel).acRead(idField,toField,
-                                        partnerCache = pc,
+                                var dataArray=(tModel as ContextModel).acRead(partnerCache = pc,
                                         criteria = null,
                                         pageIndex = 1,
                                         pageSize = 10)
                                 if(dataArray!=null){
                                     var jArr = JsonArray()
-                                    dataArray.data.forEach {fvIT->
-                                        var id = fvIT.getValue(idField)
-                                        var toValue = fvIT.getValue(toField)
-                                        var jo=JsonObject()
-                                        jo.addProperty(idField.propertyName,id?.toString())
-                                        jo.addProperty(toField.name,toValue?.toString())
-                                        jArr.add(jo)
+                                    dataArray.toModelDataObjectArray().forEach {it->
+                                        jArr.add(this.gson.toJsonTree(it))
                                     }
                                     var metaObj=JsonObject()
                                     metaObj.add("options",jArr)
@@ -295,24 +305,25 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return mv
     }
 
-    protected open fun loadModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject?{
+    protected open fun loadModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?, reqData:JsonObject?):JsonObject?{
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-               return this.loadCreateModelViewData(mv,viewData,pc,reqData)
+               return this.loadCreateModelViewData(mv,viewData,pc,ownerField,reqData)
             }
             ModelView.ViewType.DETAIL->{
-                return this.loadDetailModelViewData(mv,viewData,pc,reqData)
+                return this.loadDetailModelViewData(mv,viewData,pc,ownerField,reqData)
             }
             ModelView.ViewType.EDIT->{
-                return this.loadEditModelViewData(mv,viewData,pc,reqData)
+                return this.loadEditModelViewData(mv,viewData,pc,ownerField,reqData)
             }
             ModelView.ViewType.LIST->{
-                return this.loadListModelViewData(mv,viewData,pc,reqData)
+                return this.loadListModelViewData(mv,viewData,pc,ownerField,reqData)
             }
         }
         return null
     }
-    protected open fun loadCreateModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject? {
+
+    protected open fun loadCreateModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData:JsonObject?):JsonObject? {
 
         return JsonObject()
     }
@@ -320,6 +331,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadDetailModelViewData(mv:ModelView,
                                                viewData:MutableMap<String,Any>,
                                                pc:PartnerCache,
+                                               ownerField:JsonObject?,
                                                reqData:JsonObject?):JsonObject?{
         val id = reqData?.get("id")?.asInt
         id?.let {
@@ -339,6 +351,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadEditModelViewData(mv:ModelView,
                                                viewData:MutableMap<String,Any>,
                                                pc:PartnerCache,
+                                             ownerField:JsonObject?,
                                                reqData:JsonObject?):JsonObject?{
         val id = reqData?.get("id")?.asInt
         id?.let {
@@ -355,7 +368,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return null
     }
 
-    protected  open fun loadListModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,reqData:JsonObject?):JsonObject?{
+    protected  open fun loadListModelViewData(mv:ModelView,
+                                              viewData:MutableMap<String,Any>,
+                                              pc:PartnerCache,
+                                              ownerField:JsonObject?,
+                                              reqData:JsonObject?):JsonObject?{
         val pageIndex = reqData?.get("pageIndex")?.asInt?:1
         val pageSize = reqData?.get("pageSize")?.asInt?:10
         val jCriteria = reqData?.get("criteria")?.asJsonObject

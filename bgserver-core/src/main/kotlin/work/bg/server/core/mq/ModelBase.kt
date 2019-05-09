@@ -275,7 +275,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 }
             }
         }
-        this.logger.debug("sql = ${sql}, values = ${sb.toString()}")
+        this.logger.info("sql = ${sql}, values = ${sb.toString()}")
         var kParameters=this.fieldValueToParameters(parameters)
         if(kParameters!=null)
             return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<ModelDataArray?> {
