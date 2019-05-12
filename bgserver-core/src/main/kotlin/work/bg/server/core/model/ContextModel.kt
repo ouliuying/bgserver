@@ -29,6 +29,7 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheRegistry
 import work.bg.server.core.context.JsonClauseResolver
 import work.bg.server.core.mq.*
+import work.bg.server.core.mq.specialized.ConstRelRegistriesField
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.model.ActionResult
 import work.bg.server.core.spring.boot.model.ReadActionParam
@@ -143,7 +144,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val reqData = data["reqData"]?.asJsonObject
         val ownerField = data["ownerField"]?.asJsonObject
         val (ownerFieldValue,toField) = this.getOwnerFieldAndRefField(ownerField,app,model)
-        ar.bag = this.loadMainViewType(app,model,viewType,ownerField,pc,reqData,viewRefType)
+        ar.bag = this.loadMainViewType(app,model,viewType,ownerFieldValue,toField,pc,reqData,viewRefType)
         return ar
     }
     private fun getOwnerFieldAndRefField(ownerField: JsonObject?,app:String,model:String):Pair<FieldValue?,FieldBase?>{
@@ -151,22 +152,59 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             val ownerApp = it["app"]?.asString
             val ownerModel = it["model"]?.asString
             val ownerFieldName = it["name"]?.asString
-            val ownerValue = it["value"]?.asLong
+            if(!ownerApp.isNullOrEmpty() && !ownerModel.isNullOrEmpty()
+                    &&!ownerFieldName.isNullOrEmpty()){
+                val ownerFieldObject = this.appModel.getModel(ownerApp,ownerModel)?.fields?.getFieldByPropertyName(ownerFieldName)
+                if(ownerFieldObject!=null){
+                    var refField = when(ownerFieldObject){
+                        is RefRelationField->{
+                            var relationModel = this.appModel.getModel(ownerFieldObject.relationModelTable!!)
+                            var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
+                            if(relationModel!=null && relationModel.meta.appName == app && relationModel.meta.name == model){
+                                relationModel.fields?.getField(ownerFieldObject.relationModelFieldName)
+                            }
+                            else if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name == model){
+                                targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
+                            }
+                            else {
+                                null
+                            }
+                        }
+                        is RefTargetField->{
+                            var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
+                            if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name==model){
+                                targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
+                            }
+                            else{
+                                null
+                            }
+                        }
+                        else->null
+                    }
+                    if(refField!=null) return if(it.has("value")){
+                        val ownerValue =  it["value"]?.asLong
+                        Pair(FieldValue(ownerFieldObject,ownerValue),refField)
+                    } else{
+                        Pair(FieldValue(ownerFieldObject,Undefined),refField)
+                    }
+                }
+            }
         }
         return Pair(null,null)
     }
 
     private fun loadMainViewType(app:String,model:String,
                                  viewType:String,
-                                 ownerField:JsonObject?,
+                                 ownerFieldValue:FieldValue?,
+                                 toField:FieldBase?,
                                  pc:PartnerCache,
                                  reqData:JsonObject?,viewRefType:String?=null):MutableMap<String,Any>{
-        var reqRefType= viewRefType?:if(ownerField!=null) ModelViewRefType.Sub else ModelViewRefType.Main
+        var reqRefType= viewRefType?:if(ownerFieldValue!=null) ModelViewRefType.Sub else ModelViewRefType.Main
         var mv=pc.getAccessControlModelView(app,model,viewType)
         var bag = mutableMapOf<String,Any>()
         if(mv!=null){
-            mv=this.fillModelViewMeta(mv,bag,pc,ownerField,reqData)
-            var mvData = this.loadModelViewData(mv,bag, pc,ownerField, reqData)
+            var mvData = this.loadModelViewData(mv,bag, pc,ownerFieldValue,toField, reqData)
+            mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,reqData)
             bag["view"] = mv
             if(mvData!=null){
                 bag["data"]=mvData
@@ -182,7 +220,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 bag["triggerGroups"]=triggerGroups
             }
             mv.refViews.forEach {
-                var refMV= this.loadRefViewType(it,pc,reqData,ownerField,reqRefType)
+                var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,reqData,reqRefType)
                 refMV?.let {
                     if(bag.containsKey("subViews")){
                         (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -198,15 +236,20 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return bag
     }
 
-    private fun loadRefViewType(refView:ModelView.RefView, pc:PartnerCache,ownerField:JsonObject?, reqData:JsonObject?, reqRefType:String):Map<String,Any>?{
+    private fun loadRefViewType(refView:ModelView.RefView,
+                                pc:PartnerCache,
+                                ownerFieldValue:FieldValue?,
+                                toField:FieldBase?,
+                                reqData:JsonObject?,
+                                reqRefType:String):Map<String,Any>?{
         var mv=pc.getAccessControlModelView(refView.app,refView.model,refView.viewType)
         if(mv!=null){
             var bag = mutableMapOf<String,Any>()
             bag["refView"]=refView
             if(refView.refTypes.contains(ModelViewRefType.Embedded)){
                 bag["view"] = mv
-                mv=this.fillModelViewMeta(mv,bag,pc,ownerField,reqData)
-                var mvData = this.loadModelViewData(mv, bag,pc, ownerField,reqData)
+                var mvData = this.loadModelViewData(mv, bag,pc, ownerFieldValue,toField,reqData)
+                mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,reqData)
                 if(mvData!=null){
                     bag["data"]=mvData
                 }
@@ -221,7 +264,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     bag["triggerGroups"]=triggerGroups
                 }
                 mv.refViews.forEach {
-                    var refMV= this.loadRefViewType(it,pc,ownerField,reqData,ModelViewRefType.Sub)
+                    var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,reqData,ModelViewRefType.Sub)
                     refMV?.let {
                         if(bag.containsKey("subViews")){
                             (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -253,31 +296,147 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return triggerGroups.toTypedArray()
     }
 
-    protected  open fun fillModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData: JsonObject?):ModelView{
+    protected  open fun fillModelViewMeta(mv:ModelView,modelData:ModelData?,viewData:MutableMap<String,Any>,
+                                          pc:PartnerCache,
+                                          ownerFieldValue:FieldValue?,
+                                          toField:FieldBase?,reqData: JsonObject?):ModelView{
 
 
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-                return this.fillCreateModelViewMeta(mv,viewData,pc,ownerField,reqData)
+                return this.fillCreateModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.DETAIL->{
-
+                return this.fillDetailModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.EDIT->{
-
+                return this.fillEditModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.LIST->{
-
+                return this.fillListModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
         }
         return mv
     }
+    protected  open fun fillDetailModelViewMeta(mv:ModelView,
+                                                modelData:ModelData?,
+                                                viewData:MutableMap<String,Any>,
+                                                pc:PartnerCache,
+                                                ownerFieldValue:FieldValue?,
+                                                toField:FieldBase?,
+                                                reqData: JsonObject?):ModelView{
+        var modelDataObject  = modelData as ModelDataObject?
+        mv.fields.forEach {
+            when (it.type) {
+                ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
+                ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
+                    if (it.relationData != null &&
+                            it.meta == null &&
+                            it.style != ModelView.Field.Style.relation &&
+                            (it.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many &&
+                            modelData != null) {
 
-    protected  open fun fillCreateModelViewMeta(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData: JsonObject?):ModelView{
+                        var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                        var rField = modelObject?.getFieldByPropertyName(it.name) as ModelMany2ManyField?
+                        var relationModel = this.appModel.getModel(rField?.relationModelTable)
+                        var targetModel=this.appModel.getModel((it.relationData as ModelView.RelationData).targetApp,
+                                (it.relationData as ModelView.RelationData).targetModel)
+                        if (modelDataObject != null &&
+                                relationModel!=null &&
+                                targetModel!=null) {
+                            var jArr = JsonArray()
+                            var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                            dataArray?.data?.forEach {fvs->
+                                fvs.forEach { fv->
+                                    if(fv.value is ModelDataObject){
+                                        if(targetModel.isSame(fv.value.model)){
+                                            jArr.add(this.gson.toJsonTree(fv.value))
+                                        }
+                                    }
+                                }
+                            }
+                            var metaObj=JsonObject()
+                            metaObj.add("options",jArr)
+                            it.meta=metaObj
+                        }
+                    }
+                }
+            }
+        }
+        return mv
+    }
+    protected  open fun fillEditModelViewMeta(mv:ModelView,
+                                              modelData:ModelData?,
+                                                viewData:MutableMap<String,Any>,
+                                                pc:PartnerCache,
+                                                ownerFieldValue:FieldValue?,
+                                                toField:FieldBase?,
+                                                reqData: JsonObject?):ModelView{
+        var modelDataObject  = modelData as ModelDataObject?
+        mv.fields.forEach {
+            when (it.type) {
+                ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
+                ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
+                    if (it.relationData != null &&
+                            it.meta == null &&
+                            it.style != ModelView.Field.Style.relation &&
+                            (it.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many &&
+                            modelData != null) {
+
+                        var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                        var rField = modelObject?.getFieldByPropertyName(it.name) as ModelMany2ManyField?
+                        var relationModel = this.appModel.getModel(rField?.relationModelTable)
+                        var targetModel=this.appModel.getModel((it.relationData as ModelView.RelationData).targetApp,
+                                (it.relationData as ModelView.RelationData).targetModel)
+                        if (modelDataObject != null &&
+                                relationModel!=null &&
+                                targetModel!=null) {
+                            var jArr = JsonArray()
+                            var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                            dataArray?.data?.forEach {fvs->
+                                fvs.forEach { fv->
+                                    if(fv.value is ModelDataObject){
+                                        if(targetModel.isSame(fv.value.model)){
+                                            jArr.add(this.gson.toJsonTree(fv.value))
+                                        }
+                                    }
+                                }
+                            }
+                            var metaObj=JsonObject()
+                            metaObj.add("options",jArr)
+                            it.meta=metaObj
+                        }
+                    }
+                }
+            }
+        }
+        return mv
+    }
+    protected  open fun fillListModelViewMeta(mv:ModelView,
+                                              modelData:ModelData?,
+                                              viewData:MutableMap<String,Any>,
+                                              pc:PartnerCache,
+                                              ownerFieldValue:FieldValue?,
+                                              toField:FieldBase?,
+                                              reqData: JsonObject?):ModelView{
+
+
+        return mv
+    }
+    protected  open fun fillCreateModelViewMeta(mv:ModelView,
+                                                modelData:ModelData?,
+                                                viewData:MutableMap<String,Any>,
+                                                pc:PartnerCache,
+                                                ownerFieldValue:FieldValue?,
+                                                toField:FieldBase?,
+                                                reqData: JsonObject?):ModelView{
         mv.fields.forEach {
             when(it.type){
-                ModelView.Field.ViewFieldType.many2OneDataSetSelect,ModelView.Field.ViewFieldType.many2ManyDataSetSelect->{
-                    if(it.relationData!=null && it.meta==null){
+                ModelView.Field.ViewFieldType.many2OneDataSetSelect,
+                ModelView.Field.ViewFieldType.many2ManyDataSetSelect->{
+                    if(it.relationData!=null &&
+                            it.meta==null &&
+                            it.style!= ModelView.Field.Style.relation){
                         var tModel = this.appModel.getModel(it.relationData!!.targetApp,it.relationData!!.targetModel)
                         if(tModel!=null){
                             var idField = tModel.fields.getIdField()
@@ -305,43 +464,100 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return mv
     }
 
-    protected open fun loadModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?, reqData:JsonObject?):JsonObject?{
+    protected open fun loadModelViewData(mv:ModelView,
+                                         viewData:MutableMap<String,Any>,
+                                         pc:PartnerCache,
+                                         ownerFieldValue:FieldValue?,
+                                         toField:FieldBase?,
+                                         reqData:JsonObject?):ModelData?{
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-               return this.loadCreateModelViewData(mv,viewData,pc,ownerField,reqData)
+               return this.loadCreateModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.DETAIL->{
-                return this.loadDetailModelViewData(mv,viewData,pc,ownerField,reqData)
+                return this.loadDetailModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.EDIT->{
-                return this.loadEditModelViewData(mv,viewData,pc,ownerField,reqData)
+                return this.loadEditModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.LIST->{
-                return this.loadListModelViewData(mv,viewData,pc,ownerField,reqData)
+                return this.loadListModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
             }
         }
         return null
     }
+    private fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
+        var fields = arrayListOf<FieldBase>()
+        if(mv.app.isNullOrEmpty() || mv.model.isNullOrEmpty()){
+            return fields
+        }
+        var modelObj: ModelBase? = this.appModel.getModel(mv.app,mv.model) ?: return fields
+        mv.fields.forEach {
+            if(it.relationData==null){
+                var field = modelObj?.getFieldByPropertyName(it.name)
+                field?.let {fd->
+                    if(fd !is FunctionField<*>){
+                        fields.add(fd)
+                    }
+                }
+            }
+            else{
+                if(it.style!=ModelView.Field.Style.relation){
+                    var field= modelObj?.getFieldByPropertyName(it.name)
+                    field?.let {
+                        fields.add(field)
+                    }
+                }
+            }
+        }
+        var idField = modelObj?.fields?.getIdField()
+        idField?.let {
+            if(fields.count {
+                it.isSame(idField)
+            }<1){
+                fields.add(idField)
+            }
+        }
+        return fields
+    }
+    protected open fun loadCreateModelViewData(mv:ModelView,
+                                               viewData:MutableMap<String,Any>,
+                                               pc:PartnerCache,
+                                               ownerFieldValue:FieldValue?,
+                                               toField:FieldBase?,
+                                               reqData:JsonObject?):ModelDataObject? {
 
-    protected open fun loadCreateModelViewData(mv:ModelView,viewData:MutableMap<String,Any>,pc:PartnerCache,ownerField:JsonObject?,reqData:JsonObject?):JsonObject? {
-
-        return JsonObject()
+        return null
     }
 
     protected open fun loadDetailModelViewData(mv:ModelView,
                                                viewData:MutableMap<String,Any>,
                                                pc:PartnerCache,
-                                               ownerField:JsonObject?,
-                                               reqData:JsonObject?):JsonObject?{
+                                               ownerFieldValue:FieldValue?,
+                                               toField:FieldBase?,
+                                               reqData:JsonObject?):ModelDataObject?{
         val id = reqData?.get("id")?.asInt
+        val fields = this.getModelViewFields(mv).toTypedArray()
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(criteria = eq(idf,it), partnerCache = pc)
+                var data = this.acRead(*fields,criteria = eq(idf,it), partnerCache = pc)
                 data?.let {
                     if(it.data.count()>0){
-                        return this.gson.toJsonTree(it.firstOrNull()) as JsonObject
+                        return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
+                            _f is ModelMany2ManyField
+                        }.toTypedArray())) as ModelDataObject?
                     }
+                }
+            }
+        }
+        if(ownerFieldValue!=null && ownerFieldValue.value!=Undefined && toField!=null) {
+            var data = this.acRead(*fields, criteria = eq(toField, ownerFieldValue.value), partnerCache = pc)
+            data?.let {
+                if (it.data.count() > 0) {
+                    return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
+                        _f is ModelMany2ManyField
+                    }.toTypedArray())) as ModelDataObject?
                 }
             }
         }
@@ -349,41 +565,139 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
 
     protected open fun loadEditModelViewData(mv:ModelView,
-                                               viewData:MutableMap<String,Any>,
-                                               pc:PartnerCache,
-                                             ownerField:JsonObject?,
-                                               reqData:JsonObject?):JsonObject?{
+                                            viewData:MutableMap<String,Any>,
+                                            pc:PartnerCache,
+                                            ownerFieldValue:FieldValue?,
+                                            toField:FieldBase?,
+                                            reqData:JsonObject?):ModelDataObject?{
         val id = reqData?.get("id")?.asInt
+        val fields = this.getModelViewFields(mv).toTypedArray()
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(criteria = eq(idf,it), partnerCache = pc)
+                var data = this.acRead(*fields, criteria = eq(idf,it), partnerCache = pc)
                 data?.let {
                     if(it.data.count()>0){
-                        return this.gson.toJsonTree(it.firstOrNull()) as JsonObject
+                        return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
+                            it is ModelMany2ManyField
+                        }.toTypedArray())) as ModelDataObject?
                     }
+                }
+            }
+        }
+
+        if(ownerFieldValue!=null && ownerFieldValue.value!=Undefined && toField!=null) {
+            var data = this.acRead(*fields, criteria = eq(toField, ownerFieldValue.value), partnerCache = pc)
+            data?.let {
+                if (it.data.count() > 0) {
+                    return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
+                        _f is ModelMany2ManyField
+                    }.toTypedArray())) as ModelDataObject?
                 }
             }
         }
         return null
     }
 
+    private  fun setM2MFieldValue(model:ModelBase,
+                                  fvs:FieldValueArray,
+                                  fd:FieldBase,
+                                  relModel:ModelBase,
+                                  relFvs:FieldValueArray){
+        val fRelModel = this.appModel.getModel((fd as ModelMany2ManyField).relationModelTable)
+        if(relModel.isSame(fRelModel)){
+            relFvs.forEach {
+                when(it.field){
+                    is ModelMany2OneField->{
+                        if(it.value is ModelDataObject){
+                            var tTargetModel = this.appModel.getModel(it.field.targetModelTable)
+                            tTargetModel?.let {_->
+                                if(tTargetModel.isSame(model)){
+                                    fvs.setValue(fd,it.value)
+                                    return@forEach
+                                }
+                            }
+                            var fTargetModel = this.appModel.getModel(fd.targetModelTable)
+                            var rTargetModel = this.appModel.getModel(it.field.targetModelTable)
+                            fTargetModel?.let {_->
+                                if(fTargetModel.isSame(rTargetModel)){
+                                    fvs.setValue(fd,it.value)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun toClientModelData(modelData:ModelData?,m2mFields:ArrayList<FieldBase>):ModelData?{
+        modelData?.let {
+            when(it){
+                is ModelDataObject->{
+                    var mso = it.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?
+                    mso?.let {msoIt->
+                        m2mFields.forEach {fd->
+                            if(fd is ModelMany2ManyField){
+                                var relModel = this.appModel.getModel(fd.relationModelTable)
+                                relModel?.let {mRelIt->
+                                    msoIt.data[mRelIt]?.let {mdaIt->
+                                        this.setM2MFieldValue(fd.model!!,it.data,fd,relModel,(mdaIt as ModelDataArray).data.first())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                is ModelDataArray->{
+                    it.data?.forEach {fvs->
+                        var mso = fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?
+                        mso?.let {msoIt->
+                            m2mFields.forEach {fd->
+                               if(fd is ModelMany2ManyField){
+                                   var relModel = this.appModel.getModel(fd.relationModelTable)
+                                   relModel?.let {mRelIt->
+                                       msoIt.data[mRelIt]?.let {mdaIt->
+                                           this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,(mdaIt as ModelDataArray).data.first())
+                                       }
+                                   }
+                               }
+                            }
+                        }
+                    }
+                }
+                else->null
+            }
+        }
+        return modelData
+    }
+
     protected  open fun loadListModelViewData(mv:ModelView,
                                               viewData:MutableMap<String,Any>,
                                               pc:PartnerCache,
-                                              ownerField:JsonObject?,
-                                              reqData:JsonObject?):JsonObject?{
+                                              ownerFieldValue:FieldValue?,
+                                              toField:FieldBase?,
+                                              reqData:JsonObject?):ModelDataArray?{
+        if(ownerFieldValue!=null){
+            if(ownerFieldValue.value==Undefined){
+                return null
+            }
+        }
+        val fields = this.getModelViewFields(mv).toTypedArray()
         val pageIndex = reqData?.get("pageIndex")?.asInt?:1
         val pageSize = reqData?.get("pageSize")?.asInt?:10
         val jCriteria = reqData?.get("criteria")?.asJsonObject
         //TODO parse javascript criteria
+
         var criteria = null as ModelExpression?
         jCriteria?.let {
             criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
         }
-        var data = this.acRead(partnerCache = pc,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
+        criteria = if(ownerFieldValue!=null && toField!=null) if(criteria!=null ) and(eq(toField,ownerFieldValue.value)!!,criteria!!) else criteria  else criteria
+        var data = this.acRead(*fields,partnerCache = pc,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
-        return if(data!=null) this.gson.toJsonTree(data) as JsonObject? else null
+        return this.toClientModelData(data,arrayListOf(*fields.filter {_f->
+            _f is ModelMany2ManyField
+        }.toTypedArray())) as ModelDataArray?
     }
 }

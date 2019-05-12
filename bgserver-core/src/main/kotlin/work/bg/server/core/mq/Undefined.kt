@@ -15,15 +15,7 @@
  *
  */
 
-package work.bg.server.errorcode
+package work.bg.server.core.mq
 
-
-enum class ErrorCode(val code:Int, val description:String){
-    SUCCESS(0,"success"),
-    RELOGIN(1,"login in"),
-    USERNAMEORPASSWORDISEMPTY(2,"UserName or password cant be empty!"),
-    USERNAMEORPASSWORDILLEGAL(3,"UserName or password is illegal"),
-    CREATEMODELFAIL(4,"没有提交任何数据！"),
-    UPDATEMODELFAIL(5,"model update failed"),
-    UNKNOW(9999,"system busy error")
+object Undefined {
 }

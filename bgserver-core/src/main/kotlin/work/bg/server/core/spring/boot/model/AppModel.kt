@@ -79,10 +79,16 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
     fun fieldsFromTable(table:String):FieldCollection?{
         return this.tableModelMap?.get(table)?.fields
     }
-    fun getModel(table:String):ModelBase?{
+    fun getModel(table:String?):ModelBase?{
+        if(table.isNullOrEmpty()){
+            return null
+        }
         return this.tableModelMap?.get(table)
     }
-    fun getModel(appName:String,modelName:String):ModelBase?{
+    fun getModel(appName:String?,modelName:String?):ModelBase?{
+        if(appName.isNullOrEmpty() || modelName.isNullOrEmpty()){
+            return null
+        }
         var key="$appName.$modelName"
         return this.appModelMapCache?.get(key)
     }

@@ -41,5 +41,9 @@ class BaseCorp(table:String,schema:String):ContextModel(table,schema){
   val comment=ModelField(null,"comment",FieldType.TEXT,"注释")
   val partners=ModelMany2ManyField(null,"partner_id",FieldType.BIGINT,"用户","public.base_corp_partner_rel","partner_id",
           "base_partner","id")
-  val partnerRoles=ModelOne2ManyField(null,"partner_role_id",FieldType.BIGINT,"角色","public.base_partner_role","corp_id")
+  val partnerRoles=ModelOne2ManyField(null,
+          "m_corp_id",
+          FieldType.BIGINT,"角色",
+          "public.base_partner_role",
+          "corp_id")
 }

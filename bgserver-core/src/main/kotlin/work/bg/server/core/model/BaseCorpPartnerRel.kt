@@ -19,7 +19,11 @@
 
 package work.bg.server.core.model
 
+import jdk.nashorn.internal.objects.Global
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldMustCoexist
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.billboard.CurrCorpBillboard
 import work.bg.server.core.mq.billboard.CurrPartnerBillboard
@@ -76,5 +80,13 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
 
     override fun maybeCheckACRule(): Boolean {
         return false
+    }
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldUnique(corp,partner,partnerRole,advice = "用戶角色必須唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL))
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldMustCoexist(partnerRole,isDefaultCorp,advice = "必須选择用户校色"))
     }
 }

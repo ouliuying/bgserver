@@ -123,7 +123,6 @@
             <field name="nickName" style="subHead" type="singleLineText"></field>
             <field name="birthday" type="date"></field>
             <field name="mobile" type="mobile"></field>
-            <field name="userIcon" type="avatar"></field>
             <field name="telephone" type="telephone"></field>
             <field name="email" type="email"></field>
             <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
@@ -157,7 +156,16 @@
             <field name="nickName" style="subHead" type="singleLineText"></field>
             <field name="birthday" type="date"></field>
             <field name="mobile" type="mobile"></field>
-            <field name="userIcon" type="imageUpload"></field>
+            <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
+            <field name="setCurrentCorpAsDefault" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"设定当前公司为默认"
+                    }
+                  ]]>
+                </meta>
+            </field>
             <field name="telephone" type="telephone"></field>
             <field name="email" type="email"></field>
             <field name="userTitle" colSpan="2" type="multiLineText"></field>
@@ -172,12 +180,10 @@
                 </actions>
             </ref>
             <field name="userName" style="head" type="static"></field>
-            <field name="password" style="head" type="static"></field>
             <field name="name" style="subHead" type="static"></field>
             <field name="nickName" style="subHead" type="static"></field>
             <field name="birthday" type="static"></field>
             <field name="mobile" type="static"></field>
-            <field name="userIcon" type="static"></field>
             <field name="telephone" type="static"></field>
             <field name="email" type="static"></field>
             <field name="userTitle" colSpan="2" type="static"></field>

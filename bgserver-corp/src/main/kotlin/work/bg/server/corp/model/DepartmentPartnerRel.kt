@@ -18,6 +18,10 @@
 package work.bg.server.corp.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldMustCoexist
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.billboard.CurrCorpBillboard
@@ -53,4 +57,12 @@ class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schem
             "id",
             defaultValue = CurrPartnerBillboard(),
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldUnique(partner,department,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldNotNullOrEmpty(department,advice = "部门必须选择"))
+    }
 }

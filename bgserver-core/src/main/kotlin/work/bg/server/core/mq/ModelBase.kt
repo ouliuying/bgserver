@@ -114,8 +114,10 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     open fun skipCorpIsolationFields():Boolean{
         return false
     }
-    open fun isSame(model:ModelBase):Boolean{
-        return this.meta.tag == model.meta.tag
+    open fun isSame(model:ModelBase?):Boolean{
+        if(model!=null)
+            return this.meta.tag == model.meta.tag
+        return false
     }
     protected open fun query(vararg fields:FieldBase,
                              fromModel:ModelBase,
@@ -329,7 +331,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     }
 
     open fun querySql(sql:String,selectFields:Array<FieldBase>?,model:ModelBase?=null,parameters:Array<FieldValue>?=null):ModelDataArray?{
-        return if(parameters!=null && !parameters.isEmpty()){
+        return if(parameters!=null && parameters.isNotEmpty()){
             var mParameters= mutableMapOf<String,FieldValue>()
             parameters.forEach {
                 var columnName=this.tableColumnNameGenerator.generateColumnName(it.field)

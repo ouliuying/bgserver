@@ -32,6 +32,14 @@
             <field name="departments.name" type="many2OneDataSetSelect"></field>
         </xpath>
 
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
+            <field name="departments.name" type="many2OneDataSetSelect"></field>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
+            <field name="departments.name" type="many2OneDataSetSelect"></field>
+        </xpath>
+
     </inherit>
 
     <model name="department" app="corp">

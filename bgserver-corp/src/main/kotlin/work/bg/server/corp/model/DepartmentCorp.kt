@@ -31,8 +31,8 @@ class DepartmentCorp :BaseCorp(){
     }
 
     val departments = ModelOne2ManyField(null,
-            "department_id",FieldType.BIGINT,
+            "m_corp_id",FieldType.BIGINT,
             "部门",
             targetModelTable = "public.department",
-            targetModelFieldName = "id")
+            targetModelFieldName = "corp_id")
 }
