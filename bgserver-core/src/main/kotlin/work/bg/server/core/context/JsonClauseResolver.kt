@@ -69,7 +69,6 @@ class JsonClauseResolver(val obj:JsonObject,
                 } else{
                     null
                 }
-
             }
             op.compareTo("and",true)==0->{
                 var andExps=this.createCriteriaFromArray(obj["exp"].asJsonArray)
@@ -90,7 +89,7 @@ class JsonClauseResolver(val obj:JsonObject,
                         val valueType=exp[3].asString
                         when (valueType) {
                             CriteriaValueType.EXPRESSION -> {
-                                this.createExpression(field,operator,value)
+                                return this.createExpression(field,operator,value)
                             }
                             CriteriaValueType.FIELD -> {
                                 return this.createFieldExpression(field,operator,value)
@@ -109,7 +108,7 @@ class JsonClauseResolver(val obj:JsonObject,
         return null
     }
 
-    //todo add sub select support
+    //TODO add sub select support
     private fun createExpression(field:FieldBase,operator:String,value:String):ModelExpression?{
 
         return null
@@ -237,6 +236,6 @@ class JsonClauseResolver(val obj:JsonObject,
                 exps.add(c)
             }
         }
-        return if(exps.count()>0) exps.toArray() as Array<ModelExpression> else null
+        return if(exps.count()>0) exps.toTypedArray() as Array<ModelExpression> else null
     }
 }

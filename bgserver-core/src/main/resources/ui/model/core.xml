@@ -98,11 +98,51 @@
         </view>
 
         <view type="searchBox">
-            <field name="userName" type="criteriaStringEqual"></field>
-            <field name="name" type="criteriaStringEqual"></field>
-            <field name="nickName" type="criteriaStringEqual"></field>
-            <field name="mobile" type="criteriaMobileEqual"></field>
-            <field name="email" type="criteriaStringILike"></field>
+            <field name="userName" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="nickName" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="mobile" type="criteriaMobileEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="email" type="criteriaStringILike">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
         </view>
 
         <view type="create">
