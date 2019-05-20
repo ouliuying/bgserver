@@ -218,6 +218,12 @@
                         <group name="main"  refType = "main"></group>
                     </action>
                 </actions>
+                <views>
+                    <view type="detail" refType="main|sub" ownerField="partnerRoles" model="partnerRole"></view>
+                </views>
+                <menus>
+
+                </menus>
             </ref>
             <field name="userName" style="head" type="static"></field>
             <field name="name" style="subHead" type="static"></field>
@@ -228,8 +234,8 @@
             <field name="email" type="static"></field>
             <field name="userTitle" colSpan="2" type="static"></field>
             <field name="userComment" colSpan="2" type="static"></field>
+            <field name="partnerRoles" style="relation"></field>
         </view>
-
     </model>
 
     <model name="partnerRole" app="core">
@@ -315,8 +321,8 @@
         <view type="detail">
             <ref>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list"></view>
-                    <view fieldName="apps" refType="main|sub" type="list"></view>
+                    <view fieldName="partners" refType="main|sub" type="list" model="partner"></view>
+                    <view fieldName="apps" refType="main|sub" type="list" model="app"></view>
                 </views>
                 <actions>
                     <group name="main"  refType = "main"></group>
@@ -325,14 +331,11 @@
 
                 </menus>
             </ref>
-            <field name="name"></field>
-            <field name="isSuper"></field>
-            <field name="accessControlRule">
-            </field>
+            <field name="name" type="static"></field>
+            <field name="isSuper" type="static"></field>
+            <field name="accessControlRule" type="static" colSpan="2"></field>
             <field name="partners" style="relation"></field>
             <field name="apps" style="relation"></field>
         </view>
     </model>
-
-
 </ui>

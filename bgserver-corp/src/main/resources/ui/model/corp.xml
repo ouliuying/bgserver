@@ -40,6 +40,12 @@
             <field name="departments.name" type="many2OneDataSetSelect"></field>
         </xpath>
 
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='partnerRoles']" op="insertAfter" app="core">
+            <field name="departments" style="relation"></field>
+        </xpath>
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/ref/views" op="append" app="core">
+            <view type="detail" refType="main|sub" ownerField="departments" model="department" app="corp"></view>
+        </xpath>
     </inherit>
 
     <model name="department" app="corp">
@@ -121,9 +127,9 @@
                     </view>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name = "parent.name" type="many2OneDataSetSelect"></field>
-            <field name="comment" type="multiLineText"></field>
+            <field name="name" type="static" style="head"></field>
+            <field name = "parent.name" type="static"></field>
+            <field name="comment" type="static"></field>
             <field name="children" style="relation"></field>
             <field name="partners" style="relation"></field>
             <field name="parent" style="relation"></field>

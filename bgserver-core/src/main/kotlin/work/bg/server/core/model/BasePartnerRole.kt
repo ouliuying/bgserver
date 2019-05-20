@@ -51,7 +51,7 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
              FieldType.BIGINT,
             "用户",
             "public.base_corp_partner_rel",
-            "partner_role_id",
+            "partner_id",
             "public.base_partner",
             "id")
 

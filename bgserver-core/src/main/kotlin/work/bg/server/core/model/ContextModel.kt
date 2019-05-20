@@ -143,9 +143,20 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val viewRefType =data["viewRefType"]?.asString
         val reqData = data["reqData"]?.asJsonObject
         val ownerField = data["ownerField"]?.asJsonObject
+        val ownerModelID = data["ownerModelID"]?.asLong
         val (ownerFieldValue,toField) = this.getOwnerFieldAndRefField(ownerField,app,model)
-        ar.bag = this.loadMainViewType(app,model,viewType,ownerFieldValue,toField,pc,reqData,viewRefType)
+        ar.bag = this.loadMainViewType(app,model,viewType,ownerFieldValue,toField,ownerModelID,pc,reqData,viewRefType)
         return ar
+    }
+    private  fun getMany2ManyFieldByRelationModel(model:ModelBase,relationModel:ModelBase):ModelMany2ManyField?{
+            model.fields?.forEach {
+                if(it is ModelMany2ManyField){
+                    if(it.relationModelTable==relationModel.fullTableName){
+                        return it
+                    }
+                }
+            }
+        return null
     }
     private fun getOwnerFieldAndRefField(ownerField: JsonObject?,app:String,model:String):Pair<FieldValue?,FieldBase?>{
         ownerField?.let {
@@ -157,21 +168,21 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 val ownerFieldObject = this.appModel.getModel(ownerApp,ownerModel)?.fields?.getFieldByPropertyName(ownerFieldName)
                 if(ownerFieldObject!=null){
                     var refField = when(ownerFieldObject){
-                        is RefRelationField->{
+                        is ModelMany2ManyField->{
                             var relationModel = this.appModel.getModel(ownerFieldObject.relationModelTable!!)
                             var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
                             if(relationModel!=null && relationModel.meta.appName == app && relationModel.meta.name == model){
                                 relationModel.fields?.getField(ownerFieldObject.relationModelFieldName)
                             }
                             else if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name == model){
-                                targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
+                               this.getMany2ManyFieldByRelationModel(targetModel,relationModel!!)
                             }
                             else {
                                 null
                             }
                         }
-                        is RefTargetField->{
-                            var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
+                        is ModelOne2ManyField,is ModelMany2OneField,is ModelOne2OneField->{
+                            var targetModel = this.appModel.getModel((ownerFieldObject as RefTargetField).targetModelTable!!)
                             if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name==model){
                                 targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
                             }
@@ -197,14 +208,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                  viewType:String,
                                  ownerFieldValue:FieldValue?,
                                  toField:FieldBase?,
+                                 ownerModelID:Long?,
                                  pc:PartnerCache,
                                  reqData:JsonObject?,viewRefType:String?=null):MutableMap<String,Any>{
         var reqRefType= viewRefType?:if(ownerFieldValue!=null) ModelViewRefType.Sub else ModelViewRefType.Main
         var mv=pc.getAccessControlModelView(app,model,viewType)
-        var bag = mutableMapOf<String,Any>()
+        var bag = LinkedHashMap<String,Any>()
         if(mv!=null){
-            var mvData = this.loadModelViewData(mv,bag, pc,ownerFieldValue,toField, reqData)
-            mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,reqData)
+            var mvData = this.loadModelViewData(mv,bag, pc,ownerFieldValue,toField,ownerModelID, reqData)
+            mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,ownerModelID,reqData)
             bag["view"] = mv
             if(mvData!=null){
                 bag["data"]=mvData
@@ -220,7 +232,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 bag["triggerGroups"]=triggerGroups
             }
             mv.refViews.forEach {
-                var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,reqData,reqRefType)
+                var refMV = this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData,reqRefType)
                 refMV?.let {
                     if(bag.containsKey("subViews")){
                         (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -240,16 +252,19 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                 pc:PartnerCache,
                                 ownerFieldValue:FieldValue?,
                                 toField:FieldBase?,
+                                ownerModelID: Long?,
                                 reqData:JsonObject?,
-                                reqRefType:String):Map<String,Any>?{
+                                reqRefType:String,
+                                fullLoad:Boolean=false
+                                ):MutableMap<String,Any>?{
         var mv=pc.getAccessControlModelView(refView.app,refView.model,refView.viewType)
         if(mv!=null){
-            var bag = mutableMapOf<String,Any>()
+            var bag = LinkedHashMap<String,Any>()
             bag["refView"]=refView
-            if(refView.refTypes.contains(ModelViewRefType.Embedded)){
+            if(refView.refTypes.contains(ModelViewRefType.Embedded) || fullLoad){
                 bag["view"] = mv
-                var mvData = this.loadModelViewData(mv, bag,pc, ownerFieldValue,toField,reqData)
-                mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,reqData)
+                var mvData = this.loadModelViewData(mv, bag,pc, ownerFieldValue,toField,ownerModelID,reqData)
+                mv=this.fillModelViewMeta(mv,mvData,bag,pc,ownerFieldValue,toField,ownerModelID,reqData)
                 if(mvData!=null){
                     bag["data"]=mvData
                 }
@@ -264,7 +279,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     bag["triggerGroups"]=triggerGroups
                 }
                 mv.refViews.forEach {
-                    var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,reqData,ModelViewRefType.Sub)
+                    var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData,ModelViewRefType.Sub)
                     refMV?.let {
                         if(bag.containsKey("subViews")){
                             (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -299,7 +314,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected  open fun fillModelViewMeta(mv:ModelView,modelData:ModelData?,viewData:MutableMap<String,Any>,
                                           pc:PartnerCache,
                                           ownerFieldValue:FieldValue?,
-                                          toField:FieldBase?,reqData: JsonObject?):ModelView{
+                                          toField:FieldBase?,
+                                          ownerModelID: Long?,
+                                          reqData: JsonObject?):ModelView{
 
 
         when(mv.viewType){
@@ -469,19 +486,20 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                          pc:PartnerCache,
                                          ownerFieldValue:FieldValue?,
                                          toField:FieldBase?,
+                                         ownerModelID: Long?,
                                          reqData:JsonObject?):ModelData?{
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
-               return this.loadCreateModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
+               return this.loadCreateModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
             ModelView.ViewType.DETAIL->{
-                return this.loadDetailModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
+                return this.loadDetailModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
             ModelView.ViewType.EDIT->{
-                return this.loadEditModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
+                return this.loadEditModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
             ModelView.ViewType.LIST->{
-                return this.loadListModelViewData(mv,viewData,pc,ownerFieldValue,toField,reqData)
+                return this.loadListModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
         }
         return null
@@ -525,6 +543,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                pc:PartnerCache,
                                                ownerFieldValue:FieldValue?,
                                                toField:FieldBase?,
+                                               ownerModelID: Long?,
                                                reqData:JsonObject?):ModelDataObject? {
 
         return null
@@ -535,8 +554,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                pc:PartnerCache,
                                                ownerFieldValue:FieldValue?,
                                                toField:FieldBase?,
+                                               ownerModelID: Long?,
                                                reqData:JsonObject?):ModelDataObject?{
-        val id = reqData?.get("id")?.asInt
+        val id = reqData?.get("id")?.asLong
         val fields = this.getModelViewFields(mv).toTypedArray()
         id?.let {
             val idField = this.fields.getIdField()
@@ -551,8 +571,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
             }
         }
-        if(ownerFieldValue!=null && ownerFieldValue.value!=Undefined && toField!=null) {
-            var data = this.acRead(*fields, criteria = eq(toField, ownerFieldValue.value), partnerCache = pc)
+        val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
+        if(ret) {
+            var data = this.acRead(*fields, criteria = criteria, partnerCache = pc)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -563,12 +584,67 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return null
     }
+    private fun getCriteriaByOwnerModelParam(ownerFieldValue: FieldValue?,toField: FieldBase?,ownerModelID: Long?):Pair<Boolean,ModelExpression?>{
 
+        if(ownerFieldValue!=null && toField!=null){
+            if(this.isPersistField(toField)){
+                if(ownerFieldValue.value!=Undefined){
+                    return Pair(true,eq(toField,ownerFieldValue.value))
+                }
+                else if(ownerModelID!=null){
+                    return Pair(true,eq(toField,ownerModelID))
+                }
+            }
+            else{
+                if(toField is ModelMany2ManyField){
+                    if(ownerFieldValue.field is ModelMany2ManyField){
+                        if(ownerModelID!=null){
+                           val mf= this.getRelationModelField(ownerFieldValue.field)
+                            if(mf?.first!=null){
+                                val tmf = this.getRelationModelField(toField)
+                                if(tmf?.first!=null){
+                                    val subSelect = select(mf.second!!,fromModel = mf.first!!).where(eq(tmf.second!!,ownerModelID))
+                                    return Pair(true,`in`(toField.model!!.fields.getIdField()!!,subSelect)!!)
+                                }
+                            }
+                        }
+                    }
+                    else if(ownerFieldValue.field is ModelMany2OneField){
+                        if(ownerFieldValue.value!=Undefined){
+                            return Pair(true,eq(toField?.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
+                        }
+                    }
+                }
+                else if(toField is ModelOne2ManyField){
+                        if(ownerFieldValue.value!=Undefined){
+                            return Pair(true,eq(toField.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
+                        }
+                }
+                else if(toField is One2OneField && toField.isVirtualField){
+                    if(ownerFieldValue.value!=Undefined){
+                        return Pair(true,eq(toField.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
+                    }
+                }
+            }
+        }
+        return Pair(false,null)
+    }
+    fun isPersistField(field:FieldBase?):Boolean{
+        field?.let {
+            if((it !is FunctionField<*>) && (it !is RefRelationField) && it !is One2ManyField){
+                if(it !is ModelOne2OneField || !it.isVirtualField){
+                    return true
+                }
+            }
+        }
+       return false
+    }
     protected open fun loadEditModelViewData(mv:ModelView,
                                             viewData:MutableMap<String,Any>,
                                             pc:PartnerCache,
                                             ownerFieldValue:FieldValue?,
                                             toField:FieldBase?,
+                                             ownerModelID: Long?,
                                             reqData:JsonObject?):ModelDataObject?{
         val id = reqData?.get("id")?.asInt
         val fields = this.getModelViewFields(mv).toTypedArray()
@@ -585,9 +661,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
             }
         }
-
-        if(ownerFieldValue!=null && ownerFieldValue.value!=Undefined && toField!=null) {
-            var data = this.acRead(*fields, criteria = eq(toField, ownerFieldValue.value), partnerCache = pc)
+        val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
+        if(ret) {
+            var data = this.acRead(*fields, criteria = criteria, partnerCache = pc)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -676,6 +752,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                               pc:PartnerCache,
                                               ownerFieldValue:FieldValue?,
                                               toField:FieldBase?,
+                                              ownerModelID: Long?,
                                               reqData:JsonObject?):ModelDataArray?{
         if(ownerFieldValue!=null){
             if(ownerFieldValue.value==Undefined){
@@ -692,7 +769,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         jCriteria?.let {
             criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
         }
-        criteria = if(ownerFieldValue!=null && toField!=null) if(criteria!=null ) and(eq(toField,ownerFieldValue.value)!!,criteria!!) else criteria  else criteria
+        val (ret,ownerCriteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
+        if(ret){
+            criteria = if(criteria!=null && ownerCriteria!=null) and(ownerCriteria,criteria!!) else if(criteria!=null) criteria  else ownerCriteria
+        }
         var data = this.acRead(*fields,partnerCache = pc,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
