@@ -97,7 +97,7 @@
                 <views>
                     <view type="list" ownerField="children" refType="sub|main">
                     </view>
-                    <view type="list" ownerField="partners" refType="sub|main">
+                    <view type="list" ownerField="partners" app="core" model="partner" refType="sub|main">
                     </view>
                     <view type="edit" ownerField="parent" refType="sub|main">
                     </view>
@@ -121,7 +121,7 @@
                 <views>
                     <view type="list" ownerField="children" refType="sub|main">
                     </view>
-                    <view type="list" ownerField="partners" refType="sub|main">
+                    <view type="list" ownerField="partners" app="core" model="partner" refType="sub|main">
                     </view>
                     <view type="detail" ownerField="parent" refType="sub|main">
                     </view>

@@ -289,7 +289,7 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule">
+            <field name="accessControlRule" colSpan="2" type="multiLineText">
             </field>
             <field name="partners" style="relation"></field>
             <field name="apps" style="relation"></field>
@@ -305,7 +305,9 @@
                     <view fieldName="apps" refType="main|sub" type="list"></view>
                 </views>
                 <actions>
-                    <group name="main"  refType = "main"></group>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
                 </actions>
                 <menus>
 
@@ -313,7 +315,7 @@
             </ref>
             <field name="name"></field>
             <field name="isSuper"></field>
-            <field name="accessControlRule">
+            <field name="accessControlRule" colSpan="2" type="multiLineText">
             </field>
             <field name="partners" style="relation"></field>
             <field name="apps" style="relation"></field>
@@ -325,7 +327,9 @@
                     <view fieldName="apps" refType="main|sub" type="list" model="app"></view>
                 </views>
                 <actions>
-                    <group name="main"  refType = "main"></group>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
                 </actions>
                 <menus>
 
