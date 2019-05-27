@@ -17,3 +17,4 @@
 /**/*.xml
 !/**/resources/ui/**/*.xml
 /**/.DS_Store
+/**/out/*
