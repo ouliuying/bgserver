@@ -12,14 +12,10 @@
  *  *  * ensure the GNU Lesser General Public License version 3 requirements
  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
  *  *
- *  
+ *
  */
 
-rootProject.name = 'bgserver'
-include 'bgserver-core'
-include 'bgserver-corp'
-include 'bgserver-account'
-include 'bgserver-crm'
-include 'bgserver-chat'
-include 'bgserver-product'
+package work.bg.server.chat.model
 
+class chat {
+}

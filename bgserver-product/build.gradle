@@ -84,8 +84,6 @@ dependencies {
 dependencies{
     compile project(':bgserver-core')
     compile project(':bgserver-corp')
-    compile project(':bgserver-crm')
-    compile project(':bgserver-account')
 }
 
 

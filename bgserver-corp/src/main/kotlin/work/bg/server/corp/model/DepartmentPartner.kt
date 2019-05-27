@@ -24,8 +24,8 @@ import work.bg.server.core.spring.boot.annotation.Model
 
 @Model("partner", "员工")
 class DepartmentPartner:BasePartner() {
-    companion object : RefSingleton<BasePartner> {
-        override lateinit var ref: BasePartner
+    companion object : RefSingleton<DepartmentPartner> {
+        override lateinit var ref: DepartmentPartner
     }
     val departments = ModelMany2ManyField(null,
             "department_id",

@@ -12,14 +12,19 @@
  *  *  * ensure the GNU Lesser General Public License version 3 requirements
  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
  *  *
- *  
+ *
  */
 
-rootProject.name = 'bgserver'
-include 'bgserver-core'
-include 'bgserver-corp'
-include 'bgserver-account'
-include 'bgserver-crm'
-include 'bgserver-chat'
-include 'bgserver-product'
+package work.bg.server.product.model
 
+import work.bg.server.core.config.AppNamePackage
+import work.bg.server.core.config.AppPackageManifest
+
+class AppName : AppNamePackage {
+    override  fun get(): AppPackageManifest {
+        return AppPackageManifest("product",
+                "产品","/icon/res/corp_app.svg",
+                "产品",
+                1)
+    }
+}
