@@ -35,7 +35,7 @@ class Customer: ContextModel("crm_customer","public") {
 
     val name = ModelField(null,"name",FieldType.STRING,title = "姓名",defaultValue = "")
 
-    val type = ModelField(null,"c_type",FieldType.INT,title = "类型",defaultValue = 0)
+    val isCorp = ModelField(null,"is_corp",FieldType.INT,title = "公司",defaultValue = 0)
 
     val status = ModelMany2OneField(null,
             "c_status",
@@ -49,12 +49,16 @@ class Customer: ContextModel("crm_customer","public") {
 
     //个人属性
     val mobile =  ModelField(null,"mobile",FieldType.STRING,title = "手机",defaultValue = "")
+    val sex =  ModelField(null,"sex",FieldType.INT,title = "手机",defaultValue = -1)
     //公司属性
     val fax =  ModelField(null,"fax",FieldType.STRING,title = "传真",defaultValue = "")
     //通用属性
     val telephone =  ModelField(null,"telephone",FieldType.STRING,title = "电话",defaultValue = "")
     val email =  ModelField(null,"email",FieldType.STRING,title = "email",defaultValue = "")
-    val address =  ModelField(null,"address",FieldType.STRING,title = "地址",defaultValue = "")
+    val province = ModelField(null,"province", FieldType.STRING,title = "省",defaultValue = "")
+    val city = ModelField(null,"city", FieldType.STRING,title = "市",defaultValue = "")
+    val district = ModelField(null,"district", FieldType.STRING,title = "区/县",defaultValue = "")
+    val streetAddress = ModelField(null,"street_address",FieldType.STRING,"详细地址",defaultValue = "")
     val website =  ModelField(null,"website",FieldType.STRING,title = "网址",defaultValue = "")
     val comment =  ModelField(null,"c_comment",FieldType.STRING,title = "注释",defaultValue = "")
     val contactAddresses = ModelOne2ManyField(null,"contact_address_id",FieldType.BIGINT,"联系人",

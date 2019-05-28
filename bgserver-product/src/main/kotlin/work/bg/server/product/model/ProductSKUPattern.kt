@@ -5,6 +5,7 @@ import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.FieldPrimaryKey
 import work.bg.server.core.mq.FieldType
 import work.bg.server.core.mq.ModelField
+import work.bg.server.core.mq.ModelOne2OneField
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="productSKUPattern")
@@ -32,4 +33,10 @@ class ProductSKUPattern:ContextModel("public.product_sku_pattern","public") {
             "sku_count",
             FieldType.INT,
             "Sku数量")
+    val product = ModelOne2OneField(null,
+            "product_id",
+            FieldType.BIGINT,
+            "产品",
+            targetModelTable = "public.product_product",
+            targetModelFieldName = "id")
 }

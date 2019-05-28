@@ -5,7 +5,7 @@ import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
-@Model(name="lead",title = "活动")
+@Model(name="event",title = "活动")
 class Event:ContextModel("crm_event","public") {
     companion object : RefSingleton<Event> {
         override lateinit var ref: Event
@@ -23,7 +23,7 @@ class Event:ContextModel("crm_event","public") {
     val endTime = ModelField(null,"end_time", FieldType.STRING,title = "结束时间")
 
     //负责人
-    val magPargtners = ModelMany2ManyField(null,
+    val magPartners = ModelMany2ManyField(null,
             "manager_partner_id",
             FieldType.BIGINT,
             title = "负责人",

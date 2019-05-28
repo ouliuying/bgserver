@@ -1,0 +1,249 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <model app="product" name="product">
+        <view type="list">
+            <field name="id"></field>
+            <field name="name" type="singleLineText"></field>
+            <field name="cost" type="singleLineText"></field>
+            <field name="price" type="multiLineText"></field>
+            <field name="count" type="multiLineText"></field>
+            <field name="count" type="multiLineText"></field>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="cost" type="singleLineText"></field>
+            <field name="price" type="multiLineText"></field>
+            <field name="count" type="multiLineText"></field>
+            <field name="attributeMap" style="relation"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="cost" type="singleLineText"></field>
+            <field name="price" type="multiLineText"></field>
+            <field name="count" type="multiLineText"></field>
+            <field name="attributeMap" style="relation"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="cost" type="singleLineText"></field>
+            <field name="price" type="multiLineText"></field>
+            <field name="count" type="multiLineText"></field>
+            <field name="attributeMap" style="relation"></field>
+        </view>
+    </model>
+    <model name="productAttribute" app="product">
+        <view type="list">
+            <field name="id"></field>
+            <field name="name" type="singleLineText"></field>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="values" style="relation"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="values" style="relation"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="values" style="relation"></field>
+        </view>
+    </model>
+    <model name="productAttributeValue" app="product">
+        <view type="list">
+            <field name="id" type="singleLineText"></field>
+            <field name="attrValue" type="singleLineText"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="attrValue" type="singleLineText"></field>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="attrValue" type="singleLineText"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="attrValue" type="singleLineText"></field>
+        </view>
+    </model>
+    <model name="productSKUPattern" app="product">
+        <view type="list">
+            <field name="id" type="singleLineText"></field>
+            <field name="name" type="singleLineText"></field>
+            <field name="skuPattern" type="singleLineText"></field>
+            <field name="skuCount" type="singleLineText"></field>
+            <field name="product.name" type="singleLineText"></field>
+        </view>
+        <view type="create">
+            <field name="name" type="singleLineText"></field>
+            <field name="skuPattern" type="singleLineText"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText"></field>
+            <field name="skuPattern" type="singleLineText"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText"></field>
+            <field name="skuPattern" type="singleLineText"></field>
+        </view>
+    </model>
+    <model name="productAttributeValueMap" app="product">
+        <view type="list">
+            <field name="productAttribute.name" type="singleLineText"></field>
+            <field name="productAttributeValue.attrValue" type="singleLineText"></field>
+        </view>
+        <view type="create">
+            <field name="productAttribute.name" type="many2OneDataSetSelect"></field>
+            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect"></field>
+        </view>
+        <view type="edit">
+            <field name="productAttribute.name" type="many2OneDataSetSelect"></field>
+            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect"></field>
+        </view>
+        <view type="detail">
+
+        </view>
+    </model>
+</ui>

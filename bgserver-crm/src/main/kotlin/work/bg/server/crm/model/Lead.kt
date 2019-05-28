@@ -74,7 +74,7 @@ class Lead:ContextModel("crm_lead","public") {
     val interactionStatus=ModelMany2OneField(null,
             "interaction_status_id",
             FieldType.BIGINT,
-            "更近状态",
+            "最近状态",
             targetModelTable = "public.crm_lead_interaction_status",
             targetModelFieldName = "id")
 }

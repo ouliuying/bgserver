@@ -3,10 +3,7 @@ package work.bg.server.product.model
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2ManyField
+import work.bg.server.core.mq.*
 
 
 @Model(name="product")
@@ -44,10 +41,19 @@ class Product:ContextModel("product_product","public") {
             FieldType.STRING,
             title = "图片",
             defaultValue = 0)
+
     val attributeMap = ModelOne2ManyField(null,
             "attribute_map",
             FieldType.BIGINT,
             "属性集",
             targetModelTable = "public.product_attribute_value_map",
             targetModelFieldName = "product")
+
+    val skuPattern = ModelOne2OneField(null,
+            "sku_pattern",
+            FieldType.BIGINT,
+            "Sku生成模式",
+            targetModelTable = "public.product_sku_pattern",
+            targetModelFieldName = "product",
+            isVirtualField = true)
 }
