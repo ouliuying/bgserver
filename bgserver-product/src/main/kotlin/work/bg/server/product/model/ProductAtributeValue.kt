@@ -10,8 +10,8 @@ import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="productAttributeValue")
 class ProductAtributeValue:ContextModel("product_attribute_value","public") {
-    companion object : RefSingleton<ProductAttribute> {
-        override lateinit var ref: ProductAttribute
+    companion object : RefSingleton<ProductAtributeValue> {
+        override lateinit var ref: ProductAtributeValue
     }
     val id= ModelField(null,
             "id",

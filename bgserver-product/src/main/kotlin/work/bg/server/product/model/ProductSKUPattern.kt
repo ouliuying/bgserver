@@ -9,7 +9,7 @@ import work.bg.server.core.mq.ModelOne2OneField
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="productSKUPattern")
-class ProductSKUPattern:ContextModel("public.product_sku_pattern","public") {
+class ProductSKUPattern:ContextModel("product_sku_pattern","public") {
     companion object : RefSingleton<ProductSKUPattern> {
         override lateinit var ref: ProductSKUPattern
     }

@@ -9,7 +9,7 @@ import work.bg.server.core.mq.ModelMany2OneField
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="productAttributeValueMap")
-class ProductAttributeValueMap:ContextModel("public.product_attribute_value_map",
+class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
         "public") {
     companion object : RefSingleton<ProductAttributeValueMap> {
         override lateinit var ref: ProductAttributeValueMap
