@@ -197,7 +197,7 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
             var fkm=it.model
             var tf=(it as RefTargetField).targetModelFieldName
             var tm=(it as RefTargetField).targetModelTable
-            var tModel=this.getModel(tm!!)
+            var tModel=this.getModel(tm)
             var tField=tModel?.fields?.getField("${tModel.fullTableName}.$tf")
             if(tModel!=null && tField!=null){
                 try {

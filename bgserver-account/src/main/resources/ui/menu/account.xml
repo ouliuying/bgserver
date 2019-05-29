@@ -1,0 +1,42 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <menu name="main" app="account" title="产品管理">
+        <menuItem title="订单" model="customerOrder"  app="crm" viewType="list">
+
+        </menuItem>
+
+        <menuItem title="订单发票" model="customerOrderInvoice"  app="crm" viewType="list">
+
+        </menuItem>
+
+        <menuItem title="订单收据" model="customerOrderReceipt" app="crm" viewType="list">
+
+        </menuItem>
+
+        <menuItem title="应收款" model="accountReceivable" viewType="list">
+
+        </menuItem>
+        <menuItem title="应付款" model="accountPayable" viewType="list">
+
+        </menuItem>
+    </menu>
+</ui>

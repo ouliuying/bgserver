@@ -1048,7 +1048,6 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                    var mrDataObject=ModelDataObject(fields=fields,model=it.model)
                    var mfd=modelRelationMatcher.getRelationMatchField(mainModel,it.model)
                    mrDataObject.fromField=mfd?.fromField
-                   mrDataObject.toField=mfd?.toField
                    subModels[it.model]=mrDataObject
                }
             }
@@ -1080,15 +1079,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         subRecord.add(fv)
                     }
                 }
-                it.data=subRecord
-                var mainIdFd=mainModel!!.fields!!.getIdField()
-                var mainIdFV=fvArr.firstOrNull {
-                    faIt->
-                    faIt.field.isSame(mainIdFd!!)
-                }
-                it.fromIdValue=mainIdFV?.value as Long?
                 mainModelDataArray.fields?.add(it.fromField!!)
-                mainRecord.add(FieldValue(it.fromField!!,it))
+                var cloneModelObject=ModelDataObject(data=subRecord,model = it.model)
+                mainRecord.add(FieldValue(it.fromField!!,cloneModelObject))
             }
             mainModelDataArray.data.add(mainRecord)
         }
