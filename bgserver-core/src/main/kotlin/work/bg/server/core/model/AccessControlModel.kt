@@ -316,7 +316,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             o2mfs.add(AttachedField(it))
                         }
                         is Many2OneField->{
-                            if(!it.model!!.isSame(model)){
+                            val tf = this.getTargetModelField(it)
+                            val ret = tf?.first?.isSame(model)
+                            if(ret==null || !ret){
                                 m2ofs.add(it)
                             }
                             else{
@@ -349,7 +351,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             o2mfs.add(AttachedField(it))
                         }
                         is Many2OneField ->{
-                            if(!it.model!!.isSame(model)){
+                            val tf = this.getTargetModelField(it)
+                            val ret = tf?.first?.isSame(model)
+                            if(ret==null || !ret){
                                 m2ofs.add(it)
                             }
                             else{
