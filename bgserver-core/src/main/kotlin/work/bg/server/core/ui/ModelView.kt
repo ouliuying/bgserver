@@ -109,7 +109,14 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                         "","","",RelationType.One2Many,toPropertyName)
                             }
                             else{
-                                logger.error("o2m ${this.app} ${this.model} $propertyName relation failed")
+                                var errorMsg = "o2m ${this.app} ${this.model} $propertyName relation failed"
+                                if(tModel==null){
+                                    errorMsg= "$errorMsg targetModelTable ${mField.targetModelTable} not exist!"
+                                }
+                                if(tField==null){
+                                    errorMsg= "$errorMsg targetModelFieldName ${mField.targetModelFieldName} not exist!"
+                                }
+                                this.logger.error(errorMsg)
                                 null
                             }
                         }
@@ -200,6 +207,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          var targetFields:Array<Field>?=null
          var fieldView:ModelView?=null
          var meta:JsonObject?=null
+         var ctrlProps:JsonObject?=null
          fun createCopy():Field{
             val f= Field(this.modelView,name,style,rowSpan,colSpan,type)
             f.visible=visible
@@ -209,6 +217,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
             f.relationData=relationData
             f.fieldView=fieldView
             f.meta=meta
+            f.ctrlProps=ctrlProps
             return f
          }
          val model=this.modelView.model

@@ -519,6 +519,9 @@ class GsonActionResultSerializerConfiguration {
                 if(src.meta!=null){
                     jObj.add("meta",src.meta)
                 }
+                if(src.ctrlProps!=null){
+                    jObj.add("ctrlProps",src.ctrlProps)
+                }
                 if(src?.fieldView!=null){
                     jObj.add("fieldView",context?.serialize(src.fieldView))
                 }

@@ -21,11 +21,20 @@
 <ui>
     <model app="product" name="product">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                    <action>
+                        <group name="opAction"  refType = "main"></group>
+                    </action>
+                </actions>
+            </ref>
             <field name="id"></field>
             <field name="name" type="singleLineText"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="count" type="multiLineText"></field>
             <field name="count" type="multiLineText"></field>
         </view>
         <view type="create">
@@ -40,6 +49,8 @@
                 <views>
                     <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
                     </view>
+                    <view type="create" ownerField="skuPattern" model="productSKUPattern" refType="sub|main">
+                    </view>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
@@ -47,6 +58,7 @@
             <field name="price" type="multiLineText"></field>
             <field name="count" type="multiLineText"></field>
             <field name="attributeMap" style="relation"></field>
+            <field name="skuPattern" style="relation"></field>
         </view>
         <view type="edit">
             <ref>
@@ -60,6 +72,8 @@
                 <views>
                     <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
                     </view>
+                    <view type="edit" ownerField="skuPattern" model="productSKUPattern" refType="sub|main">
+                    </view>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
@@ -67,6 +81,7 @@
             <field name="price" type="multiLineText"></field>
             <field name="count" type="multiLineText"></field>
             <field name="attributeMap" style="relation"></field>
+            <field name="skuPattern" style="relation"></field>
         </view>
         <view type="detail">
             <ref>
@@ -80,6 +95,8 @@
                 <views>
                     <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
                     </view>
+                    <view type="detail" ownerField="skuPattern" model="productSKUPattern" refType="sub|main">
+                    </view>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
@@ -87,12 +104,33 @@
             <field name="price" type="multiLineText"></field>
             <field name="count" type="multiLineText"></field>
             <field name="attributeMap" style="relation"></field>
+            <field name="skuPattern" style="relation"></field>
         </view>
     </model>
     <model name="productAttribute" app="product">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                    <action>
+                        <group name="opAction"  refType = "main"></group>
+                    </action>
+                    <action>
+
+                    </action>
+                </actions>
+                <views>
+
+                </views>
+                <menus>
+
+                </menus>
+            </ref>
             <field name="id"></field>
             <field name="name" type="singleLineText"></field>
+            <field name="comment" type="singleLineText"></field>
         </view>
         <view type="create">
             <ref>
@@ -109,6 +147,7 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
             <field name="values" style="relation"></field>
         </view>
         <view type="edit">
@@ -126,36 +165,53 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
             <field name="values" style="relation"></field>
         </view>
         <view type="detail">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main"  refType = "main|sub"></group>
                     </action>
                 </actions>
                 <menus>
                 </menus>
                 <views>
-                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="none">
                     </view>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
+            <field name="name" type="static" style="head"></field>
+            <field name="comment" type="static" style="normal"></field>
             <field name="values" style="relation"></field>
         </view>
     </model>
     <model name="productAttributeValue" app="product">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="opAction"  refType = "main|sub"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
             <field name="id" type="singleLineText"></field>
             <field name="attrValue" type="singleLineText"></field>
+            <field name="attrValueComment" type="multiLineText" style="normal"></field>
         </view>
         <view type="edit">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main"  refType = "main|sub"></group>
                     </action>
                 </actions>
                 <menus>
@@ -163,13 +219,14 @@
                 <views>
                 </views>
             </ref>
-            <field name="attrValue" type="singleLineText"></field>
+            <field name="attrValue" type="singleLineText" style="head"></field>
+            <field name="attrValueComment" type="multiLineText" style="normal"></field>
         </view>
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main"  refType = "main|sub"></group>
                     </action>
                 </actions>
                 <menus>
@@ -177,7 +234,8 @@
                 <views>
                 </views>
             </ref>
-            <field name="attrValue" type="singleLineText"></field>
+            <field name="attrValue" type="singleLineText" style="head"></field>
+            <field name="attrValueComment" type="multiLineText" style="normal"></field>
         </view>
         <view type="detail">
             <ref>
@@ -191,7 +249,8 @@
                 <views>
                 </views>
             </ref>
-            <field name="attrValue" type="singleLineText"></field>
+            <field name="attrValue" type="singleLineText" style="head"></field>
+            <field name="attrValueComment" type="multiLineText" style="normal"></field>
         </view>
     </model>
     <model name="productSKUPattern" app="product">
@@ -203,7 +262,7 @@
             <field name="product.name" type="singleLineText"></field>
         </view>
         <view type="create">
-            <field name="name" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"></field>
             <field name="skuPattern" type="singleLineText"></field>
         </view>
         <view type="edit">
@@ -214,7 +273,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="name" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"></field>
             <field name="skuPattern" type="singleLineText"></field>
         </view>
         <view type="detail">
@@ -225,25 +284,58 @@
                     </action>
                 </actions>
             </ref>
-            <field name="name" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"></field>
             <field name="skuPattern" type="singleLineText"></field>
         </view>
     </model>
     <model name="productAttributeValueMap" app="product">
         <view type="list">
-            <field name="productAttribute.name" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="productAttribute.name" type="singleLineText" style="head"></field>
             <field name="productAttributeValue.attrValue" type="singleLineText"></field>
         </view>
         <view type="create">
-            <field name="productAttribute.name" type="many2OneDataSetSelect"></field>
-            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="productAttribute.name" type="many2OneDataSetSelect" style="head"></field>
+            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect">
+                <ctrlProps>
+                    <![CDATA[
+                    {
+                     "moreBtn":false
+                    }
+                  ]]>
+                </ctrlProps>
+            </field>
         </view>
         <view type="edit">
-            <field name="productAttribute.name" type="many2OneDataSetSelect"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="productAttribute.name" type="many2OneDataSetSelect" style="head"></field>
             <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect"></field>
         </view>
         <view type="detail">
-
+            <field name="productAttribute.name" type="head"></field>
+            <field name="productAttributeValue.attrValue" type="static"></field>
         </view>
     </model>
 </ui>

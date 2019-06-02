@@ -1,9 +1,16 @@
 package work.bg.server.product.model
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
+import work.bg.server.core.ui.ModelView
 
 
 @Model(name="product")
@@ -47,13 +54,26 @@ class Product:ContextModel("product_product","public") {
             FieldType.BIGINT,
             "属性集",
             targetModelTable = "public.product_attribute_value_map",
-            targetModelFieldName = "product")
+            targetModelFieldName = "product_id")
 
     val skuPattern = ModelOne2OneField(null,
             "sku_pattern",
             FieldType.BIGINT,
             "Sku生成模式",
             targetModelTable = "public.product_sku_pattern",
-            targetModelFieldName = "product",
+            targetModelFieldName = "product_id",
             isVirtualField = true)
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "产品名称已经存在",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldNotNullOrEmpty(this.name,advice = "产品名称不能为空！")
+        )
+    }
+
 }

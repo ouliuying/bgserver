@@ -19,6 +19,7 @@ package work.bg.server.core.ui
 
 class ModelViewRefType {
     companion object {
+        const val None = "none"
         const val Main = "main"
         const val Sub = "sub"
         const val Embedded = "embedded"

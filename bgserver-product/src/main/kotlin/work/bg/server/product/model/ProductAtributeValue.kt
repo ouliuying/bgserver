@@ -20,7 +20,7 @@ class ProductAtributeValue:ContextModel("product_attribute_value","public") {
             primaryKey = FieldPrimaryKey())
 
     val attribute=ModelMany2OneField(null,
-            "atrribute_id",
+            "attribute_id",
             FieldType.BIGINT,
             "属性",
             targetModelTable = "public.product_attribute",
@@ -30,4 +30,8 @@ class ProductAtributeValue:ContextModel("product_attribute_value","public") {
             "attr_value",
             FieldType.STRING,
             "值")
+    val attrValueComment=ModelField(null,
+            "attr_value_comment",
+            FieldType.STRING,
+            "值注释")
 }

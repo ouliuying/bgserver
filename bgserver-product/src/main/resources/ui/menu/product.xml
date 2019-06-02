@@ -20,7 +20,7 @@
 
 <ui>
     <menu name="main" app="product" title="产品管理">
-        <menuItem title="产品" model="product" viewType="list">
+        <menuItem title="产品列表" model="product" viewType="list">
 
         </menuItem>
         <menuItem title="添加产品" model="product" viewType="create">

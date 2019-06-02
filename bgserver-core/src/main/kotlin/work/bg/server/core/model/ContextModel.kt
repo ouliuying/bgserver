@@ -222,8 +222,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 bag["data"]=mvData
             }
             var actionNameArray = arrayListOf<String>()
+            var reqRefTypeArray = reqRefType.split(",")
             mv.refActionGroups.forEach {
-                if(it.refTypes.contains(reqRefType)){
+                if(it.refTypes.intersect(reqRefTypeArray).count()>0){
                     actionNameArray.add(it.groupName)
                 }
             }
@@ -755,7 +756,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                               ownerModelID: Long?,
                                               reqData:JsonObject?):ModelDataArray?{
         if(ownerFieldValue!=null){
-            if(ownerFieldValue.value==Undefined){
+            if(ownerFieldValue.value==Undefined && ownerModelID==null){
                 return null
             }
         }

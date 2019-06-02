@@ -46,7 +46,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
                     }
                 }
                 is ModelFieldNotNullOrEmpty->{
-                    if(!this.fieldsNotNullOrEmpty(it.targetFields,modelData)){
+                    if(!this.fieldsNotNullOrEmpty(it.targetFields,modelData,it.canBeBlank)){
                         return Pair(false,it.advice)
                     }
                 }
@@ -79,7 +79,8 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         }
         return (existCount==0||existCount==fields.count())
     }
-    private  fun fieldsNotNullOrEmpty(fields:Array<out ModelField>,modelData:ModelDataObject):Boolean{
+
+    private  fun fieldsNotNullOrEmpty(fields:Array<out ModelField>,modelData:ModelDataObject,canBeBlank:Boolean):Boolean{
         fields.forEach {
             var fv=modelData.data.filter {mFV->
                 mFV.field.isSame(it)
@@ -94,8 +95,12 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
                 if(fv[0].value==null || (fv[0].value as String).isNullOrEmpty()){
                     return false
                 }
+                else if(!canBeBlank){
+                    if((fv[0].value as String).isNullOrBlank()){
+                        return false
+                    }
+                }
             }
-
         }
         return true
     }

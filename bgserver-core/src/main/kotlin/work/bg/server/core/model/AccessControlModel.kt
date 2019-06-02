@@ -504,7 +504,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
             else if(it.field is One2ManyField){
-                var rtf=it as RefTargetField
+                var rtf=it.field as RefTargetField
                 if(o2mfs.filter { rt-> (rt.field as FieldBase).getFullName()==(it.field as FieldBase).getFullName() }.count()<1)
                 {
                     o2mfs.add(it)

@@ -34,6 +34,7 @@ import work.bg.server.core.spring.boot.model.AppModel
 import org.dom4j.io.SAXReader
 import org.dom4j.Element
 import work.bg.server.core.constant.ModelReservedKey
+import javax.xml.stream.events.EndElement
 
 //@ConditionalOnBean(value = [AppModel::class])
 @Component
@@ -626,6 +627,16 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     if(subMetaNode!=null){
                         f.meta=  gson.fromJson(subMetaNode.textTrim,JsonObject::class.java)
                        // print(f.meta)
+                    }
+
+                    var subCtrlProps = it.elements("ctrlProps")
+                    if(subCtrlProps.size>0){
+                        try {
+                            f.ctrlProps = gson.fromJson((subCtrlProps[0] as Element).textTrim,JsonObject::class.java)
+                        }
+                        catch (ex:java.lang.Exception){
+
+                        }
                     }
                 }
             }

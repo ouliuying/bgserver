@@ -20,6 +20,6 @@ package work.bg.server.core.acrule.inspector
 import work.bg.server.core.mq.ModelDataObject
 import work.bg.server.core.mq.ModelField
 
-class ModelFieldNotNullOrEmpty(override vararg val targetFields: ModelField, override val advice: String):ModelFieldInspector {
+class ModelFieldNotNullOrEmpty(override vararg val targetFields: ModelField, override val advice: String,val canBeBlank:Boolean=false):ModelFieldInspector {
 
 }
