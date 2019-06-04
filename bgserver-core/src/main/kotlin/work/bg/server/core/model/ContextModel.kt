@@ -233,7 +233,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 bag["triggerGroups"]=triggerGroups
             }
             mv.refViews.forEach {
-                var refMV = this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData,reqRefType)
+                var refMV = this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData,reqRefTypeArray)
                 refMV?.let {
                     if(bag.containsKey("subViews")){
                         (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -255,7 +255,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                 toField:FieldBase?,
                                 ownerModelID: Long?,
                                 reqData:JsonObject?,
-                                reqRefType:String,
+                                reqRefTypeArray:List<String>,
                                 fullLoad:Boolean=false
                                 ):MutableMap<String,Any>?{
         var mv=pc.getAccessControlModelView(refView.app,refView.model,refView.viewType)
@@ -271,7 +271,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
                 var actionNameArray = arrayListOf<String>()
                 mv.refActionGroups.forEach {
-                    if(it.refTypes.contains(ModelViewRefType.Sub)){
+                    if(it.refTypes.intersect(reqRefTypeArray).count()>0){
                         actionNameArray.add(it.groupName)
                     }
                 }
@@ -280,7 +280,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     bag["triggerGroups"]=triggerGroups
                 }
                 mv.refViews.forEach {
-                    var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData,ModelViewRefType.Sub)
+                    var refMV= this.loadRefViewType(it,pc,ownerFieldValue,toField,ownerModelID,reqData, arrayListOf(ModelViewRefType.Sub))
                     refMV?.let {
                         if(bag.containsKey("subViews")){
                             (bag["subViews"] as ArrayList<Map<String,Any>>).add(refMV)
@@ -521,7 +521,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
             }
             else{
-                if(it.style!=ModelView.Field.Style.relation){
+                val rd = it.relationData as ModelView.RelationData
+                if(it.style!=ModelView.Field.Style.relation ||
+                        rd.type==ModelView.RelationType.Many2One||
+                        rd.type==ModelView.RelationType.One2One){
                     var field= modelObj?.getFieldByPropertyName(it.name)
                     field?.let {
                         fields.add(field)

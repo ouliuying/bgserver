@@ -1746,7 +1746,6 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(!result){
             return Pair(null,errorMsg)
         }
-
         return try {
             var tCriteria=criteria
             var idFV=modelDataObject.idFieldValue
@@ -1782,7 +1781,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 }
                                 it.value.data.add(FieldValue(it.value?.model?.fields?.getIdField()!!,id?.first))
                             }
-                            else{
+                            else if(it.value.hasNormalField()){
                                 it.value.context=modelDataObject.context
                                 var ret=(it.field.model as AccessControlModel?)?.rawEdit(it.value,null,useAccessControl,partnerCache)
                                 if(ret==null ||ret.second!=null){
@@ -1865,6 +1864,28 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                         if (ret==null || ret.second!=null){
                                             return  Pair(null,"更新失败")
                                         }
+                                    }
+                                }
+                            }
+                        }
+                       is One2OneField->{
+                            if(fv.field.isVirtualField && (fv.value is ModelDataObject)){
+                                if(fv.value.idFieldValue==null){
+                                    var tmf=this.getTargetModelField(fv.field)
+                                    fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
+                                    fv.value.context=modelDataObject.context
+                                    var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,useAccessControl,partnerCache)
+                                    if (o2o==null || o2o.second!=null){
+                                        return  Pair(null,"创建失败")
+                                    }
+                                }
+                                else{
+                                    var tmf=this.getTargetModelField(fv.field)
+                                    fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
+                                    fv.value.context=modelDataObject.context
+                                    var o2o=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,criteria=null,useAccessControl = useAccessControl,partnerCache = partnerCache)
+                                    if (o2o==null || o2o.second!=null){
+                                        return  Pair(null,"更新失败")
                                     }
                                 }
                             }

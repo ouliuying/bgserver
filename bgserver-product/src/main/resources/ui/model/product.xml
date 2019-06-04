@@ -35,7 +35,6 @@
             <field name="name" type="singleLineText"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="count" type="multiLineText"></field>
         </view>
         <view type="create">
             <ref>
@@ -56,7 +55,7 @@
             <field name="name" type="singleLineText" style="head"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="count" type="multiLineText"></field>
+            <field name="uom.name" type="many2OneDataSetSelect"></field>
             <field name="attributeMap" style="relation"></field>
             <field name="skuPattern" style="relation"></field>
         </view>
@@ -72,14 +71,14 @@
                 <views>
                     <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
                     </view>
-                    <view type="edit" ownerField="skuPattern" model="productSKUPattern" refType="sub|main">
+                    <view type="edit" ownerField="skuPattern" model="productSKUPattern" refType="none">
                     </view>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="count" type="multiLineText"></field>
+            <field name="uom.name" type="many2OneDataSetSelect"></field>
             <field name="attributeMap" style="relation"></field>
             <field name="skuPattern" style="relation"></field>
         </view>
@@ -93,16 +92,18 @@
                 <menus>
                 </menus>
                 <views>
-                    <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="sub|main">
+                    <view type="list" ownerField="attributeMap" model="productAttributeValueMap" refType="none">
                     </view>
-                    <view type="detail" ownerField="skuPattern" model="productSKUPattern" refType="sub|main">
+                    <view type="detail" ownerField="skuPattern" model="productSKUPattern" refType="none">
+                    </view>
+                    <view type="detail" ownerField="uom" model="productUOM" refType="none">
                     </view>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="cost" type="singleLineText"></field>
-            <field name="price" type="multiLineText"></field>
-            <field name="count" type="multiLineText"></field>
+            <field name="name" type="static" style="head"></field>
+            <field name="cost" type="static"></field>
+            <field name="price" type="static"></field>
+            <field name="uom"  style="relation"></field>
             <field name="attributeMap" style="relation"></field>
             <field name="skuPattern" style="relation"></field>
         </view>
@@ -280,12 +281,12 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "sub"></group>
+                        <group name="main"  refType = "main|sub"></group>
                     </action>
                 </actions>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="skuPattern" type="singleLineText"></field>
+            <field name="name" type="static" style="head"></field>
+            <field name="skuPattern" type="static"></field>
         </view>
     </model>
     <model name="productAttributeValueMap" app="product">
@@ -336,6 +337,68 @@
         <view type="detail">
             <field name="productAttribute.name" type="head"></field>
             <field name="productAttributeValue.attrValue" type="static"></field>
+        </view>
+    </model>
+    <model name="productUOM" app="product">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub|singleSelection"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                </views>
+            </ref>
+            <field name="name" type="static" style="head"></field>
+            <field name="comment" type="static" style="normal"></field>
         </view>
     </model>
 </ui>

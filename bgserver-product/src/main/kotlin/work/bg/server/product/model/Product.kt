@@ -38,11 +38,14 @@ class Product:ContextModel("product_product","public") {
             FieldType.DECIMAL,
             title = "售价",
             defaultValue = 0)
-    val count =  ModelField(null,
-            "count",
+    val uom =  ModelMany2OneField(null,
+            "uom_id",
             FieldType.BIGINT,
-            title = "数量",
-            defaultValue = 0)
+            title = "单位",
+            targetModelTable ="public.product_uom",
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+
     val img =  ModelField(null,
             "img",
             FieldType.STRING,

@@ -62,11 +62,11 @@ class Customer: ContextModel("crm_customer","public") {
     val website =  ModelField(null,"website",FieldType.STRING,title = "网址",defaultValue = "")
     val comment =  ModelField(null,"c_comment",FieldType.STRING,title = "注释",defaultValue = "")
     val contactAddresses = ModelOne2ManyField(null,"contact_address_id",FieldType.BIGINT,"联系人",
-            targetModelTable = "public.customer_contact_address",targetModelFieldName = "customer")
+            targetModelTable = "public.customer_contact_address",targetModelFieldName = "customer_id")
 
     //对应占有,辅助员工
     val partners = ModelMany2ManyField(null,"own_partner_id",FieldType.BIGINT,title = "占有人",
-            relationModelTable = "public.crmPartnerCustomerRel",
+            relationModelTable = "public.crm_partner_customer_rel",
             relationModelFieldName = "partner_id",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",

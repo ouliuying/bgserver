@@ -35,5 +35,8 @@
         <menuItem title="添加属性" model="productAttribute" viewType="create">
 
         </menuItem>
+        <menuItem title="产品单位" model="productUOM" viewType="list">
+
+        </menuItem>
     </menu>
 </ui>

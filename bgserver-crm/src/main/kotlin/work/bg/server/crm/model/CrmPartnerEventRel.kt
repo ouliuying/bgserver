@@ -6,7 +6,7 @@ import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model("crmPartnerEventRel")
-class CrmPartnerEventRel:ContextModel("crm_partner_rel","public") {
+class CrmPartnerEventRel:ContextModel("crm_partner_event_rel","public") {
     companion object : RefSingleton<CrmPartnerEventRel> {
         override lateinit var ref: CrmPartnerEventRel
     }
@@ -29,9 +29,9 @@ class CrmPartnerEventRel:ContextModel("crm_partner_rel","public") {
             targetModelTable = "public.crm_event",
             targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val magFlag= ModelField(null,
-            "magFlag",
-            FieldType.BIGINT,
+    val mainFlag= ModelField(null,
+            "main_flag",
+            FieldType.INT,
             "主要负责人",
             defaultValue = 0)
 }

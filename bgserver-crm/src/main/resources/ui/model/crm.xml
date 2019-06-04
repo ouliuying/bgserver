@@ -118,45 +118,70 @@
 
     <model name="event" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="singleLineText"></field>
             <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleCheckbox" style="head"></field>
+            <field name="budgetCost" type="singleLineText" style="head"></field>
             <field name="actualCost" type="many2OneDataSetSelect"></field>
-            <field name="startTime" type="many2OneDataSetSelect"></field>
-            <field name="endTime" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="startTime" type="date"></field>
+            <field name="endTime" type="date"></field>
+            <field name="comment" type="multiLineText"></field>
         </view>
 
         <view type="edit">
             <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleCheckbox" style="head"></field>
-            <field name="actualCost" type="many2OneDataSetSelect"></field>
-            <field name="startTime" type="many2OneDataSetSelect"></field>
-            <field name="endTime" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="budgetCost" type="singleLineText" style="subHead"></field>
+            <field name="actualCost" type="singleLineText" style="subHead"></field>
+            <field name="startTime" type="date"></field>
+            <field name="endTime" type="date"></field>
+            <field name="comment" type="multiLineText"></field>
             <field name="magPartners" style="relation"></field>
             <field name="leads" style="relation"></field>
             <field name="customers" style="relation"></field>
         </view>
 
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="sub"></view>
+                </views>
+            </ref>
             <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleCheckbox" style="head"></field>
-            <field name="actualCost" type="many2OneDataSetSelect"></field>
-            <field name="startTime" type="many2OneDataSetSelect"></field>
-            <field name="endTime" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="budgetCost" type="singleLineText" style="subHead"></field>
+            <field name="actualCost" type="singleLineText" style="subHead"></field>
+            <field name="startTime" type="date"></field>
+            <field name="endTime" type="date"></field>
+            <field name="comment" type="multiLineText"></field>
             <field name="magPartners" style="relation"></field>
-            <field name="leads" style="relation"></field>
-            <field name="customers" style="relation"></field>
         </view>
         <view type="detail">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleCheckbox" style="head"></field>
-            <field name="actualCost" type="many2OneDataSetSelect"></field>
-            <field name="startTime" type="many2OneDataSetSelect"></field>
-            <field name="endTime" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="static" style="head"></field>
+            <field name="budgetCost" type="static" style="subHead"></field>
+            <field name="actualCost" type="static" style="subHead"></field>
+            <field name="startTime" type="static"></field>
+            <field name="endTime" type="static"></field>
+            <field name="comment" type="static"></field>
             <field name="magPartners" style="relation"></field>
             <field name="leads" style="relation"></field>
             <field name="customers" style="relation"></field>
@@ -418,13 +443,31 @@
     </model>
     <model name="crmPartnerEventRel" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"></group>
+                    </action>
+                </actions>
+            </ref>
 
+            <field name="id" type="singleLineText"></field>
+            <field name="partner.name" type="singleLineText"></field>
+            <field name="mainFlag" type="singleLineText"></field>
         </view>
         <view type="edit">
 
         </view>
         <view type="create">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"></field>
+            <field name="magFlag" type="singleCheckbox"></field>
         </view>
         <view type="detail">
 

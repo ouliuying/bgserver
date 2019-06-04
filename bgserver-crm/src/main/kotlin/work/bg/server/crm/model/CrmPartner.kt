@@ -31,6 +31,7 @@ class CrmPartner:DepartmentPartner() {
             relationModelFieldName = "customer_id",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "id")
+
     val  leads = ModelMany2ManyField(null,
             "crm_lead_id",
             FieldType.BIGINT,
