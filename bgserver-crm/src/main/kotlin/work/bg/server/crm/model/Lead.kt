@@ -21,6 +21,7 @@ import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.crm.field.ModelFullAddressField
 
 @Model(name="lead",title = "线索")
 class Lead:ContextModel("crm_lead","public") {
@@ -42,7 +43,9 @@ class Lead:ContextModel("crm_lead","public") {
     val district = ModelField(null,"district", FieldType.STRING,title = "区/县",defaultValue = "")
     val streetAddress = ModelField(null,"street_address",FieldType.STRING,"详细地址",defaultValue = "")
 
-    val partners = ModelMany2ManyField(null,"own_partner_id",FieldType.BIGINT,title = "占有人",
+    val partners = ModelMany2ManyField(null,
+            "own_partner_id",
+            FieldType.BIGINT,title = "占有人",
             relationModelTable = "public.crm_partner_lead_rel",
             relationModelFieldName = "partner_id",
             targetModelTable = "public.base_partner",
@@ -69,7 +72,7 @@ class Lead:ContextModel("crm_lead","public") {
             FieldType.BIGINT,
             "沟通记录",
             targetModelTable = "public.crm_lead_customer_communication_history",
-            targetModelFieldName = "lead")
+            targetModelFieldName = "lead_id")
 
     val interactionStatus=ModelMany2OneField(null,
             "interaction_status_id",
@@ -77,4 +80,15 @@ class Lead:ContextModel("crm_lead","public") {
             "最近状态",
             targetModelTable = "public.crm_lead_interaction_status",
             targetModelFieldName = "id")
+
+    val fullAddress by lazy {
+            ModelFullAddressField(null,
+                    "fullAddress",
+                    "地址",
+                    this.province,this.city,
+                    this.district,
+                    this.streetAddress,
+                    this.gson)
+    }
+
 }

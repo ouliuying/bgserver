@@ -25,94 +25,104 @@
 
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view/edit" op="append" app="core">
-            <field name="events" style="relation"></field>
-            <field name="customers" style="relation"></field>
-            <field name="leads" style="relation"></field>
-            <field name="orderInvoices" style="relation"></field>
-            <field name="orderReceipts" style="relation"></field>
+            <field name="events" style="relation"/>
+            <field name="customers" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="orderInvoices" style="relation"/>
+            <field name="orderReceipts" style="relation"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view/detail" op="append" app="core">
-            <field name="events" style="relation"></field>
-            <field name="customers" style="relation"></field>
-            <field name="leads" style="relation"></field>
-            <field name="orderInvoices" style="relation"></field>
-            <field name="orderReceipts" style="relation"></field>
+            <field name="events" style="relation"/>
+            <field name="customers" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="orderInvoices" style="relation"/>
+            <field name="orderReceipts" style="relation"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='product'][@name='product']/view/detail" op="append" app="product">
-            <field name="customerOpportunities" style="relation"></field>
+            <field name="customerOpportunities" style="relation"/>
         </xpath>
         <xpath expression="/ui/model[@app='product'][@name='product']/view/edit" op="append" app="product">
-            <field name="customerOpportunities" style="relation"></field>
+            <field name="customerOpportunities" style="relation"/>
         </xpath>
     </inherit>
 
     <model name="customer" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText"></field>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="isCorp" type="singleCheckbox" style="head"></field>
-            <field name="status" type="many2OneDataSetSelect"></field>
-            <field name="event" type="many2OneDataSetSelect"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="website" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="id" type="singleLineText"/>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="isCorp" type="singleCheckbox" style="head"/>
+            <field name="status" type="many2OneDataSetSelect"/>
+            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="website" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="isCorp" type="singleCheckbox" style="head"></field>
-            <field name="status" type="many2OneDataSetSelect"></field>
-            <field name="event" type="many2OneDataSetSelect"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
-            <field name="contactAddresses" style="relation"></field>
-            <field name="partners" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="isCorp" type="singleCheckbox" style="head"/>
+            <field name="status" type="many2OneDataSetSelect"/>
+            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
+            <field name="contactAddresses" style="relation"/>
+            <field name="partners" style="relation"/>
         </view>
 
         <view type="edit">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="isCorp" type="singleCheckbox" style="head"></field>
-            <field name="status" type="many2OneDataSetSelect"></field>
-            <field name="event" type="many2OneDataSetSelect"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
-            <field name="contactAddresses" style="relation"></field>
-            <field name="partners" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="isCorp" type="singleCheckbox" style="head"/>
+            <field name="status" type="many2OneDataSetSelect"/>
+            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
+            <field name="contactAddresses" style="relation"/>
+            <field name="partners" style="relation"/>
         </view>
 
         <view type="detail">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="isCorp" type="singleCheckbox" style="head"></field>
-            <field name="status" type="many2OneDataSetSelect"></field>
-            <field name="event" type="many2OneDataSetSelect"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
-            <field name="contactAddresses" style="relation"></field>
-            <field name="partners" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="isCorp" type="singleCheckbox" style="head"/>
+            <field name="status" type="many2OneDataSetSelect"/>
+            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
+            <field name="contactAddresses" style="relation"/>
+            <field name="partners" style="relation"/>
         </view>
     </model>
 
@@ -121,207 +131,290 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                     <action>
-                        <group name="opAction" refType="main|sub"></group>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText"></field>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleLineText" style="head"></field>
-            <field name="actualCost" type="many2OneDataSetSelect"></field>
-            <field name="startTime" type="date"></field>
-            <field name="endTime" type="date"></field>
-            <field name="comment" type="multiLineText"></field>
+            <field name="id" type="singleLineText"/>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="budgetCost" type="singleLineText" style="head"/>
+            <field name="actualCost" type="many2OneDataSetSelect"/>
+            <field name="startTime" type="date"/>
+            <field name="endTime" type="date"/>
+            <field name="comment" type="multiLineText"/>
         </view>
 
         <view type="edit">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleLineText" style="subHead"></field>
-            <field name="actualCost" type="singleLineText" style="subHead"></field>
-            <field name="startTime" type="date"></field>
-            <field name="endTime" type="date"></field>
-            <field name="comment" type="multiLineText"></field>
-            <field name="magPartners" style="relation"></field>
-            <field name="leads" style="relation"></field>
-            <field name="customers" style="relation"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="sub"/>
+                    <view type="list" model="lead" ownerField="leads" refType="sub"/>
+                    <view type="list" model="customer" ownerField="customers" refType="sub"/>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="budgetCost" type="singleLineText" style="subHead"/>
+            <field name="actualCost" type="singleLineText" style="subHead"/>
+            <field name="startTime" type="date"/>
+            <field name="endTime" type="date"/>
+            <field name="comment" type="multiLineText"/>
+            <field name="magPartners" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="customers" style="relation"/>
         </view>
 
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
                 <views>
-                    <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="sub"></view>
+                    <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="sub"/>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="budgetCost" type="singleLineText" style="subHead"></field>
-            <field name="actualCost" type="singleLineText" style="subHead"></field>
-            <field name="startTime" type="date"></field>
-            <field name="endTime" type="date"></field>
-            <field name="comment" type="multiLineText"></field>
-            <field name="magPartners" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="budgetCost" type="singleLineText" style="subHead"/>
+            <field name="actualCost" type="singleLineText" style="subHead"/>
+            <field name="startTime" type="date"/>
+            <field name="endTime" type="date"/>
+            <field name="comment" type="multiLineText"/>
+            <field name="magPartners" style="relation"/>
         </view>
         <view type="detail">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="none"/>
+                    <view type="list" model="lead" ownerField="leads" refType="none"/>
+                    <view type="list" model="customer" ownerField="customers" refType="none"/>
+                </views>
             </ref>
-            <field name="name" type="static" style="head"></field>
-            <field name="budgetCost" type="static" style="subHead"></field>
-            <field name="actualCost" type="static" style="subHead"></field>
-            <field name="startTime" type="static"></field>
-            <field name="endTime" type="static"></field>
-            <field name="comment" type="static"></field>
-            <field name="magPartners" style="relation"></field>
-            <field name="leads" style="relation"></field>
-            <field name="customers" style="relation"></field>
+            <field name="name" type="static" style="head"/>
+            <field name="budgetCost" type="static" style="subHead"/>
+            <field name="actualCost" type="static" style="subHead"/>
+            <field name="startTime" type="static"/>
+            <field name="endTime" type="static"/>
+            <field name="comment" type="static"/>
+            <field name="magPartners" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="customers" style="relation"/>
         </view>
     </model>
     <model name="lead" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="corpName" type="singleLineText"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
-            <field name="commPartner.name" type="singleLineText"></field>
-            <field name="event.name" type="singleLineText"></field>
-            <field name="interactionStatus.name" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="corpName" type="singleLineText"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="commPartner.name" type="singleLineText"/>
+            <field name="event.name" type="singleLineText"/>
+            <field name="interactionStatus.name" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="corpName" type="singleLineText"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmPartnerLeadRel" ownerField="partners" refType="main|sub"/>
+                    <view type="detail" model="partner" ownerField="commPartner" refType="none"/>
+                    <view type="list" model="leadCustomerCommunicationHistory" ownerField="communications"
+                          refType="none"/>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="event" style="many2OneDataSetSelect"/>
+            <field name="corpName" type="singleLineText"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
+
+            <field name="partners" style="relation"/>
+            <field name="commPartner" style="relation"/>
+            <field name="communications" style="relation"/>
         </view>
         <view type="create">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="corpName" type="singleLineText"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmPartnerLeadRel" ownerField="partners" refType="main|sub"/>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="event.name" type="many2OneDataSetSelect"/>
+            <field name="corpName" type="singleLineText"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
+
+            <field name="partners" style="relation"/>
         </view>
         <view type="detail">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="corpName" type="singleLineText"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="fax" type="singleLineText"></field>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmPartnerLeadRel" ownerField="partners" refType="none"/>
+                    <view type="detail" model="partner" ownerField="commPartner" refType="none"/>
+                    <view type="list" model="leadCustomerCommunicationHistory"
+                          ownerField="communications"
+                          refType="none"/>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="event" style="many2OneDataSetSelect"/>
+            <field name="corpName" type="singleLineText"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="fax" type="singleLineText"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
+
+            <field name="partners" style="relation"/>
+            <field name="commPartner" style="relation"/>
+            <field name="communications" style="relation"/>
         </view>
     </model>
     <model name="customerStatus" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="name" type="singleLineText" style="head"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="name" type="singleLineText" style="head"/>
         </view>
         <view type="edit">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="leads" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="leads" style="relation"/>
         </view>
         <view type="create">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="leads" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="leads" style="relation"/>
         </view>
         <view type="detail">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="leads" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="leads" style="relation"/>
         </view>
     </model>
     <model name="leadCustomerCommunicationHistory" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="content" type="singleLineText" style="head"></field>
-            <field name="createTime" type="singleLineText" style="head"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="content" type="singleLineText" style="head"/>
+            <field name="createTime" type="singleLineText" style="head"/>
         </view>
         <view type="create">
-            <field name="content" type="singleLineText"></field>
+            <field name="content" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="content" type="singleLineText"></field>
+            <field name="content" type="singleLineText"/>
         </view>
         <view type="detail">
-            <field name="content" type="singleLineText"></field>
+            <field name="content" type="singleLineText"/>
         </view>
     </model>
     <model name="customerContactAddress" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
         </view>
         <div type="edit">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
         </div>
         <div type="create">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
         </div>
         <div type="detail">
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="mobile" type="singleLineText"></field>
-            <field name="telephone" type="singleLineText"></field>
-            <field name="email" type="singleLineText"></field>
-            <field name="department" type="singleLineText"></field>
-            <field name="sex" type="singleLineText"></field>
-            <field name="birthday" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="mobile" type="singleLineText"/>
+            <field name="telephone" type="singleLineText"/>
+            <field name="email" type="singleLineText"/>
+            <field name="department" type="singleLineText"/>
+            <field name="sex" type="singleLineText"/>
+            <field name="birthday" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
         </div>
     </model>
     <model name="customerOpportunity" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText" style="head"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText" style="head"/>
         </view>
         <view type="edit">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
         <view type="detail">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
     </model>
     <model name="customerOpportunityOrderQuotation" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="opportunity.title" type="singleLineText"></field>
-            <field name="order.title" type="singleLineText"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="opportunity.title" type="singleLineText"/>
+            <field name="order.title" type="singleLineText"/>
         </view>
         <view type="edit">
 
@@ -335,68 +428,68 @@
     </model>
     <model name="customerOrder" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
-            <field name="customer.name" type="singleLineText"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
+            <field name="customer.name" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
         <view type="detail">
-            <field name="title" type="singleLineText" style="head"></field>
-            <field name="price" type="singleLineText"></field>
+            <field name="title" type="singleLineText" style="head"/>
+            <field name="price" type="singleLineText"/>
         </view>
     </model>
     <model name="customerOrderInvoice" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="detail">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
     </model>
     <model name="customerOrderReceipt" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"></field>
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="id" type="singleLineText" style="head"/>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
         <view type="detail">
-            <field name="fromCorpName" type="singleLineText"></field>
-            <field name="toCorpName" type="singleLineText"></field>
-            <field name="amount" type="singleLineText"></field>
+            <field name="fromCorpName" type="singleLineText"/>
+            <field name="toCorpName" type="singleLineText"/>
+            <field name="amount" type="singleLineText"/>
         </view>
     </model>
     <model name="crmCustomerOpportunityProductRel" app="crm">
@@ -443,31 +536,41 @@
     </model>
     <model name="crmPartnerEventRel" app="crm">
         <view type="list">
+
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="sub"></group>
+                        <group name="main" refType="sub"/>
                     </action>
                 </actions>
             </ref>
 
-            <field name="id" type="singleLineText"></field>
-            <field name="partner.name" type="singleLineText"></field>
-            <field name="mainFlag" type="singleLineText"></field>
+            <field name="id" type="singleLineText"/>
+            <field name="partner.name" type="singleLineText"/>
+            <field name="mainFlag" type="singleLineText"/>
+
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="magFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="sub"></group>
+                        <group name="main" refType="sub"/>
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"></field>
-            <field name="magFlag" type="singleCheckbox"></field>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="magFlag" type="singleCheckbox"/>
         </view>
         <view type="detail">
 

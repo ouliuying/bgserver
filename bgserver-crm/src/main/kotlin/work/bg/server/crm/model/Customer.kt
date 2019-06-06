@@ -37,14 +37,11 @@ class Customer: ContextModel("crm_customer","public") {
 
     val isCorp = ModelField(null,"is_corp",FieldType.INT,title = "公司",defaultValue = 0)
 
-    val status = ModelMany2OneField(null,
-            "c_status",
-            FieldType.INT,title = "状态",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
-
     val event = ModelMany2OneField(null,
             "event_id",FieldType.BIGINT,
             title = "活动",
+            targetModelTable = "public.crm_event",
+            targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     //个人属性

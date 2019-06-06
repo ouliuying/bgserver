@@ -68,7 +68,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     @Autowired
     protected  lateinit var createRecordSetIsolationFields: ModelCreateFieldsSetIsolationFieldsValueBean
     @Autowired
-    protected  lateinit var createFieldsProcessProxyModelField: ModelCreateFieldsProcessProxyModelFieldBeanValue
+    protected  lateinit var cuFieldsProcessProxyModelField: ModelCUFieldsProcessProxyModelFieldBeanValue
     @Autowired
     protected lateinit var modelCreateFieldsInspectorCheck: ModelCreateFieldsInspectorCheckBean
 
@@ -712,10 +712,49 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
         }
-
+        this.doFillModelFunctionFields(mDataArray,useAccessControl,partnerCache)
         return mDataArray
     }
-
+    protected open fun doFillModelFunctionFields(modelDataArray:ModelDataArray?,useAccessControl: Boolean,partnerCache: PartnerCache?){
+        val model=modelDataArray?.model
+        val functions = model?.fields?.getTypeFields<FunctionField<*>>()?.values?.toTypedArray()?: arrayOf()
+        modelDataArray?.data?.forEach {
+            this.doFillFieldValueArrayFunctionFields(*functions,fieldValueArray = it,useAccessControl = useAccessControl,partnerCache = partnerCache)
+        }
+    }
+    protected open fun doFillModelFunctionFields(modelDataObject: ModelDataObject?,useAccessControl: Boolean,partnerCache: PartnerCache?){
+        val model=modelDataObject?.model
+        val functions = model?.fields?.getTypeFields<FunctionField<*>>()?.values?.toTypedArray()?: arrayOf()
+        modelDataObject?.let {
+            this.doFillFieldValueArrayFunctionFields(*functions,fieldValueArray = modelDataObject.data,
+                    useAccessControl = useAccessControl,
+                    partnerCache = partnerCache)
+        }
+    }
+    private fun doFillFieldValueArrayFunctionFields(vararg functionFields:FieldBase?,fieldValueArray:FieldValueArray,useAccessControl: Boolean,partnerCache: PartnerCache?){
+        functionFields.forEach {
+            if(it is FunctionField<*>){
+                it.compute(fieldValueArray,partnerCache,null)
+            }
+        }
+        fieldValueArray.forEach {
+            when {
+                it.field is ProxyRelationModelField<*> -> it.field.inverse(fieldValueArray,partnerCache,null,null)
+                it.value is ModelDataObject -> this.doFillModelFunctionFields(it.value,useAccessControl,partnerCache)
+                it.value is ModelDataArray ->  this.doFillModelFunctionFields(it.value,useAccessControl,partnerCache)
+                it.value is ModelDataSharedObject -> it.value.data.forEach { _, u ->
+                    when(u){
+                        is ModelDataObject->{
+                            this.doFillModelFunctionFields(u,useAccessControl,partnerCache)
+                        }
+                        is ModelDataArray->{
+                            this.doFillModelFunctionFields(u,useAccessControl,partnerCache)
+                        }
+                    }
+                }
+            }
+        }
+    }
     protected  open fun reconstructMultipleRelationModelRecordSet(model:ModelBase?,
                                                                   fields:Array<FieldBase>,
                                                                   reqMainArray:ModelDataArray?,
@@ -750,6 +789,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return mainArray
     }
+
     private  fun readM2MModelDataArrayFromMultiModelDataArray(relModel:ModelBase,
                                                               field: FieldBase,
                                                               fieldValue:Long,
@@ -820,210 +860,6 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return fields
     }
 
-//    protected  open fun reconstructMultipleRelationModelRecordSet(model:ModelBase?,
-//                                                                  fields:Array<FieldBase>,
-//                                                                  reqMainArray:ModelDataArray?,
-//                                                                  relModel:ModelBase?,
-//                                                                  targetFields:Array<FieldBase>,
-//                                                                  relDataArray:ModelDataArray?,
-//                                                                  modelRelationMatcher: ModelRelationMatcher){
-//
-//        //fix performance
-//        fields.forEach {
-//            reqMainArray?.fields?.add(it as FieldBase)
-//        }
-//        var sourceID2ModelDataArrayContainer= mutableMapOf<Long,LinkedHashMap<FieldBase?,ModelData>>()
-//        relDataArray?.data?.forEach r@{ relRecord->
-//            fields.forEach f@{fd->
-//                var keyField = if(relModel!=null){
-//                    relModel.fields?.getFieldByTargetField(model?.fields?.getIdField())
-//                }
-//                else
-//                {
-//                    var tf= this.getTargetModelField(fd as FieldBase)
-//                    tf?.first?.fields?.getFieldByTargetField(model?.fields?.getIdField())
-//                }
-//                if(keyField!=null){
-//                    var sourceId=relRecord.firstOrNull {
-//                        it.field.isSame(keyField)
-//                    }?.value as Long
-//
-//                    var mrs=if(relModel!=null){
-//                        var fdMap= mutableMapOf<FieldBase,ModelData>()
-//                        var relModelDataArray=if(sourceID2ModelDataArrayContainer.containsKey(sourceId)
-//                                && sourceID2ModelDataArrayContainer[sourceId]?.containsKey(ConstRelRegistriesField.ref)!!
-//                        && (sourceID2ModelDataArrayContainer[sourceId]?.get(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data!=null
-//                        && (sourceID2ModelDataArrayContainer[sourceId]?.get(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.containsKey(relModel)!!){
-//                            (sourceID2ModelDataArrayContainer[sourceId]?.get(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relModel) as ModelDataArray
-//                        }
-//                        else {
-//                            var relModelDataArray = ModelDataArray(fields = arrayListOf(*relModel?.fields?.getAllPersistFields()?.values?.toTypedArray()!!), model = relModel)
-//                            var mrfd=modelRelationMatcher.getRelationMatchField(model,relModel)
-//                            relModelDataArray.fromIdValue=sourceId
-//                            relModelDataArray.fromField=mrfd?.fromField
-//                            relModelDataArray.toField=mrfd?.toField
-//                            relModelDataArray
-//                        }
-//                        //relRegistries field in main record
-//                        fdMap[ConstRelRegistriesField.ref]=ModelDataSharedObject(mutableMapOf(Pair(relModel,relModelDataArray)))
-//
-//                        var nRec = FieldValueArray()
-//                        var mFields = arrayListOf<FieldBase>()
-//
-//                        targetFields.forEach {
-//                            if (it.model == relModel) {
-//                                mFields.add(it)
-//                            }
-//                        }
-//
-//                        mFields.forEach {
-//                            //var key = it.getFullName()!!
-//                            var mFV=relRecord.firstOrNull {mit->
-//                                mit.field.isSame(it)
-//                            }
-//                            if(mFV!=null){
-//                                nRec.add(mFV)
-//                            }
-//                        }
-//
-//                        fields.forEach { rfd ->
-//                            var tmf = this.getTargetModelField(rfd as FieldBase)
-//                            var rmf = this.getRelationModelField(rfd as FieldBase)
-//                            // m2m field in main record
-//                            if(!sourceID2ModelDataArrayContainer.containsKey(sourceId)
-//                                    || !sourceID2ModelDataArrayContainer[sourceId]?.containsKey(rfd)!!)
-//                            {
-//                                var rs=ModelDataObject(fields = arrayListOf(),model = tmf?.first)
-//                                var mrfd=modelRelationMatcher.getRelationMatchField(model,relModel)
-//                                rs.fromIdValue=sourceId
-//                                rs.fromField=mrfd?.fromField
-//                                rs.toField=mrfd?.toField
-//                                fdMap[rfd]=rs
-//                            }
-//
-//                            var mFields = arrayListOf<FieldBase>()
-//                            targetFields.forEach {
-//                                if (it.model == tmf!!.first) {
-//                                    mFields.add(it)
-//                                }
-//                            }
-//
-//                            var subModelDataObject = ModelDataObject(fields=mFields, model = tmf?.first)
-//                            var mrfd=modelRelationMatcher.getRelationMatchField(relModel,tmf?.first)
-//                            subModelDataObject.fromField = mrfd?.fromField
-//                            subModelDataObject.fromIdValue = sourceId
-//                            subModelDataObject.toField=mrfd?.toField
-//
-//
-//                            var subRec = FieldValueArray()
-//                            mFields.forEach {
-//                                var mFV=relRecord.firstOrNull {mit->
-//                                    mit.field.isSame(it)
-//                                }
-//                                if(mFV!=null){
-//                                    subRec.add(mFV)
-//                                }
-//                            }
-//
-//                            subModelDataObject.data=subRec
-//                            nRec.setValue(rmf!!.second!!,subModelDataObject)
-//                        }
-//                        //sourceId2ModelRecordSet[sourceId]=modelRecordSet
-//                        relModelDataArray.data.add(nRec)
-//                        //Pair(null as FieldBase, modelRecordSet)
-//
-//                        fdMap
-//
-//                    }
-//                    else{
-//                        var tmf=this.getTargetModelField(fd as FieldBase)
-//                        if(tmf?.first==null){
-//                            return@f
-//                        }
-//                        var mFields=arrayListOf<FieldBase>()
-//                        targetFields.forEach {
-//                            if(it.model==tmf!!.first){
-//                                mFields.add(it)
-//                            }
-//                        }
-//                        var modelDataArray=if(sourceID2ModelDataArrayContainer.containsKey(sourceId) && sourceID2ModelDataArrayContainer[sourceId]!!.containsKey(fd)){
-//                            sourceID2ModelDataArrayContainer[sourceId]?.get(fd)!! as ModelDataArray
-//                        }
-//                        else {
-//                            var modelDataArray=ModelDataArray(fields=mFields,model=tmf.first)
-//                            var mrfd=modelRelationMatcher.getRelationMatchField(model,tmf.first)
-//                            modelDataArray.fromField=mrfd?.fromField
-//                            modelDataArray.fromIdValue=sourceId
-//                            modelDataArray.toField=mrfd?.toField
-//                            modelDataArray
-//                        }
-//                        var nRec=FieldValueArray()
-//                        mFields.forEach {
-//                           // var key=it.getFullName()!!
-//                           // nRec[it.propertyName]=relRecord[key]
-//                            var fv=relRecord.firstOrNull {rfv->
-//                                rfv.field.isSame(it)
-//                            }
-//                            if(fv!=null){
-//                                nRec.add(fv)
-//                            }
-//                        }
-//                        modelDataArray.data.add(nRec)
-//
-//                        mapOf(fd as FieldBase to modelDataArray)
-//                    }
-//
-//                    var fs=sourceID2ModelDataArrayContainer[sourceId]
-//                    mrs.forEach { t, u ->
-//                        if(fs!=null){
-//                            fs?.put(t,u)
-//                        }
-//                        else{
-//                            fs=LinkedHashMap<FieldBase?,ModelData>()
-//                            fs?.put(t,u)
-//                            sourceID2ModelDataArrayContainer[sourceId]= fs!!
-//                        }
-//                    }
-//
-//                }
-//
-//                if(relModel!=null){
-//                    return@r
-//                }
-//            }
-//        }
-//
-//        var idFd=model!!.fields!!.getIdField()!!
-//
-//        reqMainArray?.data?.forEach {
-//            var mSrcId: Long? = it.firstOrNull { mit->
-//                mit.field.isSame(idFd)
-//            }?.value as Long? ?: return@forEach
-//            var mrs= sourceID2ModelDataArrayContainer[mSrcId!!]
-//            mrs?.forEach { f, md ->
-//                if(f !is ConstRelRegistriesField){
-//                    setOrReplaceFieldValueArrayItem(it,f!!,md)
-//                }
-//                else
-//                {
-//                    var relRegField=it.firstOrNull { rit->
-//                          rit.field.isSame(f)
-//                    }
-//                    if(relRegField!=null){
-//                        if(relRegField.value is ModelDataSharedObject){
-//                            (relRegField.value as ModelDataSharedObject).data[md.model]=md
-//                        }
-//                        else{
-//                            throw ModelErrorException("${ModelReservedKey.relRegistriesFieldKey} is reserved keyword,dont use it as field name or property name")
-//                        }
-//                    }
-//                    else{
-//                        it.add(FieldValue(f,md))
-//                    }
-//                }
-//            }
-//        }
-//    }
     private fun setOrReplaceFieldValueArrayItem(fVArr:FieldValueArray,field:FieldBase,value:Any?){
         var index=fVArr.indexOfFirst {
             it.field.isSame(field)
@@ -1454,7 +1290,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected open fun runCreateFieldsInitializeRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
         this.createRecordSetIsolationFields(modelDataObject,partnerCache)
-        this.createFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
+        this.cuFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
 
         var rules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueInitializeRule<*>>(model)
         rules?.forEach {
@@ -1670,7 +1506,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(partnerCache==null){
                 return Pair(false,"权限接口没有提供操作用户信息")
             }
-            //this.runCreateFieldsInitializeRules(modelDataObject,partnerCache)
+            this.cuFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
             var ret = this.runEditFieldsCheckRules(modelDataObject,partnerCache)
             if(!ret.first){
                 return ret

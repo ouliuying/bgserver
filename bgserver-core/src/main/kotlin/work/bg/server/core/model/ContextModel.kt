@@ -148,16 +148,29 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         ar.bag = this.loadMainViewType(app,model,viewType,ownerFieldValue,toField,ownerModelID,pc,reqData,viewRefType)
         return ar
     }
-    private  fun getMany2ManyFieldByRelationModel(model:ModelBase,relationModel:ModelBase):ModelMany2ManyField?{
+    private  fun getMany2ManyFieldByRelationModel(model:ModelBase,relationModel:ModelBase,ownerField:FieldBase):ModelMany2ManyField?{
+            val ownerModel = ownerField.model!!
             model.fields?.forEach {
                 if(it is ModelMany2ManyField){
-                    if(it.relationModelTable==relationModel.fullTableName){
+                    if(it.relationModelTable==relationModel.fullTableName && it.targetModelFieldName=="id" &&
+                            it.targetModelTable==ownerModel.fullTableName){
                         return it
                     }
                 }
             }
         return null
     }
+
+    private  fun getRelationModelMany2OneFieldToOwnerFieldModel(relationModel:ModelBase,ownerField:FieldBase):FieldBase?{
+        val ownerModel = ownerField.model!!
+        relationModel.fields?.forEach {
+            if(it is ModelMany2OneField && it.targetModelTable==ownerModel.fullTableName && it.targetModelFieldName=="id"){
+                return it
+            }
+        }
+        return null
+    }
+
     private fun getOwnerFieldAndRefField(ownerField: JsonObject?,app:String,model:String):Pair<FieldValue?,FieldBase?>{
         ownerField?.let {
             val ownerApp = it["app"]?.asString
@@ -172,10 +185,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             var relationModel = this.appModel.getModel(ownerFieldObject.relationModelTable!!)
                             var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
                             if(relationModel!=null && relationModel.meta.appName == app && relationModel.meta.name == model){
-                                relationModel.fields?.getField(ownerFieldObject.relationModelFieldName)
+                                this.getRelationModelMany2OneFieldToOwnerFieldModel(relationModel,ownerFieldObject)
                             }
                             else if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name == model){
-                               this.getMany2ManyFieldByRelationModel(targetModel,relationModel!!)
+                               this.getMany2ManyFieldByRelationModel(targetModel,relationModel!!,ownerFieldObject)
+                               // targetModel.fields.getField(ownerFieldObject.targetModelFieldName)
                             }
                             else {
                                 null
@@ -441,6 +455,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
 
         return mv
     }
+
     protected  open fun fillCreateModelViewMeta(mv:ModelView,
                                                 modelData:ModelData?,
                                                 viewData:MutableMap<String,Any>,
@@ -507,6 +522,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
     private fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
         var fields = arrayListOf<FieldBase>()
+        var fFields = arrayListOf<FunctionField<*>>()
         if(mv.app.isNullOrEmpty() || mv.model.isNullOrEmpty()){
             return fields
         }
@@ -516,7 +532,21 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 var field = modelObj?.getFieldByPropertyName(it.name)
                 field?.let {fd->
                     if(fd !is FunctionField<*>){
-                        fields.add(fd)
+                        if(fd !in fields){
+                            fields.add(fd)
+                        }
+                    }
+                    else{
+                        if(fd !in fFields){
+                            fFields.add(fd)
+                        }
+                        fd.depFields.forEach {dFD->
+                            if(dFD !is FunctionField<*>){
+                                if(dFD !in fields){
+                                    fields.add(dFD!!)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -526,8 +556,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                         rd.type==ModelView.RelationType.Many2One||
                         rd.type==ModelView.RelationType.One2One){
                     var field= modelObj?.getFieldByPropertyName(it.name)
-                    field?.let {
-                        fields.add(field)
+                    field?.let { rFD->
+                        if(rFD !in fields){
+                            fields.add(rFD)
+                        }
                     }
                 }
             }
@@ -561,11 +593,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                ownerModelID: Long?,
                                                reqData:JsonObject?):ModelDataObject?{
         val id = reqData?.get("id")?.asLong
-        val fields = this.getModelViewFields(mv).toTypedArray()
+        val fields= this.getModelViewFields(mv)
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(*fields,criteria = eq(idf,it), partnerCache = pc)
+                var data = this.acRead(*fields.toTypedArray(),criteria = eq(idf,it), partnerCache = pc)
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -577,7 +609,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
         if(ret) {
-            var data = this.acRead(*fields, criteria = criteria, partnerCache = pc)
+            var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -651,11 +683,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                              ownerModelID: Long?,
                                             reqData:JsonObject?):ModelDataObject?{
         val id = reqData?.get("id")?.asInt
-        val fields = this.getModelViewFields(mv).toTypedArray()
+        val fields = this.getModelViewFields(mv)
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(*fields, criteria = eq(idf,it), partnerCache = pc)
+                var data = this.acRead(*fields.toTypedArray(), criteria = eq(idf,it), partnerCache = pc)
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
@@ -667,7 +699,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
         if(ret) {
-            var data = this.acRead(*fields, criteria = criteria, partnerCache = pc)
+            var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -710,6 +742,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             }
         }
     }
+
     private fun toClientModelData(modelData:ModelData?,m2mFields:ArrayList<FieldBase>):ModelData?{
         modelData?.let {
             when(it){
@@ -750,7 +783,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return modelData
     }
+    protected open fun processFunctionFieldAfterRead(modelArray:ModelDataArray?,funFields:ArrayList<FunctionField<*>>){
 
+    }
     protected  open fun loadListModelViewData(mv:ModelView,
                                               viewData:MutableMap<String,Any>,
                                               pc:PartnerCache,

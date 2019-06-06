@@ -26,12 +26,12 @@ class ProxyRelationModelField<T>(model:ModelBase?,
                                  fieldType:FieldType,
                                  title:String?=null):FunctionField<T>(model,null,null,name,fieldType,title, arrayOf(field)) {
 
-    override fun compute(fieldValueArry: FieldValueArray, partnerCache: PartnerCache, data: Any?): T? {
+    override fun compute(fieldValueArry: FieldValueArray, partnerCache: PartnerCache?, data: Any?): T? {
         setProxyModelFieldValueFromRelationModel(fieldValueArry, partnerCache, data)
         return null
     }
 
-    private fun setProxyModelFieldValueFromRelationModel(fieldValueArray: FieldValueArray, partnerCache: PartnerCache, data: Any?){
+    private fun setProxyModelFieldValueFromRelationModel(fieldValueArray: FieldValueArray, partnerCache: PartnerCache?, data: Any?){
         var relRegisterFiled = fieldValueArray.firstOrNull {
             it.field.isSame(ConstRelRegistriesField.ref)
         }
@@ -58,7 +58,7 @@ class ProxyRelationModelField<T>(model:ModelBase?,
     }
 
 
-    override fun inverse(fieldValueArray: FieldValueArray, partnerCache: PartnerCache, value: T?, data: Any?) {
+    override fun inverse(fieldValueArray: FieldValueArray, partnerCache: PartnerCache?, value: T?, data: Any?) {
         setProxyModelFieldValueArrayToRelationModel(fieldValueArray)
     }
 
