@@ -584,6 +584,8 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 if(it!=null){
                     var name=it.attributeValue("name")
                     var style=it.attributeValue("style")
+                    var visible = it.attributeValue("visible")
+                    var enable = it.attributeValue("enable")
                     if(style.isNullOrEmpty()){
                         style="normal"
                     }
@@ -616,6 +618,8 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     var subNodes=it.elements("view")
                     var subNode=if(subNodes.size>0) subNodes[0] as Element? else null
                     val f=mv.addField(name,style,rowSpan,colSpan,type,title,icon)
+                    f.visible=visible
+                    f.enable=enable
                     if(subNode!=null){
                         var subModel=viewNode?.attributeValue("name")
                         var subApp=viewNode?.attributeValue("app")?:app

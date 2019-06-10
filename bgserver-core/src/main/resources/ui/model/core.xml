@@ -34,14 +34,14 @@
 <!--                    </view>-->
 <!--                </views>-->
             </ref>
-            <field name="id"></field>
-            <field name="name"></field>
+            <field name="id"/>
+            <field name="name"/>
         </view>
         <view type="create">
-            <field name="name"></field>
+            <field name="name"/>
         </view>
         <view type="edit">
-            <field name="name"></field>
+            <field name="name"/>
         </view>
     </model>
     <model name="corpPartnerRel" app="core">
@@ -76,25 +76,25 @@
             <ref>
                 <actions>
                         <action>
-                            <group name="main"></group>
+                            <group name="main"/>
                         </action>
                         <action>
-                            <group name="opAction"></group>
+                            <group name="opAction"/>
                         </action>
                 </actions>
                 <menus>
 
                 </menus>
                 <views>
-                    <view type="searchBox" refType="embedded"></view>
+                    <view type="searchBox" refType="embedded"/>
                 </views>
             </ref>
-            <field name="id"></field>
-            <field name="userName"></field>
-            <field name="name"></field>
-            <field name="partnerRoles.name"></field>
-            <field name="nickName"></field>
-            <field name="mobile"></field>
+            <field name="id"/>
+            <field name="userName"/>
+            <field name="name"/>
+            <field name="partnerRoles.name"/>
+            <field name="nickName"/>
+            <field name="mobile"/>
         </view>
 
         <view type="searchBox">
@@ -149,7 +149,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <menus>
@@ -157,15 +157,15 @@
                 <views>
                 </views>
             </ref>
-            <field name="userName" style="head" type="singleLineText"></field>
-            <field name="password" style="head" type="singleLineText"></field>
-            <field name="name" style="subHead" type="singleLineText"></field>
-            <field name="nickName" style="subHead" type="singleLineText"></field>
-            <field name="birthday" type="date"></field>
-            <field name="mobile" type="mobile"></field>
-            <field name="telephone" type="telephone"></field>
-            <field name="email" type="email"></field>
-            <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
+            <field name="userName" style="head" type="singleLineText"/>
+            <field name="password" style="head" type="singleLineText"/>
+            <field name="name" style="subHead" type="singleLineText"/>
+            <field name="nickName" style="subHead" type="singleLineText"/>
+            <field name="birthday" type="date"/>
+            <field name="mobile" type="mobile"/>
+            <field name="telephone" type="telephone"/>
+            <field name="email" type="email"/>
+            <field name="partnerRoles.name" type="many2OneDataSetSelect"/>
             <field name="setCurrentCorpAsDefault" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -175,29 +175,29 @@
                   ]]>
                 </meta>
             </field>
-            <field name="userTitle" colSpan="2" type="multiLineText"></field>
-            <field name="userComment" colSpan="2" type="multiLineText"></field>
-            <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="userTitle" colSpan="2" type="multiLineText"/>
+            <field name="userComment" colSpan="2" type="multiLineText"/>
+            <field name="label1" title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
+            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
+            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
+            <field name="label3" title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
         </view>
 
         <view type="edit">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"></group>
+                        <group name="main"/>
                     </action>
                 </actions>
             </ref>
-            <field name="userName" style="head" type="singleLineText"></field>
-            <field name="password" style="head" type="singleLineText"></field>
-            <field name="name" style="subHead" type="singleLineText"></field>
-            <field name="nickName" style="subHead" type="singleLineText"></field>
-            <field name="birthday" type="date"></field>
-            <field name="mobile" type="mobile"></field>
-            <field name="partnerRoles.name" type="many2OneDataSetSelect"></field>
+            <field name="userName" style="head" type="singleLineText"/>
+            <field name="password" style="head" type="singleLineText"/>
+            <field name="name" style="subHead" type="singleLineText"/>
+            <field name="nickName" style="subHead" type="singleLineText"/>
+            <field name="birthday" type="date"/>
+            <field name="mobile" type="mobile"/>
+            <field name="partnerRoles.name" type="many2OneDataSetSelect"/>
             <field name="setCurrentCorpAsDefault" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -207,35 +207,35 @@
                   ]]>
                 </meta>
             </field>
-            <field name="telephone" type="telephone"></field>
-            <field name="email" type="email"></field>
-            <field name="userTitle" colSpan="2" type="multiLineText"></field>
-            <field name="userComment" colSpan="2" type="multiLineText"></field>
+            <field name="telephone" type="telephone"/>
+            <field name="email" type="email"/>
+            <field name="userTitle" colSpan="2" type="multiLineText"/>
+            <field name="userComment" colSpan="2" type="multiLineText"/>
         </view>
         <view type="detail">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <views>
-                    <view type="detail" refType="main|sub" ownerField="partnerRoles" model="partnerRole"></view>
+                    <view type="detail" refType="main|sub" ownerField="partnerRoles" model="partnerRole"/>
                 </views>
                 <menus>
 
                 </menus>
             </ref>
-            <field name="userName" style="head" type="static"></field>
-            <field name="name" style="subHead" type="static"></field>
-            <field name="nickName" style="subHead" type="static"></field>
-            <field name="birthday" type="static"></field>
-            <field name="mobile" type="static"></field>
-            <field name="telephone" type="static"></field>
-            <field name="email" type="static"></field>
-            <field name="userTitle" colSpan="2" type="static"></field>
-            <field name="userComment" colSpan="2" type="static"></field>
-            <field name="partnerRoles" style="relation"></field>
+            <field name="userName" style="head" type="static"/>
+            <field name="name" style="subHead" type="static"/>
+            <field name="nickName" style="subHead" type="static"/>
+            <field name="birthday" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="email" type="static"/>
+            <field name="userTitle" colSpan="2" type="static"/>
+            <field name="userComment" colSpan="2" type="static"/>
+            <field name="partnerRoles" style="relation"/>
         </view>
     </model>
 
@@ -244,13 +244,13 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|singleSelection|sub"></group>
+                        <group name="main" refType="main|singleSelection|sub"/>
                     </action>
                     <action>
-                        <group name="opAction" refType="main"></group>
+                        <group name="opAction" refType="main"/>
                     </action>
                     <action>
-                        <group name="selSingleItemAction" refType="singleSelection"></group>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                 </actions>
                 <menus>
@@ -258,8 +258,8 @@
                 <views>
                 </views>
             </ref>
-            <field name="id"></field>
-            <field name="name"></field>
+            <field name="id"/>
+            <field name="name"/>
             <field name="isSuper">
             </field>
             <field name="accessControlRule">
@@ -270,17 +270,17 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <menus>
                 </menus>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list"></view>
-                    <view fieldName="apps" refType="main|sub" type="list"></view>
+                    <view fieldName="partners" refType="main|sub" type="list"/>
+                    <view fieldName="apps" refType="main|sub" type="list"/>
                 </views>
             </ref>
-            <field name="name" style="head" type="singleLineText"></field>
+            <field name="name" style="head" type="singleLineText"/>
             <field name="isSuper" style="subHead" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -292,55 +292,55 @@
             </field>
             <field name="accessControlRule" colSpan="2" type="multiLineText">
             </field>
-            <field name="partners" style="relation"></field>
-            <field name="apps" style="relation"></field>
-            <field name="label1"  title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <field name="label2"  title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
-            <field name="label3"  title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"></field>
+            <field name="partners" style="relation"/>
+            <field name="apps" style="relation"/>
+            <field name="label1" title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
+            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
+            <field name="label3" title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
         </view>
 
         <view type="edit">
             <ref>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list"></view>
-                    <view fieldName="apps" refType="main|sub" type="list"></view>
+                    <view fieldName="partners" refType="main|sub" type="list"/>
+                    <view fieldName="apps" refType="main|sub" type="list"/>
                 </views>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <menus>
 
                 </menus>
             </ref>
-            <field name="name"></field>
-            <field name="isSuper"></field>
+            <field name="name"/>
+            <field name="isSuper"/>
             <field name="accessControlRule" colSpan="2" type="multiLineText">
             </field>
-            <field name="partners" style="relation"></field>
-            <field name="apps" style="relation"></field>
+            <field name="partners" style="relation"/>
+            <field name="apps" style="relation"/>
         </view>
         <view type="detail">
             <ref>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list" model="partner"></view>
-                    <view fieldName="apps" refType="main|sub" type="list" model="app"></view>
+                    <view fieldName="partners" refType="main|sub" type="list" model="partner"/>
+                    <view fieldName="apps" refType="main|sub" type="list" model="app"/>
                 </views>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <menus>
 
                 </menus>
             </ref>
-            <field name="name" type="static"></field>
-            <field name="isSuper" type="static"></field>
-            <field name="accessControlRule" type="static" colSpan="2"></field>
-            <field name="partners" style="relation"></field>
-            <field name="apps" style="relation"></field>
+            <field name="name" type="static"/>
+            <field name="isSuper" type="static"/>
+            <field name="accessControlRule" type="static" colSpan="2"/>
+            <field name="partners" style="relation"/>
+            <field name="apps" style="relation"/>
         </view>
     </model>
 </ui>

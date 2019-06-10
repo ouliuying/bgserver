@@ -63,7 +63,6 @@
             <field name="id" type="singleLineText"/>
             <field name="name" type="singleLineText" style="head"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="status" type="many2OneDataSetSelect"/>
             <field name="event" type="many2OneDataSetSelect"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
@@ -75,54 +74,136 @@
             <field name="comment" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="name" type="singleLineText" style="head"/>
+            <ref>
+
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+
+                <views>
+                    <view type="list"
+                          ownerField="contactAddresses"
+                          model="customerContactAddress"
+                          refType="main|sub"/>
+                    <view type="list"
+                          ownerField="opportunities"
+                          model="customerOpportunity"
+                          refType="main|sub"/>
+                    <view type="list"
+                          ownerField="partners"
+                          model="crmPartnerCustomerRel"
+                          refType="main|sub"/>
+                </views>
+
+            </ref>
+            <field name="name" type="singleLineText" style="head" title="公司|姓名"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="status" type="many2OneDataSetSelect"/>
-            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="event.name" type="many2OneDataSetSelect"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
+            <field name="website" type="singleLineText"/>
+            <field name="birthday" type="date" visible="isCorp!=1"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
             <field name="comment" type="singleLineText"/>
             <field name="contactAddresses" style="relation"/>
+            <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
         </view>
 
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list"
+                          ownerField="contactAddresses"
+                          model="customerContactAddress"
+                          refType="main|sub"/>
+                    <view type="list"
+                          ownerField="opportunities"
+                          model="customerOpportunity"
+                          refType="main|sub"/>
+                    <view type="list"
+                          ownerField="partners"
+                          model="crmPartnerCustomerRel"
+                          refType="main|sub"/>
+                    <view type="detail"
+                          ownerField="partners"
+                          model="crmPartnerCustomerRel"
+                          refType="none"/>
+                </views>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="status" type="many2OneDataSetSelect"/>
             <field name="event" type="many2OneDataSetSelect"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
+            <field name="website" type="singleLineText"/>
+            <field name="birthday" type="date" visible="isCorp!=1"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
             <field name="comment" type="singleLineText"/>
             <field name="contactAddresses" style="relation"/>
+            <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
+            <field name="commPartner" style="relation"/>
         </view>
 
         <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list"
+                          ownerField="contactAddresses"
+                          model="customerContactAddress"
+                          refType="none"/>
+                    <view type="list"
+                          ownerField="opportunities"
+                          model="customerOpportunity"
+                          refType="none"/>
+                    <view type="list"
+                          ownerField="partners"
+                          model="crmPartnerCustomerRel"
+                          refType="none"/>
+                    <view type="detail"
+                          ownerField="partners"
+                          model="crmPartnerCustomerRel"
+                          refType="none"/>
+                </views>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="status" type="many2OneDataSetSelect"/>
             <field name="event" type="many2OneDataSetSelect"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
+            <field name="website" type="singleLineText"/>
+            <field name="birthday" type="date" visible="isCorp!=1"/>
+            <field name="fullAddress" type="chinaFullAddress"/>
             <field name="comment" type="singleLineText"/>
             <field name="contactAddresses" style="relation"/>
+            <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
+            <field name="commPartner" style="relation"/>
         </view>
     </model>
 

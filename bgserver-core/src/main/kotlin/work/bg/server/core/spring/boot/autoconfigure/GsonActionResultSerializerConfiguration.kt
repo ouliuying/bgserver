@@ -512,6 +512,7 @@ class GsonActionResultSerializerConfiguration {
                 jObj.addProperty("colSpan",src.colSpan)
                 jObj.addProperty("rowSpan",src.rowSpan)
                 jObj.addProperty("visible",src.visible)
+                jObj.addProperty("enable",src.enable)
                 jObj.addProperty("viewType",src.viewType)
                 jObj.addProperty("icon",src.icon)
                 jObj.addProperty("app",src.app)

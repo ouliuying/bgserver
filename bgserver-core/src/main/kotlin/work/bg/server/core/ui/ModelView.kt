@@ -146,8 +146,6 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
 
     fun createCopy():ModelView{
         var mv=ModelView(this.app,this.model,this.viewType)
-        mv.enable=enable
-        mv.visible=visible
         mv.meta=meta
         var cpyChildren= arrayListOf<Field>()
         this.fields.forEach {
@@ -201,23 +199,23 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          }
          var title:String=""
          var icon:String=""
-         var visible:Int=1
-         var enable = 1
          var relationData:RelationData?=null
          var targetFields:Array<Field>?=null
          var fieldView:ModelView?=null
          var meta:JsonObject?=null
          var ctrlProps:JsonObject?=null
+         var visible:String?=null
+         var enable:String?=null
          fun createCopy():Field{
             val f= Field(this.modelView,name,style,rowSpan,colSpan,type)
-            f.visible=visible
             f.title=title
-            f.enable=this.enable
             f.icon=icon
             f.relationData=relationData
             f.fieldView=fieldView
             f.meta=meta
             f.ctrlProps=ctrlProps
+            f.visible=visible
+            f.enable=enable
             return f
          }
          val model=this.modelView.model

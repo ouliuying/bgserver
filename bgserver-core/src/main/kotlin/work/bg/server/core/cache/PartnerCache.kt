@@ -350,12 +350,21 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     f.name == it.name
                 }
                 if(tf!=null){
-                    if(it.visible==0){
+                    if(it.enable=="false"){
                         mv.fields.remove(tf)
                     }
                     else{
-                        tf.visible=it.visible
-                        tf.enable = it.enable
+                        if(it.visible!=null){
+                            if(tf.visible==null){
+                                tf.visible=it.visible
+                            }
+                            else{
+                                tf.visible="(${tf.visible}) and (${it.visible})"
+                            }
+                        }
+//                        if(it.enable!=null){
+//                            tf.enable = it.enable
+//                        }
                         if(it.subViewRule!=null){
                             tf.fieldView=applyViewRule(tf.fieldView,it.subViewRule as CorpPartnerRoleCache.ViewRule)
                         }

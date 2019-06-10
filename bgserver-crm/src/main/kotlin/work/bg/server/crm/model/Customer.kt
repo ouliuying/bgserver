@@ -21,6 +21,7 @@ import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.crm.field.ModelFullAddressField
 
 @Model(name="customer",title = "客户")
 class Customer: ContextModel("crm_customer","public") {
@@ -46,7 +47,7 @@ class Customer: ContextModel("crm_customer","public") {
 
     //个人属性
     val mobile =  ModelField(null,"mobile",FieldType.STRING,title = "手机",defaultValue = "")
-    val sex =  ModelField(null,"sex",FieldType.INT,title = "手机",defaultValue = -1)
+    val sex =  ModelField(null,"sex",FieldType.INT,title = "性别",defaultValue = -1)
     //公司属性
     val fax =  ModelField(null,"fax",FieldType.STRING,title = "传真",defaultValue = "")
     //通用属性
@@ -56,6 +57,15 @@ class Customer: ContextModel("crm_customer","public") {
     val city = ModelField(null,"city", FieldType.STRING,title = "市",defaultValue = "")
     val district = ModelField(null,"district", FieldType.STRING,title = "区/县",defaultValue = "")
     val streetAddress = ModelField(null,"street_address",FieldType.STRING,"详细地址",defaultValue = "")
+    val fullAddress by lazy {
+        ModelFullAddressField(null,
+                "fullAddress",
+                "地址",
+                this.province,this.city,
+                this.district,
+                this.streetAddress,
+                this.gson)
+    }
     val website =  ModelField(null,"website",FieldType.STRING,title = "网址",defaultValue = "")
     val comment =  ModelField(null,"c_comment",FieldType.STRING,title = "注释",defaultValue = "")
     val contactAddresses = ModelOne2ManyField(null,"contact_address_id",FieldType.BIGINT,"联系人",

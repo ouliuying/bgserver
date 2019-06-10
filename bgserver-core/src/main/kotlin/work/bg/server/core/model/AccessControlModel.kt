@@ -252,7 +252,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 fields.forEach {f->
                     val fr = it.fieldRules[f.propertyName]
                     if(fr!=null){
-                        if(fr.readAction.enable>0){
+                        if(fr.readAction.enable!="false"){
                             rFields.add(f)
                         }
                     }
@@ -290,7 +290,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.readAction.enable<1){
+            if(it.readAction.enable=="false"){
                 return null
             }
         }
@@ -1123,12 +1123,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.createAction.enable<1){
+            if(it.createAction.enable=="false"){
 
             }
         }
         modelRule?.fieldRules?.forEach { _, u ->
-            if(u.createAction.enable==1) {
+            if(u.createAction.enable!="false") {
                 if(u.createAction.setValue!=null){
                     modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.setValue,partnerCache))
                 } else if(u.createAction.defalut!=null && !modelDataObject.hasFieldValue(u.field)){
@@ -1152,7 +1152,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.fieldRules?.forEach { _, u ->
-            if(u.editAction.enable==1) {
+            if(u.editAction.enable!="false") {
                 if(u.editAction.setValue!=null){
                     modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.setValue,partnerCache))
                 } else if(u.editAction.defalut!=null && !modelDataObject.hasFieldValue(u.field)){
@@ -1197,7 +1197,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.createAction.enable<1){
+            if(it.createAction.enable=="false"){
                 return Pair(false,"没有添加权限")
             }
         }
@@ -1246,7 +1246,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.editAction.enable<1){
+            if(it.editAction.enable=="false"){
                 return Pair(false,"没有更新权限")
             }
         }
@@ -1798,7 +1798,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         model?.let {
             var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
             modelRule?.let {
-                if(it.deleteAction.enable<1){
+                if(it.deleteAction.enable=="false"){
                     return Pair(false,"无删除权限")
                 }
             }

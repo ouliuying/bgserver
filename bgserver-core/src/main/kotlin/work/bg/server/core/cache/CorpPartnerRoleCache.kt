@@ -348,8 +348,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         viewElem.selectNodes("fields/field").forEach {
             val fieldElem = it as Element
             val name = fieldElem.attributeValue("name")
-            val enable = if((fieldElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
-            val visible =  if((fieldElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+            val enable = (fieldElem.selectSingleNode("setting/enable") as Element?)?.textTrim
+            val visible =  (fieldElem.selectSingleNode("setting/visible") as Element?)?.textTrim
             if(!name.isNullOrEmpty()){
                 var fr = ViewRule.FieldRule(name,enable,visible)
                 fieldRules.add(fr)
@@ -373,7 +373,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             val editElem = modelElem.selectSingleNode("setting/edit")
             val deleteElem = modelElem.selectSingleNode("setting/delete")
             var modelRule = ModelRule(model)
-            val createEnable = if((createElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val createEnable = (createElem?.selectSingleNode("enable") as Element?)?.textTrim
             val createCheckBelongToPartner = if((createElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             var ruleBeans = arrayListOf<ModelRule.RuleBean>()
             createElem.selectNodes("rules/rule/bean").forEach {
@@ -384,7 +384,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             }
             modelRule.createAction = ModelRule.CreateAction(createEnable,createCheckBelongToPartner,ruleBeans.toTypedArray())
 
-            val editEnable = if((editElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val editEnable = (editElem?.selectSingleNode("enable") as Element?)?.textTrim
             val editCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             editElem.selectNodes("rules/rule/bean").forEach {
@@ -396,7 +396,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             modelRule.editAction = ModelRule.EditAction(editEnable,editCheckBelongToPartner,ruleBeans.toTypedArray())
 
 
-            val readEnable = if((readElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val readEnable = (readElem?.selectSingleNode("enable") as Element?)?.textTrim
             val readCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             readElem.selectNodes("rules/rule/bean").forEach {
@@ -407,7 +407,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             }
             modelRule.readAction = ModelRule.ReadAction(readEnable,readCheckBelongToPartner,ruleBeans.toTypedArray())
 
-            val deleteEnable = if((deleteElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+            val deleteEnable = (deleteElem?.selectSingleNode("enable") as Element?)?.textTrim
             val deleteCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             deleteElem.selectNodes("rules/rule/bean").forEach {
@@ -423,23 +423,23 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 val field = fieldElem.attributeValue("name")
                 var fr= ModelRule.FieldRule(field)
                 val readElem=fieldElem.selectSingleNode("setting/read")
-                var enable = if((readElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+                var enable = (readElem?.selectSingleNode("enable") as Element?)?.textTrim
                 fr.readAction= ModelRule.FieldRule.ReadAction(enable)
 
                 val editElem=fieldElem.selectSingleNode("setting/edit")
-                enable = if((editElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+                enable = (editElem?.selectSingleNode("enable") as Element?)?.textTrim
                // var default = (editElem?.selectSingleNode("default") as Element?)?.textTrim
                 var setValue =  (editElem?.selectSingleNode("setValue") as Element?)?.textTrim
               //  visible = if((editElem?.selectSingleNode("visible") as Element?)?.textTrim=="1") 1 else 0
                 fr.editAction=ModelRule.FieldRule.EditAction(enable,setValue)
 
                 val deleteElem=fieldElem.selectSingleNode("setting/delete")
-                enable = if((deleteElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+                enable = (deleteElem?.selectSingleNode("enable") as Element?)?.textTrim
               //  visible = if((deleteElem?.selectSingleNode("visible") as Element?)?.textTrim=="1") 1 else 0
                 fr.deleteAction= ModelRule.FieldRule.DeleteAction(enable)
 
                 val createElem=fieldElem.selectSingleNode("setting/create")
-                enable = if((createElem?.selectSingleNode("enable") as Element?)?.textTrim=="0") 0 else 1
+                enable = (createElem?.selectSingleNode("enable") as Element?)?.textTrim
                 val default = (readElem?.selectSingleNode("default") as Element?)?.textTrim
                 setValue =  (readElem?.selectSingleNode("setValue") as Element?)?.textTrim
                // visible = if((createElem?.selectSingleNode("visible") as Element?)?.textTrim=="1") 1 else 0
@@ -466,21 +466,21 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         class RuleBean(val name:String,val config:String){
 
         }
-        open class ModelRuleAction(val enable:Int,
+        open class ModelRuleAction(val enable:String?,
                                    val checkBelongToPartner:Int=1,
                                    val ruleBeans:Array<RuleBean> = arrayOf()){
 
         }
-        class DeleteAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
+        class DeleteAction(enable:String?,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class CreateAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
+        class CreateAction(enable:String?,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class EditAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
+        class EditAction(enable:String?,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
-        class ReadAction(enable:Int,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
+        class ReadAction(enable:String?,checkBelongToPartner:Int,ruleBeans:Array<RuleBean>):ModelRuleAction(enable,checkBelongToPartner,ruleBeans){
 
         }
 
@@ -493,11 +493,11 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
 
-            open class FieldRuleAction(val enable:Int,val defalut:String?=null,val setValue:String?=null)
-            class DeleteAction(enable:Int):FieldRuleAction(enable)
-            class CreateAction(enable:Int, default: String?,setValue: String?):FieldRuleAction(enable,default,setValue)
-            class EditAction(enable:Int,setValue:String?):FieldRuleAction(enable,setValue=setValue)
-            class ReadAction(enable:Int):FieldRuleAction(enable)
+            open class FieldRuleAction(val enable:String?,val defalut:String?=null,val setValue:String?=null)
+            class DeleteAction(enable:String?):FieldRuleAction(enable)
+            class CreateAction(enable:String?, default: String?,setValue: String?):FieldRuleAction(enable,default,setValue)
+            class EditAction(enable:String?,setValue:String?):FieldRuleAction(enable,setValue=setValue)
+            class ReadAction(enable:String?):FieldRuleAction(enable)
         }
 
     }
@@ -522,7 +522,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     class ViewRule(val app:String,val model:String,val type:String,val enable:Int,val visible:Int,
                    val fieldRules:Array<ViewRule.FieldRule> = arrayOf()){
 
-        class FieldRule(val name:String,val enable:Int,val visible:Int){
+        class FieldRule(val name:String,val enable:String?,val visible:String?){
             var subViewRule:ViewRule?=null
         }
 
