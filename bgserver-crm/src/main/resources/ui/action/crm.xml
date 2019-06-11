@@ -19,5 +19,10 @@
   -->
 
 <ui>
-
+    <action viewType="detail" app="crm" model="customerOpportunity">
+        <group name="createOrEditQuotation">
+            <trigger title="创建报价单" model="customerOpportunityOrderQuotation" viewType="create" name="createQuotation"></trigger>
+            <trigger title="更新报价单" model="customerOpportunityOrderQuotation" viewType="edit" name="editQuotation"></trigger>
+        </group>
+    </action>
 </ui>

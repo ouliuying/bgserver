@@ -24,16 +24,16 @@ import java.time.LocalTime
 
 class ModelFieldConvert {
     companion object {
-        fun toTypeValue(field:FieldBase?,value:String):Any?{
+        fun toTypeValue(field:FieldBase?,value:String?):Any?{
             return when(field?.fieldType){
-                FieldType.INT->value.toInt()
+                FieldType.INT->value?.toInt()
                 FieldType.DATE->if(value=="now()") LocalDate.now() else LocalDate.parse(value)
                 FieldType.DATETIME->if(value=="now()") LocalDateTime.now() else LocalDateTime.parse(value)
                 FieldType.TIME->if(value=="now()") LocalTime.now() else LocalTime.parse(value)
                 FieldType.TEXT->value
                 FieldType.STRING->value
-                FieldType.BIGINT->value.toBigInteger()
-                FieldType.NUMBER->value.toBigDecimal()
+                FieldType.BIGINT->value?.toBigInteger()
+                FieldType.NUMBER->value?.toBigDecimal()
                 else->null
             }
         }

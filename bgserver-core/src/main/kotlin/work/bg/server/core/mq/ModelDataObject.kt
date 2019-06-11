@@ -62,11 +62,18 @@ class ModelDataObject(override var data: FieldValueArray = FieldValueArray(),
         var fieldValue = this.data.firstOrNull {
             it.field.isSame(field)
         }
-        if(fieldValue!=null) {
-           this.data.setValue(fieldValue.field,value)
+        val tValue = when(value) {
+            is com.google.gson.internal.LazilyParsedNumber -> {
+                ModelFieldConvert.toTypeValue(field,value?.toString())
+            }
+            else -> value
+        }
+
+        if(fieldValue!=null){
+           this.data.setValue(fieldValue.field,tValue)
         }
         else {
-            this.data.add(FieldValue(field,value))
+            this.data.add(FieldValue(field,tValue))
             this.fields?.add(field)
         }
     }

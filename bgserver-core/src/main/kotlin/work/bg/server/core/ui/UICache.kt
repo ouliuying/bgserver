@@ -655,8 +655,25 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     val refType =  it.attributeValue("refType")
                     var refTypes = if(refType.isNullOrEmpty())  arrayListOf(ModelViewRefType.Main) else arrayListOf(*refType.split('|').toTypedArray())
                     if(!groupName.isNullOrEmpty()){
+                        var triggers = ArrayList<ModelView.RefActionGroup.RefTrigger>()
+                        (it.selectNodes("trigger") as List<Element>?)?.forEach { tit->
+                            val tApp = tit.attributeValue("app")?:aApp
+                            val tModel = tit.attributeValue("model")?:aModel
+                            val tViewType = tit.attributeValue("viewType")?:aViewType
+                            val tTitle = tit.attributeValue("title")
+                            val tName = tit.attributeValue("name")
+                            val tVisible = tit.attributeValue("visible")
+                            val tEnable = tit.attributeValue("enable")
+                            try{
+                                triggers.add(ModelView.RefActionGroup.RefTrigger(tApp!!,tModel!!,tViewType!!,tName!!,tTitle,tVisible,tEnable))
+                            }
+                            catch (ex:java.lang.Exception){
+
+                            }
+
+                        }
                         mv.refActionGroups.add(ModelView.RefActionGroup(aApp!!,
-                                aModel!!,aViewType!!,groupName, refTypes))
+                                aModel!!,aViewType!!,groupName,triggers, refTypes))
                     }
                 }
             }

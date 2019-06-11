@@ -154,7 +154,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     val tag = "$app.$t.$it"
                     val rv=this.currRole?.viewRules?.get(tag)
                     if(rv!=null){
-                        if(rv.enable!=0){
+                        if(rv.enable!="false"){
                             toKeys.add(it)
                         }
                     }
@@ -229,13 +229,13 @@ class PartnerCache(partnerData:Map<String,Any?>?,
 
     }
     private fun applyMenuRule(menu: MenuNode?, rule:CorpPartnerRoleCache.MenuRule):MenuNode?{
-        if(menu==null || rule.visible==0){
+        if(menu==null || rule.visible=="false"){
             return null
         }
         rule.children.forEach {
             when(it.type){
                 CorpPartnerRoleCache.MenuRule.MenuType.MENU->{
-                    if(it.visible==0){
+                    if(it.visible=="false"){
                         removeMenuChild(menu,it.app,it.name)
                     }
                     else{
@@ -253,7 +253,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     }
                 }
                 CorpPartnerRoleCache.MenuRule.MenuType.MENU_ITEM->{
-                    if(it.visible==0){
+                    if(it.visible=="false"){
                         removeMenuItemChild(menu,it.app,it.model,it.viewType)
                     }
                     else{
@@ -289,25 +289,44 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         return null
     }
 
-    fun getAccessControlModelViewActionGroup(app:String,model:String,viewType:String,groupName:String):TriggerGroup?{
-        var va = UICache.ref.getViewAction(app,model,viewType,groupName)
+    fun getAccessControlModelViewActionGroup(refActionGroup: ModelView.RefActionGroup):TriggerGroup?{
+        var va = UICache.ref.getViewAction(refActionGroup.app,refActionGroup.model,refActionGroup.viewType,refActionGroup.groupName)
         //todo add access control
         if(va!=null){
-            var tg = va.groups[groupName]
-            var tgRule = this.getActionGroupRule(tg,app,model,viewType)?.groupRules?.get(groupName)
-            if(tg!=null && tgRule!=null){
-                var cloneTG = tg.createCopy()
-                if(tgRule.visible==0){
-                    return null
+            var tg = va.groups[refActionGroup.groupName]
+            var tgRule = this.getActionGroupRule(tg,
+                    refActionGroup.app,
+                    refActionGroup.model,
+                    refActionGroup.viewType)?.groupRules?.get(refActionGroup.groupName)
+            if(tg!=null){
+                if(tgRule!=null && tgRule.visible == "false") {
+                        return null
                 }
-                tg.enable=tgRule.enable
-                tgRule.triggerRules.forEach { t, u ->
+                var cloneTG = tg.createCopy()
+                if(tgRule!=null){
+                    if(tgRule.visible=="false"){
+                        return null
+                    }
+                    tg.enable=tgRule.enable
+
+
+                    tgRule.triggerRules.forEach { t, u ->
+                        var t=cloneTG.triggers.firstOrNull {tit->
+                            tit.name==u.name && tit.app == u.app && tit.model==u.model && tit.viewType == u.viewType
+                        }
+                        if(t!=null){
+                            t.enable= if(t.enable!=null && u.enable!=null) "(${t.enable}) and (${u.enable})" else t.enable?:u.enable
+                            t.visible= if(t.visible!=null && u.visible!=null) "(${t.visible}) and (${u.visible})" else t.visible?:u.visible
+                        }
+                    }
+                }
+                refActionGroup.triggers.forEach { u->
                     var t=cloneTG.triggers.firstOrNull {tit->
                         tit.name==u.name && tit.app == u.app && tit.model==u.model && tit.viewType == u.viewType
                     }
                     if(t!=null){
-                        t.enable=u.enable
-                        t.visible=u.visible
+                        t.enable= if(t.enable!=null && u.enable!=null) "(${t.enable}) and (${u.enable})" else t.enable?:u.enable
+                        t.visible= if(t.visible!=null && u.visible!=null) "(${t.visible}) and (${u.visible})" else t.visible?:u.visible
                     }
                 }
                 return cloneTG
@@ -341,7 +360,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     }
     private fun applyViewRule(mv:ModelView?,rule:CorpPartnerRoleCache.ViewRule):ModelView?{
         if(mv!=null){
-            if(rule.visible==0){
+            if(rule.visible=="false"){
                 return null
             }
             mv.enable=rule.enable

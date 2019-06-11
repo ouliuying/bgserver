@@ -56,7 +56,7 @@ class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
             FieldType.BIGINT,
             "产品",
             relationModelTable = "public.crm_customer_opportunity_product_rel",
-            relationModelFieldName = "product",
+            relationModelFieldName = "product_id",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
 

@@ -235,14 +235,14 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             if(mvData!=null){
                 bag["data"]=mvData
             }
-            var actionNameArray = arrayListOf<String>()
+            var refActionGroups = arrayListOf<ModelView.RefActionGroup>()
             var reqRefTypeArray = reqRefType.split(",")
             mv.refActionGroups.forEach {
                 if(it.refTypes.intersect(reqRefTypeArray).count()>0){
-                    actionNameArray.add(it.groupName)
+                    refActionGroups.add(it)
                 }
             }
-            var triggerGroups = this.loadModelViewActionTriggerGroups(mv,actionNameArray.toTypedArray(),pc,reqData)
+            var triggerGroups = this.loadModelViewActionTriggerGroups(mv,refActionGroups.toTypedArray(),pc,reqData)
             if(triggerGroups!=null){
                 bag["triggerGroups"]=triggerGroups
             }
@@ -283,13 +283,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 if(mvData!=null){
                     bag["data"]=mvData
                 }
-                var actionNameArray = arrayListOf<String>()
+                var refActionGroups = arrayListOf<ModelView.RefActionGroup>()
                 mv.refActionGroups.forEach {
                     if(it.refTypes.intersect(reqRefTypeArray).count()>0){
-                        actionNameArray.add(it.groupName)
+                        refActionGroups.add(it)
                     }
                 }
-                var triggerGroups = this.loadModelViewActionTriggerGroups(mv,actionNameArray.toTypedArray(),pc,reqData)
+                var triggerGroups = this.loadModelViewActionTriggerGroups(mv,refActionGroups.toTypedArray(),pc,reqData)
                 if(triggerGroups!=null){
                     bag["triggerGroups"]=triggerGroups
                 }
@@ -315,10 +315,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
      * actions end
      */
 
-    protected open fun loadModelViewActionTriggerGroups(mv:ModelView,actionNames:Array<String>,pc:PartnerCache,reqData: JsonObject?):Array<TriggerGroup>?{
+    protected open fun loadModelViewActionTriggerGroups(mv:ModelView,refActionGroups:Array<ModelView.RefActionGroup>,pc:PartnerCache,reqData: JsonObject?):Array<TriggerGroup>?{
         var triggerGroups = arrayListOf<TriggerGroup>()
-        actionNames.forEach {
-            val tg=pc.getAccessControlModelViewActionGroup(mv.app!!,mv.model!!,mv.viewType!!,it)
+        refActionGroups.forEach {
+            val tg=pc.getAccessControlModelViewActionGroup(it)
             if(tg!=null){
                 triggerGroups.add(tg)
             }

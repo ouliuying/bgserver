@@ -1004,17 +1004,18 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         }
                     }
                     is FieldDefaultValueBillboard->{
-                        when(value){
+                        return when(value){
                             is CurrCorpBillboard-> FieldValue(field,value.looked(partnerCache))
                             is CurrPartnerBillboard->FieldValue(field,value.looked(partnerCache))
                             else-> FieldValue(field,value.looked(null))
                         }
                     }
                     else->{
-                        if(value!=null) FieldValue(field,value) else null
+                        return if(value!=null) FieldValue(field,value) else null
                     }
                 }
             }
+
     }
 
 
@@ -1131,8 +1132,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(u.createAction.enable!="false") {
                 if(u.createAction.setValue!=null){
                     modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.setValue,partnerCache))
-                } else if(u.createAction.defalut!=null && !modelDataObject.hasFieldValue(u.field)){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.defalut,partnerCache))
+                } else if(u.createAction.default!=null && !modelDataObject.hasFieldValue(u.field)){
+                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.default,partnerCache))
                 }
             } else{
                 modelDataObject.removeFieldValue(u.field)
@@ -1155,8 +1156,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(u.editAction.enable!="false") {
                 if(u.editAction.setValue!=null){
                     modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.setValue,partnerCache))
-                } else if(u.editAction.defalut!=null && !modelDataObject.hasFieldValue(u.field)){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.defalut,partnerCache))
+                } else if(u.editAction.default!=null && !modelDataObject.hasFieldValue(u.field)){
+                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.default,partnerCache))
                 }
             } else{
                 modelDataObject.removeFieldValue(u.field)

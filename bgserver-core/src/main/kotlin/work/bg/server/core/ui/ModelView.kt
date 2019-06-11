@@ -29,8 +29,8 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
     var refActionGroups:ArrayList<RefActionGroup> = arrayListOf()
     var refMenus:ArrayList<RefMenu> = arrayListOf()
     var refViews:ArrayList<RefView> = arrayListOf()
-    var visible=1
-    var enable = 1
+    var visible:String?=null
+    var enable:String? = null
     var meta:JsonObject?=null
     object ViewType{
         const val CREATE = "create"
@@ -226,6 +226,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                          val model:String,
                          val viewType:String,
                          val groupName:String,
+                         val triggers:ArrayList<RefTrigger>,
                          var refTypes:ArrayList<String> = arrayListOf()){
 
         fun createCopy():RefActionGroup{
@@ -234,10 +235,17 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                     model,
                     viewType,
                     groupName,
+                    triggers,
                     refTypes
             )
         }
-
+        class RefTrigger(val app:String,
+                         val model:String,
+                         val viewType:String,
+                         val name:String,
+                         val title:String?,
+                         val visible:String?,
+                         val enable:String?)
     }
     class RefView(val app:String,
                   val model:String,

@@ -136,10 +136,6 @@
                           ownerField="partners"
                           model="crmPartnerCustomerRel"
                           refType="main|sub"/>
-                    <view type="detail"
-                          ownerField="partners"
-                          model="crmPartnerCustomerRel"
-                          refType="none"/>
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"/>
@@ -158,7 +154,6 @@
             <field name="contactAddresses" style="relation"/>
             <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
-            <field name="commPartner" style="relation"/>
         </view>
 
         <view type="detail">
@@ -182,24 +177,25 @@
                           model="crmPartnerCustomerRel"
                           refType="none"/>
                     <view type="detail"
-                          ownerField="partners"
-                          model="crmPartnerCustomerRel"
+                          ownerField="commPartner"
+                          model="partner"
+                          app="core"
                           refType="none"/>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="event" type="many2OneDataSetSelect"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="fax" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="email" type="singleLineText"/>
-            <field name="department" type="singleLineText"/>
-            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
-            <field name="website" type="singleLineText"/>
-            <field name="birthday" type="date" visible="isCorp!=1"/>
-            <field name="fullAddress" type="chinaFullAddress"/>
-            <field name="comment" type="singleLineText"/>
+            <field name="name" type="static" style="head"/>
+            <field name="isCorp" type="static" style="head"/>
+            <field name="event" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="fax" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="email" type="static"/>
+            <field name="department" type="static"/>
+            <field name="sex"  type="static" visible="isCorp!=1"/>
+            <field name="website" type="static"/>
+            <field name="birthday" type="static" visible="isCorp!=1"/>
+            <field name="fullAddress" type="static"/>
+            <field name="comment" type="static"/>
             <field name="contactAddresses" style="relation"/>
             <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
@@ -381,14 +377,14 @@
                           refType="none"/>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="event" style="many2OneDataSetSelect"/>
-            <field name="corpName" type="singleLineText"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="fax" type="singleLineText"/>
-            <field name="fullAddress" type="chinaFullAddress"/>
+            <field name="name" type="static" style="head"/>
+            <field name="interactionStatus.name" type="static" style="head"/>
+            <field name="event" style="static"/>
+            <field name="corpName" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="fax" type="static"/>
+            <field name="fullAddress" type="static"/>
 
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
@@ -474,21 +470,74 @@
     </model>
     <model name="customerOpportunity" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="singleLineText" style="head"/>
             <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText" style="head"/>
+            <field name="price" type="real" style="head"/>
         </view>
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view  type="list" model="crmCustomerOpportunityProductRel" refType="main|sub"></view>
+                </views>
+            </ref>
             <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText"/>
+            <field name="price" type="real"/>
+            <field name="customer.name" type="many2OneDataSetSelect"/>
+            <field name="products" style="relation"/>
         </view>
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view  type="list" ownerField="products" model="crmCustomerOpportunityProductRel" refType="main|sub"></view>
+                </views>
+            </ref>
             <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText"/>
+            <field name="price" type="real"/>
+            <field name="customer.name" type="many2OneDataSetSelect"/>
+            <field name="products" style="relation"/>
         </view>
         <view type="detail">
-            <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="createOrEditQuotation" refType="main|sub">
+                            <trigger  model="customerOpportunityOrderQuotation" viewType="create" name="createQuotation"></trigger>
+                            <trigger  model="customerOpportunityOrderQuotation" viewType="edit" name="editQuotation" visible="false"></trigger>
+                        </group>
+                    </action>
+                </actions>
+                <views>
+                    <view  type="list" ownerField="products" model="crmCustomerOpportunityProductRel" refType="none"></view>
+                    <view  type="detail" ownerField="customer" model="customer" refType="none"></view>
+                </views>
+            </ref>
+            <field name="title" type="static" style="head"/>
+            <field name="price" type="static"/>
+            <field name="customer" style="relation"/>
+            <field name="products" style="relation"/>
         </view>
     </model>
     <model name="customerOpportunityOrderQuotation" app="crm">
@@ -575,16 +624,51 @@
     </model>
     <model name="crmCustomerOpportunityProductRel" app="crm">
         <view type="list">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opView" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="product.name"/>
+            <field name="count"/>
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="product.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="count" type="singleLineText"/>
         </view>
         <view type="create">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="product.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="count" type="singleLineText"/>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="product.name" type="static" style="head"/>
+            <field name="count" type="static"/>
         </view>
     </model>
     <model name="crmCustomerOrderProductRel" app="crm">

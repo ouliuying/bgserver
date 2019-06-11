@@ -232,8 +232,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             var groups = mutableMapOf<String,ActionRule.GroupRule>()
             actionElem.elements("group").forEach {
                 var gElem = it as Element
-                var enable = if ((gElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
-                var visible = if ((gElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+                var enable = (gElem.selectSingleNode("setting/enable") as Element?)?.textTrim
+                var visible = (gElem.selectSingleNode("setting/visible") as Element?)?.textTrim
                 var gName = gElem.attributeValue("name")
                 var triggers =  mutableMapOf<String,ActionRule.TriggerRule>()
                 gElem.elements("trigger").forEach { tIT->
@@ -242,8 +242,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                     var tApp=tElem.attributeValue("app")?:app
                     var tModel=tElem.attributeValue("model")?:app
                     var tViewType=tElem.attributeValue("viewType")?:app
-                    var enable = if ((tElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
-                    var visible = if ((tElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+                    var enable = (tElem.selectSingleNode("setting/enable") as Element?)?.textTrim
+                    var visible = (tElem.selectSingleNode("setting/visible") as Element?)?.textTrim
 
                     triggers[tName]=ActionRule.TriggerRule(tApp,tModel,tViewType,tName,enable,visible)
                 }
@@ -275,7 +275,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         var cApp = menuItemElem.attributeValue("app")?:app
         val cModel = menuItemElem.attributeValue("model")
         val cViewType = menuItemElem.attributeValue("viewType")
-        val visible= if ((menuItemElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+        val visible= (menuItemElem.selectSingleNode("setting/visible") as Element?)?.textTrim
         if(cApp.isNullOrEmpty()
                 || cModel.isNullOrEmpty()
                 || cViewType.isNullOrEmpty()){
@@ -304,7 +304,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     private  fun buildSubMenuRule(menuElem:Element,app:String):MenuRule?{
         var cApp = menuElem.attributeValue("app")?:app
         val cName = menuElem.attributeValue("name")
-        val visible= if ((menuElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+        val visible= (menuElem.selectSingleNode("setting/visible") as Element?)?.textTrim
         if(cApp.isNullOrEmpty()
                 || cName.isNullOrEmpty()){
             return null
@@ -342,8 +342,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         if(app.isNullOrEmpty() || model.isNullOrEmpty() || type.isNullOrEmpty()){
             return null
         }
-        val enable = if((viewElem.selectSingleNode("setting/enable") as Element?)?.textTrim=="0") 0 else 1
-        val visible =  if((viewElem.selectSingleNode("setting/visible") as Element?)?.textTrim=="0") 0 else 1
+        val enable = (viewElem.selectSingleNode("setting/enable") as Element?)?.textTrim
+        val visible =  (viewElem.selectSingleNode("setting/visible") as Element?)?.textTrim
         var fieldRules = arrayListOf<ViewRule.FieldRule>()
         viewElem.selectNodes("fields/field").forEach {
             val fieldElem = it as Element
@@ -374,7 +374,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             val deleteElem = modelElem.selectSingleNode("setting/delete")
             var modelRule = ModelRule(model)
             val createEnable = (createElem?.selectSingleNode("enable") as Element?)?.textTrim
-            val createCheckBelongToPartner = if((createElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
+            val createCheckBelongToPartner = if((createElem?.selectSingleNode("checkBelongTo") as Element?)?.textTrim=="0") 0 else 1
             var ruleBeans = arrayListOf<ModelRule.RuleBean>()
             createElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -385,7 +385,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             modelRule.createAction = ModelRule.CreateAction(createEnable,createCheckBelongToPartner,ruleBeans.toTypedArray())
 
             val editEnable = (editElem?.selectSingleNode("enable") as Element?)?.textTrim
-            val editCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
+            val editCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongTo") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             editElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -397,7 +397,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
             val readEnable = (readElem?.selectSingleNode("enable") as Element?)?.textTrim
-            val readCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
+            val readCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongTo") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             readElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -408,7 +408,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             modelRule.readAction = ModelRule.ReadAction(readEnable,readCheckBelongToPartner,ruleBeans.toTypedArray())
 
             val deleteEnable = (deleteElem?.selectSingleNode("enable") as Element?)?.textTrim
-            val deleteCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongToPartner") as Element?)?.textTrim=="0") 0 else 1
+            val deleteCheckBelongToPartner = if((editElem?.selectSingleNode("checkBelongTo") as Element?)?.textTrim=="0") 0 else 1
             ruleBeans = arrayListOf<ModelRule.RuleBean>()
             deleteElem.selectNodes("rules/rule/bean").forEach {
                 val beanElem = it as Element
@@ -493,7 +493,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
 
-            open class FieldRuleAction(val enable:String?,val defalut:String?=null,val setValue:String?=null)
+            open class FieldRuleAction(val enable:String?, val default:String?=null, val setValue:String?=null)
             class DeleteAction(enable:String?):FieldRuleAction(enable)
             class CreateAction(enable:String?, default: String?,setValue: String?):FieldRuleAction(enable,default,setValue)
             class EditAction(enable:String?,setValue:String?):FieldRuleAction(enable,setValue=setValue)
@@ -504,13 +504,13 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
     class  ActionRule(val app:String,val model:String,val viewType:String,val groupRules:Map<String,GroupRule> = mutableMapOf()){
-        class GroupRule(val name:String,val enable:Int,val visible:Int, val triggerRules:Map<String,TriggerRule> = mutableMapOf())
-        class TriggerRule(val app:String,val model:String,val viewType:String,val name:String,val enable:Int,val visible:Int)
+        class GroupRule(val name:String,val enable:String?,val visible:String?, val triggerRules:Map<String,TriggerRule> = mutableMapOf())
+        class TriggerRule(val app:String,val model:String,val viewType:String,val name:String,val enable:String?,val visible:String?)
     }
 
-    class MenuRule(val name:String,val model:String,val viewType:String,val app:String,val type:MenuType,val visible:Int){
-        constructor(model:String,viewType:String,app:String,visible:Int):this("",model,viewType,app,MenuType.MENU_ITEM,visible)
-        constructor(name:String,app:String,visible:Int):this(name,"","",app,MenuType.MENU,visible)
+    class MenuRule(val name:String,val model:String,val viewType:String,val app:String,val type:MenuType,val visible:String?){
+        constructor(model:String,viewType:String,app:String,visible:String?):this("",model,viewType,app,MenuType.MENU_ITEM,visible)
+        constructor(name:String,app:String,visible:String?):this(name,"","",app,MenuType.MENU,visible)
         var children:ArrayList<MenuRule> = arrayListOf()
 
         enum class MenuType(val type:Int){
@@ -519,7 +519,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         }
     }
 
-    class ViewRule(val app:String,val model:String,val type:String,val enable:Int,val visible:Int,
+    class ViewRule(val app:String,val model:String,val type:String,val enable:String?,val visible:String?,
                    val fieldRules:Array<ViewRule.FieldRule> = arrayOf()){
 
         class FieldRule(val name:String,val enable:String?,val visible:String?){

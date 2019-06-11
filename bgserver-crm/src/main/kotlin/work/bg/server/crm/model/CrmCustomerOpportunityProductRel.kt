@@ -20,7 +20,7 @@ class CrmCustomerOpportunityProductRel:ContextModel("crm_customer_opportunity_pr
             "product_id",
             FieldType.BIGINT,
             "产品",
-            targetModelTable = "public.crm_product",
+            targetModelTable = "public.product_product",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
 

@@ -92,12 +92,12 @@ class Customer: ContextModel("crm_customer","public") {
             FieldType.BIGINT,
             "沟通记录",
             targetModelTable = "public.crm_lead_customer_communication_history",
-            targetModelFieldName = "customer")
+            targetModelFieldName = "customer_id")
 
     val opportunities = ModelOne2ManyField(null,
             "opportnities",
             FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
-            targetModelFieldName = "customers")
+            targetModelFieldName = "customer_id")
 }
