@@ -17,6 +17,8 @@
  *
  */
 
+
+
 package work.bg.server.core.model
 
 import org.apache.commons.logging.LogFactory
@@ -531,7 +533,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
             var subSelect=select(idField!!,fromModel = model!!).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
             var rtFields=ArrayList<FieldBase>()
-            rtFields.addAll(rmf?.first?.fields?.getAllPersistFields()?.values!!)
+            rtFields.addAll(rmf?.first?.fields?.getAllPersistFields(true)?.values!!)
             modelRelationMatcher.addMatchData(model,idField,rmf?.first,rIDField)
             var joinModels=ArrayList<JoinModel>()
             it.value.forEach allField@{rrf->
@@ -1487,6 +1489,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
             }
+            val ret = this.afterCreateObject(modelDataObject,useAccessControl,partnerCache)
+            if(!ret.first){
+                return Pair(null,"添加失败")
+            }
             return Pair(nID,null)
         } catch (ex:Exception){
             return Pair(null,ex.message)
@@ -1498,7 +1504,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //
 //        return Pair(true,null)
 //    }
-
+    protected  open fun afterCreateObject(modelDataObject:ModelDataObject,useAccessControl:Boolean,pc:PartnerCache?):Pair<Boolean,String?>{
+        return Pair(true,"")
+    }
     protected  open fun beforeEditCheck(modelDataObject:ModelDataObject,
                                      useAccessControl: Boolean,
                                      partnerCache:PartnerCache?):Pair<Boolean,String?>{
@@ -1598,7 +1606,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
-                        and(tCriteria,acCriteria)!!
+                        and(tCriteria, acCriteria)
                     } else acCriteria
                 }
             }
@@ -1620,7 +1628,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             }
                             else if(it.value.hasNormalField()){
                                 it.value.context=modelDataObject.context
-                                var ret=(it.field.model as AccessControlModel?)?.rawEdit(it.value,null,useAccessControl,partnerCache)
+                                var ret=(it.value.model as AccessControlModel?)?.rawEdit(it.value,null,useAccessControl,partnerCache)
                                 if(ret==null ||ret.second!=null){
                                     return ret?:Pair(null,"更新失败")
                                 }

@@ -239,13 +239,18 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                     refTypes
             )
         }
-        class RefTrigger(val app:String,
-                         val model:String,
-                         val viewType:String,
+        class RefTrigger(val app:String?,
+                         val model:String?,
+                         val viewType:String?,
                          val name:String,
                          val title:String?,
+                         val ownerField:String?,
                          val visible:String?,
-                         val enable:String?)
+                         val enable:String?){
+            override fun toString(): String {
+                return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title}  ${this.visible} ${this.enable}"
+            }
+        }
     }
     class RefView(val app:String,
                   val model:String,

@@ -41,6 +41,9 @@
         <menuItem title="报价单" model="customerOpportunityOrderQuotation" viewType="list">
 
         </menuItem>
+        <menuItem title="报价单模板" model="customerOpportunityOrderQuotationTemplate" viewType="list">
+
+        </menuItem>
         <menuItem title="订单" model="customerOrder" viewType="list">
 
         </menuItem>

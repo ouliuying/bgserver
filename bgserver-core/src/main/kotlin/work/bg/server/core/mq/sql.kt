@@ -36,74 +36,73 @@ fun delete(fromModel:ModelBase):DeleteStatement{
 fun create(vararg fieldValues:FieldValue,model:ModelBase):CreateStatement{
     return CreateStatement(*fieldValues,model=model)
 }
-fun and(vararg expression:ModelExpression):ModelExpression?{
-
+fun and(vararg expression:ModelExpression):ModelExpression{
     return AndExpression(*expression)
 }
-fun or(vararg expression:ModelExpression):ModelExpression?{
+fun or(vararg expression:ModelExpression):ModelExpression{
 
     return OrExpression(*expression)
 }
 
-fun eq(field:FieldBase,value:Any?):ModelExpression?{
+fun eq(field:FieldBase,value:Any?):ModelExpression{
     return EqualExpression(field,value)
 }
 
-fun exists(field:FieldBase,criteria:ModelExpression):ModelExpression?{
+fun exists(field:FieldBase,criteria:ModelExpression):ModelExpression{
     return ExistsExpression(field,criteria)
 }
 
-fun notExists(field:FieldBase,criteria:ModelExpression):ModelExpression?{
+fun notExists(field:FieldBase,criteria:ModelExpression):ModelExpression{
     return NotExistsExpression(field,criteria)
 }
 
-fun gtEq(field:FieldBase,value:Any?):ModelExpression?{
+fun gtEq(field:FieldBase,value:Any?):ModelExpression{
     return GreaterEqualExpression(field,value)
 }
 fun gt(field:FieldBase,value:Any?):ModelExpression?{
     return GreaterExpression(field,value)
 }
-fun `in`(field:FieldBase,valueSet:Array<Any>?):ModelExpression?{
+fun `in`(field:FieldBase,valueSet:Array<Any>?):ModelExpression{
     return InExpression(field,valueSet)
 }
-fun `in`(field:FieldBase,criteria:ModelExpression?):ModelExpression?{
+fun `in`(field:FieldBase,criteria:ModelExpression?):ModelExpression{
     return InExpression(field,criteria)
 }
 
-fun notIn(field:FieldBase,valueSet:Array<Any>?):ModelExpression?{
+fun notIn(field:FieldBase,valueSet:Array<Any>?):ModelExpression{
     return NotInExpression(field,valueSet)
 }
-fun notIn(field:FieldBase,criteria:ModelExpression?):ModelExpression?{
+fun notIn(field:FieldBase,criteria:ModelExpression?):ModelExpression{
     return NotInExpression(field,criteria)
 }
 
-fun `is`(field:FieldBase,value:Any?=null):ModelExpression?{
+fun `is`(field:FieldBase,value:Any?=null):ModelExpression{
     return IsExpression(field,value)
 }
-fun isNot(field:FieldBase,value:Any?=null):ModelExpression?{
+fun isNot(field:FieldBase,value:Any?=null):ModelExpression{
     return IsNotExpression(field,value)
 }
-fun ltEq(field:FieldBase, value:Any?):ModelExpression?{
+fun ltEq(field:FieldBase, value:Any?):ModelExpression{
     return LessEqualExpression(field,value)
 }
-fun lt(field:FieldBase, value:Any?):ModelExpression?{
+fun lt(field:FieldBase, value:Any?):ModelExpression{
     return LessExpression(field,value)
 }
 
-fun like(field:FieldBase,value:String):ModelExpression?{
+fun like(field:FieldBase,value:String):ModelExpression{
     return LikeExpression(field,value)
 }
-fun iLike(field:FieldBase,value:String):ModelExpression?{
+fun iLike(field:FieldBase,value:String):ModelExpression{
     return LikeExpression(field,value)
 }
-fun notLike(field:FieldBase,value:String):ModelExpression?{
+fun notLike(field:FieldBase,value:String):ModelExpression{
     return NotLikeExpression(field,value)
 }
-fun notILike(field:FieldBase,value:String):ModelExpression?{
+fun notILike(field:FieldBase,value:String):ModelExpression{
     return LikeExpression(field,value)
 }
 
-fun notEq(field:FieldBase,value:Any?):ModelExpression?{
+fun notEq(field:FieldBase,value:Any?):ModelExpression{
     return NotEqualExpression(field,value)
 }
 

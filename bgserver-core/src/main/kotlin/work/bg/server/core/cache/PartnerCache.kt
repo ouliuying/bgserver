@@ -312,7 +312,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
 
                     tgRule.triggerRules.forEach { t, u ->
                         var t=cloneTG.triggers.firstOrNull {tit->
-                            tit.name==u.name && tit.app == u.app && tit.model==u.model && tit.viewType == u.viewType
+                            tit.name==u.name
                         }
                         if(t!=null){
                             t.enable= if(t.enable!=null && u.enable!=null) "(${t.enable}) and (${u.enable})" else t.enable?:u.enable
@@ -322,11 +322,16 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                 }
                 refActionGroup.triggers.forEach { u->
                     var t=cloneTG.triggers.firstOrNull {tit->
-                        tit.name==u.name && tit.app == u.app && tit.model==u.model && tit.viewType == u.viewType
+                        tit.name==u.name
                     }
                     if(t!=null){
                         t.enable= if(t.enable!=null && u.enable!=null) "(${t.enable}) and (${u.enable})" else t.enable?:u.enable
                         t.visible= if(t.visible!=null && u.visible!=null) "(${t.visible}) and (${u.visible})" else t.visible?:u.visible
+                        t.ownerField=u.ownerField
+                        t.app=u.app?:t.app
+                        t.model=u.model?:t.model
+                        t.title=u.title?:t.title
+                        t.viewType=u.viewType?:t.viewType
                     }
                 }
                 return cloneTG

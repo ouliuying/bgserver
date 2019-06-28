@@ -639,7 +639,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             f.ctrlProps = gson.fromJson((subCtrlProps[0] as Element).textTrim,JsonObject::class.java)
                         }
                         catch (ex:java.lang.Exception){
-
+                            logger.error(ex.toString())
                         }
                     }
                 }
@@ -657,18 +657,21 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     if(!groupName.isNullOrEmpty()){
                         var triggers = ArrayList<ModelView.RefActionGroup.RefTrigger>()
                         (it.selectNodes("trigger") as List<Element>?)?.forEach { tit->
-                            val tApp = tit.attributeValue("app")?:aApp
-                            val tModel = tit.attributeValue("model")?:aModel
-                            val tViewType = tit.attributeValue("viewType")?:aViewType
+                            val tApp = tit.attributeValue("app")
+                            val tModel = tit.attributeValue("model")
+                            val tViewType = tit.attributeValue("viewType")
                             val tTitle = tit.attributeValue("title")
                             val tName = tit.attributeValue("name")
                             val tVisible = tit.attributeValue("visible")
                             val tEnable = tit.attributeValue("enable")
+                            val tOwnerField = tit.attributeValue("ownerField")
                             try{
-                                triggers.add(ModelView.RefActionGroup.RefTrigger(tApp!!,tModel!!,tViewType!!,tName!!,tTitle,tVisible,tEnable))
+                                var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tVisible,tEnable)
+                                logger.debug("load rt ${rt.toString()}")
+                                triggers.add(rt)
                             }
                             catch (ex:java.lang.Exception){
-
+                                logger.error(ex.toString())
                             }
 
                         }
@@ -722,7 +725,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         }
         catch (ex:Exception)
         {
-            ex.printStackTrace()
+            logger.error(ex.toString())
         }
         return null
     }

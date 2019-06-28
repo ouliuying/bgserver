@@ -29,7 +29,7 @@ import work.bg.server.core.mq.*
 class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>> {
     private lateinit var _config:String
     override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
-        var idFV: FieldValue = modelData.idFieldValue ?: return Pair(false,"")
+        var idFV: FieldValue = modelData.idFieldValue ?: return Pair(true,"")
         data?.forEach {
             when(it){
                 is ModelFieldUnique ->{

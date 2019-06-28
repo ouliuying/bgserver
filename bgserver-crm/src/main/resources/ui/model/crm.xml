@@ -492,7 +492,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view  type="list" model="crmCustomerOpportunityProductRel" refType="main|sub"></view>
+                    <view type="list" model="crmCustomerOpportunityOrderProductRel" refType="main|sub"/>
                 </views>
             </ref>
             <field name="title" type="singleLineText" style="head"/>
@@ -508,7 +508,8 @@
                     </action>
                 </actions>
                 <views>
-                    <view  type="list" ownerField="products" model="crmCustomerOpportunityProductRel" refType="main|sub"></view>
+                    <view type="list" ownerField="products" model="crmCustomerOpportunityOrderProductRel"
+                          refType="main|sub"/>
                 </views>
             </ref>
             <field name="title" type="singleLineText" style="head"/>
@@ -524,56 +525,150 @@
                     </action>
                     <action>
                         <group name="createOrEditQuotation" refType="main|sub">
-                            <trigger  model="customerOpportunityOrderQuotation" viewType="create" name="createQuotation"></trigger>
-                            <trigger  model="customerOpportunityOrderQuotation" viewType="edit" name="editQuotation" visible="false"></trigger>
+                            <trigger model="customerOpportunityOrderQuotation" ownerField="quotation" viewType="create" name="createQuotation"
+                                     visible="quotation.id&lt;1"/>
+                            <trigger model="customerOpportunityOrderQuotation" ownerField="quotation" viewType="edit" name="editQuotation"
+                                     visible="quotation.id&gt;0"/>
                         </group>
+
+                        <group name="createOrGotoOrder" refType="main|sub">
+                            <trigger model="customerOrder" ownerField="order" viewType="create" name="createOrder"
+                                     visible="quotation.id&gt;0 and order.id&lt;1"/>
+                            <trigger model="customerOrder" ownerField="order" viewType="detail" name="gotoOrderDetail"
+                                     visible="quotation.id&gt;0 and order.id&gt;0"/>
+                        </group>
+
                     </action>
                 </actions>
                 <views>
-                    <view  type="list" ownerField="products" model="crmCustomerOpportunityProductRel" refType="none"></view>
-                    <view  type="detail" ownerField="customer" model="customer" refType="none"></view>
+                    <view type="list" ownerField="products" model="crmCustomerOpportunityOrderProductRel" refType="none"/>
+                    <view type="detail" ownerField="customer" model="customer" refType="none"/>
                 </views>
             </ref>
             <field name="title" type="static" style="head"/>
             <field name="price" type="static"/>
+            <field name="quotation" style="relation" visible="false"/>
+            <field name="order" style="relation" visible="false"/>
             <field name="customer" style="relation"/>
             <field name="products" style="relation"/>
         </view>
     </model>
     <model name="customerOpportunityOrderQuotation" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="singleLineText" style="head"/>
             <field name="opportunity.title" type="singleLineText"/>
             <field name="order.title" type="singleLineText"/>
+            <field name="tpl.name" type="singleLineText"/>
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="tpl.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="create">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="tpl.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="detail" ownerField="tpl" model="customerOpportunityOrderQuotationTemplate"/>
+                </views>
+            </ref>
+            <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
+            <field name="comment" type="multiLineText"/>
+            <field name="tpl" style="relation"/>
         </view>
     </model>
     <model name="customerOrder" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="singleLineText" style="head"/>
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="singleLineText"/>
             <field name="customer.name" type="singleLineText"/>
+            <field name="opportunity.title" type="singleLineText"/>
         </view>
         <view type="edit">
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="singleLineText"/>
+
         </view>
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" model="crmCustomerOpportunityOrderProductRel"  ownerField="products" refType="main|sub"/>
+                </views>
+            </ref>
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="singleLineText"/>
+            <field name="customer.name" type="many2OneDataSetSelect" enable="opportunity=undefined or opportunity.id&lt;1"/>
+            <field name="opportunity.title" type="singleLineText" enable="false"/>
+            <field name="products" style="relation"  visible="opportunity=undefined or opportunity.id&lt;1"/>
         </view>
         <view type="detail">
-            <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+
+                <views>
+                    <view type="list" model="crmCustomerOpportunityOrderProductRel"  ownerField="products" refType="none"/>
+                    <view type="detail" model="customer"  ownerField="customer" refType="none"/>
+                    <view type="detail" model="customerOpportunity"  ownerField="opportunity" refType="none"/>
+                </views>
+            </ref>
+            <field name="title" type="static" style="head"/>
+            <field name="price" type="static"/>
+            <field name="opportunity" style="relation"/>
+            <field name="products" style="relation"/>
+            <field name="customer" style="relation"/>
         </view>
     </model>
     <model name="customerOrderInvoice" app="crm">
@@ -622,7 +717,7 @@
             <field name="amount" type="singleLineText"/>
         </view>
     </model>
-    <model name="crmCustomerOpportunityProductRel" app="crm">
+    <model name="crmCustomerOpportunityOrderProductRel" app="crm">
         <view type="list">
             <ref>
                 <actions>
@@ -753,6 +848,59 @@
         </view>
         <view type="detail">
 
+        </view>
+    </model>
+    <model name="customerOpportunityOrderQuotationTemplate" app="crm">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="id" type="singleLineText"/>
+            <field name="name" type="singleLineText"/>
+            <field name="comment" type="singleLineText"/>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="tpl" type="multiLineText"/>
+            <field name="comment" type="singleLineText"/>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="tpl" type="multiLineText"/>
+            <field name="comment" type="singleLineText"/>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="static" style="head"/>
+            <field name="tpl" type="static"/>
+            <field name="comment" type="static"/>
         </view>
     </model>
 </ui>

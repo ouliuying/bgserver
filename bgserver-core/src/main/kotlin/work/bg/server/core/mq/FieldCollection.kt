@@ -180,7 +180,13 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
                     }
                 }
             }
-            return this.cachedPersistFields
+            if(!excludeVirtualOne2OneField){
+                return this.cachedPersistFields
+            }
+            else{
+                return cachedPersistFieldsExcludeVirtualOne2OneField
+            }
+
         }
         finally {
             cachedPersistFieldsLock.unlockWrite(tamp)
@@ -199,7 +205,7 @@ class FieldCollection(vararg fields:FieldBase): Iterable<FieldBase>{
         var funFields= mutableMapOf<String,FieldBase>()
         var relatioinFields=mutableMapOf<String,FieldBase>()
         this.fieldSet.forEach{
-            if(fullFieldNames.contains(it.key)){
+            if(fullFieldNames!=null && fullFieldNames!!.toList().contains(it.key)){
                 when(it){
                     is FunctionField<*>->{
                         funFields[it.key] = it.value

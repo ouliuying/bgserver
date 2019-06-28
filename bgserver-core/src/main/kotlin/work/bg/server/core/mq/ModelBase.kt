@@ -234,6 +234,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
 
     open fun update(modelDataObject: ModelDataObject, criteria:ModelExpression?=null):Long?{
         var rData=mqUpdate(*modelDataObject.data.toTypedArray(),setModel = modelDataObject.model!!).where(criteria).render(null)
+        logger.info(rData?.first)
         var parameters=this.fieldValueToParameters(rData?.second)
         var uRet= if(parameters!=null)
         {

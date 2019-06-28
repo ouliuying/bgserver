@@ -554,6 +554,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 val rd = it.relationData as ModelView.RelationData
                 if(it.style!=ModelView.Field.Style.relation ||
                         rd.type==ModelView.RelationType.Many2One||
+                        rd.type==ModelView.RelationType.VirtualOne2One||
                         rd.type==ModelView.RelationType.One2One){
                     var field= modelObj?.getFieldByPropertyName(it.name)
                     field?.let { rFD->
@@ -581,8 +582,41 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                toField:FieldBase?,
                                                ownerModelID: Long?,
                                                reqData:JsonObject?):ModelDataObject? {
+        var mo = ModelDataObject(model=this)
+        if(ownerFieldValue!=null && ownerFieldValue.value!=Undefined && toField!=null){
+            var ownerModel = ownerFieldValue.field.model as ContextModel?
+            ownerModel?.let {
+                if(it.isPersistField(ownerFieldValue.field)){
+                    val ownerData = it.acRead(criteria =eq(ownerFieldValue.field,ownerFieldValue.value),partnerCache = pc)
 
-        return null
+                    if(ownerData!=null){
+                        val d =  ownerData.firstOrNull()
+                        d?.let {
+                            mo.setFieldValue(toField!!,d)
+                        }
+                    }
+                }
+            }
+        }
+        if(ownerModelID!=null && ownerModelID>0){
+            var ownerModel = ownerFieldValue?.field?.model as ContextModel?
+            ownerModel?.let {
+               val ma= ownerModel.acRead(model=ownerModel,partnerCache = pc,criteria = eq(ownerModel.fields?.getIdField()!!,ownerModelID))
+               ma?.firstOrNull()?.let {mit->
+                   this.fields.map {
+                       if (it is RefTargetField) {
+                            if(ownerModel.fullTableName == it.targetModelTable &&
+                                    FieldConstant.id==it.targetModelFieldName) {
+                                mo.setFieldValue(it, mit)
+                                return@map
+                            }
+                       }
+                   }
+
+               }
+            }
+        }
+        return mo
     }
 
     protected open fun loadDetailModelViewData(mv:ModelView,
@@ -754,7 +788,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                 var relModel = this.appModel.getModel(fd.relationModelTable)
                                 relModel?.let {mRelIt->
                                     msoIt.data[mRelIt]?.let {mdaIt->
-                                        this.setM2MFieldValue(fd.model!!,it.data,fd,relModel,(mdaIt as ModelDataArray).data.first())
+                                        (mdaIt as ModelDataArray).data.firstOrNull()?.let { sit->
+                                            this.setM2MFieldValue(fd.model!!,it.data,fd,relModel,sit)
+                                        }
                                     }
                                 }
                             }

@@ -55,7 +55,7 @@ class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
             "products",
             FieldType.BIGINT,
             "产品",
-            relationModelTable = "public.crm_customer_opportunity_product_rel",
+            relationModelTable = "public.crm_customer_opportunity_order_product_rel",
             relationModelFieldName = "product_id",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
@@ -66,7 +66,16 @@ class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
             "报价单",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_opportunity_order_quotation",
-            targetModelFieldName = "opportunity"
+            targetModelFieldName = "opportunity_id"
+            )
+
+    val order = ModelOne2OneField(null,
+            "opportunity",
+            FieldType.BIGINT,
+            "订单",
+            isVirtualField = true,
+            targetModelTable = "public.crm_customer_order",
+            targetModelFieldName = "opportunity_id"
             )
 
 }

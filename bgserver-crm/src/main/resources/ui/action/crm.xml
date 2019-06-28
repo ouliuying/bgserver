@@ -24,5 +24,9 @@
             <trigger title="创建报价单" model="customerOpportunityOrderQuotation" viewType="create" name="createQuotation"></trigger>
             <trigger title="更新报价单" model="customerOpportunityOrderQuotation" viewType="edit" name="editQuotation"></trigger>
         </group>
+        <group name="createOrGotoOrder">
+            <trigger title="创建订单" model="customerOrder" viewType="create" name="createOrder"></trigger>
+            <trigger title="订单" model="customerOrder" viewType="detail" name="gotoOrderDetail"></trigger>
+        </group>
     </action>
 </ui>

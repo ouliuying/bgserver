@@ -17,10 +17,14 @@
 
 package work.bg.server.crm.model
 
+import com.google.gson.JsonObject
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.core.ui.ModelView
+import java.math.BigInteger
 
 @Model("customerOrder")
 class CustomerOrder:
@@ -55,8 +59,8 @@ class CustomerOrder:
             "products",
             FieldType.BIGINT,
             "产品",
-            relationModelTable = "public.crm_customer_opportunity_product_rel",
-            relationModelFieldName = "product",
+            relationModelTable = "public.crm_customer_opportunity_order_product_rel",
+            relationModelFieldName = "product_id",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
 
@@ -66,6 +70,61 @@ class CustomerOrder:
             "报价单",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_opportunity_order_quotation",
-            targetModelFieldName = "order"
+            targetModelFieldName = "order_id")
+
+    val opportunity = ModelOne2OneField(null,
+            "opportunity_id",
+            FieldType.BIGINT,
+            "商机",
+            targetModelTable = "public.crm_customer_opportunity",
+            targetModelFieldName = "id"
     )
+
+    override fun loadCreateModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: FieldValue?, toField: FieldBase?, ownerModelID: Long?, reqData: JsonObject?): ModelDataObject? {
+
+        if(ownerModelID!=null && ownerModelID>0){
+           var co = CustomerOpportunity.ref.acRead(criteria = eq(CustomerOpportunity.ref.id,ownerModelID),partnerCache = pc)?.firstOrNull()
+            co?.let {
+                var retCO = ModelDataObject(model=this)
+                retCO.setFieldValue(CustomerOrder.ref.opportunity,co)
+                retCO.setFieldValue(CustomerOrder.ref.customer,co.getFieldValue(CustomerOpportunity.ref.customer))
+                retCO.setFieldValue(CustomerOrder.ref.price,co.getFieldValue(CustomerOpportunity.ref.price))
+                retCO.setFieldValue(CustomerOrder.ref.title,co.getFieldValue(CustomerOpportunity.ref.title))
+                return retCO
+            }
+        }
+
+        return super.loadCreateModelViewData(mv, viewData, pc, ownerFieldValue, toField, ownerModelID, reqData)
+    }
+
+    override fun afterCreateObject(modelDataObject: ModelDataObject,useAccessControl:Boolean,pc:PartnerCache?):Pair<Boolean,String?>{
+
+        //super.afterCreateObject(modelDataObject)
+        var d = modelDataObject.getFieldValue(CustomerOrder.ref.opportunity)
+       if(d is ModelDataObject){
+          val oid= d.getFieldValue(CustomerOrder.ref.id)
+           oid?.let {
+               var mo = ModelDataObject(model=CrmCustomerOpportunityOrderProductRel.ref)
+               mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
+              val ret=  CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
+                       oid),useAccessControl,pc)
+               if(ret.first==null){
+                   return Pair(false,"添加失败")
+               }
+           }
+       }
+        else{
+           d?.let {
+               val oid = (d as BigInteger).toLong()
+               var mo = ModelDataObject(model=CrmCustomerOpportunityOrderProductRel.ref)
+               mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
+               val ret = CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
+                       oid),useAccessControl,pc)
+               if(ret.first==null){
+                   return Pair(false,"添加失败")
+               }
+           }
+       }
+        return Pair(true,null)
+    }
 }

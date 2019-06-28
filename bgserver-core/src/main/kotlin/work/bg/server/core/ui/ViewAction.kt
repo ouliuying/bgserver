@@ -18,12 +18,13 @@
 package work.bg.server.core.ui
 
 data class Trigger(val name:String,
-                   val title:String,
+                   var title:String,
                    var app:String,
                    var model:String,
                    var viewType:String){
     var enable:String?=null
     var visible:String?=null
+    var ownerField:String?=null
     fun createCopy():Trigger{
         return Trigger(name,title,app,model,viewType)
     }

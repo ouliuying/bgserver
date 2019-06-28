@@ -2,10 +2,7 @@ package work.bg.server.crm.model
 
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2OneField
+import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="customerOpportunityOrderQuotation")
@@ -27,15 +24,25 @@ class CustomerOpportunityOrderQuotation:
             FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
-            targetModelFieldName = "quotation"
+            targetModelFieldName = "id"
             )
 
     val order=ModelOne2OneField(null,
             "order_id",
             FieldType.BIGINT,
-            "商机",
+            "订单",
             targetModelTable = "public.crm_customer_order",
-            targetModelFieldName = "quotation"
+            targetModelFieldName = "id"
     )
 
+    var tpl = ModelMany2OneField(null,
+            "tpl_id",FieldType.BIGINT,
+            "模板",
+            targetModelTable = "public.crm_customer_opportunity_order_quotation_template",
+            targetModelFieldName = "id")
+
+    val comment= ModelField(null,
+            "comment",
+            FieldType.TEXT,
+            "注释")
 }
