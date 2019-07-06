@@ -24,7 +24,7 @@ class ProxyRelationModelField<T>(model:ModelBase?,
                                  val field:FieldBase,
                                  name:String,
                                  fieldType:FieldType,
-                                 title:String?=null):FunctionField<T>(model,null,null,name,fieldType,title, arrayOf(field)) {
+                                 title:String?=null):FunctionField<T>(model,name,fieldType,title,null,null, arrayOf(field)) {
 
     override fun compute(fieldValueArry: FieldValueArray, partnerCache: PartnerCache?, data: Any?): T? {
         setProxyModelFieldValueFromRelationModel(fieldValueArry, partnerCache, data)

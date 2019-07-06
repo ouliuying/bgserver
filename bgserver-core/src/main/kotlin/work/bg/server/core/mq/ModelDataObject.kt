@@ -104,4 +104,8 @@ class ModelDataObject(override var data: FieldValueArray = FieldValueArray(),
             it.isSame(field)
         }
     }
+
+    override fun isEmpty(): Boolean {
+        return this.data.isEmpty()
+    }
 }

@@ -46,4 +46,5 @@ open  abstract  class ModelData(open val data:Any,
     fun <T>`as`():T{
         return this as T
     }
+    open fun isEmpty():Boolean=false
 }

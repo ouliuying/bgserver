@@ -665,8 +665,9 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             val tVisible = tit.attributeValue("visible")
                             val tEnable = tit.attributeValue("enable")
                             val tOwnerField = tit.attributeValue("ownerField")
+                            val tActionName = tit.attributeValue("actionName")
                             try{
-                                var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tVisible,tEnable)
+                                var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tActionName,tVisible,tEnable)
                                 logger.debug("load rt ${rt.toString()}")
                                 triggers.add(rt)
                             }

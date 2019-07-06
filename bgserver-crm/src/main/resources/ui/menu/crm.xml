@@ -50,9 +50,6 @@
         <menuItem title="发票" model="customerOrderInvoice" viewType="list">
 
         </menuItem>
-        <menuItem title="收据" model="customerOrderReceipt" viewType="list">
-
-        </menuItem>
         <menuItem title="产品" model="product" app="product" viewType="list">
 
         </menuItem>

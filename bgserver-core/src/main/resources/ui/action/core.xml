@@ -19,14 +19,12 @@
     <action viewType="create" app="*" model="*">
         <group name="main">
             <trigger title="保存" name="doCreate"></trigger>
-            <trigger title="重置" name="doCancel"></trigger>
         </group>
     </action>
 
     <action viewType="edit" app="*" model="*">
         <group name="main">
             <trigger title="保存" name="doSave"></trigger>
-            <trigger title="重置" name="doReload"></trigger>
         </group>
     </action>
 
@@ -51,6 +49,12 @@
     <action viewType="detail" app="*" model="*">
         <group name="main">
             <trigger title="编辑" name="toEdit"></trigger>
+        </group>
+    </action>
+
+    <action viewType="modelAction" app="*" model="*">
+        <group name="main">
+            <trigger title="确定" name="doSave"></trigger>
         </group>
     </action>
 

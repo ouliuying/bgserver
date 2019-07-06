@@ -20,12 +20,12 @@ package work.bg.server.core.mq
 import work.bg.server.core.cache.PartnerCache
 
 open class FunctionField<T>(model:ModelBase?,
-                            val comp:((FieldValueArray,PartnerCache?,Any?)->T?)?,
-                            val inv:((FieldValueArray, PartnerCache?, T?, Any?)->Unit)?,
                             name:String,
                             fieldType:FieldType,
                             title:String?,
-                            open val depFields: Array<FieldBase?>):FieldBase(name,title,fieldType,model) {
+                            val comp:((FieldValueArray,PartnerCache?,Any?)->T?)?=null,
+                            val inv:((FieldValueArray, PartnerCache?, T?, Any?)->Unit)?=null,
+                            open val depFields: Array<FieldBase?>?=null):FieldBase(name,title,fieldType,model) {
     open  fun  compute(fieldValueArray:FieldValueArray,partnerCache: PartnerCache?,data:Any?):T?{
             return this.comp?.invoke(fieldValueArray,partnerCache,data)
     }

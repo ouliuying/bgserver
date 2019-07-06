@@ -1530,6 +1530,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     open fun acEdit(modelData:ModelData,
                     criteria:ModelExpression?,
                     partnerCache:PartnerCache):Pair<Long?,String?>{
+        if(modelData.isEmpty()){
+            return Pair(0,"提交数据为空")
+        }
         return this.safeEdit(modelData,
                 criteria = criteria,
                 useAccessControl = true,
@@ -1620,7 +1623,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         if(it.value is ModelDataObject){
                             if(it.value.idFieldValue==null){
                                 it.value.context=modelDataObject.context
-                                var id=(it.value.model as AccessControlModel?)?.rawCreate(it.value,useAccessControl,partnerCache)
+                                var id=(it.value.model as AccessControlModel?)?.rawCreate(it.value,
+                                        useAccessControl,
+                                        partnerCache)
                                 if(id==null ||id.second!=null){
                                     return id?:Pair(null,"创建失败")
                                 }
@@ -1677,14 +1682,19 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 {
                                     fv.value.context=modelDataObject.context
                                     fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
-                                    var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,useAccessControl,partnerCache)
+                                    var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,
+                                            useAccessControl,
+                                            partnerCache)
                                     if (o2m==null || o2m.second!=null){
                                         return  Pair(null,"创建失败")
                                     }
                                 }
                                 else{
                                     fv.value.context=modelDataObject.context
-                                    var ret=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,null,useAccessControl,partnerCache)
+                                    var ret=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,
+                                            null,
+                                            useAccessControl,
+                                            partnerCache)
                                     if (ret==null || ret.second!=null){
                                         return  Pair(null,"更新失败")
                                     }
@@ -1697,7 +1707,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     if(tfvc.idFieldValue==null){
                                         tfvc.context=modelDataObject.context
                                         tfvc.data.add(FieldValue(tmf?.second!!,mIDFV.value))
-                                        var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(tfvc,useAccessControl,partnerCache)
+                                        var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(tfvc,
+                                                useAccessControl,
+                                                partnerCache)
                                         if (o2m==null || o2m.second!=null){
                                             return  Pair(null,"创建失败")
                                         }
@@ -1705,7 +1717,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     else
                                     {
                                         tfvc.context=modelDataObject.context
-                                        var ret=(tmf?.first as AccessControlModel?)?.rawEdit(tfvc,null,useAccessControl,partnerCache)
+                                        var ret=(tmf?.first as AccessControlModel?)?.rawEdit(tfvc,
+                                                null,
+                                                useAccessControl,
+                                                partnerCache)
                                         if (ret==null || ret.second!=null){
                                             return  Pair(null,"更新失败")
                                         }
@@ -1719,7 +1734,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     var tmf=this.getTargetModelField(fv.field)
                                     fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
                                     fv.value.context=modelDataObject.context
-                                    var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,useAccessControl,partnerCache)
+                                    var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value,
+                                            useAccessControl,
+                                            partnerCache)
                                     if (o2o==null || o2o.second!=null){
                                         return  Pair(null,"创建失败")
                                     }
@@ -1728,7 +1745,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     var tmf=this.getTargetModelField(fv.field)
                                     fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
                                     fv.value.context=modelDataObject.context
-                                    var o2o=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,criteria=null,useAccessControl = useAccessControl,partnerCache = partnerCache)
+                                    var o2o=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,
+                                            criteria=null,
+                                            useAccessControl = useAccessControl,
+                                            partnerCache = partnerCache)
                                     if (o2o==null || o2o.second!=null){
                                         return  Pair(null,"更新失败")
                                     }

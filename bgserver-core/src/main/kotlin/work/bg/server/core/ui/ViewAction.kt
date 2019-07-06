@@ -25,6 +25,7 @@ data class Trigger(val name:String,
     var enable:String?=null
     var visible:String?=null
     var ownerField:String?=null
+    var actionName:String?=null
     fun createCopy():Trigger{
         return Trigger(name,title,app,model,viewType)
     }

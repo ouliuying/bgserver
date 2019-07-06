@@ -629,9 +629,26 @@
             <field name="opportunity.title" type="singleLineText"/>
         </view>
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+
+                <views>
+                    <view type="list" model="crmCustomerOpportunityOrderProductRel"  ownerField="products" refType="main|sub"/>
+                    <view type="detail" model="customer"  ownerField="customer" refType="none"/>
+                    <view type="detail" model="customerOpportunity"  ownerField="opportunity" refType="none"/>
+                </views>
+
+            </ref>
+
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="singleLineText"/>
-
+            <field name="opportunity" style="relation"/>
+            <field name="products" style="relation"/>
+            <field name="customer" style="relation"/>
         </view>
         <view type="create">
             <ref>
@@ -656,6 +673,16 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="confirmOrderProcess" refType="main|sub">
+                            <trigger title="确认订单" model="customerOrder" viewType="modelAction" name="order_step" visible="step=0" actionName="confirmCustomerOrder"/>
+                            <trigger title="通知订单状态" model="customerOrder" viewType="modelAction" name="order_step2"
+                                     visible="step&gt;0" enable="step&gt;0" actionName="notifyOrderStepBySmsEmail"/>
+                            <trigger title="开具发票/收据" model="customerOrderInvoice" viewType="create" ownerField="invoice" name="order_step3" visible="step=1"/>
+                            <trigger title="发票/收据" model="customerOrderInvoice" viewType="edit" name="order_step4" ownerField="invoice" visible="step&gt;1" enable="step&gt;1"/>
+                            <trigger title="确认回款" model="customerOrder" viewType="modelAction" name="order_step5" visible="step=2" actionName="confirmOrderPayment"/>
+                        </group>
+                    </action>
                 </actions>
 
                 <views>
@@ -666,9 +693,23 @@
             </ref>
             <field name="title" type="static" style="head"/>
             <field name="price" type="static"/>
+            <field name="step" type="static"/>
+            <field name="invoice" style="relation" visible="false"/>
             <field name="opportunity" style="relation"/>
             <field name="products" style="relation"/>
             <field name="customer" style="relation"/>
+
+        </view>
+        <view type="modelAction">
+            <ref>
+                <actions>
+                    <action>
+                       <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="sms" type="multiLineText" style="head"/>
+            <field name="mail" type="multiLineText"/>
         </view>
     </model>
     <model name="customerOrderInvoice" app="crm">
@@ -684,9 +725,17 @@
             <field name="amount" type="singleLineText"/>
         </view>
         <view type="create">
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="fromCorpName" type="singleLineText" style="head"/>
+            <field name="toCorpName" type="singleLineText" style="head"/>
             <field name="amount" type="singleLineText"/>
+            <field name="order" type="singleLineText" visible="false"/>
         </view>
         <view type="detail">
             <field name="fromCorpName" type="singleLineText"/>
@@ -725,7 +774,7 @@
                         <group name="main" refType="main|sub"/>
                     </action>
                     <action>
-                        <group name="opView" refType="main|sub"/>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
@@ -736,7 +785,10 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>

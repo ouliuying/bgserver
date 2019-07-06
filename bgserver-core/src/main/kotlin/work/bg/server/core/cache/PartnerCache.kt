@@ -329,6 +329,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                         t.visible= if(t.visible!=null && u.visible!=null) "(${t.visible}) and (${u.visible})" else t.visible?:u.visible
                         t.ownerField=u.ownerField
                         t.app=u.app?:t.app
+                        t.actionName=u.actionName?:t.actionName
                         t.model=u.model?:t.model
                         t.title=u.title?:t.title
                         t.viewType=u.viewType?:t.viewType

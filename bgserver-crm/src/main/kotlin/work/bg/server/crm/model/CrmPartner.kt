@@ -46,11 +46,5 @@ class CrmPartner:DepartmentPartner() {
             "发票",
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "accountPartner")
-    val orderReceipts = ModelOne2ManyField(null,
-            "receipt",
-            FieldType.BIGINT,
-            "收据",
-            targetModelTable = "public.crm_customer_order_receipt",
-            targetModelFieldName = "accountPartner")
 
 }

@@ -31,11 +31,9 @@ class ModelFullAddressField(model:ModelBase?,name:String,
                             val city:FieldBase,
                             val district:FieldBase,
                             val streetAddress:FieldBase,val json:Gson):FunctionField<String>(model,
-        null,
-        null,
         name,
         FieldType.STRING,
-        title,depFields= arrayOf(province, city, district, streetAddress)) {
+        title,null,null,depFields= arrayOf(province, city, district, streetAddress)) {
     //before to ui
     override fun compute(fieldValueArray: FieldValueArray, partnerCache: PartnerCache?, data: Any?): String? {
         val str= this.json.toJson(mapOf(
@@ -52,7 +50,7 @@ class ModelFullAddressField(model:ModelBase?,name:String,
     override fun inverse(fieldValueArray: FieldValueArray, partnerCache: PartnerCache?, value: String?, data: Any?) {
       val fullValue = fieldValueArray.getValue(this)
         if(fullValue!=null){
-            val pMap = this.json.fromJson(fullValue as String,Map::class.java)
+            val pMap = this.json.fromJson(fullValue as String,Map::class.java) as Map<String,String?>
             if(pMap!=null){
                 fieldValueArray.setValue(this.province,pMap[this.province.propertyName]?:"")
                 fieldValueArray.setValue(this.city,pMap[this.city.propertyName]?:"")

@@ -37,4 +37,8 @@ class ModelDataArray(override var data:ArrayList<FieldValueArray> = arrayListOf(
         }
         return arr
     }
+
+    override fun isEmpty(): Boolean {
+        return true
+    }
 }

@@ -511,7 +511,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             ModelView.ViewType.DETAIL->{
                 return this.loadDetailModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
-            ModelView.ViewType.EDIT->{
+            ModelView.ViewType.EDIT,ModelView.ViewType.MODEL_ACTION->{
                 return this.loadEditModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
             ModelView.ViewType.LIST->{
@@ -535,12 +535,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                         if(fd !in fields){
                             fields.add(fd)
                         }
+                        else{
+                            //pass
+                        }
                     }
                     else{
                         if(fd !in fFields){
                             fFields.add(fd)
                         }
-                        fd.depFields.forEach {dFD->
+                        fd.depFields?.forEach {dFD->
                             if(dFD !is FunctionField<*>){
                                 if(dFD !in fields){
                                     fields.add(dFD!!)

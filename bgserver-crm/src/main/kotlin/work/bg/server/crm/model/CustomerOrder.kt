@@ -18,12 +18,16 @@
 package work.bg.server.crm.model
 
 import com.google.gson.JsonObject
+import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
+import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.core.spring.boot.model.ActionResult
 import work.bg.server.core.ui.ModelView
+import work.bg.server.errorcode.ErrorCode
 import java.math.BigInteger
 
 @Model("customerOrder")
@@ -80,6 +84,56 @@ class CustomerOrder:
             targetModelFieldName = "id"
     )
 
+    val step = ModelField(null,
+            "step",
+            FieldType.INT,
+            "状态",
+            defaultValue = 0)
+
+    val invoice = ModelOne2OneField(null,
+            "invoice",
+            fieldType = FieldType.BIGINT,
+            title = "票据",
+            isVirtualField = true,
+            targetModelTable = "public.crm_customer_order_invoice",
+            targetModelFieldName = "order_id")
+
+    val sms = FunctionField<String>(null,"sms",FieldType.TEXT,"短信")
+    val mail = FunctionField<String>(null,"mail",FieldType.TEXT,"邮件")
+
+
+    @Action("confirmCustomerOrder")
+    fun confirmCustomerOrder(@RequestBody modelData:ModelDataObject?, pc:PartnerCache): ActionResult?{
+        var r = ActionResult(ErrorCode.UNKNOW)
+        var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
+       d?.getFieldValue(this.step)?.let {
+           if(it!=CustomerOrderStep.NEW_STEP.step){
+                r.description="只能确认信订单"
+           }
+           else{
+               var mo=ModelDataObject(model=this)
+               mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
+               mo.setFieldValue(this.step,CustomerOrderStep.CONFIRM_STEP.step)
+               this.acEdit(mo,criteria = null,partnerCache = pc)
+               r.errorCode=ErrorCode.SUCCESS
+           }
+       }
+        return r
+    }
+
+    @Action("notifyOrderStepBySmsEmail")
+    fun notifyOrderStepBySmsEmail(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
+
+        return null
+    }
+
+    @Action("confirmOrderPayment")
+    fun confirmOrderPayment(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
+
+        return null
+    }
+
+
     override fun loadCreateModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: FieldValue?, toField: FieldBase?, ownerModelID: Long?, reqData: JsonObject?): ModelDataObject? {
 
         if(ownerModelID!=null && ownerModelID>0){
@@ -127,4 +181,11 @@ class CustomerOrder:
        }
         return Pair(true,null)
     }
+    fun setStep(id:Long,step:Int,pc:PartnerCache?,useAccessControl:Boolean){
+        var mo = ModelDataObject(model=this)
+        mo.setFieldValue(this.id,id)
+        mo.setFieldValue(this.step,step)
+        this.rawEdit(mo,criteria = null,partnerCache = pc,useAccessControl = useAccessControl)
+    }
+
 }

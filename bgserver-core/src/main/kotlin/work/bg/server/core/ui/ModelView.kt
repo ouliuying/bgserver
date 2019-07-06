@@ -37,7 +37,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
         const val LIST = "list"
         const val EDIT = "edit"
         const val DETAIL = "detail"
-
+        const val MODEL_ACTION="modelAction"
     }
     fun addField(name:String,
                  style:String,
@@ -245,10 +245,11 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                          val name:String,
                          val title:String?,
                          val ownerField:String?,
+                         val actionName:String?,
                          val visible:String?,
                          val enable:String?){
             override fun toString(): String {
-                return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title}  ${this.visible} ${this.enable}"
+                return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title} ${this.actionName}  ${this.visible} ${this.enable}"
             }
         }
     }
