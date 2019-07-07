@@ -123,14 +123,27 @@ class CustomerOrder:
 
     @Action("notifyOrderStepBySmsEmail")
     fun notifyOrderStepBySmsEmail(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
-
-        return null
+        var r =ActionResult()
+        return r
     }
 
     @Action("confirmOrderPayment")
     fun confirmOrderPayment(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
-
-        return null
+        var r = ActionResult(ErrorCode.UNKNOW)
+        var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
+        d?.getFieldValue(this.step)?.let {
+            if(it!=CustomerOrderStep.INVOICE_STEP.step){
+                r.description="未开票订单"
+            }
+            else{
+                var mo=ModelDataObject(model=this)
+                mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
+                mo.setFieldValue(this.step,CustomerOrderStep.PAYMENT_STEP.step)
+                this.acEdit(mo,criteria = null,partnerCache = pc)
+                r.errorCode=ErrorCode.SUCCESS
+            }
+        }
+        return r
     }
 
 

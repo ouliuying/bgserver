@@ -20,7 +20,7 @@
 
 <ui>
     <menu name="main" app="account" title="产品管理">
-        <menuItem title="订单" model="customerOrder"  app="crm" viewType="list">
+        <menuItem title="客户订单" model="customerOrder"  app="crm" viewType="list">
 
         </menuItem>
 
@@ -28,13 +28,10 @@
 
         </menuItem>
 
-        <menuItem title="订单收据" model="customerOrderReceipt" app="crm" viewType="list">
-
-        </menuItem>
-
         <menuItem title="应收款" model="accountReceivable" viewType="list">
 
         </menuItem>
+
         <menuItem title="应付款" model="accountPayable" viewType="list">
 
         </menuItem>

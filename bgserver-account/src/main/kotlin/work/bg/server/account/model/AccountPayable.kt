@@ -26,12 +26,4 @@ class AccountPayable:ContextModel("account_payable","public") {
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "id")
 
-    val orderReceipt= ModelOne2OneField(null,
-            "order_invoice_id",
-            FieldType.BIGINT,
-            "收据",
-            targetModelTable = "public.crm_customer_order_receipt",
-            targetModelFieldName = "id")
-
-
 }

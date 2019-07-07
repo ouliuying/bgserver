@@ -7,6 +7,7 @@ import work.bg.server.core.mq.*
 import work.bg.server.core.mq.billboard.CurrPartnerBillboard
 import work.bg.server.core.spring.boot.annotation.Model
 import java.math.BigDecimal
+import java.math.BigInteger
 
 //订单发票
 
@@ -52,6 +53,7 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
             targetModelFieldName = "id",
             defaultValue = CurrPartnerBillboard())
 
+
     //0 普通发票，1 增值税发票 2 收据
     val typ =ModelField(null,
             "typ",
@@ -59,6 +61,10 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
             "类型",
             defaultValue = 0)
     val comment =ModelField(null,"comment",FieldType.TEXT,"附加说明")
+
+
+
+
     override fun afterCreateObject(modelDataObject: ModelDataObject,
                                    useAccessControl: Boolean,
                                    pc: PartnerCache?): Pair<Boolean, String?> {
@@ -67,14 +73,17 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
             when(it){
                 is ModelDataObject->{
                     it.idFieldValue?.value?.let {
-                        CustomerOrder.ref.setStep((it as BigDecimal).toLong(),CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
+                        CustomerOrder.ref.setStep((it as BigInteger).toLong(),CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
                     }
                 }
                 else->{
-                    CustomerOrder.ref.setStep(it as Long,CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
+                    CustomerOrder.ref.setStep((it as BigInteger).toLong(),CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
                 }
             }
         }
+
+
+
         return Pair(true,null)
     }
 }

@@ -20,14 +20,25 @@
 
 <ui>
     <inherit>
-        <xpath expression="/ui/model[@app='crm'][@name='customerOrderInvoice']/view/edit" op="append" app="crm">
+        <xpath expression="/ui/model[@app='crm'][@name='customerOrderInvoice']/view[@type='edit']" op="append" app="crm">
             <field name="receivable" style="relation"></field>
             <field name="payable" style="relation"></field>
+            <field name="order" style="relation" visible="false"/>
         </xpath>
-        <xpath expression="/ui/model[@app='crm'][@name='customerOrderReceipt']/view/edit" op="append" app="crm">
-            <field name="receivable" style="relation"></field>
-            <field name="payable" style="relation"></field>
+
+        <xpath expression="/ui/model[@app='crm'][@name='customerOrderInvoice']/view[@type='edit']/field[@name='toCorpName']" op="insertAfter" app="crm">
+            <field name="payTyp" type="singleLineText" enable="order.id&lt;1 or order.id=undefined"  style="head"/>
         </xpath>
+
+
+        <xpath expression="/ui/model[@app='crm'][@name='customerOrderInvoice']/view[@type='create']/field[@name='toCorpName']" op="insertAfter" app="crm">
+            <field name="payTyp" type="singleLineText" enable="order.id&lt;1 or order.id=undefined"  style="head"/>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='crm'][@name='customerOrderInvoice']/view[@type='create']" op="append" app="crm">
+            <field name="order" style="relation" visible="false"/>
+        </xpath>
+
     </inherit>
     <model name="accountPayable" app="account">
         <view type="list">

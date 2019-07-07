@@ -1661,7 +1661,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 if (fv != null) {
                     var acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache)
                     if(acFV!=null){
-                        fVCShadow.data.add(acFV)
+                        fVCShadow.setFieldValue(acFV.field,acFV.value)
                     }
                 }
             }

@@ -714,14 +714,28 @@
     </model>
     <model name="customerOrderInvoice" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="singleLineText" style="head"/>
             <field name="fromCorpName" type="singleLineText"/>
             <field name="toCorpName" type="singleLineText"/>
             <field name="amount" type="singleLineText"/>
         </view>
         <view type="edit">
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="fromCorpName" type="singleLineText" style="head"/>
+            <field name="toCorpName" type="singleLineText" style="head"/>
             <field name="amount" type="singleLineText"/>
         </view>
         <view type="create">
@@ -735,32 +749,15 @@
             <field name="fromCorpName" type="singleLineText" style="head"/>
             <field name="toCorpName" type="singleLineText" style="head"/>
             <field name="amount" type="singleLineText"/>
-            <field name="order" type="singleLineText" visible="false"/>
         </view>
         <view type="detail">
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
-        </view>
-    </model>
-    <model name="customerOrderReceipt" app="crm">
-        <view type="list">
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
-        </view>
-        <view type="edit">
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
-        </view>
-        <view type="create">
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
-        </view>
-        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="fromCorpName" type="singleLineText"/>
             <field name="toCorpName" type="singleLineText"/>
             <field name="amount" type="singleLineText"/>
