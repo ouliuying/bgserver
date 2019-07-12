@@ -17,6 +17,7 @@
 
 package work.bg.server.core.model
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
@@ -41,6 +42,7 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             FieldType.BIGINT,
             "标示",
             primaryKey = FieldPrimaryKey())
+
     val name=ModelField(null,
             "name",
             FieldType.STRING,
@@ -50,11 +52,13 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             FieldType.STRING,
             "说明",
             defaultValue = "针对app的说明")
+
     val defaultFlag=ModelField(null,
             "default_flag",
             FieldType.INT,
             "默认",
             defaultValue = 0)
+
     val partnerRole=ModelMany2OneField(null,
             "partner_role_id",
             FieldType.BIGINT,
@@ -81,5 +85,31 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             res.bag[menuName]=menuTree
         }
         return res
+    }
+    @Action("saveShortcutAppSetting")
+    fun saveShortcutAppSetting(@RequestBody shortcutApps :JsonArray,
+                               partnerCache:PartnerCache):ActionResult?{
+        var ret= ActionResult()
+        BasePartnerAppShortcut.ref.acDelete(criteria = eq(BasePartnerAppShortcut.ref.partner,partnerCache.partnerID),partnerCache = partnerCache)
+        var modelDataArray=ModelDataArray(model=BasePartnerAppShortcut.ref)
+        var shortRef= BasePartnerAppShortcut.ref
+        var index=0
+        shortcutApps.forEach {
+            var jo = it as JsonObject
+            var fvs =FieldValueArray()
+            fvs.setValue(shortRef.partner,partnerCache.partnerID)
+            var name = jo["name"]?.asString
+            name?.let {
+                var app=this.rawRead(criteria = eq(this.name,name),useAccessControl = true,partnerCache = partnerCache)?.firstOrNull()
+                app?.let {
+                    fvs.setValue(shortRef.app,app)
+                }
+            }
+            fvs.setValue(shortRef.index,index)
+            index++
+            modelDataArray.add(fvs)
+        }
+        shortRef.acCreate(modelDataArray,partnerCache=partnerCache)
+        return ret
     }
 }

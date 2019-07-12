@@ -41,4 +41,7 @@ class ModelDataArray(override var data:ArrayList<FieldValueArray> = arrayListOf(
     override fun isEmpty(): Boolean {
         return true
     }
+    fun add(fvs:FieldValueArray){
+        this.data.add(fvs)
+    }
 }

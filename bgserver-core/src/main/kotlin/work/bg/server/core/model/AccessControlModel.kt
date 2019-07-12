@@ -1851,15 +1851,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     open fun acDelete(modelData: ModelData,
                       criteria:ModelExpression?,
-                      useAccessControl:Boolean,
                       partnerCache:PartnerCache?):Pair<Long?,String?>{
 
         return this.safeDelete(modelData,
                 criteria = criteria,
-                useAccessControl = useAccessControl,
+                useAccessControl = true,
                 partnerCache = partnerCache)
     }
 
+    open fun acDelete(criteria:ModelExpression?,
+                      partnerCache:PartnerCache?):Pair<Long?,String?>{
+        val modelData = ModelDataObject(model=this)
+        return this.safeDelete(modelData,
+                criteria = criteria,
+                useAccessControl = true,
+                partnerCache = partnerCache)
+    }
 
     open fun safeDelete(modelData: ModelData,
                         criteria:ModelExpression?,

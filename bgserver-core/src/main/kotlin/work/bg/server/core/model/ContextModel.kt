@@ -122,7 +122,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             fdarr.setValue(idField,id)
             var  mo = ModelDataObject(model=this,data=fdarr)
             val criteria = eq(idField,id)
-            var ret= this.acDelete(mo,criteria=criteria,useAccessControl = true,partnerCache = pc)
+            var ret= this.acDelete(mo,criteria=criteria,partnerCache = pc)
             ret?.first?.let {
                 if(it>0){
                   return ar

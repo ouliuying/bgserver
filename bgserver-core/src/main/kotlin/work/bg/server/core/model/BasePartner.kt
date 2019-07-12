@@ -195,8 +195,9 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
                             (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?)?.data?.getValue(BasePartnerRole.ref!!.isSuper) as Int
                         }
                         var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?
-                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as ModelDataObject
+                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as ModelDataObject?
                         var corpID=corpObject?.data?.getValue(BaseCorp.ref!!.id) as Long?
+                        var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                         var corps=corpPartnerRels?.data?.map {
                             it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject
                         }
@@ -210,15 +211,16 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
                                 partner["status"] = 1
                                 var sys= mutableMapOf<String,Any?>()
                                 ar.bag["sys"]=sys
-                                sys["corps"] = corps.toList().stream().map {
+                                sys["corps"] = corps?.toList()?.stream()?.map {
                                     mapOf(
                                             "id" to it.data.getValue(BaseCorp.ref!!.id),
                                             "name" to it.data.getValue(BaseCorp.ref!!.name),
                                             "comment" to it.data.getValue(BaseCorp.ref!!.comment)
                                     )
-                                }.toArray()
+                                }?.toArray()
                                 sys["currCorp"] = pc.activeCorp
-                                sys["installApps"]=AppModel.ref.appPackageManifests
+                                sys["installApps"]= AppModel.ref.appPackageManifests
+                                sys["roleApps"]=if(partnerRoleID!=null) BasePartnerRole.ref.getInstallApps(partnerRoleID) else emptyList()
                                 sys["shortcutApps"]=BasePartnerAppShortcut.ref.getPartnerApps(id)
                                 return ar
                             }

@@ -22,4 +22,6 @@ include 'bgserver-account'
 include 'bgserver-crm'
 include 'bgserver-chat'
 include 'bgserver-product'
+include 'bgserver-worktile'
+include 'bgserver-setting'
 

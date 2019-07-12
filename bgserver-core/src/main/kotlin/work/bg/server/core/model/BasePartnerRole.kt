@@ -18,9 +18,11 @@
 package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.config.AppPackageManifest
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.billboard.CurrCorpBillboard
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.core.spring.boot.model.AppModel
 
 @Model("partnerRole", "角色")
 class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
@@ -71,5 +73,29 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
 
     constructor():this("base_partner_role","public")
 
-
+    fun getInstallApps(id:Long):List<String>{
+        val apps = mutableListOf<String>()
+        var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(AttachedField(this.apps)))?.firstOrNull()
+        d?.let {
+            (it.getFieldValue(this.isSuper) as Int?)?.let {isSuper->
+                if(isSuper>0){
+                    return AppModel.ref.appPackageManifests.keys.toList()
+                }
+            }
+            val pApps = it.getFieldValue(this.apps) as ModelDataArray?
+            pApps?.let {mda->
+                mda.toModelDataObjectArray().forEach {
+                    mdo->
+                    val name = mdo.getFieldValue(BasePartnerRole.ref.name) as String?
+                    name?.let {
+                       val pm= AppModel.ref.appPackageManifests[name]
+                        pm?.let {appm->
+                            apps.add(pm.name)
+                        }
+                    }
+                }
+            }
+        }
+        return apps
+    }
 }
