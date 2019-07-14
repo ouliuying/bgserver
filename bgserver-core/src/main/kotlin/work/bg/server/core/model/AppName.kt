@@ -24,7 +24,7 @@ class AppName : AppNamePackage {
     override  fun get():AppPackageManifest{
         return AppPackageManifest("core",
                 "公司",
-                "/icon/res/core_app.svg",
+                "/svg/core-app.svg",
                 "我的公司",1)
     }
 }

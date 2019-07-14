@@ -17,10 +17,10 @@
 
 package work.bg.server.core.ui
 
-open class MenuNode(val app:String,val title:String?,val model:String?,val viewType:String?){
+open class MenuNode(val app:String,val title:String?,val model:String?,val viewType:String?,val icon:String?){
     var children:ArrayList<MenuNode>?=null
     open fun createCopy():MenuNode{
-        var mn=MenuNode(this.app,this.title,this.model,this.viewType)
+        var mn=MenuNode(this.app,this.title,this.model,this.viewType,this.icon)
         mn.children=this.childrenCopy()
         return mn
     }
@@ -36,9 +36,9 @@ open class MenuNode(val app:String,val title:String?,val model:String?,val viewT
     }
 }
 
-class MenuTree(app:String,val name:String, title:String?):MenuNode(app,title,null,null) {
+class MenuTree(app:String,val name:String, title:String?,icon:String?):MenuNode(app,title,null,null,icon) {
     override fun createCopy(): MenuTree {
-        var mt=MenuTree(this.app,this.name,this.title)
+        var mt=MenuTree(this.app,this.name,this.title,icon)
         mt.children=childrenCopy()
         return mt
     }

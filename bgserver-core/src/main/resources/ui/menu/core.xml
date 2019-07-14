@@ -15,12 +15,8 @@
   ~  */
   -->
 <ui>
-    <menu name="main" app="core" title="公司管理">
-        <menuItem title="公司信息" model="partner" viewType="main">
-
-        </menuItem>
-
-        <menu name="partner" app="core" title="公司员工">
+    <menu name="main" app="core" title="公司管理" icon="/svg/core-app.svg">
+        <menu name="partner" app="core" title="公司员工"  icon="/svg/corp-partners.svg">
             <menuItem title="员工列表" model="partner" viewType="list">
 
             </menuItem>
@@ -29,7 +25,7 @@
             </menuItem>
         </menu>
 
-        <menu name="partnerRole" app="core" title="角色管理">
+        <menu name="partnerRole" app="core" title="角色管理" icon="/svg/corp-role-mag.svg">
             <menuItem title="角色列表" model="partnerRole" viewType="list">
 
             </menuItem>

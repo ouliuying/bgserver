@@ -29,7 +29,9 @@ import work.bg.server.core.spring.boot.annotation.ModelScan
     "work.bg.server.corp.model",
     "work.bg.server.product.model",
     "work.bg.server.crm.model",
-    "work.bg.server.account.model"])
+    "work.bg.server.account.model",
+    "work.bg.server.worktable.model",
+    "work.bg.server.setting.model"])
 class ServerApplication{
     private val logger = LogFactory.getLog(javaClass)
     init {

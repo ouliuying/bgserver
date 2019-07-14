@@ -177,10 +177,6 @@
             </field>
             <field name="userTitle" colSpan="2" type="multiLineText"/>
             <field name="userComment" colSpan="2" type="multiLineText"/>
-            <field name="label1" title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
-            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
-            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
-            <field name="label3" title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
         </view>
 
         <view type="edit">

@@ -18,15 +18,16 @@
  *
  */
 
-package work.bg.server.worktile.model
+package work.bg.server.worktable.model
 
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.model.ContextModel
-import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.core.config.AppNamePackage
+import work.bg.server.core.config.AppPackageManifest
 
-@Model("worktile")
-class Worktile:ContextModel("worktitle","public") {
-    companion object : RefSingleton<Worktile> {
-        override lateinit var ref: Worktile
+class AppName : AppNamePackage {
+    override  fun get():AppPackageManifest{
+        return AppPackageManifest("worktable",
+                "工作台","/svg/my-worktable.svg",
+                "我的工作台",
+                1)
     }
 }

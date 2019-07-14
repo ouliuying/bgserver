@@ -442,6 +442,7 @@ class GsonActionResultSerializerConfiguration {
                 jObj.addProperty("app",tree.app)
                 jObj.addProperty("name",tree.name)
                 jObj.addProperty("title",tree.title)
+                jObj.addProperty("icon",tree.icon)
                 var jSubMenu=JsonArray()
                 jObj.add("subMenu",jSubMenu)
                 tree?.children?.forEach {
@@ -475,6 +476,7 @@ class GsonActionResultSerializerConfiguration {
                 jObj.addProperty("model",node.model)
                 jObj.addProperty("title",node.title)
                 jObj.addProperty("viewType",node.viewType)
+                jObj.addProperty("icon",node.icon)
             }
             return jObj
         }

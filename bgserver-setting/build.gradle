@@ -82,7 +82,7 @@ dependencies{
     compile project(':bgserver-product')
     compile project(':bgserver-crm')
     compile project(':bgserver-account')
-    compile project(':bgserver-worktile')
+    compile project(':bgserver-worktable')
 }
 
 

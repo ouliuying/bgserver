@@ -23,7 +23,7 @@ import work.bg.server.core.config.AppPackageManifest
 class AppName : AppNamePackage {
     override  fun get():AppPackageManifest{
         return AppPackageManifest("corp",
-                "公司部门","/icon/res/corp_app.svg",
+                "公司部门","/svg/my-worktable.svg",
                 "在公司和员工直接添加部门的支持",
                 1)
     }

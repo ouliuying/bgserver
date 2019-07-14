@@ -376,7 +376,8 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 }
                 var name=menu?.attributeValue("name")
                 var title=menu?.attributeValue("title")
-                var mT= MenuTree(appName,name,title)
+                var icon=menu?.attributeValue("icon")
+                var mT= MenuTree(appName,name,title,icon)
                 var elements=menu.elements() as List<Element?>?
                 mT.children= arrayListOf()
                 elements?.forEach {
@@ -412,7 +413,8 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 var title=menuItem?.attributeValue("title")
                 var model=menuItem?.attributeValue("model")
                 var viewType=menuItem?.attributeValue("viewType")
-                return MenuNode(app,title,model,viewType)
+                var icon=menuItem?.attributeValue("icon")
+                return MenuNode(app,title,model,viewType,icon)
             }
             catch (ex:Exception){
 
