@@ -17,6 +17,7 @@
 
 package work.bg.server.core.ui
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.apache.commons.logging.LogFactory
 import org.dom4j.dom.DOMElement
@@ -202,10 +203,11 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          var relationData:RelationData?=null
          var targetFields:Array<Field>?=null
          var fieldView:ModelView?=null
-         var meta:JsonObject?=null
+         var meta:JsonElement?=null
          var ctrlProps:JsonObject?=null
          var visible:String?=null
          var enable:String?=null
+         var source:ModelViewFieldSource?=null
          fun createCopy():Field{
             val f= Field(this.modelView,name,style,rowSpan,colSpan,type)
             f.title=title
@@ -216,6 +218,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
             f.ctrlProps=ctrlProps
             f.visible=visible
             f.enable=enable
+             f.source=source
             return f
          }
          val model=this.modelView.model

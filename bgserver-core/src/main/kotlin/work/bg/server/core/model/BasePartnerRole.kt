@@ -18,6 +18,7 @@
 package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.*
 import work.bg.server.core.config.AppPackageManifest
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.billboard.CurrCorpBillboard
@@ -35,10 +36,14 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             FieldType.BIGINT,
             "标识",
             primaryKey = FieldPrimaryKey())
+
     val name=ModelField(null,
             "name",
             FieldType.STRING,
             "名称")
+
+
+
     val corp=ModelMany2OneField(null,
             "corp_id",
              FieldType.BIGINT,
@@ -57,7 +62,11 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             "public.base_partner",
             "id")
 
-    val accessControlRule = ModelField(null,"ac_rule",FieldType.STRING,"权限配置",defaultValue = "")
+    val accessControlRule = ModelField(null,
+            "ac_rule",
+            FieldType.STRING,
+            "权限配置",
+            defaultValue = "")
 
     val isSuper=ModelField(null,
             "is_super",
@@ -67,7 +76,7 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
 
     val apps=ModelOne2ManyField(null,"m_partner_role_id",
             FieldType.BIGINT,
-            title = "app",
+            title = "应用",
             targetModelTable = "public.base_app",
             targetModelFieldName = "partner_role_id")
 
@@ -97,5 +106,18 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             }
         }
         return apps
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "名称必须设置"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType=ModelFieldUnique.IsolationType.IN_CORP)
+        )
     }
 }

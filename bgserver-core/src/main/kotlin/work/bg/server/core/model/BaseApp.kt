@@ -28,6 +28,8 @@ import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.spring.boot.model.ActionResult
+import work.bg.server.core.spring.boot.model.AppModel
+import work.bg.server.core.ui.ModelView
 
 @Model("app","应用")
 class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schemaName) {
@@ -111,5 +113,18 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
         }
         shortRef.acCreate(modelDataArray,partnerCache=partnerCache)
         return ret
+    }
+
+    fun loadInstallApps():Any{
+        var jArr = JsonArray()
+        var metaObj=JsonObject()
+        AppModel.ref.appPackageManifests.forEach { t, u ->
+            jArr.add(this.gson.toJsonTree(mapOf(
+                    "text" to u.title,
+                    "value" to u.name
+            )))
+        }
+        metaObj.add("options",jArr)
+        return metaObj
     }
 }

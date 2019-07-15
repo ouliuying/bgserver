@@ -264,6 +264,49 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return fields
     }
+    private fun sortFields(model:ModelBase,targetFields:ArrayList<FieldBase>,
+                           fs:ArrayList<FieldBase>,
+                           o2ofs:ArrayList<FieldBase>,
+                           o2mfs:ArrayList<AttachedField>,
+                           m2ofs:ArrayList<FieldBase>,
+                           m2mfs:ArrayList<AttachedField>,
+                           ownerMany2OneFields:ArrayList<ModelMany2OneField>){
+        targetFields.forEach {
+            when(it){
+                is One2OneField->{
+                    o2ofs.add(it)
+                }
+                is One2ManyField->{
+                    o2mfs.add(AttachedField(it))
+                }
+                is Many2OneField->{
+                    val tf = this.getTargetModelField(it)
+                    val ret = tf?.first?.isSame(model)
+                    if(ret==null || !ret){
+                        m2ofs.add(it)
+                    }
+                    else{
+                        fs.add(it)
+                        ownerMany2OneFields.add(it as ModelMany2OneField)
+                    }
+                }
+                is Many2ManyField->{
+                    m2mfs.add(AttachedField(it))
+                }
+                else->{
+                    if(model.isSame(it.model)){
+                        fs.add(it)
+                    }
+                    else{
+                        var rFd= (model as AccessControlModel).getRelationFieldTo(it)
+                        rFd?.let{
+                            sortFields(model, arrayListOf(rFd),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
+                        }
+                    }
+                }
+            }
+        }
+    }
     open fun rawRead(vararg fields:FieldBase,
                      model:ModelBase?=null,
                      criteria:ModelExpression?,
@@ -307,35 +350,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(partnerCache!=null){
                 pFields=this.filterAcModelFields(pFields,model=this,partnerCache=partnerCache)
             }
-            if(pFields!=null){
-                pFields?.forEach {
-
-                    when(it){
-                        is One2OneField->{
-                            o2ofs.add(it)
-                        }
-                        is One2ManyField->{
-                            o2mfs.add(AttachedField(it))
-                        }
-                        is Many2OneField->{
-                            val tf = this.getTargetModelField(it)
-                            val ret = tf?.first?.isSame(model)
-                            if(ret==null || !ret){
-                                m2ofs.add(it)
-                            }
-                            else{
-                                fs.add(it)
-                                ownerMany2OneFields.add(it as ModelMany2OneField)
-                            }
-                        }
-                        is Many2ManyField->{
-                            m2mfs.add(AttachedField(it))
-                        }
-                        else->{
-                          fs.add(it)
-                        }
-                    }
-                }
+            pFields?.let {
+                sortFields(model, arrayListOf(*pFields),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
             }
         }
         else{
@@ -344,34 +360,29 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                // partnerCache?.acFilterReadFields(fields as Array<FieldBase>)
                 pFields
             } else fields
-            pFields?.forEach {
-                when(it){
-                        is One2OneField ->{
-                            o2ofs.add(it)
-                        }
-                        is One2ManyField ->{
-                            o2mfs.add(AttachedField(it))
-                        }
-                        is Many2OneField ->{
-                            val tf = this.getTargetModelField(it)
-                            val ret = tf?.first?.isSame(model)
-                            if(ret==null || !ret){
-                                m2ofs.add(it)
-                            }
-                            else{
-                                fs.add(it)
-                                ownerMany2OneFields.add(it as ModelMany2OneField)
-                            }
-                        }
-                        is Many2ManyField->{
-                            m2mfs.add(AttachedField(it))
-                        }
-                        else->{
-                            fs.add(it)
-                        }
-                }
+            pFields?.let {
+                sortFields(model, arrayListOf(*pFields),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
             }
         }
+        fs= arrayListOf(*(fs.distinctBy {
+            it.getFullName()
+        }.toTypedArray()))
+        o2ofs= arrayListOf(*(o2ofs.distinctBy {
+            it.getFullName()
+        }.toTypedArray()))
+        m2ofs= arrayListOf(*(m2ofs.distinctBy {
+            it.getFullName()
+        }.toTypedArray()))
+        o2mfs= arrayListOf(*(o2mfs.distinctBy {
+            (it.field as FieldBase).getFullName()
+        }.toTypedArray()))
+        m2mfs= arrayListOf(*(m2mfs.distinctBy {
+            (it.field as FieldBase).getFullName()
+        }.toTypedArray()))
+        ownerMany2OneFields= arrayListOf(*(ownerMany2OneFields.distinctBy {
+            it.getFullName()
+        }.toTypedArray()))
+
         var joinModels= arrayListOf<JoinModel>()
         var modelRelationMatcher = ModelRelationMatcher()
         o2ofs.forEach {
@@ -716,6 +727,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         this.doFillModelFunctionFields(mDataArray,useAccessControl,partnerCache)
         return mDataArray
+    }
+    fun getRelationFieldTo(model:FieldBase):FieldBase?{
+
+
+
+        return null
     }
     protected open fun doFillModelFunctionFields(modelDataArray:ModelDataArray?,useAccessControl: Boolean,partnerCache: PartnerCache?){
         val model=modelDataArray?.model

@@ -44,7 +44,7 @@
             <field name="departments" style="relation"></field>
         </xpath>
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/ref/views" op="append" app="core">
-            <view type="detail" refType="main|sub" ownerField="departments" model="department" app="corp"></view>
+            <view type="detail" refType="none" ownerField="departments" model="department" app="corp"></view>
         </xpath>
     </inherit>
 

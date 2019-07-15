@@ -17,10 +17,10 @@
 
 package util
 
-class MethodInvocation(private val instance:Any,private val methodName:String) {
-     operator fun invoke(){
+class MethodInvocation(private val instance:Any,private val methodName:String){
+     operator fun invoke():Any?{
          var method=instance::class.java.getDeclaredMethod(methodName)!!
          method.isAccessible=true
-         method(instance)
+         return method(instance)
     }
 }

@@ -21,6 +21,7 @@ package work.bg.server.core.model
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -218,6 +219,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return Pair(null,null)
     }
 
+    protected open fun controlModelViewStatusWithOwnerField(mv:ModelView?,toField:FieldBase?,ownerFieldValue:FieldValue?,ownerModelID:Long?,pc:PartnerCache){
+        if(mv!=null && toField!=null){
+            mv.fields.map {
+                if(it.name == toField.propertyName){
+                    it.enable="enable=false"
+                }
+            }
+        }
+    }
     private fun loadMainViewType(app:String,model:String,
                                  viewType:String,
                                  ownerFieldValue:FieldValue?,
@@ -225,8 +235,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                  ownerModelID:Long?,
                                  pc:PartnerCache,
                                  reqData:JsonObject?,viewRefType:String?=null):MutableMap<String,Any>{
+
         var reqRefType= viewRefType?:if(ownerFieldValue!=null) ModelViewRefType.Sub else ModelViewRefType.Main
         var mv=pc.getAccessControlModelView(app,model,viewType)
+        controlModelViewStatusWithOwnerField(mv,toField,ownerFieldValue,ownerModelID,pc)
         var bag = LinkedHashMap<String,Any>()
         if(mv!=null){
             var mvData = this.loadModelViewData(mv,bag, pc,ownerFieldValue,toField,ownerModelID, reqData)
@@ -493,6 +505,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     }
                 }
             }
+           it.source?.let {fs->
+               val tMeta = ModelViewFieldSourceCache.run(fs)
+               tMeta?.let { m->
+
+                   it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+               }
+           }
         }
         return mv
     }
@@ -809,7 +828,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                    var relModel = this.appModel.getModel(fd.relationModelTable)
                                    relModel?.let {mRelIt->
                                        msoIt.data[mRelIt]?.let {mdaIt->
-                                           this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,(mdaIt as ModelDataArray).data.first())
+                                           (mdaIt as ModelDataArray).data.firstOrNull()?.let {nfvs->
+                                               this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,nfvs)
+                                           }
+
                                        }
                                    }
                                }

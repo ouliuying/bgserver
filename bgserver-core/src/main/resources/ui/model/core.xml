@@ -46,6 +46,40 @@
     </model>
     <model name="corpPartnerRel" app="core">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="isDefaultCorp" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"非默认",
+                     "1":"默认"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="partner.name" type="static"/>
+            <field name="partnerRole.name" type="static"/>
+        </view>
+
+        <view type="edit">
+
+        </view>
+
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" style="head" type="many2OneDataSetSelect"/>
             <field name="isDefaultCorp" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -55,20 +89,20 @@
                   ]]>
                 </meta>
             </field>
-            <field name="partner" >
-            </field>
-
-            <field name="partnerRole">
-            </field>
-
         </view>
-
-        <view type="edit">
-
-        </view>
-
-        <view type="create">
-
+        <view type="detail">
+            <field name="partnerRole.name" style="head" type="static">
+            </field>
+            <field name="isDefaultCorp" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="partner" app="core">
@@ -216,7 +250,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="detail" refType="main|sub" ownerField="partnerRoles" model="partnerRole"/>
+                    <view type="detail" refType="none" ownerField="partnerRoles" model="corpPartnerRel"/>
                 </views>
                 <menus>
 
@@ -256,7 +290,15 @@
             </ref>
             <field name="id"/>
             <field name="name"/>
-            <field name="isSuper">
+            <field name="isSuper" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"公司成员",
+                     "1":"超级管理员"
+                    }
+                  ]]>
+                </meta>
             </field>
             <field name="accessControlRule">
             </field>
@@ -272,8 +314,8 @@
                 <menus>
                 </menus>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list"/>
-                    <view fieldName="apps" refType="main|sub" type="list"/>
+                    <view ownerField="partners" refType="main|sub" type="list" model="corpPartnerRel"/>
+                    <view ownerField="apps" refType="main|sub" type="list" model="app"/>
                 </views>
             </ref>
             <field name="name" style="head" type="singleLineText"/>
@@ -286,13 +328,9 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule" colSpan="2" type="multiLineText">
-            </field>
+            <field name="accessControlRule" colSpan="2" type="multiLineText"/>
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
-            <field name="label1" title="测试标签1" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
-            <field name="label2" title="测试标签2" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
-            <field name="label3" title="测试标签3" style="label" type="iconLabel" icon="/icon/res/icon_label.svg"/>
         </view>
 
         <view type="edit">
@@ -337,6 +375,57 @@
             <field name="accessControlRule" type="static" colSpan="2"/>
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
+        </view>
+    </model>
+    <model name="app" app="core">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="enumStatic"/>
+            <field name="title"/>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="select" style="head">
+                <source app="core" model="app" method="loadInstallApps"/>
+            </field>
+            <field name="title" type="singleLineText"/>
+            <field name="partnerRole.name" type="many2OneDataSetSelect"/>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="select" style="head"/>
+            <field name="title" type="singleLineText"/>
+            <field name="partnerRole" type="many2OneDataSetSelect"/>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="enumStatic"/>
+            <field name="title" type="singleLineText"/>
+            <field name="partnerRole.name" type="many2OneDataSetSelect" enable="false"/>
         </view>
     </model>
 </ui>

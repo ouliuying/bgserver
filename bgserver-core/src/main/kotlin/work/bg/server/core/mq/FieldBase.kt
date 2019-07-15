@@ -29,7 +29,7 @@ abstract  class  FieldBase constructor(open var name:String,
     override fun accept(visitor: ModelExpressionVisitor,parent:ModelExpression?): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-    open fun getFullName():String?{
+    open fun getFullName():String{
         return "${this.model?.fullTableName}.${this.name}"
     }
     override fun render(parent: ModelExpression?): Pair<String, Map<String, Any?>>? {

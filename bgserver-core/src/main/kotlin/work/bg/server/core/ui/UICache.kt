@@ -593,7 +593,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     }
                     var type=it.attributeValue("type")
                     if(type.isNullOrEmpty()){
-                        type="singleLineText"
+                        type="static"
                     }
                     var title=it.attributeValue("title")
                     if(title.isNullOrEmpty()){
@@ -634,7 +634,15 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                         f.meta=  gson.fromJson(subMetaNode.textTrim,JsonObject::class.java)
                        // print(f.meta)
                     }
-
+                    var sourceNode = it.element("source") as Element?
+                    sourceNode?.let {
+                        val sApp = (it.attributeValue("app") as String?)?:app
+                        val sModel = (it.attributeValue("model") as String?)?:model
+                        val sMethod = (it.attributeValue("method") as String?)
+                        if(!sApp.isNullOrEmpty() && !sModel.isNullOrEmpty() && !sMethod.isNullOrEmpty()){
+                            f.source = ModelViewFieldSource(sApp,sModel,sMethod)
+                        }
+                    }
                     var subCtrlProps = it.elements("ctrlProps")
                     if(subCtrlProps.size>0){
                         try {
