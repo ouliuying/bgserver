@@ -35,13 +35,12 @@ import org.springframework.transaction.TransactionDefinition
 import work.bg.server.core.acrule.*
 import work.bg.server.core.acrule.bean.*
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.config.ActionType
 import work.bg.server.core.constant.ModelReservedKey
 import work.bg.server.core.exception.ModelErrorException
+import work.bg.server.core.model.billboard.FieldValueDependentingRecordBillboard
 import work.bg.server.core.mq.aggregation.MaxExpression
-import work.bg.server.core.mq.billboard.CurrCorpBillboard
-import work.bg.server.core.mq.billboard.CurrPartnerBillboard
-import work.bg.server.core.mq.billboard.FieldDefaultValueBillboard
-import work.bg.server.core.mq.billboard.TimestampBillboard
+import work.bg.server.core.model.billboard.*
 import work.bg.server.core.mq.join.innerJoin
 import work.bg.server.core.mq.specialized.ConstGetRecordRefField
 import work.bg.server.core.mq.specialized.ConstRelRegistriesField
@@ -1011,7 +1010,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(0,errorMessage)
     }
 
-    open fun getCreateFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null):FieldValue?{
+    open fun getCreateFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null,fvs:FieldValueArray?=null):FieldValue?{
             return when (field) {
                 is ProxyRelationModelField<*> -> null
                 else -> when(value){
@@ -1026,7 +1025,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         return when(value){
                             is CurrCorpBillboard-> FieldValue(field,value.looked(partnerCache))
                             is CurrPartnerBillboard->FieldValue(field,value.looked(partnerCache))
+
                             else-> FieldValue(field,value.looked(null))
+                        }
+                    }
+                    is FieldValueDependentingRecordBillboard->{
+                        val ret = value.looked(fvs,ActionType.CREATE)
+                        return if(ret.first){
+                            FieldValue(field,ret.second)
+                        } else{
+                            null
                         }
                     }
                     else->{
@@ -1038,7 +1046,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
 
-    open fun getEditFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null):FieldValue?{
+    open fun getEditFieldValue(field:FieldBase,value:Any?,partnerCache:PartnerCache?=null,fvs:FieldValueArray?=null):FieldValue?{
         return when (field) {
             is ProxyRelationModelField<*> -> null
             else -> when(value){
@@ -1047,7 +1055,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
                 is FieldDefaultValueBillboard->{
                    null
-
+                }
+                is FieldValueDependentingRecordBillboard->{
+                    var ret = value?.looked(fvs,ActionType.EDIT)
+                    return if(ret.first){
+                        FieldValue(field,ret.second)
+                    }
+                    else{
+                        null
+                    }
                 }
                 else->{
                     if(value!=null) FieldValue(field,value) else null
@@ -1107,14 +1123,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
                 if (fv == null) {
                     if (oit.defaultValue != null) {
-                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache)
+                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache,modelDataObject.data)
                         acFV?.let {
                             modelDataObject.setFieldValue(acFV.field,acFV.value)
                         }
                     }
                 }
                 else{
-                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache)
+                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache,modelDataObject.data)
                     tFV?.let {
                         modelDataObject.setFieldValue(tFV.field,tFV.value)
                     }
@@ -1403,12 +1419,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
                 if (fv == null) {
                     if (oit.defaultValue != null) {
-                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache)
+                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache, modelDataObject.data)
                             acFV?.let { fVCShadow.data.add(acFV) }
                     }
                 }
                 else{
-                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache)
+                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache, modelDataObject.data)
                     tFV?.let { fVCShadow.data.add(tFV) }
                 }
             }
@@ -1676,9 +1692,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     fv.field.getFullName() == oit.getFullName()
                 }
                 if (fv != null) {
-                    var acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache)
+                    var acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache,modelDataObject.data)
                     if(acFV!=null){
                         fVCShadow.setFieldValue(acFV.field,acFV.value)
+                    }
+                }
+                else{
+                    if(oit.defaultValue is FieldValueDependentingRecordBillboard){
+                        var ret = oit.defaultValue.looked(modelDataObject.data,ActionType.EDIT)
+                        if(ret.first){
+                            fVCShadow.setFieldValue(oit,ret.second)
+                        }
                     }
                 }
             }

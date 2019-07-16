@@ -19,9 +19,8 @@ package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.acrule.inspector.*
-import work.bg.server.core.config.AppPackageManifest
 import work.bg.server.core.mq.*
-import work.bg.server.core.mq.billboard.CurrCorpBillboard
+import work.bg.server.core.model.billboard.CurrCorpBillboard
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.spring.boot.model.AppModel
 

@@ -20,9 +20,8 @@ package work.bg.server.corp.model
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
-import work.bg.server.core.mq.billboard.CurrCorpBillboard
+import work.bg.server.core.model.billboard.CurrCorpBillboard
 import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.AppModel
 
 @Model("department", "部门")
 class Department:ContextModel("corp_department",

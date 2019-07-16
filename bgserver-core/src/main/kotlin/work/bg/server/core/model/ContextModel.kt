@@ -406,6 +406,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     }
                 }
             }
+            it.source?.let {fs->
+                val tMeta = ModelViewFieldSourceCache.run(fs)
+                tMeta?.let { m->
+
+                    it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+                }
+            }
         }
         return mv
     }
@@ -453,6 +460,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     }
                 }
             }
+            it.source?.let {fs->
+                val tMeta = ModelViewFieldSourceCache.run(fs)
+                tMeta?.let { m->
+
+                    it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+                }
+            }
         }
         return mv
     }
@@ -464,7 +478,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                               toField:FieldBase?,
                                               reqData: JsonObject?):ModelView{
 
+        mv.fields.forEach {
+            it.source?.let {fs->
+                val tMeta = ModelViewFieldSourceCache.run(fs)
+                tMeta?.let { m->
 
+                    it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+                }
+            }
+        }
         return mv
     }
 

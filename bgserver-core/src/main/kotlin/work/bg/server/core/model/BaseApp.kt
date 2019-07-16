@@ -19,17 +19,18 @@ package work.bg.server.core.model
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.config.ActionType
 import work.bg.server.core.mq.*
+import work.bg.server.core.model.billboard.FieldValueDependentingRecordBillboard
 import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
 import work.bg.server.core.spring.boot.model.ActionResult
 import work.bg.server.core.spring.boot.model.AppModel
-import work.bg.server.core.ui.ModelView
 
 @Model("app","应用")
 class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schemaName) {
@@ -53,7 +54,21 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             "title",
             FieldType.STRING,
             "说明",
-            defaultValue = "针对app的说明")
+            defaultValue = object : FieldValueDependentingRecordBillboard{
+                override fun computeValue(fvs: FieldValueArray?,actionType:ActionType): Pair<Boolean,Any?> {
+                    val nameField = this@BaseApp.name
+                    fvs?.let {
+                        val name = it.getValue(nameField) as String?
+                        name?.let {
+                            val appManifest= AppModel.ref.appPackageManifests[name]
+                            appManifest?.let {
+                                return Pair(true,it.title)
+                            }
+                        }
+                    }
+                    return Pair(false,null)
+                }
+            })
 
     val defaultFlag=ModelField(null,
             "default_flag",
@@ -69,6 +84,12 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             title = "角色",
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE)
             )
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,this.partnerRole,advice = "角色的应用必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
 
     @Action("loadAppContainer")
     fun loadAppContainer(@RequestBody appData :JsonObject,
@@ -125,6 +146,14 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             )))
         }
         metaObj.add("options",jArr)
+        return metaObj
+    }
+    fun loadInstallAppsNameToTitle():Any{
+        var jArr = JsonArray()
+        var metaObj=JsonObject()
+        AppModel.ref.appPackageManifests.forEach { t, u ->
+            metaObj.addProperty(u.name,u.title)
+        }
         return metaObj
     }
 }

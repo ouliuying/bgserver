@@ -19,15 +19,14 @@
 
 package work.bg.server.core.model
 
-import jdk.nashorn.internal.objects.Global
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldMustCoexist
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.mq.*
-import work.bg.server.core.mq.billboard.CurrCorpBillboard
-import work.bg.server.core.mq.billboard.CurrPartnerBillboard
+import work.bg.server.core.model.billboard.CurrCorpBillboard
+import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model("corpPartnerRel")

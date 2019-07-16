@@ -4,9 +4,8 @@ import work.bg.server.core.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
-import work.bg.server.core.mq.billboard.CurrPartnerBillboard
+import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import work.bg.server.core.spring.boot.annotation.Model
-import java.math.BigDecimal
 import java.math.BigInteger
 
 //订单发票

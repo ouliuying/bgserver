@@ -51,6 +51,9 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
                 </actions>
             </ref>
             <field name="isDefaultCorp" type="enumStatic">
@@ -336,8 +339,8 @@
         <view type="edit">
             <ref>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list"/>
-                    <view fieldName="apps" refType="main|sub" type="list"/>
+                    <view ownerField="partners" refType="main|sub" type="list"  model="corpPartnerRel"/>
+                    <view ownerField="apps" refType="main|sub" type="list" model="app"/>
                 </views>
                 <actions>
                     <action>
@@ -348,8 +351,16 @@
 
                 </menus>
             </ref>
-            <field name="name"/>
-            <field name="isSuper"/>
+            <field name="name" style="head"/>
+            <field name="isSuper" style="subHead" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"系统超级管理员"
+                    }
+                  ]]>
+                </meta>
+            </field>
             <field name="accessControlRule" colSpan="2" type="multiLineText">
             </field>
             <field name="partners" style="relation"/>
@@ -358,8 +369,8 @@
         <view type="detail">
             <ref>
                 <views>
-                    <view fieldName="partners" refType="main|sub" type="list" model="partner"/>
-                    <view fieldName="apps" refType="main|sub" type="list" model="app"/>
+                    <view ownerField="partners" refType="none" type="list" model="corpPartnerRel"/>
+                    <view ownerField="apps" refType="none" type="list" model="app"/>
                 </views>
                 <actions>
                     <action>
@@ -370,8 +381,17 @@
 
                 </menus>
             </ref>
-            <field name="name" type="static"/>
-            <field name="isSuper" type="static"/>
+            <field name="name" type="static" style="head"/>
+            <field name="isSuper" type="enumStatic" style="subHead">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
             <field name="accessControlRule" type="static" colSpan="2"/>
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
@@ -384,9 +404,14 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
                 </actions>
             </ref>
-            <field name="name" type="enumStatic"/>
+            <field name="name" type="enumStatic">
+                <source app="core" model="app" method="loadInstallAppsNameToTitle"></source>
+            </field>
             <field name="title"/>
         </view>
         <view type="create">

@@ -18,9 +18,6 @@
 package work.bg.server.core.model.billboard
 
 import work.bg.server.core.model.BasePartner
-import work.bg.server.core.mq.billboard.ConstantFieldBillboard
-import work.bg.server.core.mq.billboard.FieldDefaultValueBillboard
-import work.bg.server.core.spring.boot.model.AppModel
 
 class PartnerTagBillboard(override val constant: Boolean=false): FieldDefaultValueBillboard,ConstantFieldBillboard{
     override fun looked(glass: Any?): Any {
