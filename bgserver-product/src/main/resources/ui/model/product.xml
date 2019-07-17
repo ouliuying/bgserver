@@ -32,9 +32,9 @@
                 </actions>
             </ref>
             <field name="id"></field>
-            <field name="name" type="singleLineText"></field>
-            <field name="cost" type="singleLineText"></field>
-            <field name="price" type="multiLineText"></field>
+            <field name="name" type="static"></field>
+            <field name="cost" type="static"></field>
+            <field name="price" type="static"></field>
         </view>
         <view type="create">
             <ref>
@@ -130,8 +130,8 @@
                 </menus>
             </ref>
             <field name="id"></field>
-            <field name="name" type="singleLineText"></field>
-            <field name="comment" type="singleLineText"></field>
+            <field name="name" type="static"></field>
+            <field name="comment" type="static"></field>
         </view>
         <view type="create">
             <ref>
@@ -204,9 +204,9 @@
                 <views>
                 </views>
             </ref>
-            <field name="id" type="singleLineText"></field>
-            <field name="attrValue" type="singleLineText"></field>
-            <field name="attrValueComment" type="multiLineText" style="normal"></field>
+            <field name="id" type="static"></field>
+            <field name="attrValue" type="static"></field>
+            <field name="attrValueComment" type="static" style="normal"></field>
         </view>
         <view type="edit">
             <ref>
@@ -250,17 +250,17 @@
                 <views>
                 </views>
             </ref>
-            <field name="attrValue" type="singleLineText" style="head"></field>
-            <field name="attrValueComment" type="multiLineText" style="normal"></field>
+            <field name="attrValue" type="static" style="head"></field>
+            <field name="attrValueComment" type="static" style="normal"></field>
         </view>
     </model>
     <model name="productSKUPattern" app="product">
         <view type="list">
-            <field name="id" type="singleLineText"></field>
-            <field name="name" type="singleLineText"></field>
-            <field name="skuPattern" type="singleLineText"></field>
-            <field name="skuCount" type="singleLineText"></field>
-            <field name="product.name" type="singleLineText"></field>
+            <field name="id" type="static"></field>
+            <field name="name" type="static"></field>
+            <field name="skuPattern" type="static"></field>
+            <field name="skuCount" type="static"></field>
+            <field name="product.name" type="static"></field>
         </view>
         <view type="create">
             <field name="name" type="singleLineText" style="head"></field>
@@ -301,8 +301,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="productAttribute.name" type="singleLineText" style="head"></field>
-            <field name="productAttributeValue.attrValue" type="singleLineText"></field>
+            <field name="productAttribute.name" type="static" style="head"></field>
+            <field name="productAttributeValue.attrValue" type="static"></field>
         </view>
         <view type="create">
             <ref>
@@ -346,14 +346,17 @@
                     <action>
                         <group name="main"  refType = "main|sub|singleSelection"></group>
                     </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
                 </actions>
                 <menus>
                 </menus>
                 <views>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name="comment" type="multiLineText" style="normal"></field>
+            <field name="name" type="static" style="head"></field>
+            <field name="comment" type="static" style="normal"></field>
         </view>
         <view type="edit">
             <ref>

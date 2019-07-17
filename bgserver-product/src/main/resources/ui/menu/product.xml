@@ -19,23 +19,28 @@
   -->
 
 <ui>
-    <menu name="main" app="product" title="产品管理">
-        <menuItem title="产品列表" model="product" viewType="list">
+    <menu name="main" app="product" title="产品" icon="/svg/product-app.svg">
+        <menu  name="product" app="product" title="产品管理" icon="/svg/product-app-mag.svg">
+            <menuItem title="产品列表" model="product" viewType="list">
 
-        </menuItem>
-        <menuItem title="添加产品" model="product" viewType="create">
+            </menuItem>
+            <menuItem title="添加产品" model="product" viewType="create">
 
-        </menuItem>
-        <menuItem title="产品Sku模式" model="productSKUPattern" viewType="list">
+            </menuItem>
+            <menuItem title="产品Sku模式" model="productSKUPattern" viewType="list">
 
-        </menuItem>
-        <menuItem title="产品属性" model="productAttribute" viewType="list">
+            </menuItem>
+        </menu>
+       <menu  name="productAttribute" app="product" title="产品属性" icon="/svg/product-app-attr.svg">
+           <menuItem title="产品属性" model="productAttribute" viewType="list">
 
-        </menuItem>
-        <menuItem title="添加属性" model="productAttribute" viewType="create">
+           </menuItem>
+           <menuItem title="添加属性" model="productAttribute" viewType="create">
 
-        </menuItem>
-        <menuItem title="产品单位" model="productUOM" viewType="list">
+           </menuItem>
+       </menu>
+
+        <menuItem title="产品单位" model="productUOM" viewType="list" icon="/svg/product-app-unit.svg">
 
         </menuItem>
     </menu>
