@@ -17,34 +17,34 @@
 <ui>
     <inherit>
         <xpath expression="/ui/model[@app='core'][@name='partner']/view/list" op="append" app="core">
-            <field name="department"></field>
+            <field name="department"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">
-            <field name="department"></field>
+            <field name="department"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partnerRole']/view/edit" op="append" app="core">
-            <field name="department"></field>
+            <field name="department"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"></field>
+            <field name="departments.name" type="many2OneDataSetSelect"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"></field>
+            <field name="departments.name" type="many2OneDataSetSelect"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"></field>
+            <field name="departments.name" type="many2OneDataSetSelect"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='partnerRoles']" op="insertAfter" app="core">
-            <field name="departments" style="relation"></field>
+            <field name="departments" style="relation"/>
         </xpath>
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/ref/views" op="append" app="core">
-            <view type="detail" refType="none" ownerField="departments" model="department" app="corp"></view>
+            <view type="detail" refType="none" ownerField="departments" model="department" app="corp"/>
         </xpath>
     </inherit>
 
@@ -53,26 +53,26 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="selSingleItemAction" refType="singleSelection"></group>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                     <action>
-                        <group name="main" refType="main|sub|singleSelection"></group>
+                        <group name="main" refType="main|sub|singleSelection"/>
                     </action>
                     <action>
-                        <group name="opAction" refType="main|sub"></group>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
-            <field name="id"></field>
-            <field name="name" type="singleLineText"></field>
-            <field name="parent.name" type="many2OneDataSetSelect"></field>
-            <field name="comment" type="multiLineText"></field>
+            <field name="id"/>
+            <field name="name" type="static"/>
+            <field name="parent.name" type="static"/>
+            <field name="comment" type="static"/>
         </view>
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <menus>
@@ -82,57 +82,53 @@
                     </view>
                 </views>
             </ref>
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name = "parent.name" type="many2OneDataSetSelect"></field>
-            <field name="comment" type="multiLineText"></field>
-            <field name="partners" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="parent.name" type="many2OneDataSetSelect"/>
+            <field name="comment" type="multiLineText"/>
+            <field name="partners" style="relation"/>
         </view>
         <view type="edit">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <views>
-                    <view type="list" ownerField="children" refType="sub|main">
+                    <view type="list" ownerField="children" model="department"  refType="sub|main">
                     </view>
-                    <view type="list" ownerField="partners" app="core" model="partner" refType="sub|main">
-                    </view>
-                    <view type="edit" ownerField="parent" refType="sub|main">
+                    <view type="list" ownerField="partners"  model="departmentPartnerRel" refType="sub|main">
                     </view>
                 </views>
             </ref>
-
-            <field name="name" type="singleLineText" style="head"></field>
-            <field name = "parent.name" type="many2OneDataSetSelect"></field>
-            <field name="comment" type="multiLineText"></field>
-            <field name="children" style="relation"></field>
-            <field name="partners" style="relation"></field>
-            <field name="parent" style="relation"></field>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="parent.name" type="many2OneDataSetSelect"/>
+            <field name="comment" type="multiLineText"/>
+            <field name="children" style="relation"/>
+            <field name="partners" style="relation"/>
         </view>
         <view type="detail">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"  refType = "main"></group>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
                 <views>
-                    <view type="list" ownerField="children" refType="sub|main">
+                    <view type="list" ownerField="children"  model="department" refType="none">
                     </view>
-                    <view type="list" ownerField="partners" app="core" model="partner" refType="sub|main">
+                    <view type="list" ownerField="partners" model="departmentPartnerRel" refType="none">
                     </view>
-                    <view type="detail" ownerField="parent" refType="sub|main">
+                    <view type="detail" ownerField="parent" model="department" refType="none">
                     </view>
                 </views>
             </ref>
-            <field name="name" type="static" style="head"></field>
-            <field name = "parent.name" type="static"></field>
-            <field name="comment" type="static"></field>
-            <field name="children" style="relation"></field>
-            <field name="partners" style="relation"></field>
-            <field name="parent" style="relation"></field>
+            <field name="name" type="static" style="head"/>
+            <field name="parent.name" type="static"/>
+            <field name="comment" type="static"/>
+            <field name="children" style="relation"/>
+            <field name="partners" style="relation"/>
+            <field name="parent" style="relation"/>
         </view>
     </model>
 
@@ -141,34 +137,48 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                     <action>
-                        <group name="opAction" refType="main|sub"></group>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
-            <field name="partner.id"></field>
-            <field name="partner.userName"></field>
-            <field name="partner.name"></field>
-            <field name="partner.nickName"></field>
-            <field name="partner.userComment"></field>
+            <field name="partner.id" title="标识"/>
+            <field name="partner.userName" title="用户名"/>
+            <field name="partner.name" title="姓名"/>
+            <field name="partner.nickName" title="昵称"/>
+            <field name="partner.userComment" title="注释"/>
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.userName" type="static" style="head"/>
         </view>
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect"></field>
+            <field name="partner.userName" type="many2OneDataSetSelect"/>
         </view>
     </model>
 

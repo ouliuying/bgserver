@@ -57,7 +57,7 @@ class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schem
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
-        return arrayOf(ModelFieldUnique(partner,department,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
+        return arrayOf(ModelFieldUnique(partner,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
     }
 
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {

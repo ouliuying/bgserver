@@ -17,7 +17,7 @@
 <ui>
     <inherit>
         <xpath expression="/ui/menu[@app='core'][@name='main']/menu[@name='partner'][@app='core']" op="insertAfter" app="core">
-            <menu name="department" app="corp" title="部门管理">
+            <menu name="department" app="corp" title="部门管理" icon="/svg/department-app.svg">
                 <menuItem title="公司部门" app="corp" model="department" viewType="list">
                 </menuItem>
                 <menuItem title="添加部门" app="corp" model="department" viewType="create">

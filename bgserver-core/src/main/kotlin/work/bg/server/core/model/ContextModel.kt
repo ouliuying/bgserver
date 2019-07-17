@@ -370,47 +370,66 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                 toField:FieldBase?,
                                                 reqData: JsonObject?):ModelView{
         var modelDataObject  = modelData as ModelDataObject?
-        mv.fields.forEach {
-            when (it.type) {
+        mv.fields.forEach {mvi->
+            when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
-                    if (it.relationData != null &&
-                            it.meta == null &&
-                            it.style != ModelView.Field.Style.relation &&
-                            (it.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many &&
+                    if (mvi.relationData != null &&
+                            mvi.meta == null &&
+                            mvi.style != ModelView.Field.Style.relation &&
                             modelData != null) {
-
-                        var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
-                        var rField = modelObject?.getFieldByPropertyName(it.name) as ModelMany2ManyField?
-                        var relationModel = this.appModel.getModel(rField?.relationModelTable)
-                        var targetModel=this.appModel.getModel((it.relationData as ModelView.RelationData).targetApp,
-                                (it.relationData as ModelView.RelationData).targetModel)
-                        if (modelDataObject != null &&
-                                relationModel!=null &&
-                                targetModel!=null) {
-                            var jArr = JsonArray()
-                            var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
-                            dataArray?.data?.forEach {fvs->
-                                fvs.forEach { fv->
-                                    if(fv.value is ModelDataObject){
-                                        if(targetModel.isSame(fv.value.model)){
-                                            jArr.add(this.gson.toJsonTree(fv.value))
+                        if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many){
+                            var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as ModelMany2ManyField?
+                            var relationModel = this.appModel.getModel(rField?.relationModelTable)
+                            var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
+                                    (mvi.relationData as ModelView.RelationData).targetModel)
+                            if (modelDataObject != null &&
+                                    relationModel!=null &&
+                                    targetModel!=null) {
+                                var jArr = JsonArray()
+                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                                dataArray?.data?.forEach {fvs->
+                                    fvs.forEach { fv->
+                                        if(fv.value is ModelDataObject){
+                                            if(targetModel.isSame(fv.value.model)){
+                                                jArr.add(this.gson.toJsonTree(fv.value))
+                                            }
                                         }
                                     }
                                 }
+                                var metaObj=JsonObject()
+                                metaObj.add("options",jArr)
+                                mvi.meta=metaObj
                             }
-                            var metaObj=JsonObject()
-                            metaObj.add("options",jArr)
-                            it.meta=metaObj
+                        }
+                        else if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2One){
+                            var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                            var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
+                                    (mvi.relationData as ModelView.RelationData).targetModel)
+                            var tField = modelObject?.getFieldByPropertyName(mvi.name)
+                            tField?.let {
+                                var tValue = modelDataObject?.getFieldValue(tField)
+                                if(targetModel!=null && tValue is ModelDataObject){
+                                    var jArr = JsonArray()
+                                    if(targetModel.isSame(tValue.model)){
+                                        jArr.add(this.gson.toJsonTree(tValue))
+                                    }
+                                    var metaObj=JsonObject()
+                                    metaObj.add("options",jArr)
+                                    mvi.meta=metaObj
+                                }
+                            }
+
                         }
                     }
                 }
             }
-            it.source?.let {fs->
+            mvi.source?.let {fs->
                 val tMeta = ModelViewFieldSourceCache.run(fs)
                 tMeta?.let { m->
 
-                    it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+                    mvi.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
                 }
             }
         }
@@ -424,47 +443,65 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                                 toField:FieldBase?,
                                                 reqData: JsonObject?):ModelView{
         var modelDataObject  = modelData as ModelDataObject?
-        mv.fields.forEach {
-            when (it.type) {
+        mv.fields.forEach {mvi->
+            when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
-                    if (it.relationData != null &&
-                            it.meta == null &&
-                            it.style != ModelView.Field.Style.relation &&
-                            (it.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many &&
+                    if (mvi.relationData != null &&
+                            mvi.meta == null &&
+                            mvi.style != ModelView.Field.Style.relation &&
                             modelData != null) {
-
-                        var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
-                        var rField = modelObject?.getFieldByPropertyName(it.name) as ModelMany2ManyField?
-                        var relationModel = this.appModel.getModel(rField?.relationModelTable)
-                        var targetModel=this.appModel.getModel((it.relationData as ModelView.RelationData).targetApp,
-                                (it.relationData as ModelView.RelationData).targetModel)
-                        if (modelDataObject != null &&
-                                relationModel!=null &&
-                                targetModel!=null) {
-                            var jArr = JsonArray()
-                            var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
-                            dataArray?.data?.forEach {fvs->
-                                fvs.forEach { fv->
-                                    if(fv.value is ModelDataObject){
-                                        if(targetModel.isSame(fv.value.model)){
-                                            jArr.add(this.gson.toJsonTree(fv.value))
+                        if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many){
+                            var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as RefRelationField?
+                            var relationModel = this.appModel.getModel(rField?.relationModelTable)
+                            var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
+                                    (mvi.relationData as ModelView.RelationData).targetModel)
+                            if (modelDataObject != null &&
+                                    relationModel!=null &&
+                                    targetModel!=null) {
+                                var jArr = JsonArray()
+                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                                dataArray?.data?.forEach {fvs->
+                                    fvs.forEach { fv->
+                                        if(fv.value is ModelDataObject){
+                                            if(targetModel.isSame(fv.value.model)){
+                                                jArr.add(this.gson.toJsonTree(fv.value))
+                                            }
                                         }
                                     }
                                 }
+                                var metaObj=JsonObject()
+                                metaObj.add("options",jArr)
+                                mvi.meta=metaObj
                             }
-                            var metaObj=JsonObject()
-                            metaObj.add("options",jArr)
-                            it.meta=metaObj
+                        }
+                        else if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2One){
+                            var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
+                            var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
+                                    (mvi.relationData as ModelView.RelationData).targetModel)
+                            var tField = modelObject?.getFieldByPropertyName(mvi.name)
+                            tField?.let {
+                                var tValue = modelDataObject?.getFieldValue(tField)
+                                if(targetModel!=null && tValue is ModelDataObject){
+                                    var jArr = JsonArray()
+                                    if(targetModel.isSame(tValue.model)){
+                                        jArr.add(this.gson.toJsonTree(tValue))
+                                    }
+                                    var metaObj=JsonObject()
+                                    metaObj.add("options",jArr)
+                                    mvi.meta=metaObj
+                                }
+                            }
+
                         }
                     }
                 }
             }
-            it.source?.let {fs->
+            mvi.source?.let {fs->
                 val tMeta = ModelViewFieldSourceCache.run(fs)
                 tMeta?.let { m->
-
-                    it.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
+                    mvi.meta = if(m is JsonElement)  m else this.gson.toJsonTree(m)
                 }
             }
         }

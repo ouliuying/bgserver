@@ -141,6 +141,7 @@ subprojects {
 dependencies{
         compile project(':bgserver-core')
         compile project(':bgserver-corp')
+        compile project(':bgserver-product')
         compile project(':bgserver-account')
         compile project(':bgserver-crm')
         compile project(':bgserver-chat')

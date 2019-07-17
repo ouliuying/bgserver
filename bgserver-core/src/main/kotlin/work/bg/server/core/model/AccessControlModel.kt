@@ -716,6 +716,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     fromModel = model!!,
                                     joinModels = joinModels.toTypedArray(),criteria =readCriteria )?.firstOrNull()
                             if(v!=null){
+                                v.model=model
                                 fvs.setValue(m2o,v)
                             }
                         }

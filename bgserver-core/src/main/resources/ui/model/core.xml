@@ -118,6 +118,9 @@
                         <action>
                             <group name="opAction"/>
                         </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
                 </actions>
                 <menus>
 

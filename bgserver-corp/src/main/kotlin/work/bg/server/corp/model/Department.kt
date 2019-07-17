@@ -18,6 +18,10 @@
 package work.bg.server.corp.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldRequired
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.model.billboard.CurrCorpBillboard
@@ -63,6 +67,7 @@ class Department:ContextModel("corp_department",
             "上级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",
+            defaultValue = null,
             foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
 
     val children = ModelOne2ManyField(null,
@@ -71,4 +76,18 @@ class Department:ContextModel("corp_department",
             title = "下级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "parent_id")
+
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.parent,this.name,advice = "同级部门不能重名",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "必须输入部门名称"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "部门名称不能为空")
+        )
+    }
 }
