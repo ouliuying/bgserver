@@ -84,6 +84,19 @@ class Department:ContextModel("corp_department",
         )
     }
 
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.parent,this.name,advice = "同级部门不能重名",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "必须输入部门名称"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "部门名称不能为空")
+        )
+    }
+
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldRequired(this.name,advice = "必须输入部门名称"),

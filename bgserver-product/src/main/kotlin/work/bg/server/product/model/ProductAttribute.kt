@@ -39,6 +39,17 @@ class ProductAttribute:ContextModel("product_attribute","public") {
         )
     }
 
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "属性名称已经存在",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldNotNullOrEmpty(this.name,advice = "属性名称不能为空！")
+        )
+    }
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldNotNullOrEmpty(this.name,advice = "属性名称不能为空！")

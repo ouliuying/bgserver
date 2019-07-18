@@ -45,6 +45,7 @@ import work.bg.server.core.mq.join.innerJoin
 import work.bg.server.core.mq.specialized.ConstGetRecordRefField
 import work.bg.server.core.mq.specialized.ConstRelRegistriesField
 import work.bg.server.core.mq.specialized.ConstSetRecordRefField
+import java.math.BigInteger
 import kotlin.streams.toList
 
 
@@ -1052,7 +1053,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             is ProxyRelationModelField<*> -> null
             else -> when(value){
                 is ModelDataObject->{
-                        null
+                    value.idFieldValue?.let {
+                        it.value?.let {
+                            val lz:Long=0
+                            return if((it as BigInteger).toLong()!=lz) FieldValue(field,it) else null
+                        }
+                    }
+                    return null
                 }
                 is FieldDefaultValueBillboard->{
                    null
@@ -1602,6 +1609,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
         } catch (ex: Exception) {
+            ex.printStackTrace()
             logger.error(ex.message)
         }
         try {
@@ -1857,6 +1865,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
             Pair(ret,null)
         } catch (ex:Exception){
+            ex.printStackTrace()
             Pair(null,ex.message)
         }
     }

@@ -91,6 +91,12 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
         )
     }
 
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,this.partnerRole,advice = "角色的应用必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
     @Action("loadAppContainer")
     fun loadAppContainer(@RequestBody appData :JsonObject,
                          partnerCache:PartnerCache):ActionResult?{

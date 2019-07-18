@@ -114,6 +114,18 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
         )
     }
 
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "名称必须设置"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
+
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType=ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType=ModelFieldUnique.IsolationType.IN_CORP)

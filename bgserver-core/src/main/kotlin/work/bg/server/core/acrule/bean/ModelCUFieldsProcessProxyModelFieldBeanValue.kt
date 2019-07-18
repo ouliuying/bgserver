@@ -36,7 +36,8 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
     }
 
     private fun invokeFieldArray(fieldValueArray:FieldValueArray,partnerCache: PartnerCache, data: Any?){
-        fieldValueArray.forEach {
+        var cloneArr = arrayListOf(*fieldValueArray.toTypedArray())
+        cloneArr.forEach {
             when {
                 it.field is FunctionField<*> -> it.field.inverse(fieldValueArray,partnerCache,null,data)
                 it.value is ModelDataObject -> this.invoke(it.value,partnerCache,null)

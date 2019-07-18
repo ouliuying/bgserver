@@ -58,20 +58,32 @@
                     <action>
                         <group name="opAction" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText"/>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="event" type="many2OneDataSetSelect"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="fax" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="email" type="singleLineText"/>
-            <field name="website" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
-            <field name="comment" type="singleLineText"/>
+            <field name="id" type="static"/>
+            <field name="name" type="static" style="head"/>
+            <field name="isCorp" type="enumStatic" style="head">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"个人",
+                     "1":"公司"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="event" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="fax" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="email" type="static"/>
+            <field name="website" type="static"/>
+            <field name="sex" type="static"/>
+            <field name="birthday" type="static"/>
+            <field name="comment" type="static"/>
         </view>
         <view type="create">
             <ref>
@@ -215,13 +227,13 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText"/>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="budgetCost" type="singleLineText" style="head"/>
-            <field name="actualCost" type="many2OneDataSetSelect"/>
-            <field name="startTime" type="date"/>
-            <field name="endTime" type="date"/>
-            <field name="comment" type="multiLineText"/>
+            <field name="id" type="static"/>
+            <field name="name" type="static" style="head"/>
+            <field name="budgetCost" type="static" style="head"/>
+            <field name="actualCost" type="static"/>
+            <field name="startTime" type="static"/>
+            <field name="endTime" type="static"/>
+            <field name="comment" type="static"/>
         </view>
 
         <view type="edit">
@@ -303,15 +315,15 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="corpName" type="singleLineText"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="fax" type="singleLineText"/>
-            <field name="commPartner.name" type="singleLineText"/>
-            <field name="event.name" type="singleLineText"/>
-            <field name="interactionStatus.name" type="singleLineText"/>
+            <field name="id" type="static" style="head"/>
+            <field name="name" type="static" style="head"/>
+            <field name="corpName" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="fax" type="static"/>
+            <field name="commPartner.name" type="static"/>
+            <field name="event.name" type="static"/>
+            <field name="interactionStatus.name" type="static"/>
         </view>
         <view type="edit">
             <ref>
@@ -329,7 +341,7 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="event" style="many2OneDataSetSelect"/>
+            <field name="event.name" type="many2OneDataSetSelect"/>
             <field name="corpName" type="singleLineText"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
@@ -379,32 +391,61 @@
             </ref>
             <field name="name" type="static" style="head"/>
             <field name="interactionStatus.name" type="static" style="head"/>
-            <field name="event" style="static"/>
+            <field name="event.name" type="static"/>
             <field name="corpName" type="static"/>
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="fax" type="static"/>
             <field name="fullAddress" type="static"/>
-
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
             <field name="communications" style="relation"/>
         </view>
     </model>
-    <model name="customerStatus" app="crm">
+    <model name="leadInteractionStatus" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="name" type="singleLineText" style="head"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub|main|singleSelection"/>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="id" type="static"/>
+            <field name="name" type="static"/>
         </view>
         <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="leads" style="relation"/>
         </view>
         <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="leads" style="relation"/>
         </view>
         <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+
             <field name="name" type="singleLineText" style="head"/>
             <field name="leads" style="relation"/>
         </view>
@@ -480,9 +521,10 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="real" style="head"/>
+            <field name="id" type="static"/>
+            <field name="title" type="static"/>
+            <field name="customer.name" type="static"/>
+            <field name="price" type="static"/>
         </view>
         <view type="edit">
             <ref>
@@ -845,18 +887,29 @@
     </model>
     <model name="crmPartnerEventRel" app="crm">
         <view type="list">
-
             <ref>
                 <actions>
                     <action>
                         <group name="main" refType="sub"/>
                     </action>
+                    <action>
+                        <group name="opAction" refType="sub"/>
+                    </action>
                 </actions>
             </ref>
 
-            <field name="id" type="singleLineText"/>
-            <field name="partner.name" type="singleLineText"/>
-            <field name="mainFlag" type="singleLineText"/>
+            <field name="id" type="static"/>
+            <field name="partner.name" type="static"/>
+            <field name="mainFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                       {
+                         "0":"否",
+                         "1":"是"
+                       }
+                    ]]>
+                </meta>
+            </field>
 
         </view>
         <view type="edit">
@@ -867,8 +920,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="magFlag" type="singleCheckbox"/>
+            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="mainFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
             <ref>
@@ -879,10 +932,35 @@
                 </actions>
             </ref>
             <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="magFlag" type="singleCheckbox"/>
+            <field name="mainFlag" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                       {
+                         "label":"主要负责人"
+                       }
+                    ]]>
+                </meta>
+            </field>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="static" style="head"/>
+            <field name="mainFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                    "0":"否",
+                    "1":"是"
+                    }
+                    ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="crmPartnerLeadRel" app="crm">

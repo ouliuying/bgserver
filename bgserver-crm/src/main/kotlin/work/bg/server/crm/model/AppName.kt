@@ -24,7 +24,7 @@ class AppName : AppNamePackage {
     override  fun get(): AppPackageManifest {
         return AppPackageManifest("crm",
                 "客户",
-                "/svg/my-worktable.svg",
+                "/svg/crm-app.svg",
                 "客户管理",
                 1)
     }

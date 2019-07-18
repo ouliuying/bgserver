@@ -29,19 +29,19 @@ class AccountCustomerOrderInvoice:CustomerOrderInvoice() {
             defaultValue = -1)
 
     val payable = ModelOne2OneField(null,
-            "orderInvoice",
+            "payable",
             FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_payable",
-            targetModelFieldName = "orderInvoice",
+            targetModelFieldName = "order_invoice_id",
             isVirtualField = true)
 
     val receivable = ModelOne2OneField(null,
-            "orderInvoice",
+            "receivable",
             FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_receivable",
-            targetModelFieldName = "orderInvoice",
+            targetModelFieldName = "order_invoice_id",
             isVirtualField = true)
 
     override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {

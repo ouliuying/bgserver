@@ -18,11 +18,15 @@
 package work.bg.server.crm.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldRequired
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
-@Model(name="customerStatus",title = "线索状态")
+@Model(name="leadInteractionStatus",title = "线索状态")
 class LeadInteractionStatus:ContextModel("crm_lead_interaction_status","public") {
     companion object : RefSingleton<LeadInteractionStatus> {
         override lateinit var ref: LeadInteractionStatus
@@ -41,8 +45,34 @@ class LeadInteractionStatus:ContextModel("crm_lead_interaction_status","public")
             defaultValue = "")
 
     val leads=ModelOne2ManyField(null,
-            "leads",FieldType.INT,
+            "leads",FieldType.BIGINT,
             "线索",
             targetModelTable = "public.crm_lead",
             targetModelFieldName = "interaction_status_id")
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "必须输入名称"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "必须输入名称"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
+
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
 }

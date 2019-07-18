@@ -19,38 +19,52 @@
   -->
 
 <ui>
-    <menu name="main" app="crm" title="产品管理">
-        <menuItem title="活动" model="event" viewType="list">
+    <menu name="main" app="crm" title="客户" icon="/svg/crm-app.svg">
+        <menu name="event" app="crm" title="活动管理" icon="/svg/crm-app-event.svg">
+            <menuItem title="推广活动" model="event" viewType="list">
 
-        </menuItem>
-        <menuItem title="创建活动" model="event" viewType="create">
+            </menuItem>
+            <menuItem title="创建活动" model="event" viewType="create">
 
-        </menuItem>
-        <menuItem title="线索" model="lead" viewType="list">
+            </menuItem>
+        </menu>
+        <menu name="lead" app="crm" title="线索管理" icon="/svg/crm-app-lead.svg">
+            <menuItem title="线索列表" model="lead" viewType="list">
 
-        </menuItem>
-        <menuItem title="创建线索" model="lead" viewType="create">
+            </menuItem>
+            <menuItem title="创建线索" model="lead" viewType="create">
 
-        </menuItem>
-        <menuItem title="客户" model="customer" viewType="list">
+            </menuItem>
+        </menu>
+        <menu name="customer" app="crm" title="商机管理" icon="/svg/crm-app-oppo.svg">
+            <menuItem title="商机列表" model="customerOpportunity" viewType="list">
+            </menuItem>
+            <menuItem title="创建商机" model="customerOpportunity" viewType="create">
+            </menuItem>
+        </menu>
+        <menu name="customer" app="crm" title="客户管理" icon="/svg/crm-app-customer.svg">
+            <menuItem title="客户列表" model="customer" viewType="list">
+            </menuItem>
+            <menuItem title="添加客户" model="customer" viewType="create">
+            </menuItem>
+        </menu>
+        <menu name="customerOpportunityOrderQuotation" app="crm" title="报价管理" icon="/svg/crm-app-quot.svg">
+            <menuItem title="报价单" model="customerOpportunityOrderQuotation" viewType="list">
 
-        </menuItem>
-        <menuItem title="商机" model="customerOpportunity" viewType="list">
+            </menuItem>
+            <menuItem title="报价单模板" model="customerOpportunityOrderQuotationTemplate" viewType="list">
 
-        </menuItem>
-        <menuItem title="报价单" model="customerOpportunityOrderQuotation" viewType="list">
+            </menuItem>
+        </menu>
+        <menu name="customerOrder" app="crm" title="订单发票" icon="/svg/crm-app-order.svg">
+            <menuItem title="订单" model="customerOrder" viewType="list">
 
-        </menuItem>
-        <menuItem title="报价单模板" model="customerOpportunityOrderQuotationTemplate" viewType="list">
+            </menuItem>
+            <menuItem title="发票" model="customerOrderInvoice" viewType="list">
 
-        </menuItem>
-        <menuItem title="订单" model="customerOrder" viewType="list">
-
-        </menuItem>
-        <menuItem title="发票" model="customerOrderInvoice" viewType="list">
-
-        </menuItem>
-        <menuItem title="产品" model="product" app="product" viewType="list">
+            </menuItem>
+        </menu>
+        <menuItem title="产品列表" model="product" app="product" viewType="list" icon="/svg/product-app-mag.svg">
 
         </menuItem>
     </menu>

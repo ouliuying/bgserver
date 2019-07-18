@@ -143,7 +143,7 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             BaseCorpPartnerRel.ref.isDefaultCorp,
             "set_current_corp_as_default",
             BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
-            "设定当前公司为默认")}
+            "当前公司为默认")}
 
 
     constructor():this("base_partner","public")
@@ -162,7 +162,26 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
         )
     }
 
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.userName,this.password,advice = "用户名或密码必须输入的信息！"),
+                ModelFieldRequired(this.email,advice = "用户邮箱必须输入的信息！"),
+                ModelFieldRequired(this.mobile,advice = "用户手机必须输入的信息！"),
+                ModelFieldNotNullOrEmpty(this.userName,this.password,advice = "用户名或密码不能为空！"),
+                ModelFieldRequired(this.email,advice = "用户邮箱不能我为空！"),
+                ModelFieldRequired(this.mobile,advice = "用户手机不能我为空！")
+        )
+    }
+
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.userName,advice = "用户名必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
+                ModelFieldUnique(this.mobile,advice = "用户手机号必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
+                ModelFieldUnique(this.email,advice = "用户邮箱必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL)
+        )
+    }
+
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldUnique(this.userName,advice = "用户名必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),
                 ModelFieldUnique(this.mobile,advice = "用户手机号必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL),

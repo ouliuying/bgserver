@@ -55,7 +55,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar=ActionResult()
         if(modelData!=null){
             var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
-            if(ret.first!=null){
+            if(ret?.first!=null && ret?.first!! > 0){
                 ar.bag["result"]=ret.first!!
                 return ar
             }

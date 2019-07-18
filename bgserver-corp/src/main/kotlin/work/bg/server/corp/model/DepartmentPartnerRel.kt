@@ -60,7 +60,14 @@ class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schem
         return arrayOf(ModelFieldUnique(partner,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
     }
 
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldUnique(partner,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
+    }
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldNotNullOrEmpty(department,advice = "部门必须选择"))
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(ModelFieldNotNullOrEmpty(department,advice = "部门必须选择"))
     }
 }

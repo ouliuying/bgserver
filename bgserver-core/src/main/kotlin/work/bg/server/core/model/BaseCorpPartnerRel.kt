@@ -87,6 +87,16 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
                 isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL))
     }
 
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldUnique(corp,partner,advice = "用戶角色必須唯一",
+                isolationType = ModelFieldUnique.IsolationType.IN_GLOBAL))
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(ModelFieldRequired(this.corp,this.partner,this.partnerRole,advice = "缺少必要的字段"),
+                ModelFieldMustCoexist(partnerRole,isDefaultCorp,advice = "必須选择用户角色"))
+    }
+
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(ModelFieldRequired(this.corp,this.partner,this.partnerRole,advice = "缺少必要的字段"),
                 ModelFieldMustCoexist(partnerRole,isDefaultCorp,advice = "必須选择用户角色"))
