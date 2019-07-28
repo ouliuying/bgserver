@@ -21,6 +21,7 @@
 
 package work.bg.server.core.model
 
+import com.google.gson.Gson
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -92,7 +93,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected lateinit var readCorpIsolation:ModelReadCorpIsolationBean
     @Autowired
     protected lateinit var readPartnerIsolation:ModelReadPartnerIsolationBean
-
+    @Autowired
+    lateinit var gson: Gson
     /*Corp Isolation Fields Begin*/
     val createTime=ModelField(null,"create_time",FieldType.DATETIME,"添加时间",defaultValue = TimestampBillboard(constant = true))
     val lastModifyTime=ModelField(null,"last_modify_time",FieldType.DATETIME,"最近修改时间",defaultValue = TimestampBillboard())
@@ -1534,6 +1536,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(!ret.first){
                 return Pair(null,"添加失败")
             }
+            this.addCreateModelLog(modelDataObject,useAccessControl,partnerCache)
             return Pair(nID,null)
         } catch (ex:Exception){
             return Pair(null,ex.message)
@@ -1545,8 +1548,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //
 //        return Pair(true,null)
 //    }
-    protected  open fun afterCreateObject(modelDataObject:ModelDataObject,useAccessControl:Boolean,pc:PartnerCache?):Pair<Boolean,String?>{
+    protected  open fun afterCreateObject(modelDataObject:ModelDataObject,
+                                          useAccessControl:Boolean,
+                                          pc:PartnerCache?):Pair<Boolean,String?>{
         return Pair(true,"")
+    }
+    protected open fun addCreateModelLog(modelDataObject:ModelDataObject,
+                                      useAccessControl:Boolean,
+                                      pc:PartnerCache?){
+
     }
     protected  open fun beforeEditCheck(modelDataObject:ModelDataObject,
                                      useAccessControl: Boolean,
@@ -1601,8 +1611,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         criteria=criteria,
                         useAccessControl=useAccessControl,
                         partnerCache = partnerCache)
-                txManager?.commit(status)
-                return  ret
+                val tRet:Long=0
+                if(ret.first!=null && ret.first!!>tRet){
+                    txManager?.commit(status)
+                    return ret
+                }
+                else{
+                    txManager?.rollback(status)
+                }
+                return  Pair(0,ret.second)
             }
             else{
 
@@ -1840,7 +1857,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                         mfvc.data.add(FieldValue(tField,mIDFV.value))
                                                         var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                         if(ret==null || ret.second!=null){
-                                                            return Pair(null,"创建失败")
+                                                            return Pair(null,ret?.second)
                                                         }
                                                     }
                                                     else if(mfvc.idFieldValue!=null){
@@ -1863,13 +1880,29 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
             }
+            var afterRet=this.afterEditObject(modelDataObject,useAccessControl,partnerCache)
+            if(!afterRet.first){
+                return Pair(0,afterRet.second)
+            }
+            this.addEditModelLog(modelDataObject,useAccessControl,partnerCache)
             Pair(ret,null)
         } catch (ex:Exception){
             ex.printStackTrace()
             Pair(null,ex.message)
         }
     }
+    protected  open fun afterEditObject(modelDataObject:ModelDataObject,
+                                          useAccessControl:Boolean,
+                                          pc:PartnerCache?):Pair<Boolean,String?>{
+        return Pair(true,"")
+    }
 
+
+    protected open fun addEditModelLog(modelDataObject:ModelDataObject,
+                                      useAccessControl:Boolean,
+                                      pc:PartnerCache?){
+
+    }
     protected  open fun beforeDeleteCheck(modelData: ModelDataObject,
                                        criteria:ModelExpression?,
                                        useAccessControl: Boolean,
@@ -1954,7 +1987,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(0,"更新失败")
     }
 
-
+    open fun rawDelete(criteria:ModelExpression?,
+                       useAccessControl: Boolean=false,
+                       partnerCache:PartnerCache?=null):Pair<Long?,String?>{
+        return this.rawDelete(ModelDataObject(model=this),criteria,useAccessControl,partnerCache)
+    }
     open fun rawDelete(modelDataObject: ModelDataObject,
                        criteria:ModelExpression?,
                        useAccessControl: Boolean=false,

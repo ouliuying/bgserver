@@ -42,7 +42,32 @@
     </inherit>
     <model name="accountPayable" app="account">
         <view type="list">
+            <field name="id" type="static"/>
+            <field name="orderInvoice.status" type="enumStatic" title="状态">
+                <meta>
+                    <![CDATA[
+                    {
+                        "-1":"正在处理",
+                        "0":"取消",
+                        "1":"成功"
+                    }
+                ]]>
+                </meta>
 
+            </field>
+            <field name="orderInvoice.typ" type="enumStatic" title="类型">
+                <meta>
+                    <![CDATA[
+                    {
+                        "0":"普通发票",
+                        "1":"增值税发票",
+                        "2":"收据"
+                    }
+                ]]>
+                </meta>
+            </field>
+            <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
+            <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
         </view>
         <view type="create">
 
@@ -57,7 +82,32 @@
 
     <model name="accountReceivable" app="account">
         <view type="list">
+            <field name="id" type="static"/>
+            <field name="orderInvoice.status" type="enumStatic" title="状态">
+                <meta>
+                    <![CDATA[
+                    {
+                        "-1":"正在处理",
+                        "0":"取消",
+                        "1":"成功"
+                    }
+                ]]>
+                </meta>
 
+            </field>
+            <field name="orderInvoice.typ" type="enumStatic" title="类型">
+                <meta>
+                    <![CDATA[
+                    {
+                        "0":"普通发票",
+                        "1":"增值税发票",
+                        "2":"收据"
+                    }
+                ]]>
+                </meta>
+            </field>
+            <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
+            <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
         </view>
         <view type="create">
 

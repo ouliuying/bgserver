@@ -92,7 +92,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         return typeEditRules
     }
     private  fun parseAcRule(){
-        if(this.acRule!=null){
+        if(!this.acRule.isNullOrEmpty() && !this.acRule.isNullOrBlank()){
             try {
 
                 var doc= DocumentHelper.parseText(this.acRule)
@@ -112,6 +112,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 }
             }
             catch (ex:Exception){
+                ex.printStackTrace()
                 logger.error(ex.toString())
             }
         }

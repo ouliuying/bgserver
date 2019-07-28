@@ -1,0 +1,75 @@
+work.bg.server.core.model.BaseApp, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.core.model.BasePartnerAppShortcut, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.core.model.BaseModelLog, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.corp.model.DepartmentCorp, work.bg.server.core.model.BaseCorp, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.SmsPartner, work.bg.server.crm.model.CrmPartner, work.bg.server.corp.model.DepartmentPartner, work.bg.server.core.model.BasePartner, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.core.model.BasePartnerRole, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.core.model.BaseCorpPartnerRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.product.model.ProductAttributeValueMap, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.product.model.ProductSKUPattern, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CrmProduct, work.bg.server.product.model.Product, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.product.model.ProductUOM, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.product.model.ProductAttributeValue, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.product.model.ProductAttribute, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.worktable.model.Worktable, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.corp.model.DepartmentPartnerRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.corp.model.Department, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.SmsSendJobLog, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.SmsTimerQueue, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.Sms, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.SmsSetting, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.sms.model.SmsSendHistory, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.account.model.AccountReceivable, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.account.model.AccountCustomerOrderInvoice, work.bg.server.crm.model.CustomerOrderInvoice, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.account.model.AccountPayable, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CustomerContactAddress, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CustomerOpportunityOrderQuotation, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CrmPartnerLeadRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.LeadCustomerCommunicationHistory, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.LeadInteractionStatus, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CustomerOrder, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CrmPartnerEventRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CustomerOpportunityOrderQuotationTemplate, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CrmCustomerOpportunityOrderProductRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CrmPartnerCustomerRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.CustomerOpportunity, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.Lead, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.Event, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.crm.model.Customer, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase

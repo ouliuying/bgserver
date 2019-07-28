@@ -9,9 +9,9 @@ import work.bg.server.core.mq.ModelMany2OneField
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model(name="productAttributeValue")
-class ProductAtributeValue:ContextModel("product_attribute_value","public") {
-    companion object : RefSingleton<ProductAtributeValue> {
-        override lateinit var ref: ProductAtributeValue
+class ProductAttributeValue:ContextModel("product_attribute_value","public") {
+    companion object : RefSingleton<ProductAttributeValue> {
+        override lateinit var ref: ProductAttributeValue
     }
     val id= ModelField(null,
             "id",

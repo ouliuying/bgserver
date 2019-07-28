@@ -37,6 +37,8 @@ import work.bg.server.core.mq.ModelData
 import work.bg.server.core.mq.ModelDataArray
 import work.bg.server.core.mq.ModelDataObject
 import work.bg.server.core.ui.UICache
+import work.bg.server.sms.SmsSender
+import work.bg.server.sms.job.SmsJob
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -53,7 +55,8 @@ class HttpRequestTest {
 
     @Autowired
     private  val gson:Gson?=null
-
+    @Autowired
+    lateinit var sender: SmsSender
     @Test
     fun greetingShouldReturnDefaultMessage() {
         assertThat(this.restTemplate!!.getForObject<String>("http://localhost:$port/",
@@ -174,5 +177,18 @@ class HttpRequestTest {
         }
         print(obj)
     }
+
+    @Test
+    fun testSender(){
+        this.sender.send(arrayListOf("18621991588"),"xxx",false,false,null)
+    }
+
+    @Test
+    fun testAutowireObject(){
+        var j= SmsJob()
+        j.execute(null)
+    }
+
+
     
 }

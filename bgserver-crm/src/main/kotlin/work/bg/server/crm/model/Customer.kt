@@ -18,6 +18,9 @@
 package work.bg.server.crm.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
+import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
@@ -36,7 +39,7 @@ class Customer: ContextModel("crm_customer","public") {
 
     val name = ModelField(null,"name",FieldType.STRING,title = "姓名",defaultValue = "")
 
-    val isCorp = ModelField(null,"is_corp",FieldType.INT,title = "公司",defaultValue = 0)
+    val isCorp = ModelField(null,"is_corp",FieldType.INT,title = "公司",defaultValue = -1)
 
     val event = ModelMany2OneField(null,
             "event_id",FieldType.BIGINT,
@@ -100,4 +103,19 @@ class Customer: ContextModel("crm_customer","public") {
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "customer_id")
+
+
+    override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldRequired(this.name,advice = "名称必填"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
+
+    override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
+        return  arrayOf(
+                ModelFieldRequired(this.name,advice = "名称必填"),
+                ModelFieldNotNullOrEmpty(this.name,advice = "名称不能为空")
+        )
+    }
 }

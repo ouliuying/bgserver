@@ -28,8 +28,12 @@ import work.bg.server.core.config.AppPackageManifest
 import work.bg.server.core.constant.ModelReservedKey
 import work.bg.server.core.mq.*
 import work.bg.server.core.model.billboard.FieldDefaultValueBillboard
+import java.io.File
+import java.io.FileWriter
 import java.lang.StringBuilder
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -144,10 +148,14 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
         this.buildDatabase()
     }
     private fun registerSingleton(){
+
+        val data = ArrayList<Array<String>>()
         this.modelMetaDatas?.forEach{ it ->
             var bean=this.appContext?.getBean((it.beanDefinitionHolder.beanDefinition as GenericBeanDefinition).beanClass) as ModelBase?
             var currCls=bean!!::class as? KClass<*>
+            var depLines = arrayListOf<String>()
             while(currCls!=null){
+                depLines.add(currCls.qualifiedName?:"")
                 var mfs=currCls.companionObjectInstance as? RefSingleton<Any>
                 mfs?.ref=bean
                 currCls=currCls.superclasses.firstOrNull {sit->
@@ -155,9 +163,34 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
                 }
             }
             if(bean!=null){
+                data.add(depLines.toTypedArray())
                 logger.info("load model ${bean.javaClass.canonicalName} at ${Date()}")
             }
         }
+        val txt = data.joinToString("\r\n============\r\n"){
+            it.joinToString()
+        }
+        var  outputFile:FileWriter?=null
+        try {
+
+            val filePath = "hierarchy/model.txt"
+            val path = Paths.get("hierarchy")
+            if(Files.notExists(path)){
+                Files.createDirectory(path)
+            }
+            val file = File(filePath)
+            // create FileWriter object with file as parameter
+            outputFile = FileWriter(file)
+        }
+        catch (ex:java.lang.Exception){
+
+        }
+        finally {
+            outputFile?.write(txt)
+            outputFile?.flush()
+            outputFile?.close()
+        }
+
     }
     private fun buildDatabase(){
         this.tableModelMap= mutableMapOf()

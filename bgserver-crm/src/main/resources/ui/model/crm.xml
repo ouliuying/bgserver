@@ -69,19 +69,29 @@
                 <meta>
                     <![CDATA[
                     {
-                     "0":"个人",
-                     "1":"公司"
+                     "0":"否",
+                     "1":"是"
                     }
                   ]]>
                 </meta>
             </field>
-            <field name="event" type="static"/>
+            <field name="event.name" type="static"/>
             <field name="mobile" type="static"/>
             <field name="fax" type="static"/>
             <field name="telephone" type="static"/>
             <field name="email" type="static"/>
             <field name="website" type="static"/>
-            <field name="sex" type="static"/>
+            <field name="sex" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                        {
+                        "-1":"未知",
+                        "1":"男",
+                        "0":"女"
+                        }
+                    ]]>
+                </meta>
+            </field>
             <field name="birthday" type="static"/>
             <field name="comment" type="static"/>
         </view>
@@ -118,7 +128,19 @@
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
+            <field name="sex"  type="select" visible="isCorp!=1">
+                <meta>
+                    <![CDATA[
+                        {
+                            "options":[
+                            {"value":-1,"text":"未知"},
+                            {"value":0,"text":"女"},
+                            {"value":1,"text":"男"}
+                            ]
+                        }
+                    ]]>
+                </meta>
+            </field>
             <field name="website" type="singleLineText"/>
             <field name="birthday" type="date" visible="isCorp!=1"/>
             <field name="fullAddress" type="chinaFullAddress"/>
@@ -152,13 +174,25 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="event" type="many2OneDataSetSelect"/>
+            <field name="event.name" type="many2OneDataSetSelect"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex"  type="singleCheckbox" visible="isCorp!=1"/>
+            <field name="sex"  type="select" visible="isCorp!=1">
+                <meta>
+                    <![CDATA[
+                        {
+                            "options":[
+                            {"value":-1,"text":"未知"},
+                            {"value":0,"text":"女"},
+                            {"value":1,"text":"男"}
+                            ]
+                        }
+                    ]]>
+                </meta>
+            </field>
             <field name="website" type="singleLineText"/>
             <field name="birthday" type="date" visible="isCorp!=1"/>
             <field name="fullAddress" type="chinaFullAddress"/>
@@ -196,14 +230,33 @@
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
-            <field name="isCorp" type="static" style="head"/>
-            <field name="event" type="static"/>
+            <field name="isCorp" type="enumStatic" style="head">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="event.name" type="static"/>
             <field name="mobile" type="static"/>
             <field name="fax" type="static"/>
             <field name="telephone" type="static"/>
             <field name="email" type="static"/>
             <field name="department" type="static"/>
-            <field name="sex"  type="static" visible="isCorp!=1"/>
+            <field name="sex"  type="enumStatic" visible="isCorp!=1">
+                <meta>
+                    <![CDATA[
+                        {
+                        "-1":"未知",
+                        "1":"男",
+                        "0":"女"
+                        }
+                    ]]>
+                </meta>
+            </field>
             <field name="website" type="static"/>
             <field name="birthday" type="static" visible="isCorp!=1"/>
             <field name="fullAddress" type="static"/>
@@ -347,7 +400,6 @@
             <field name="telephone" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="fullAddress" type="chinaFullAddress"/>
-
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
             <field name="communications" style="relation"/>
@@ -468,44 +520,115 @@
     </model>
     <model name="customerContactAddress" app="crm">
         <view type="list">
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="email" type="singleLineText"/>
-            <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
-            <field name="comment" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="id" type="static" style="head"/>
+            <field name="name" type="static" style="head"/>
+            <field name="mobile" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="email" type="static"/>
+            <field name="department" type="static"/>
+            <field name="sex" type="enumStatic">
+                <meta>
+                    {
+                    "-1":"未知",
+                    "0":"女",
+                    "1":"男"
+                    }
+                </meta>
+            </field>
+            <field name="birthday" type="date"/>
+            <field name="comment" type="static"/>
         </view>
         <div type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <field name="sex" type="select">
+                <meta>
+                    <![CDATA[
+                        {
+                            "options":[
+                            {"value":-1,"text":"未知"},
+                            {"value":0,"text":"女"},
+                            {"value":1,"text":"男"}
+                            ]
+                        }
+                    ]]>
+                </meta>
+            </field>
+            <field name="birthday" type="date"/>
             <field name="comment" type="singleLineText"/>
         </div>
         <div type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <field name="sex" type="select">
+                <meta>
+                    <![CDATA[
+                        {
+                            "options":[
+                            {"value":-1,"text":"未知"},
+                            {"value":0,"text":"女"},
+                            {"value":1,"text":"男"}
+                            ]
+                        }
+                    ]]>
+                </meta>
+            </field>
+            <field name="birthday" type="date"/>
             <field name="comment" type="singleLineText"/>
         </div>
         <div type="detail">
-            <field name="name" type="singleLineText" style="head"/>
-            <field name="mobile" type="singleLineText"/>
-            <field name="telephone" type="singleLineText"/>
-            <field name="email" type="singleLineText"/>
-            <field name="department" type="singleLineText"/>
-            <field name="sex" type="singleLineText"/>
-            <field name="birthday" type="singleLineText"/>
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="static" style="head"/>
+            <field name="mobile" type="static"/>
+            <field name="telephone" type="static"/>
+            <field name="email" type="static"/>
+            <field name="department" type="static"/>
+            <field name="sex" type="enumStatic">
+                <meta>
+                    {
+                    "-1":"未知",
+                    "0":"女",
+                    "1":"男"
+                    }
+                </meta>
+            </field>
+            <field name="birthday" type="date"/>
             <field name="comment" type="singleLineText"/>
         </div>
     </model>
@@ -534,7 +657,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="list" model="crmCustomerOpportunityOrderProductRel" refType="main|sub"/>
+                    <view type="list" ownerField="products" model="crmCustomerOpportunityOrderProductRel" refType="sub"/>
                 </views>
             </ref>
             <field name="title" type="singleLineText" style="head"/>
@@ -604,10 +727,10 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="opportunity.title" type="singleLineText"/>
-            <field name="order.title" type="singleLineText"/>
-            <field name="tpl.name" type="singleLineText"/>
+            <field name="id" type="static" style="head"/>
+            <field name="opportunity.title" type="static"/>
+            <field name="order.title" type="static"/>
+            <field name="tpl.name" type="static"/>
         </view>
         <view type="edit">
             <ref>
@@ -643,13 +766,17 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="detail" ownerField="tpl" model="customerOpportunityOrderQuotationTemplate"/>
+                    <view type="detail" ownerField="tpl" model="customerOpportunityOrderQuotationTemplate" refType="none"/>
+                    <view type="detail" ownerField="order" model="customerOrder" refType="none"/>
+                    <view type="detail" ownerField="opportunity" model="customerOpportunity" refType="none"/>
                 </views>
             </ref>
-            <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
-            <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
-            <field name="comment" type="multiLineText"/>
+<!--            <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>-->
+
+            <field name="comment" type="static"/>
             <field name="tpl" style="relation"/>
+            <field name="order"  style="relation"/>
+            <field name="opportunity" style="relation"/>
         </view>
     </model>
     <model name="customerOrder" app="crm">
@@ -664,11 +791,11 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="title" type="singleLineText" style="head"/>
-            <field name="price" type="singleLineText"/>
-            <field name="customer.name" type="singleLineText"/>
-            <field name="opportunity.title" type="singleLineText"/>
+            <field name="id" type="static" style="head"/>
+            <field name="title" type="static" style="head"/>
+            <field name="price" type="static"/>
+            <field name="customer.name" type="static"/>
+            <field name="opportunity.title" type="static"/>
         </view>
         <view type="edit">
             <ref>
@@ -763,10 +890,10 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText" style="head"/>
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
+            <field name="id" type="static" style="head"/>
+            <field name="fromCorpName" type="static"/>
+            <field name="toCorpName" type="static"/>
+            <field name="amount" type="static"/>
         </view>
         <view type="edit">
             <ref>
@@ -838,7 +965,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
@@ -857,32 +984,67 @@
             <field name="count" type="static"/>
         </view>
     </model>
-    <model name="crmCustomerOrderProductRel" app="crm">
-        <view type="list">
-
-        </view>
-        <view type="edit">
-
-        </view>
-        <view type="create">
-
-        </view>
-        <view type="detail">
-
-        </view>
-    </model>
     <model name="crmPartnerCustomerRel" app="crm">
         <view type="list">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="static" style="head"/>
+            <field name="ownFlag" type="enumStatic">
+                <meta>
+                    {
+                    "1":"所有",
+                    "0":"辅助"
+                    }
+                </meta>
+            </field>
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="ownFlag" type="singleCheckbox"></field>
         </view>
         <view type="create">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="ownFlag" type="singleCheckbox"></field>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"></group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="static" style="head"/>
+            <field name="ownFlag" type="enumStatic">
+                <meta>
+                    {
+                    "1":"所有",
+                    "0":"辅助"
+                    }
+                </meta>
+            </field>
         </view>
     </model>
     <model name="crmPartnerEventRel" app="crm">
@@ -965,16 +1127,79 @@
     </model>
     <model name="crmPartnerLeadRel" app="crm">
         <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
 
+            <field name="id" type="static"/>
+            <field name="partner.name" type="static"/>
+            <field name="mainFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                       {
+                         "0":"否",
+                         "1":"是"
+                       }
+                    ]]>
+                </meta>
+            </field>
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="mainFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="mainFlag" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                       {
+                         "label":"主要负责人"
+                       }
+                    ]]>
+                </meta>
+            </field>
         </view>
         <view type="detail">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" type="static" style="head"/>
+            <field name="mainFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                    "0":"否",
+                    "1":"是"
+                    }
+                    ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="customerOpportunityOrderQuotationTemplate" app="crm">
@@ -989,9 +1214,9 @@
                     </action>
                 </actions>
             </ref>
-            <field name="id" type="singleLineText"/>
-            <field name="name" type="singleLineText"/>
-            <field name="comment" type="singleLineText"/>
+            <field name="id" type="static"/>
+            <field name="name" type="static"/>
+            <field name="comment" type="static"/>
         </view>
         <view type="edit">
             <ref>

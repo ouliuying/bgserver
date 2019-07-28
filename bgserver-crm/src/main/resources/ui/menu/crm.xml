@@ -57,10 +57,10 @@
             </menuItem>
         </menu>
         <menu name="customerOrder" app="crm" title="订单发票" icon="/svg/crm-app-order.svg">
-            <menuItem title="订单" model="customerOrder" viewType="list">
+            <menuItem title="订单列表" model="customerOrder" viewType="list">
 
             </menuItem>
-            <menuItem title="发票" model="customerOrderInvoice" viewType="list">
+            <menuItem title="发票列表" model="customerOrderInvoice" viewType="list">
 
             </menuItem>
         </menu>

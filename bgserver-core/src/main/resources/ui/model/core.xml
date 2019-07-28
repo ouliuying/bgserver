@@ -456,4 +456,13 @@
             <field name="partnerRole.name" type="many2OneDataSetSelect" enable="false"/>
         </view>
     </model>
+    <model name="modelLog" app="core">
+        <view type="list">
+            <field name="app" type="static"/>
+            <field name="model" type="static"/>
+            <field name="modelID" type="static"/>
+            <field name="data" type="static"/>
+            <field name="partner" type="static"/>
+        </view>
+    </model>
 </ui>

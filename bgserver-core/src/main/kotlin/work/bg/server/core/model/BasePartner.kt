@@ -36,6 +36,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheKey
 import work.bg.server.core.model.billboard.PartnerTagBillboard
 import work.bg.server.core.mq.*
@@ -145,6 +146,13 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
             BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
             "当前公司为默认")}
 
+    val modelLogs = ModelOne2ManyField(null,
+            "model_logs",
+            FieldType.BIGINT,
+            "日志",
+            targetModelTable = "public.base_model_log",
+            targetModelFieldName = "partner_id")
+
 
     constructor():this("base_partner","public")
     init {
@@ -154,8 +162,6 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldRequired(this.userName,this.password,advice = "用户名或密码必须输入的信息！"),
-                ModelFieldRequired(this.email,advice = "用户邮箱必须输入的信息！"),
-                ModelFieldRequired(this.mobile,advice = "用户手机必须输入的信息！"),
                 ModelFieldNotNullOrEmpty(this.userName,this.password,advice = "用户名或密码不能为空！"),
                 ModelFieldRequired(this.email,advice = "用户邮箱不能我为空！"),
                 ModelFieldRequired(this.mobile,advice = "用户手机不能我为空！")
@@ -164,10 +170,7 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
 
     override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
-                ModelFieldRequired(this.userName,this.password,advice = "用户名或密码必须输入的信息！"),
-                ModelFieldRequired(this.email,advice = "用户邮箱必须输入的信息！"),
-                ModelFieldRequired(this.mobile,advice = "用户手机必须输入的信息！"),
-                ModelFieldNotNullOrEmpty(this.userName,this.password,advice = "用户名或密码不能为空！"),
+                ModelFieldRequired(this.userName,advice = "用户名或密码必须输入的信息！"),
                 ModelFieldRequired(this.email,advice = "用户邮箱不能我为空！"),
                 ModelFieldRequired(this.mobile,advice = "用户手机不能我为空！")
         )

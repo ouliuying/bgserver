@@ -18,15 +18,13 @@
  *
  */
 
-package work.bg.server.setting.model
+package work.bg.server.sms.bean
 
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.model.ContextModel
-import work.bg.server.core.spring.boot.annotation.Model
+import org.springframework.stereotype.Service
 
-@Model("settingSms")
-class Sms:ContextModel("setting_sms","public") {
-    companion object : RefSingleton<Sms> {
-        override lateinit var ref: Sms
+@Service
+class C8686SenderBean {
+    fun doSend(mobiles:Array<String>,message:String,userName:String,password:String):Triple<Int,String,Any?>{
+        return Triple(0,"成功",null)
     }
 }

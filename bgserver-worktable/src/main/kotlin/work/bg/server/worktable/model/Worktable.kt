@@ -22,11 +22,20 @@ package work.bg.server.worktable.model
 
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
+import work.bg.server.core.spring.boot.annotation.Action
 import work.bg.server.core.spring.boot.annotation.Model
+import work.bg.server.core.spring.boot.model.ActionResult
+import javax.servlet.http.HttpSession
 
 @Model("worktable")
 class Worktable:ContextModel("worktable","public") {
     companion object : RefSingleton<Worktable> {
         override lateinit var ref: Worktable
+    }
+    @Action("loadModelLog")
+    fun loadModelLog(session: HttpSession):Any?{
+        var ar=ActionResult()
+
+        return ar
     }
 }

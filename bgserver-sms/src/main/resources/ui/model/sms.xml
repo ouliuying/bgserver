@@ -1,0 +1,92 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <model name="smsSetting" app="sms">
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="userName" type="singleLineText" style="head"/>
+            <field name="password" type="password"/>
+        </view>
+    </model>
+    <model name="sms" app="sms">
+        <view type="sendSms">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="send"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="mobile" type="multiLineText"/>
+            <field name="message" type="multiLineText"/>
+        </view>
+        <view type="importSendSms">
+                <ref>
+                    <actions>
+                        <action>
+                            <group name="send"/>
+                        </action>
+                    </actions>
+                </ref>
+            <field name="mobileFile" type="file"/>
+            <field name="message" type="multiLineText"/>
+        </view>
+    </model>
+    <model name="smsSendHistory" app="sms">
+        <view type="list">
+            <ref>
+
+            </ref>
+            <field name="id"/>
+            <field name="sendPartner.userName" type="static"/>
+            <field name="mobile" type="static"/>
+            <field name="message" type="static"/>
+            <field name="smsCount" type="static"/>
+            <field name="sendType" type="static"/>
+            <field name="sendTime" type="static"/>
+            <field name="status" type="static"/>
+            <field name="statusDesc" type="static"/>
+            <field name="ip" type="static"/>
+        </view>
+
+    </model>
+    <model name="smsTimerQueue" app="sms">
+        <view type="list">
+            <ref>
+
+            </ref>
+            <field name="id"/>
+            <field name="sendPartner.userName" type="static"/>
+            <field name="mobiles" type="static"/>
+            <field name="message" type="static"/>
+            <field name="timerType" type="static"/>
+            <field name="timerValue" type="static"/>
+            <field name="addTime" type="static"/>
+            <field name="ip" type="static"/>
+        </view>
+    </model>
+</ui>

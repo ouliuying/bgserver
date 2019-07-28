@@ -1,10 +1,11 @@
 package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.mq.*
+import work.bg.server.core.spring.boot.annotation.Model
 
+@Model("modelLog")
 class BaseModelLog:ContextModel("base_model_log","public") {
     companion object: RefSingleton<BaseModelLog> {
         override lateinit var ref: BaseModelLog
@@ -24,14 +25,29 @@ class BaseModelLog:ContextModel("base_model_log","public") {
             "model",
             FieldType.STRING,
             "模型")
-
-    val action= ModelField(null,
-            "action",
-            FieldType.STRING,
-            "动作")
+    val modelID= ModelField(null,
+            "model_id",
+            FieldType.BIGINT,
+            "模型ID")
 
     val data= ModelField(null,
             "data",
             FieldType.STRING,
-            "操作")
+            "数据")
+
+    val partner = ModelMany2OneField(null,
+            "partner_id",
+            FieldType.BIGINT,
+            "操作人",
+            targetModelTable = "public.base_partner",
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

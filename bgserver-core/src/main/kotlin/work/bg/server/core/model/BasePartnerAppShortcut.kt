@@ -18,6 +18,7 @@
 package work.bg.server.core.model
 
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
@@ -55,10 +56,19 @@ class BasePartnerAppShortcut(tableName:String,schemaName:String):ContextModel(ta
         dataObjectArray?.data?.forEach {
             var mobj=it.getValue(BasePartnerAppShortcut.ref.app) as ModelDataObject?
             if(mobj!=null){
-                var name=mobj.data.getValue(BaseApp.ref.name) as String
-                apps.add(name)
+                var name=mobj.data.getValue(BaseApp.ref.name) as String?
+                name?.let {
+                    apps.add(name)
+                }
             }
         }
         return apps
+    }
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

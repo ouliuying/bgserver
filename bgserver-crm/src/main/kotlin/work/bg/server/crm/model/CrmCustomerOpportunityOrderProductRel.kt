@@ -1,6 +1,9 @@
 package work.bg.server.crm.model
 
+import util.TypeConvert
 import work.bg.server.core.RefSingleton
+import work.bg.server.core.acrule.inspector.ModelFieldInspector
+import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
@@ -47,6 +50,20 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
             FieldType.INT,
             "产品数量")
 
+    override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.product,this.customerOrder,advice = "订单中商品必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP),
+                ModelFieldUnique(this.product,this.customerOpportunity,advice = "商机中商品必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
+    override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
+        return arrayOf(
+                ModelFieldUnique(this.product,this.customerOrder,advice = "订单中商品必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP),
+                ModelFieldUnique(this.product,this.customerOpportunity,advice = "商机中商品必须唯一",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
+        )
+    }
+
     override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
         var (result,msg) =  super.afterCreateObject(modelDataObject, useAccessControl, pc)
         if(!result){
@@ -63,7 +80,7 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
             if(orderID==null && opportunityID!=null){
                 val opportunityObj=CustomerOpportunity.ref.rawRead(criteria = eq(CustomerOpportunity.ref.id,opportunityID),partnerCache = pc,useAccessControl = useAccessControl)?.firstOrNull()
                 val orderObj = opportunityObj?.getFieldValue(CustomerOpportunity.ref.order) as ModelDataObject?
-                val orderObjID = (orderObj?.idFieldValue?.value as BigInteger?)?.toLong()
+                val orderObjID =TypeConvert.getLong(orderObj?.idFieldValue?.value as Number?)
                 if(orderObjID!=null){
                     mo.setFieldValue(this.customerOrder,orderObjID)
                 }
@@ -71,7 +88,7 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
             else if(orderID!=null && opportunityID==null){
                 val orderObj=CustomerOrder.ref.rawRead(criteria = eq(CustomerOrder.ref.id,orderID),partnerCache = pc,useAccessControl = useAccessControl)?.firstOrNull()
                 val opportunityObj = orderObj?.getFieldValue(CustomerOrder.ref.opportunity) as ModelDataObject?
-                val opportunityObjID = (opportunityObj?.idFieldValue?.value as BigInteger?)?.toLong()
+                val opportunityObjID = TypeConvert.getLong(opportunityObj?.idFieldValue?.value as Number?)
                 if(opportunityObjID!=null){
                     mo.setFieldValue(this.customerOpportunity,opportunityObjID)
                 }

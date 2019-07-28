@@ -23,7 +23,7 @@ import work.bg.server.core.config.AppPackageManifest
 class AppName : AppNamePackage {
     override  fun get(): AppPackageManifest {
         return AppPackageManifest("account",
-                "财务","/icon/res/corp_app.svg",
+                "财务","/svg/account-app.svg",
                 "财务",
                 1)
     }

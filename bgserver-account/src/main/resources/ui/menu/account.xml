@@ -19,21 +19,22 @@
   -->
 
 <ui>
-    <menu name="main" app="account" title="产品管理">
-        <menuItem title="客户订单" model="customerOrder"  app="crm" viewType="list">
+    <menu name="main" app="account" title="财务" icon="/svg/account-app.svg">
+        <menu name="customerOrder" app="account" title="订单管理" icon="/svg/crm-app-order.svg">
+            <menuItem title="客户订单" model="customerOrder"  app="crm" viewType="list">
+            </menuItem>
+            <menuItem title="订单发票" model="customerOrderInvoice"  app="crm" viewType="list">
+            </menuItem>
+        </menu>
 
-        </menuItem>
 
-        <menuItem title="订单发票" model="customerOrderInvoice"  app="crm" viewType="list">
+        <menu name="payAndReceivable" app="account" title="应收应付" icon="/svg/account-pay.svg">
+            <menuItem title="应收款" model="accountReceivable" viewType="list">
+            </menuItem>
+            <menuItem title="应付款" model="accountPayable" viewType="list">
+            </menuItem>
+        </menu>
 
-        </menuItem>
 
-        <menuItem title="应收款" model="accountReceivable" viewType="list">
-
-        </menuItem>
-
-        <menuItem title="应付款" model="accountPayable" viewType="list">
-
-        </menuItem>
     </menu>
 </ui>

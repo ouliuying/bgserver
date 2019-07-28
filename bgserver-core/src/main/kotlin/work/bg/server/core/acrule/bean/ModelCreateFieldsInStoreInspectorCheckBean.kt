@@ -46,16 +46,19 @@ class ModelCreateFieldsInStoreInspectorCheckBean:
                                 targetFieldValues.setValue(fv.field,fv.value)
                             }
                         }
-                         val m =modelData.model as AccessControlModel
-                        if(partnerCache!=null){
-                            if(it.isolationType==ModelFieldUnique.IsolationType.IN_CORP){
-                                targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
-                            }
-                            else if(it.isolationType==ModelFieldUnique.IsolationType.IN_PARTNER){
-                                targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
-                                targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)
-                            }
+                        if(it.targetFields.count()!=targetFieldValues.count()){
+                            return@forEach
                         }
+                        val m =modelData.model as AccessControlModel
+
+                        if(it.isolationType==ModelFieldUnique.IsolationType.IN_CORP){
+                            targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
+                        }
+                        else if(it.isolationType==ModelFieldUnique.IsolationType.IN_PARTNER){
+                            targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
+                            targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)
+                        }
+
                         if(m.rawCount(targetFieldValues)>0){
                              return Pair(false,it.advice)
                          }

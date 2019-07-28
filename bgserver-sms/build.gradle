@@ -1,0 +1,97 @@
+/*
+ *
+ *  *
+ *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+ *  *  * https://bg.work
+ *  *  *
+ *  *  * GNU Lesser General Public License Usage
+ *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+ *  *  * General Public License version 3 as published by the Free Software
+ *  *  * Foundation and appearing in the file LICENSE.txt included in the
+ *  *  * project of this file. Please review the following information to
+ *  *  * ensure the GNU Lesser General Public License version 3 requirements
+ *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+ *  *
+ *
+ */
+
+buildscript {
+    ext{
+        kotlin_version = "1.3.41"
+        spring_boot_version = "2.1.6.RELEASE"
+        spring_version = "5.1.8.RELEASE"
+        spring_session_version = "2.1.6.RELEASE"
+        spring_build_conventions_version="0.0.22.RELEASE"
+        dependency_management_plugin_version="1.0.7.BUILD-SNAPSHOT"
+        junit_version = "4.12"
+        kotlintest_runner_junit5_version = "3.1.10"
+        HikariCP_version="3.2.0"
+        httpclient_version = "4.5.5"
+        postgresql_version = "42.2.0"
+        jackson_module_kotlin_version ="2.9.6"
+        gson_version = "2.8.5"
+        jvmTarget_version ="1.8"
+        okhttp_version = "3.10.0"
+        guava_version = "26.0-jre"
+        dom4j_version = "1.6.1"
+        jaxen_version = "1.1.6"
+        //spring_boot_plugin_version = '1.5.4.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version" // See https://kotlinlang.org/docs/reference/compiler-plugins.html#kotlin-spring-compiler-plugin
+        //classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_plugin_version"
+    }
+}
+
+apply plugin: "java"
+apply plugin: "kotlin"
+apply plugin: "kotlin-allopen"
+apply plugin: "org.jetbrains.kotlin.jvm"
+group 'work.bg.server'
+version '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+allOpen {
+    annotation("work.bg.server.core.spring.boot.annotation.Model")
+}
+allOpen {
+    annotation("work.bg.server.core.spring.boot.annotation.Action")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: "$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-js', version: "$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile group: 'junit', name: 'junit', version: "$junit_version"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_runner_junit5_version"
+    compile "org.springframework.boot:spring-boot-starter-quartz:$spring_boot_version"
+}
+
+dependencies{
+    compile project(':bgserver-core')
+    compile project(':bgserver-corp')
+    compile project(':bgserver-product')
+    compile project(':bgserver-crm')
+    compile project(':bgserver-account')
+    compile project(':bgserver-worktable')
+    compile project(':bgserver-setting')
+    compile project(':bgserver-kafka')
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "$jvmTarget_version"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "$jvmTarget_version"
+}

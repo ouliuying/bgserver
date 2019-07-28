@@ -18,10 +18,13 @@
 package work.bg.server
 
 import org.apache.commons.logging.LogFactory
-import java.util.Date
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import work.bg.server.core.runServer
 import work.bg.server.core.spring.boot.annotation.ModelScan
+import org.springframework.scheduling.quartz.SchedulerFactoryBean
+import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer
+import org.springframework.context.annotation.Bean
+import java.util.*
 
 
 @SpringBootApplication
@@ -31,7 +34,8 @@ import work.bg.server.core.spring.boot.annotation.ModelScan
     "work.bg.server.crm.model",
     "work.bg.server.account.model",
     "work.bg.server.worktable.model",
-    "work.bg.server.setting.model"])
+    "work.bg.server.setting.model",
+    "work.bg.server.sms.model"])
 class ServerApplication{
     private val logger = LogFactory.getLog(javaClass)
     init {

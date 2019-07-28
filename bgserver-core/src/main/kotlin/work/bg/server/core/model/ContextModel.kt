@@ -26,6 +26,7 @@ import com.google.gson.JsonObject
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
+import util.TypeConvert
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheRegistry
 import work.bg.server.core.context.JsonClauseResolver
@@ -36,13 +37,16 @@ import work.bg.server.core.spring.boot.model.ActionResult
 import work.bg.server.core.spring.boot.model.ReadActionParam
 import work.bg.server.core.ui.*
 import work.bg.server.errorcode.ErrorCode
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 abstract  class ContextModel(tableName:String,schemaName:String):AccessControlModel(tableName,schemaName) {
     private val logger = LogFactory.getLog(javaClass)
     @Autowired
     var partnerCacheRegistry:PartnerCacheRegistry?=null
-    @Autowired
-    lateinit var gson: Gson
+//    @Autowired
+//    lateinit var gson: Gson
     init {
 
     }
@@ -59,6 +63,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 ar.bag["result"]=ret.first!!
                 return ar
             }
+            ar.description=ret?.second
         }
         ar.errorCode=ErrorCode.UPDATEMODELFAIL
         return ar
@@ -598,7 +603,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return null
     }
-    private fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
+    protected fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
         var fields = arrayListOf<FieldBase>()
         var fFields = arrayListOf<FunctionField<*>>()
         if(mv.app.isNullOrEmpty() || mv.model.isNullOrEmpty()){
@@ -735,7 +740,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return null
     }
-    private fun getCriteriaByOwnerModelParam(ownerFieldValue: FieldValue?,toField: FieldBase?,ownerModelID: Long?):Pair<Boolean,ModelExpression?>{
+    protected fun getCriteriaByOwnerModelParam(ownerFieldValue: FieldValue?,toField: FieldBase?,ownerModelID: Long?):Pair<Boolean,ModelExpression?>{
 
         if(ownerFieldValue!=null && toField!=null){
             if(this.isPersistField(toField)){
@@ -858,7 +863,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
     }
 
-    private fun toClientModelData(modelData:ModelData?,m2mFields:ArrayList<FieldBase>):ModelData?{
+    protected fun toClientModelData(modelData:ModelData?,m2mFields:ArrayList<FieldBase>):ModelData?{
         modelData?.let {
             when(it){
                 is ModelDataObject->{
@@ -938,5 +943,64 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return this.toClientModelData(data,arrayListOf(*fields.filter {_f->
             _f is ModelMany2ManyField
         }.toTypedArray())) as ModelDataArray?
+    }
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+        modelDataObject.idFieldValue?.value?.let {
+            var modelID = TypeConvert.getLong(it as Number)
+            val modelTitle = this.meta.title
+            val embeddedCtlType=JsonObject()
+            val ctlData=JsonObject()
+            ctlData.addProperty("modelID",modelID)
+            ctlData.addProperty("app",this.meta.appName)
+            ctlData.addProperty("model",this.meta.name)
+            ctlData.addProperty("viewType","detail")
+            ctlData.addProperty("title",this.meta.title)
+            embeddedCtlType.addProperty("viewType","logView")
+            embeddedCtlType.add("data",ctlData)
+            this.addModelLogImp("创建$modelTitle",embeddedCtlType,"时间：${Date()}",modelID=modelID,pc=pc)
+        }
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+        modelDataObject.idFieldValue?.value?.let {
+            val modelID = TypeConvert.getLong(it as Number)
+            val modelTitle = this.meta.title
+            val embeddedCtlType=JsonObject()
+            val ctlData=JsonObject()
+            ctlData.addProperty("modelID",modelID)
+            ctlData.addProperty("app",this.meta.appName)
+            ctlData.addProperty("model",this.meta.name)
+            ctlData.addProperty("viewType","detail")
+            ctlData.addProperty("title",this.meta.title)
+            embeddedCtlType.addProperty("viewType","logView")
+            embeddedCtlType.add("data",ctlData)
+            this.addModelLogImp("更新$modelTitle",embeddedCtlType,"时间：${Date()}",modelID=modelID,pc=pc)
+        }
+    }
+
+    private  fun addModelLogImp(vararg args:Any,modelID:Long?,pc:PartnerCache?){
+        var modelLog= BaseModelLog.ref
+        var mo=ModelDataObject(model=modelLog)
+        mo.setFieldValue(modelLog.app,this.meta.appName)
+        mo.setFieldValue(modelLog.model,this.meta.name)
+        mo.setFieldValue(modelLog.modelID,modelID)
+        pc?.let {
+            val partnerObj=ModelDataObject(model=BasePartner.ref)
+            partnerObj.setFieldValue(BasePartner.ref.id,pc?.partnerID)
+            mo.setFieldValue(modelLog.partner,partnerObj)
+        }
+        if(args.isNotEmpty()){
+            val argArray = JsonArray()
+            for (arg in args) {
+                when(arg){
+                    is String->argArray.add(arg)
+                    is JsonElement->argArray.add(arg)
+                    else->argArray.add(this.gson.toJsonTree(arg))
+                }
+            }
+            mo.setFieldValue(modelLog.data,argArray.toString())
+        }
+        modelLog.rawCreate(mo,useAccessControl = false,partnerCache = null)
     }
 }

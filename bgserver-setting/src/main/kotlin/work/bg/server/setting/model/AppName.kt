@@ -26,7 +26,7 @@ import work.bg.server.core.config.AppPackageManifest
 class AppName : AppNamePackage {
     override  fun get():AppPackageManifest{
         return AppPackageManifest("setting",
-                "系统设置","/svg/my-worktable.svg",
+                "系统设置","/svg/setting-app.svg",
                 "系统设置",
                 1)
     }

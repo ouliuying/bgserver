@@ -1,0 +1,51 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <inherit>
+        <xpath expression="/ui/menu[@app='setting'][@name='main']" op="append" app="setting">
+            <menu name="smsSetting" app="sms" title="短信平台" icon="/svg/department-app.svg">
+                <menuItem title="账号设置" app="sms" model="smsSetting" viewType="edit">
+                </menuItem>
+            </menu>
+        </xpath>
+    </inherit>
+    <menu name="main" app="sms" title="短信平台" icon="/svg/sms-app.svg">
+        <menu name="smsOp" app="sms" title="发送短信" icon="/svg/sms-send.svg">
+            <menuItem title="直接发送" model="sms" viewType="sendSms">
+
+            </menuItem>
+
+            <menuItem title="导入发送" model="sms" viewType="importSendSms">
+
+            </menuItem>
+        </menu>
+
+        <menu name="smsMag" app="sms" title="历史记录" icon="/svg/sms-log.svg">
+            <menuItem title="发送日志" model="smsSendHistory" viewType="list">
+
+            </menuItem>
+            <menuItem title="定时队列" model="smsTimerQueue" viewType="list">
+
+            </menuItem>
+        </menu>
+
+    </menu>
+</ui>
