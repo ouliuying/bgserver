@@ -8,7 +8,7 @@ buildscript {
         dependency_management_plugin_version="1.0.7.BUILD-SNAPSHOT"
         junit_version = "4.12"
         kotlintest_runner_junit5_version="3.1.10"
-        HikariCP_version="3.2.0"
+        HikariCP_version="3.3.1"
         httpclient_version = "4.5.5"
         postgresql_version = "42.2.0"
         jackson_module_kotlin_version ="2.9.6"

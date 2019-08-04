@@ -17,5 +17,6 @@
 
 package work.bg.server.chat.model
 
-class chat {
+class Chat {
+
 }

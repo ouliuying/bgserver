@@ -36,6 +36,7 @@ buildscript {
         guava_version = "26.0-jre"
         dom4j_version = "1.6.1"
         jaxen_version = "1.1.6"
+        vertx_version = "4.0.0-milestone1"
 
         //spring_boot_plugin_version = '1.5.4.RELEASE'
     }
@@ -80,12 +81,36 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: "$junit_version"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_runner_junit5_version"
 }
+dependencies{
+    // https://mvnrepository.com/artifact/io.vertx/vertx-core
+    compile group: 'io.vertx', name: 'vertx-core', version: "$vertx_version"
+    // https://mvnrepository.com/artifact/io.vertx/vertx-web
+    compile group: 'io.vertx', name: 'vertx-web', version: "$vertx_version"
+    // https://mvnrepository.com/artifact/io.vertx/vertx-redis-client
+    compile group: 'io.vertx', name: 'vertx-redis-client', version: "$vertx_version"
+// https://mvnrepository.com/artifact/io.vertx/vertx-lang-kotlin
+    compile group: 'io.vertx', name: 'vertx-lang-kotlin', version: "$vertx_version"
+    // https://mvnrepository.com/artifact/io.vertx/vertx-lang-kotlin-coroutines
+    compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: "$vertx_version"
+    // https://mvnrepository.com/artifact/io.vertx/vertx-sockjs-service-proxy
+    compile group: 'io.vertx', name: 'vertx-sockjs-service-proxy', version: "$vertx_version"
+// https://mvnrepository.com/artifact/io.vertx/vertx-codegen
+    compile group: 'io.vertx', name: 'vertx-codegen', version: "$vertx_version"
+}
+dependencies{
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 
+}
 dependencies{
     compile project(':bgserver-core')
     compile project(':bgserver-corp')
     compile project(':bgserver-crm')
     compile project(':bgserver-account')
+    compile project(':bgserver-worktable')
+    compile project(':bgserver-setting')
+    compile project(':bgserver-kafka')
+    compile project(':bgserver-sms')
 }
 
 
