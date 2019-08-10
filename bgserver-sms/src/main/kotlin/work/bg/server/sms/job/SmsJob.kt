@@ -55,7 +55,8 @@ class SmsJob:Job {
     lateinit var gson:Gson
     override fun execute(context: JobExecutionContext?) {
        val dmap  = context?.jobDetail?.jobDataMap
-        AppModel.ref.appContext?.autowireCapableBeanFactory?.autowireBeanProperties(this,
+        AppModel.ref.appContext?.autowireCapableBeanFactory?.autowireBeanProperties(
+                this,
                 AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE,
                 false)
 
