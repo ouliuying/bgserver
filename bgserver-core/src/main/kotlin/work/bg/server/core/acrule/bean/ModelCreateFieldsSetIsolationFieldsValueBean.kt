@@ -46,8 +46,8 @@ class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueI
             this.setFieldValue(modelData,lastModifyCorpID,partnerCache.corpID)
             this.setFieldValue(modelData,createPartnerID,partnerCache.partnerID)
             this.setFieldValue(modelData,lastModifyPartnerID,partnerCache.partnerID)
-            this.setFieldValue(modelData,createTime,util.Time.now())
-            this.setFieldValue(modelData,lastModifyTime,util.Time.now())
+            this.setFieldValue(modelData,createTime, work.bg.server.util.Time.now())
+            this.setFieldValue(modelData,lastModifyTime, work.bg.server.util.Time.now())
         }
         return Pair(true,"")
     }

@@ -18,6 +18,7 @@
 package work.bg.server
 
 import org.apache.commons.logging.LogFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import work.bg.server.core.runServer
 import work.bg.server.core.spring.boot.annotation.ModelScan
@@ -35,7 +36,8 @@ import java.util.*
     "work.bg.server.account.model",
     "work.bg.server.worktable.model",
     "work.bg.server.setting.model",
-    "work.bg.server.sms.model"])
+    "work.bg.server.sms.model",
+    "work.bg.server.chat.model"])
 class ServerApplication{
     private val logger = LogFactory.getLog(javaClass)
     init {

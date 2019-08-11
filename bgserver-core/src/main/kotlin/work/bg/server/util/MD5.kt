@@ -15,23 +15,22 @@
  *
  */
 
-package util
+package work.bg.server.util
 
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
-import org.junit.Test
+import java.security.MessageDigest
 
-class MD5Test : StringSpec({
-    var mdHash=MD5.hash("123456")
-    mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
-})
-
-
-class MD5Test2{
-
-    @Test
-    fun test(){
-        var mdHash=MD5.hash("123456")
-        mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
+class MD5{
+    companion object {
+        fun hash(data:String):String{
+            val mdEnc = MessageDigest.getInstance("MD5")
+            var sb=StringBuilder()
+            var md5Bytes=mdEnc.digest(data.toByteArray())
+            md5Bytes.forEach {
+                var bt=it.toUByte()
+                var padVal=bt.toString(16).padStart(2,'0').toLowerCase()
+                sb.append(padVal)
+            }
+            return sb.toString()
+        }
     }
 }

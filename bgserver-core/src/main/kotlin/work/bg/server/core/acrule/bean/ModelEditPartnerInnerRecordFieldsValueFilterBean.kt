@@ -36,7 +36,7 @@ class ModelEditPartnerInnerRecordFieldsValueFilterBean: ModelEditRecordFieldsVal
         if(modelData.hasFieldValue(BasePartner.ref.password)){
             var password = modelData.getFieldValue(BasePartner.ref.password)
             if(password!=null && !(password as String).isNullOrEmpty()){
-                modelData.setFieldValue(BasePartner.ref.password,util.MD5.hash(password))
+                modelData.setFieldValue(BasePartner.ref.password, work.bg.server.util.MD5.hash(password))
             }
             else{
                 modelData.removeFieldValue(BasePartner.ref.password)

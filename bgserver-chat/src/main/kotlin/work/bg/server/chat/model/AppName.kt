@@ -18,20 +18,17 @@
  *
  */
 
-package work.bg.server.core.ui
+package work.bg.server.chat.model
 
-import work.bg.server.util.MethodInvocation
-import work.bg.server.core.spring.boot.model.AppModel
+import work.bg.server.core.config.AppNamePackage
+import work.bg.server.core.config.AppPackageManifest
 
-
-
-//TODO cache instance method,call method with parameters
-object ModelViewFieldSourceCache {
-    fun run(source:ModelViewFieldSource):Any?{
-        var model = AppModel.ref.getModel(source.app,source.model)
-        model?.let {
-            return MethodInvocation(model,source.method)()
-        }
-        return null
+class AppName : AppNamePackage {
+    override  fun get(): AppPackageManifest {
+        return AppPackageManifest("chat",
+                "企信",
+                "/svg/crm-app.svg",
+                "企业通讯",
+                1)
     }
 }

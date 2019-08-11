@@ -36,7 +36,6 @@ import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
-import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheKey
 import work.bg.server.core.model.billboard.PartnerTagBillboard
 import work.bg.server.core.mq.*
@@ -201,7 +200,7 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
     }
     @Action(name="login")
     fun login(@RequestParam userName:String,@RequestParam password:String,@RequestParam devType:Int,session:HttpSession):ActionResult?{
-        var md5Password=util.MD5.hash(password)
+        var md5Password= work.bg.server.util.MD5.hash(password)
         var partner=this.rawRead(criteria = and(eq(this.userName,userName)!!,eq(this.password,md5Password)!!),
                 attachedFields = arrayOf(AttachedField(this.corps),AttachedField(this.partnerRoles)))
         return when{

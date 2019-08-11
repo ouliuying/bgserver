@@ -15,23 +15,22 @@
  *
  */
 
-package util
+package work.bg.server.util
 
-import java.security.CryptoPrimitive
-import java.security.MessageDigest
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 
-class MD5{
+class PropertyAssign {
     companion object {
-        fun hash(data:String):String{
-            val mdEnc = MessageDigest.getInstance("MD5")
-            var sb=StringBuilder()
-            var md5Bytes=mdEnc.digest(data.toByteArray())
-            md5Bytes.forEach {
-                var bt=it.toUByte()
-                var padVal=bt.toString(16).padStart(2,'0').toLowerCase()
-                sb.append(padVal)
+        fun set(instance:Any,propertyName: String,value:Any){
+            var p=instance::class.memberProperties.firstOrNull {
+                it.name==propertyName
             }
-            return sb.toString()
+            if(p!=null){
+                p.isAccessible=true
+                p.javaField?.set(instance,value)
+            }
         }
     }
 }

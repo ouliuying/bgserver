@@ -18,9 +18,7 @@
  *
  */
 
-package util
-
-import java.math.BigInteger
+package work.bg.server.util
 
 object TypeConvert {
     inline fun <reified T> getLong(value:T?):Long? where T:Number{

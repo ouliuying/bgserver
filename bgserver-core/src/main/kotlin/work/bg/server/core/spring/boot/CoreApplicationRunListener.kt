@@ -23,7 +23,7 @@ import org.springframework.boot.SpringApplicationRunListener
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
-import util.MethodInvocation
+import work.bg.server.util.MethodInvocation
 import work.bg.server.core.spring.boot.model.AppModel
 import work.bg.server.core.ui.UICache
 import java.util.*

@@ -19,14 +19,13 @@
 
 package work.bg.server.core.model
 
-import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
-import util.TypeConvert
+import work.bg.server.util.TypeConvert
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheRegistry
 import work.bg.server.core.context.JsonClauseResolver

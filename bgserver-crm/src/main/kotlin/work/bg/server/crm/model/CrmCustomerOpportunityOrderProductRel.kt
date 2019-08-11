@@ -1,6 +1,6 @@
 package work.bg.server.crm.model
 
-import util.TypeConvert
+import work.bg.server.util.TypeConvert
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique

@@ -15,23 +15,12 @@
  *
  */
 
-package util
+package work.bg.server.util
 
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaField
-
-class PropertyAssign {
-    companion object {
-        fun set(instance:Any,propertyName: String,value:Any){
-            var p=instance::class.memberProperties.firstOrNull {
-                it.name==propertyName
-            }
-            if(p!=null){
-                p.isAccessible=true
-                p.javaField?.set(instance,value)
-            }
-        }
+class MethodInvocation(private val instance:Any,private val methodName:String){
+     operator fun invoke():Any?{
+         var method=instance::class.java.getDeclaredMethod(methodName)!!
+         method.isAccessible=true
+         return method(instance)
     }
 }

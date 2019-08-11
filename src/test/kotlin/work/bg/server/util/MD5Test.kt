@@ -15,13 +15,28 @@
  *
  */
 
-package work.bg.server.core.spring.boot.model
-import work.bg.server.errorcode.ErrorCode
-open class ActionResult(errorCode:ErrorCode,var description:String?=null) {
-    var errorCode:ErrorCode=ErrorCode.SUCCESS
-    var bag:MutableMap<String,Any> = mutableMapOf()
+package work.bg.server.util
+
+import io.kotlintest.shouldBe
+import io.kotlintest.specs.StringSpec
+import org.junit.Test
+import java.util.*
+
+class MD5Test : StringSpec({
+    var mdHash=MD5.hash("123456")
+    mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
+})
+
+class MD5Test2{
     init {
-        this.errorCode=errorCode
+        print("start test ${Date()}")
     }
-    constructor():this(ErrorCode.SUCCESS)
+    @Test
+    fun doTest(){
+        var mdHash=MD5.hash("123456")
+        mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
+    }
 }
+
+
+

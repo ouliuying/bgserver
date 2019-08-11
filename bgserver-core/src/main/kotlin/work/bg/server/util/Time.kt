@@ -15,28 +15,12 @@
  *
  */
 
-package util
+package work.bg.server.util
 
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
-import org.junit.Test
 import java.util.*
 
-class MD5Test : StringSpec({
-    var mdHash=MD5.hash("123456")
-    mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
-})
-
-class MD5Test2{
-    init {
-        print("start test ${Date()}")
-    }
-    @Test
-    fun doTest(){
-        var mdHash=MD5.hash("123456")
-        mdHash shouldBe "e10adc3949ba59abbe56e057f20f883e"
+object  Time{
+    fun now():Date{
+        return Date()
     }
 }
-
-
-

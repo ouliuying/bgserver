@@ -100,6 +100,8 @@ dependencies{
 dependencies{
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+// https://mvnrepository.com/artifact/redis.clients/jedis
+    compile group: 'redis.clients', name: 'jedis', version: '3.1.0'
 
 }
 dependencies{
