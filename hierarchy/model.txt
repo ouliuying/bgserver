@@ -30,11 +30,11 @@ work.bg.server.corp.model.DepartmentPartnerRel, work.bg.server.core.model.Contex
 ============
 work.bg.server.corp.model.Department, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
 ============
-work.bg.server.chat.model.ChatPartnerUUID, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
-============
-work.bg.server.chat.model.ChatPartnerJoinChannelRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+work.bg.server.chat.model.Chat, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
 ============
 work.bg.server.chat.model.ChatChannel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
+============
+work.bg.server.chat.model.ChatModelJoinChannelRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
 ============
 work.bg.server.sms.model.SmsSendJobLog, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, work.bg.server.core.mq.ModelBase
 ============

@@ -25,10 +25,10 @@ import work.bg.server.core.model.ContextModel
 import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
-@Model("chatPartnerJoinChannelRel")
-class ChatPartnerJoinChannelRel:ContextModel("chat_partner_join_channel_rel","public") {
-    companion object: RefSingleton<ChatPartnerJoinChannelRel> {
-        override lateinit var ref: ChatPartnerJoinChannelRel
+@Model("chatModelJoinChannelRel")
+class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public") {
+    companion object: RefSingleton<ChatModelJoinChannelRel> {
+        override lateinit var ref: ChatModelJoinChannelRel
     }
 
 

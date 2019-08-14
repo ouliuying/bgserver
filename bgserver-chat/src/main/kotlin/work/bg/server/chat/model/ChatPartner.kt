@@ -24,6 +24,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestParam
+import work.bg.server.chat.billboard.ChatGuidBillboard
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheKey
@@ -56,13 +57,11 @@ class ChatPartner: SmsPartner() {
         override lateinit var ref: ChatPartner
     }
 
-    val chatUUID = ModelOne2OneField(null,
-            "chat_partner_uuid",
-            FieldType.BIGINT,
+    val chatUUID = ModelField(null,
+            "chat_uuid",
+            FieldType.STRING,
             "通讯UUID",
-            isVirtualField = true,
-            targetModelTable = "public.chat_partner_uuid",
-            targetModelFieldName = "partner_id")
+            defaultValue = ChatGuidBillboard())
 
     val ownChannels = ModelOne2ManyField(null,
             "own_channels",
@@ -74,7 +73,7 @@ class ChatPartner: SmsPartner() {
     val joinChannels = ModelMany2ManyField(null,"join_channels",
             FieldType.BIGINT,
             "加入的频道",
-            relationModelTable = "public.chat_partner_join_channel_rel",
+            relationModelTable = "public.chat_model_join_channel_rel",
             relationModelFieldName = "join_partner_id",
             targetModelTable = "public.chat_channel",
             targetModelFieldName = "join_partners")
@@ -89,8 +88,8 @@ class ChatPartner: SmsPartner() {
             partner!=null->{
                 var id=partner?.data?.firstOrNull()?.getValue(this.id) as Long?
                 if(id!=null && id>0) {
-                    val chatUUID = (partner?.firstOrNull()?.
-                            getFieldValue(this.chatUUID) as ModelDataObject?)?.getFieldValue(ChatPartnerUUID.ref.uuid) as String?
+                    val chatUUID = partner?.firstOrNull()?.
+                            getFieldValue(this.chatUUID) as String?
                     var ar = ActionResult()
                     var corpPartnerRels = (partner?.data?.
                             firstOrNull()?.
@@ -151,9 +150,9 @@ class ChatPartner: SmsPartner() {
         var channels = ChatChannel.ref.rawRead(criteria = or(eq(
                 chModel.defaultFlag,1
         ),eq(chModel.owner,partnerID),`in`(chModel.id,
-                select(ChatPartnerJoinChannelRel.ref.joinChannel,
-                fromModel= ChatPartnerJoinChannelRel.ref)
-                .where(eq(ChatPartnerJoinChannelRel.ref.joinPartner,partnerID)))))?.toModelDataObjectArray()
+                select(ChatModelJoinChannelRel.ref.joinChannel,
+                fromModel= ChatModelJoinChannelRel.ref)
+                .where(eq(ChatModelJoinChannelRel.ref.joinPartner,partnerID)))))?.toModelDataObjectArray()
         var ja = JsonArray()
         channels?.let {
             channels.forEach {
@@ -196,33 +195,20 @@ class ChatPartner: SmsPartner() {
         return null
     }
 
-    override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
-        var ret = super.afterCreateObject(modelDataObject, useAccessControl, pc)
-        if(!ret.first){
-            return ret
-        }
-        var cID = modelDataObject.getFieldValue(this.id) as Long?
-        var puuid = ModelDataObject(model=ChatPartnerUUID.ref)
-        puuid.setFieldValue(ChatPartnerUUID.ref.partner,cID)
-        puuid.setFieldValue(ChatPartnerUUID.ref.uuid,UUID.randomUUID().toString())
-        val pd = ChatPartnerUUID.ref.rawCreate(puuid,useAccessControl,pc)
-        if(pd.first!=null && pd.first!!>0){
-            return ret
-        }
-        return Pair(false,"创建企信UUID失败！")
-    }
+//    override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
+//       return super.afterCreateObject(modelDataObject, useAccessControl, pc)
+//    }
 
     override fun afterEditObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
         var ret= super.afterEditObject(modelDataObject, useAccessControl, pc)
         val pid = TypeConvert.getLong(modelDataObject.idFieldValue?.value as Number?)
         pid?.let {
-            var chatUUIDObj = ChatPartnerUUID.ref.rawRead(criteria = eq(ChatPartnerUUID.ref.partner,pid))?.firstOrNull()
-            if(chatUUIDObj==null){
-                chatUUIDObj = ModelDataObject(model=ChatPartnerUUID.ref)
-                chatUUIDObj.setFieldValue(ChatPartnerUUID.ref.partner,pid)
-                chatUUIDObj.setFieldValue(ChatPartnerUUID.ref.uuid,UUID.randomUUID().toString())
-                val pd = ChatPartnerUUID.ref.rawCreate(chatUUIDObj,useAccessControl,pc)
-                if(pd.first!=null && pd.first!!>0){
+            var selfObj = this.rawRead(criteria = eq(this.id,pid))?.firstOrNull()
+            if(selfObj!=null && selfObj.getFieldValue(this.chatUUID)==null){
+                selfObj = ModelDataObject(model=this)
+                selfObj.setFieldValue(this.chatUUID,UUID.randomUUID().toString())
+                val pd = this.update(selfObj,criteria = eq(this.id,pid))
+                if(pd!=null && pd!!>0){
                     return ret
                 }
                 return Pair(false,"创建企信UUID失败！")
