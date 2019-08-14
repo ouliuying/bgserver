@@ -38,9 +38,6 @@ buildscript {
 
 }
 
-ext {
-    redis.ip = '192.168.31.166'
-}
 group 'work.bg.server'
 version '0.0.1-SNAPSHOT'
 

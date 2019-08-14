@@ -27,7 +27,7 @@ import work.bg.server.core.mq.*
 import work.bg.server.core.spring.boot.annotation.Model
 
 @Model("chatChannel")
-class ChatChannel:ContextModel("public","chat_channel") {
+class ChatChannel:ContextModel("chat_channel","public") {
     companion object: RefSingleton<ChatChannel> {
         override lateinit var ref: ChatChannel
     }

@@ -71,18 +71,36 @@
         </view>
 
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="partner.name" style="head" type="many2OneDataSetSelect"/>
+            <field name="partnerRole.name" style="head" type="many2OneDataSetSelect"/>
+            <field name="isDefaultCorp" type="singleCheckbox">
+                <meta>
+                    <![CDATA[
+                    {
+                     "label":"默认公司"
+                    }
+                  ]]>
+                </meta>
+            </field>
         </view>
 
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
             <field name="partner.name" style="head" type="many2OneDataSetSelect"/>
+            <field name="partnerRole.name" style="head" type="many2OneDataSetSelect"/>
             <field name="isDefaultCorp" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -195,6 +213,7 @@
                 <menus>
                 </menus>
                 <views>
+                        <view type="create" ownerField="partnerRoles" model="corpPartnerRel" refType="none"></view>
                 </views>
             </ref>
             <field name="userName" style="head" type="singleLineText"/>
@@ -205,27 +224,31 @@
             <field name="mobile" type="mobile"/>
             <field name="telephone" type="telephone"/>
             <field name="email" type="email"/>
-            <field name="partnerRoles.name" type="many2OneDataSetSelect"/>
-            <field name="setCurrentCorpAsDefault" type="singleCheckbox">
-                <meta>
-                    <![CDATA[
-                    {
-                     "label":"设定当前公司为默认"
-                    }
-                  ]]>
-                </meta>
-            </field>
+<!--            <field name="partnerRoles.name" type="many2OneDataSetSelect"/>-->
+<!--            <field name="setCurrentCorpAsDefault" type="singleCheckbox">-->
+<!--                <meta>-->
+<!--                    <![CDATA[-->
+<!--                    {-->
+<!--                     "label":"设定当前公司为默认"-->
+<!--                    }-->
+<!--                  ]]>-->
+<!--                </meta>-->
+<!--            </field>-->
             <field name="userTitle" colSpan="2" type="multiLineText"/>
             <field name="userComment" colSpan="2" type="multiLineText"/>
+            <field name="partnerRoles" style="relation"></field>
         </view>
 
         <view type="edit">
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="edit" refType="none" ownerField="partnerRoles" model="corpPartnerRel"></view>
+                </views>
             </ref>
             <field name="userName" style="head" type="singleLineText"/>
             <field name="password" style="head" type="singleLineText"/>
@@ -233,20 +256,20 @@
             <field name="nickName" style="subHead" type="singleLineText"/>
             <field name="birthday" type="date"/>
             <field name="mobile" type="mobile"/>
-            <field name="partnerRoles.name" type="many2OneDataSetSelect"/>
-            <field name="setCurrentCorpAsDefault" type="singleCheckbox">
-                <meta>
-                    <![CDATA[
-                    {
-                     "label":"设定当前公司为默认"
-                    }
-                  ]]>
-                </meta>
-            </field>
+<!--            <field name="setCurrentCorpAsDefault" type="singleCheckbox">-->
+<!--                <meta>-->
+<!--                    <![CDATA[-->
+<!--                    {-->
+<!--                     "label":"设定当前公司为默认"-->
+<!--                    }-->
+<!--                  ]]>-->
+<!--                </meta>-->
+<!--            </field>-->
             <field name="telephone" type="telephone"/>
             <field name="email" type="email"/>
             <field name="userTitle" colSpan="2" type="multiLineText"/>
             <field name="userComment" colSpan="2" type="multiLineText"/>
+            <field name="partnerRoles" style="relation"></field>
         </view>
         <view type="detail">
             <ref>

@@ -27,7 +27,7 @@ class AppName : AppNamePackage {
     override  fun get(): AppPackageManifest {
         return AppPackageManifest("chat",
                 "企信",
-                "/svg/crm-app.svg",
+                "/svg/chat-channel-logo.svg",
                 "企业通讯",
                 1)
     }
