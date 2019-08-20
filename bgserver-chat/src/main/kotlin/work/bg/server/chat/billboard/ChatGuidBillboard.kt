@@ -24,7 +24,7 @@ import work.bg.server.core.model.BasePartner
 import work.bg.server.core.model.billboard.ConstantFieldBillboard
 import work.bg.server.core.model.billboard.FieldDefaultValueBillboard
 import java.util.*
-
+typealias ChatChannelGuidBillboard = ChatGuidBillboard
 class ChatGuidBillboard(override val constant: Boolean=false) : FieldDefaultValueBillboard, ConstantFieldBillboard {
     override fun looked(glass: Any?): Any {
         return UUID.randomUUID().toString()

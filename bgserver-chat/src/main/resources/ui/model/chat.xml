@@ -1,0 +1,223 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <model name="chatChannel" app="chat">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+<!--                    <action>-->
+<!--                        <group name="joinOpAction" refType="main|sub"/>-->
+<!--                    </action>-->
+                </actions>
+            </ref>
+            <field name="name" type="static"/>
+            <field name="uuid" type="static"/>
+            <field name="defaultFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="mustJoinFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="broadcastType" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"点对点",
+                     "1":"广播"
+                    }
+                  ]]>
+                </meta>
+            </field>
+
+            <field name="joinStatus" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"",
+                     "1":"创建",
+                     "2":"参加"
+                    }
+                  ]]>
+                </meta>
+            </field>
+
+            <field name="owner.userName" type="static"/>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="defaultFlag" type="singleCheckbox"/>
+            <field name="mustJoinFlag" type="singleCheckbox"/>
+            <field name="broadcastType" type="singleCheckbox"/>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="name" type="singleLineText" style="head"/>
+            <field name="defaultFlag" type="singleCheckbox"/>
+            <field name="mustJoinFlag" type="singleCheckbox"/>
+            <field name="broadcastType" type="singleCheckbox"/>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+                <views>
+                    <view type="list" ownerField="joinPartners" model="chatModelJoinChannelRel" refType="none"/>
+                </views>
+            </ref>
+            <field name="name" type="static" style="head"/>
+            <field name="uuid" type="static"/>
+            <field name="defaultFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="mustJoinFlag" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"否",
+                     "1":"是"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="broadcastType" type="enumStatic">
+                <meta>
+                    <![CDATA[
+                    {
+                     "0":"点对点",
+                     "1":"广播"
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="owner.userName" type="static"/>
+            <field name="joinPartners" style="relation"/>
+        </view>
+    </model>
+    <model name="chatModelJoinChannelRel" app="chat">
+        <view type="list">
+            <refs>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                </actions>
+            </refs>
+            <field name="joinPartner.name" type="static" />
+            <field name="joinPartner.userName" type="static" />
+            <field name="joinChannel.name" type="static" />
+            <field name="joinChannel.uuid" type="static" />
+        </view>
+
+        <view type="create">
+            <refs>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </refs>
+            <field name="joinPartner.userName" type="many2OneDataSetSelect" />
+            <field name="joinChannel.name" type="many2OneDataSetSelect" />
+        </view>
+
+        <view type="edit">
+            <refs>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </refs>
+            <field name="joinPartner.userName" type="many2OneDataSetSelect" />
+            <field name="joinPartner.name" type="many2OneDataSetSelect" />
+        </view>
+
+        <view type="detail">
+            <refs>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </refs>
+            <field name="joinPartner.userName" type="static" />
+            <field name="joinChannel.name" type="static" />
+        </view>
+
+    </model>
+
+    <model name="chatChannelMessage" app="chat">
+        <view type="list">
+            <refs>
+            </refs>
+            <field type="static" name="channelUUID"/>
+            <field type="static" name="fromChatUUID"/>
+            <field type="static" name="toChatUUID"/>
+            <field type="static" name="message"/>
+        </view>
+    </model>
+</ui>

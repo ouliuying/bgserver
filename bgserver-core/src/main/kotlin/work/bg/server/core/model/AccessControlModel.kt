@@ -756,7 +756,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     private fun doFillFieldValueArrayFunctionFields(vararg functionFields:FieldBase?,fieldValueArray:FieldValueArray,useAccessControl: Boolean,partnerCache: PartnerCache?){
         functionFields.forEach {
             if(it is FunctionField<*>){
-                it.compute(fieldValueArray,partnerCache,null)
+                val compValue = it.compute(fieldValueArray,partnerCache,null)
+                fieldValueArray.setValue(it,compValue)
             }
         }
         fieldValueArray.forEach {

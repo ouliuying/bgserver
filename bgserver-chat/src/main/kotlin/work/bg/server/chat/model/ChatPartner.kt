@@ -159,7 +159,7 @@ class ChatPartner: SmsPartner() {
                 var jo = JsonObject()
                 jo.addProperty("id",it.getFieldValue(chModel.id)?.toString())
                 jo.addProperty("name",it.getFieldValue(chModel.name)?.toString())
-                jo.addProperty("tag",it.getFieldValue(chModel.tag)?.toString())
+                jo.addProperty("uuid",it.getFieldValue(chModel.uuid)?.toString())
                 jo.addProperty("defaultFlag",it.getFieldValue(chModel.defaultFlag)?.toString())
                 jo.addProperty("mustJoinFlag",it.getFieldValue(chModel.mustJoinFlag)?.toString())
                 jo.addProperty("broadcastType",it.getFieldValue(chModel.broadcastType)?.toString())

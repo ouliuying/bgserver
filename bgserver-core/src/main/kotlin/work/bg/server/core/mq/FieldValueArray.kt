@@ -34,7 +34,7 @@ class FieldValueArray: ArrayList<FieldValue>(){
         }
         else{
             this.add(FieldValue(field,value))
-            -1
+            this.size-1
         }
     }
     fun containFieldKey(field:FieldBase):Boolean{

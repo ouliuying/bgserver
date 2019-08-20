@@ -1,0 +1,34 @@
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<ui>
+    <menu name="main" app="chat" title="企信管理" icon="/svg/chat-channel-logo.svg">
+        <menu name="chatChannel" app="chat" title="企信频道"  icon="/svg/corp-partners.svg">
+            <menuItem title="频道列表" model="chatChannel" viewType="list">
+            </menuItem>
+            <menuItem title="添加频道" model="chatChannel" viewType="create">
+            </menuItem>
+        </menu>
+
+        <menu name="chatChannelMessage" app="chat" title="信息管理"  icon="/svg/corp-partners.svg">
+            <menuItem title="信息日志" model="chatChannelMessage" viewType="list"></menuItem>
+        </menu>
+    </menu>
+</ui>

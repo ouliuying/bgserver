@@ -20,6 +20,8 @@
 
 package work.bg.server.chat.model
 
+import work.bg.server.chat.billboard.ChatChannelGuidBillboard
+import work.bg.server.chat.field.PartnerJoinStatusField
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
@@ -41,10 +43,11 @@ class ChatChannel:ContextModel("chat_channel","public") {
             FieldType.STRING,
             "名称")
 
-    val tag = ModelField(null,
-            "tag",
+    val uuid = ModelField(null,
+            "uuid",
             FieldType.STRING,
-            "内部标识")
+            "内部标识",
+            defaultValue = ChatChannelGuidBillboard())
 
     val defaultFlag = ModelField(null,
             "default_flag",
@@ -77,8 +80,16 @@ class ChatChannel:ContextModel("chat_channel","public") {
             "join_partners",
             FieldType.BIGINT,
             "加入的员工",
-            relationModelTable = "public.chat_partner_join_channel_rel",
+            relationModelTable = "public.chat_model_join_channel_rel",
             relationModelFieldName = "join_partner_id",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "join_channels")
+
+    val joinStatus =PartnerJoinStatusField(null,
+            "join_status",
+            "关系",
+            this.owner)
+
+
+
 }

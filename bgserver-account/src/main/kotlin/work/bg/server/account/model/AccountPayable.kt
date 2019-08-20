@@ -14,11 +14,13 @@ class AccountPayable:ContextModel("account_payable","public") {
     companion object: RefSingleton<AccountPayable> {
         override lateinit var ref: AccountPayable
     }
+
     val id= ModelField(null,
             "id",
             FieldType.BIGINT,
             "标识",
             primaryKey = FieldPrimaryKey())
+
     val orderInvoice= ModelOne2OneField(null,
             "order_invoice_id",
             FieldType.BIGINT,
