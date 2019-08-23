@@ -17,17 +17,24 @@
 
 package work.bg.server.core.ui
 
+import com.google.gson.JsonObject
+
 data class Trigger(val name:String,
                    var title:String,
                    var app:String,
                    var model:String,
                    var viewType:String){
+
     var enable:String?=null
     var visible:String?=null
     var ownerField:String?=null
     var actionName:String?=null
+    var meta:JsonObject?=null
+
     fun createCopy():Trigger{
-        return Trigger(name,title,app,model,viewType)
+        val t= Trigger(name,title,app,model,viewType)
+        t.meta = meta
+        return t
     }
 }
 data class TriggerGroup(val name:String,

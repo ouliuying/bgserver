@@ -302,6 +302,15 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             if(!(name.isNullOrEmpty()||title.isNullOrEmpty())){
                                 var t=Trigger(name,title,tApp,tModel,tViewType)
                                 ag.triggers.add(t)
+                                val metaElem = tit.selectSingleNode("meta") as Element?
+                                metaElem?.let {
+                                    try {
+                                        t.meta=this.gson.fromJson(metaElem.textTrim,JsonObject::class.java)
+                                    }
+                                    catch (ex:java.lang.Exception){
+                                        ex.printStackTrace()
+                                    }
+                                }
                             }
                         }
                     }
@@ -680,6 +689,15 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                                 var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tActionName,tVisible,tEnable)
                                 logger.debug("load rt ${rt.toString()}")
                                 triggers.add(rt)
+                                try {
+                                    val metaElem = tit.selectSingleNode("meta") as Element?
+                                    metaElem?.let {
+                                        rt.meta = this.gson.fromJson(metaElem.textTrim,JsonObject::class.java)
+                                    }
+                                }
+                                catch (ex:java.lang.Exception){
+                                    ex.printStackTrace()
+                                }
                             }
                             catch (ex:java.lang.Exception){
                                 logger.error(ex.toString())

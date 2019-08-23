@@ -844,12 +844,38 @@
                     </action>
                     <action>
                         <group name="confirmOrderProcess" refType="main|sub">
-                            <trigger title="确认订单" model="customerOrder" viewType="modelAction" name="order_step" visible="step=0" actionName="confirmCustomerOrder"/>
-                            <trigger title="通知订单状态" model="customerOrder" viewType="modelAction" name="order_step2"
-                                     visible="step&gt;0" enable="step&gt;0" actionName="notifyOrderStepBySmsEmail"/>
-                            <trigger title="开具发票/收据" model="customerOrderInvoice" viewType="create" ownerField="invoice" name="order_step3" visible="step=1"/>
-                            <trigger title="发票/收据" model="customerOrderInvoice" viewType="edit" name="order_step4" ownerField="invoice" visible="step&gt;1" enable="step&gt;1"/>
-                            <trigger title="确认回款" model="customerOrder" viewType="modelAction" name="order_step5" visible="step=2" actionName="confirmOrderPayment"/>
+                            <trigger title="确认订单"
+                                     model="customerOrder"
+                                     viewType="modelAction"
+                                     name="order_step"
+                                     visible="step=0"
+                                     actionName="confirmCustomerOrder"/>
+                            <trigger title="通知订单状态"
+                                     model="customerOrder"
+                                     viewType="modelAction"
+                                     name="order_step2"
+                                     visible="step&gt;0"
+                                     enable="step&gt;0"
+                                     actionName="notifyOrderStepBySmsEmail"/>
+                            <trigger title="开具发票/收据"
+                                     model="customerOrderInvoice"
+                                     viewType="create"
+                                     ownerField="invoice"
+                                     name="order_step3"
+                                     visible="step=1"/>
+                            <trigger title="发票/收据"
+                                     model="customerOrderInvoice"
+                                     viewType="edit"
+                                     name="order_step4"
+                                     ownerField="invoice"
+                                     visible="step&gt;1"
+                                     enable="step&gt;1"/>
+                            <trigger title="确认回款"
+                                     model="customerOrder"
+                                     viewType="modelAction"
+                                     name="order_step5"
+                                     visible="step=2"
+                                     actionName="confirmOrderPayment"/>
                         </group>
                     </action>
                 </actions>

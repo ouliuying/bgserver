@@ -20,8 +20,31 @@
 
 <ui>
     <action viewType="list" app="chat" model="chatChannel">
-        <group name="joinOpAction">
-            <trigger title="加入" name="doJoinChannel"></trigger>
+        <group name="OpChannelAction">
+            <trigger title="加入"
+                     name="doJoinChannel"
+                     viewType="modelActionConfirm">
+                <meta>
+                    <![CDATA[
+                    {
+                     "title":"提示",
+                     "message":"确定要加入此频道？"
+                    }
+                  ]]>
+                </meta>
+            </trigger>
+            <trigger title="退出"
+                     name="doExitChannel"
+                     viewType="modelActionConfirm">
+                <meta>
+                    <![CDATA[
+                    {
+                     "title":"提示",
+                     "message":"确定要退出此频道？"
+                    }
+                  ]]>
+                </meta>
+            </trigger>
         </group>
     </action>
 </ui>

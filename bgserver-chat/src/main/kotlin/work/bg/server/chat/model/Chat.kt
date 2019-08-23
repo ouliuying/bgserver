@@ -52,6 +52,11 @@ class Chat:ContextModel("chat","public") {
         }?:ActionResult(ErrorCode.UNKNOW,"continue")
     }
 
+    @Action("activeChatSession")
+    fun activeChatSession(sessionID:String):ActionResult?{
+        return null
+    }
+
     private fun getChannelMetaByChatSessionID(chatSessionID:String):String?{
         try {
             var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))

@@ -333,6 +333,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                         t.model=u.model?:t.model
                         t.title=u.title?:t.title
                         t.viewType=u.viewType?:t.viewType
+                        t.meta = u.meta?:t.meta
                     }
                 }
                 return cloneTG
@@ -387,9 +388,6 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                                 tf.visible="(${tf.visible}) and (${it.visible})"
                             }
                         }
-//                        if(it.enable!=null){
-//                            tf.enable = it.enable
-//                        }
                         if(it.subViewRule!=null){
                             tf.fieldView=applyViewRule(tf.fieldView,it.subViewRule as CorpPartnerRoleCache.ViewRule)
                         }

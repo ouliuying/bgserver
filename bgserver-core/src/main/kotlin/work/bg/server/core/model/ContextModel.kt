@@ -439,6 +439,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return mv
     }
+
     protected  open fun fillEditModelViewMeta(mv:ModelView,
                                               modelData:ModelData?,
                                                 viewData:MutableMap<String,Any>,
@@ -599,9 +600,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             ModelView.ViewType.LIST->{
                 return this.loadListModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
             }
+            ModelView.ViewType.MODEL_ACTION_CONFIRM->{
+                return null
+            }
         }
         return null
     }
+
     protected fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
         var fields = arrayListOf<FieldBase>()
         var fFields = arrayListOf<FunctionField<*>>()

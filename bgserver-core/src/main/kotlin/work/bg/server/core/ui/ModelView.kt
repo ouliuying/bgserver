@@ -39,6 +39,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
         const val EDIT = "edit"
         const val DETAIL = "detail"
         const val MODEL_ACTION="modelAction"
+        const val MODEL_ACTION_CONFIRM = "modelActionConfirm"
     }
     fun addField(name:String,
                  style:String,
@@ -251,6 +252,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                          val actionName:String?,
                          val visible:String?,
                          val enable:String?){
+            var meta:JsonObject?=null
             override fun toString(): String {
                 return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title} ${this.actionName}  ${this.visible} ${this.enable}"
             }
