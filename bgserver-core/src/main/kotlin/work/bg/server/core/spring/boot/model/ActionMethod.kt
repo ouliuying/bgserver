@@ -94,7 +94,12 @@ class ActionMethod constructor(val method: KFunction<*>){
         if(partnerCacheKey!=null){
             partnerCache= (this.bean as ContextModel).partnerCacheRegistry?.get(partnerCacheKey as PartnerCacheKey)
         }
+        else{
+            val apiToken= request.getHeader("token")
+            if(!apiToken.isNullOrEmpty()){
 
+            }
+        }
         var mavContainer = ModelAndViewContainer()
         mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request))
         mavContainer.setIgnoreDefaultModelOnRedirect(true)
