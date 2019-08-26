@@ -24,7 +24,7 @@ object ChatEventBusConstant {
     const val CHAT_SESSION_ID = "chatSessionID"
     const val CHAT_TO_UUID = "toUUID"
     const val CHAT_FROM_UUID = "fromUUID"
-    const val CHANNEL_TAG = "channelTag"
+    const val CHANNEL_UUID = "channelUUID"
     const val CLIENT_TO_SERVER_ADDRESS = "client.to.server"
     const val SERVER_TO_CLIENT_ADDRESS_PATTERN = "^server\\.to\\.client\\.[.]+\$"
     const val SERVER_TO_CLIENT_ADDRESS_HEADER = "server.to.client."

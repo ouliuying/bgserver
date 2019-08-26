@@ -162,7 +162,7 @@ class ModelClientRedis(var redis:Redis,channelMeta:String?) {
     }
     fun publish(message: Message<JsonObject>,
                 chatSession:ModelClientChatSession){
-        val channelTag = message.body().getString(ChatEventBusConstant.CHANNEL_TAG)
+        val channelTag = message.body().getString(ChatEventBusConstant.CHANNEL_UUID)
         channelTag?.let {
             val ch = this.channels[channelTag]
             ch?.let {

@@ -161,8 +161,8 @@ class ChatPartner: SmsPartner() {
                 jo.addProperty("name",it.getFieldValue(chModel.name)?.toString())
                 jo.addProperty("uuid",it.getFieldValue(chModel.uuid)?.toString())
                 jo.addProperty("defaultFlag",it.getFieldValue(chModel.defaultFlag)?.toString())
-                jo.addProperty("mustJoinFlag",it.getFieldValue(chModel.mustJoinFlag)?.toString())
                 jo.addProperty("broadcastType",it.getFieldValue(chModel.broadcastType)?.toString())
+                jo.addProperty("icon",it.getFieldValue(chModel.icon)?.toString())
                 ja.add(jo)
             }
         }

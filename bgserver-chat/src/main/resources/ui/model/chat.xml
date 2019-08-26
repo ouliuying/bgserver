@@ -50,16 +50,7 @@
                   ]]>
                 </meta>
             </field>
-            <field name="mustJoinFlag" type="enumStatic">
-                <meta>
-                    <![CDATA[
-                    {
-                     "0":"否",
-                     "1":"是"
-                    }
-                  ]]>
-                </meta>
-            </field>
+
             <field name="broadcastType" type="enumStatic">
                 <meta>
                     <![CDATA[
@@ -95,7 +86,6 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="defaultFlag" type="singleCheckbox"/>
-            <field name="mustJoinFlag" type="singleCheckbox"/>
             <field name="broadcastType" type="singleCheckbox"/>
         </view>
         <view type="edit">
@@ -108,7 +98,6 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="defaultFlag" type="singleCheckbox"/>
-            <field name="mustJoinFlag" type="singleCheckbox"/>
             <field name="broadcastType" type="singleCheckbox"/>
         </view>
         <view type="detail">
@@ -125,16 +114,6 @@
             <field name="name" type="static" style="head"/>
             <field name="uuid" type="static"/>
             <field name="defaultFlag" type="enumStatic">
-                <meta>
-                    <![CDATA[
-                    {
-                     "0":"否",
-                     "1":"是"
-                    }
-                  ]]>
-                </meta>
-            </field>
-            <field name="mustJoinFlag" type="enumStatic">
                 <meta>
                     <![CDATA[
                     {
