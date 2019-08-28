@@ -1,0 +1,8 @@
+{
+  "type": 1,
+  "isResponse": 1,
+  "uuid": "GUID",
+  "timestamp": 15484,
+  "channelUUID": "GUID",
+  "toUUID": "GUID"
+}

@@ -1,0 +1,22 @@
+[{
+  "opType": 1,
+  "opAction": "addChannel",
+  "data": {
+    "uuid": "GUID"
+  }
+},
+{
+  "opType": 1,
+  "opAction": "updateChannel",
+  "data": {
+    "uuid": "GUID"
+  }
+},
+  {
+    "opType": 1,
+    "opAction": "removeChannel",
+    "data": {
+      "uuid": "GUID"
+    }
+  }
+]

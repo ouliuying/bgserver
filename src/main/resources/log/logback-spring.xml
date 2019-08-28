@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  *
+  ~  *  *
+  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+  ~  *  *  * https://bg.work
+  ~  *  *  *
+  ~  *  *  * GNU Lesser General Public License Usage
+  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
+  ~  *  *  * General Public License version 3 as published by the Free Software
+  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
+  ~  *  *  * project of this file. Please review the following information to
+  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
+  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
+  ~  *  *
+  ~  *
+  ~  */
+  ~
+  -->
+
+<configuration  scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>logback</contextName>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+             <level>TRACE</level>
+         </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/logback.%d{yyyy-MM-dd-HH}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="console" />
+        <appender-ref ref="file" />
+    </root>
+    <logger name="io.vertx.ext.web.impl.RouterImpl" level="trace" />
+    <logger name="io.vertx.ext.web.handler.sockjs.impl.EventBusBridgeImpl" level="trace" />
+</configuration>

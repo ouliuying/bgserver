@@ -6,6 +6,8 @@
 /build/*
 /**/build/*
 /out/*
+/logs
+/logs/*
 /gradle/*
 /code_section/*
 /code-section/*
@@ -18,3 +20,5 @@
 !/**/resources/ui/**/*.xml
 /**/.DS_Store
 /**/out/*
+!/**/resources/log/**/*.xml
+!/**/resources/msg/**/*.json

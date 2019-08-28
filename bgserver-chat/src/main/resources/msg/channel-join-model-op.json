@@ -1,0 +1,29 @@
+[
+  {
+    "opType": 2,
+    "opAction": "addJoinModel",
+    "data": {
+      "uuid": "GUID",
+      "model": "partner",
+      "channelUUID": "GUID"
+    }
+  },
+  {
+    "opType": 2,
+    "opAction": "updateJoinModel",
+    "data": {
+      "uuid": "GUID",
+      "model": "partner",
+      "channelUUID": "GUID"
+    }
+  },
+  {
+    "opType": 2,
+    "opAction": "removeJoinModel",
+    "data": {
+      "uuid": "GUID",
+      "model": "partner",
+      "channelUUID": "GUID"
+    }
+  }
+]

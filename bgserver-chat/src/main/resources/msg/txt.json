@@ -1,0 +1,14 @@
+{
+  "type": 0,
+  "uuid": "GUUID",
+  "seq": 1,
+  "fromUUID": "GUID",
+  "toUUID": "GUID",
+  "mentionUUIDSet": ["GUID"],
+  "channelUUID": "GUID",
+  "responseType": 0,
+  "fromDevType": 0,
+  "toDevType": 0,
+  "timestamp": 1547,
+  "content": "hello world!"
+}
