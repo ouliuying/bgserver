@@ -143,12 +143,7 @@ dependencies {
     compile group: 'jaxen', name: 'jaxen', version: "$jaxen_version"
 
 }
-dependencies{
-    compile group: 'org.zalando', name: 'logbook-core', version: '1.11.2'
-    // https://mvnrepository.com/artifact/org.zalando/logbook-servlet
-    compile group: 'org.zalando', name: 'logbook-servlet', version: '1.11.2'
 
-}
 compileKotlin {
     kotlinOptions.jvmTarget = "$jvmTarget_version"
 }

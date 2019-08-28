@@ -20,17 +20,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
+import org.springframework.core.annotation.Order
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import work.bg.server.core.spring.boot.annotation.ShouldLoginInterceptor
-import org.springframework.web.filter.ShallowEtagHeaderFilter
 import javax.servlet.Filter
-import org.zalando.logbook.Logbook
-import org.zalando.logbook.servlet.LogbookFilter
 
 
 inline fun <reified T : Any> runServer(vararg args: String): Unit{
@@ -47,10 +42,9 @@ class  CoreApplication: WebMvcConfigurer
         registry.addInterceptor(ShouldLoginInterceptor(this.unauthRedirectUrl))
     }
     @Bean
-    fun logBookFilter(): Filter {
-        val logbook = Logbook.create()
-        var filter= LogbookFilter(logbook)
-        return filter
+    @Order(HIGHEST_PRECEDENCE)
+    fun resetRequestBodyFilter(): Filter {
+        return ResetRequestFilter()
     }
 }
 

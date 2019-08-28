@@ -74,9 +74,9 @@ class ChatPartner: SmsPartner() {
             FieldType.BIGINT,
             "加入的频道",
             relationModelTable = "public.chat_model_join_channel_rel",
-            relationModelFieldName = "join_partner_id",
+            relationModelFieldName = "join_channel_id",
             targetModelTable = "public.chat_channel",
-            targetModelFieldName = "join_partners")
+            targetModelFieldName = "id")
 
 
     @Action(name="login")

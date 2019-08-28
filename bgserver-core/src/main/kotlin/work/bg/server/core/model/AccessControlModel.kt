@@ -1000,6 +1000,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             errorMessage=errMsg
         } catch (ex: Exception) {
             logger.error(ex.message)
+            ex.printStackTrace()
             errorMessage=ex.message
         }
         try
@@ -1976,6 +1977,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
         } catch (ex: Exception) {
+            ex.printStackTrace()
             logger.error(ex.message)
         }
         try {

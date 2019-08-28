@@ -47,23 +47,27 @@ class HttpServerVerticle:AbstractVerticle() {
 
         val router = Router.router(vertx)
 
-        val options = BridgeOptions().addInboundPermitted(PermittedOptions().setAddress(ChatEventBusConstant.CLIENT_TO_SERVER_ADDRESS))
-                                     .addOutboundPermitted(PermittedOptions().setAddressRegex(ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_PATTERN))
+        val options = BridgeOptions()
+                .addInboundPermitted(PermittedOptions().setAddress(ChatEventBusConstant.CLIENT_TO_SERVER_ADDRESS))
+                .addOutboundPermitted(PermittedOptions().setAddressRegex(ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_PATTERN))
+                .addInboundPermitted(PermittedOptions().setAddressRegex(ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_PATTERN))
 
         router.route("/eventbus/*").handler(SockJSHandler.create(vertx).bridge(options))
 
         this.httpServer.requestHandler(router).listen{
             if(it.succeeded()){
                 this.logger.info("chat http server port $port success")
+                val eb = vertx.eventBus()
+                eb.consumer<JsonObject>(ChatEventBusConstant.CLIENT_TO_SERVER_ADDRESS).handler { message ->
+                    this.logger.info(message.body().toString())
+                    eb.publish("chat.to.server.message",message.body())
+                }
             }
             else{
                 this.logger.info("chat http server port $port fail")
             }
         }
-        val eb = vertx.eventBus()
-        eb.consumer<JsonObject>("chat.to.server").handler { message ->
-           eb.publish("chat.to.server.message",message)
-        }
+
     }
 
     override fun stop() {

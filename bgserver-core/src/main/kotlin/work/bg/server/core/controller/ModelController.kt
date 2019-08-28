@@ -55,8 +55,8 @@ class ModelController constructor(val  appModel: AppModel){
     @RequestMapping("/login",method = [RequestMethod.POST,RequestMethod.GET],produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     fun login(request: HttpServletRequest,
                 response: HttpServletResponse,
-                session: HttpSession,@RequestParam userName:String):Any?{
-        logger.info(userName)
+                session: HttpSession):Any?{
+       // logger.info(userName)
         var ret= appModel(request,response,session,"core","partner","login")
         if(ret!=null){
             logger.info(ret.javaClass.canonicalName)

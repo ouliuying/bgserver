@@ -91,7 +91,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
             relationModelTable = "public.chat_model_join_channel_rel",
             relationModelFieldName = "join_partner_id",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "join_channels")
+            targetModelFieldName = "id")
 
     val joinStatus =PartnerJoinStatusField(null,
             "join_status",

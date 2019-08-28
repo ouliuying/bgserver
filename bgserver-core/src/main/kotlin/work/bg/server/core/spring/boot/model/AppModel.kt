@@ -526,23 +526,24 @@ class  AppModel(modelMetaDatas: List<ModelMetaData>, val appPackageManifests:Map
                         modelName: String,
                         action: String): Any?{
         try
-        {   var paramInfo=StringBuilder()
-            paramInfo.append("call $appName.$modelName.$action, parameters = ")
-            request.parameterMap.forEach { t, u ->
-                var pValue=u.joinToString()
-                paramInfo.append("$t =$pValue  ")
-            }
-            try {
-                var allBytes=request.inputStream.readBytes()
-                paramInfo.append("all bytes = ")
-                paramInfo.append(String(allBytes, Charset.defaultCharset()))
-            }
-            catch(ex:Exception)
-            {
-                logger.error(ex.toString())
-            }
-
-            logger.info(paramInfo)
+        {
+//            var paramInfo=StringBuilder()
+//            paramInfo.append("call $appName.$modelName.$action, parameters = ")
+//            request.parameterMap.forEach { t, u ->
+//                var pValue=u.joinToString()
+//                paramInfo.append("$t =$pValue  ")
+//            }
+//            try {
+//                var allBytes=request.inputStream.readBytes()
+//                paramInfo.append("all bytes = ")
+//                paramInfo.append(String(allBytes, Charset.defaultCharset()))
+//            }
+//            catch(ex:Exception)
+//            {
+//                logger.error(ex.toString())
+//            }
+//
+//            logger.info(paramInfo)
             return this.appModelRegistries[appName]?.invoke(request,response,session,this,appName,modelName,action)
         }
         catch (err:Exception){
