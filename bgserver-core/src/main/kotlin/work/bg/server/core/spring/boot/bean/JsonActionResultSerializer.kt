@@ -1,4 +1,4 @@
-/*
+package work.bg.server.core.spring.boot.bean/*
  *
  *  *
  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
