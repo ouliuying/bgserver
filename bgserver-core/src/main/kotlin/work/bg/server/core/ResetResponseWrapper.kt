@@ -70,40 +70,42 @@ class ResetResponseWrapper(response: HttpServletResponse):HttpServletResponseWra
     }
     val bodyText: String
         get() = String(bodyShadow.toByteArray(), Charset.defaultCharset())
+
+    class FeedServletOutputStream(private var original:ServletOutputStream,
+                                  private var shadow:OutputStream):ServletOutputStream(){
+
+
+        override fun write(b: Int) {
+            original.write(b)
+            shadow.write(b)
+        }
+
+
+        override fun write(b: ByteArray, off: Int, len: Int) {
+            original.write(b, off, len)
+            shadow.write(b, off, len)
+        }
+
+
+        override fun flush() {
+            original.flush()
+            shadow.flush()
+        }
+
+
+        override fun close() {
+            original.close()
+            shadow.close()
+        }
+
+        override fun isReady(): Boolean {
+            return original.isReady
+        }
+
+        override fun setWriteListener(listener: WriteListener) {
+            original.setWriteListener(listener)
+        }
+    }
+
 }
 
-class FeedServletOutputStream(private var original:ServletOutputStream,
-                              private var shadow:OutputStream):ServletOutputStream(){
-
-
-    override fun write(b: Int) {
-        original.write(b)
-        shadow.write(b)
-    }
-
-
-    override fun write(b: ByteArray, off: Int, len: Int) {
-        original.write(b, off, len)
-        shadow.write(b, off, len)
-    }
-
-
-    override fun flush() {
-        original.flush()
-        shadow.flush()
-    }
-
-
-    override fun close() {
-        original.close()
-        shadow.close()
-    }
-
-    override fun isReady(): Boolean {
-        return original.isReady
-    }
-
-    override fun setWriteListener(listener: WriteListener) {
-        original.setWriteListener(listener)
-    }
-}

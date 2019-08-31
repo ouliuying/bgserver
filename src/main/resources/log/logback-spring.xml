@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ /*
-  ~  *
-  ~  *  *
-  ~  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
-  ~  *  *  * https://bg.work
-  ~  *  *  *
-  ~  *  *  * GNU Lesser General Public License Usage
-  ~  *  *  * Alternatively, this file may be used under the terms of the GNU Lesser
-  ~  *  *  * General Public License version 3 as published by the Free Software
-  ~  *  *  * Foundation and appearing in the file LICENSE.txt included in the
-  ~  *  *  * project of this file. Please review the following information to
-  ~  *  *  * ensure the GNU Lesser General Public License version 3 requirements
-  ~  *  *  * will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-  ~  *  *
-  ~  *
-  ~  */
-  ~
-  -->
-
 <configuration  scan="true" scanPeriod="60 seconds" debug="false">
     <contextName>logback</contextName>
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -45,4 +25,12 @@
     </root>
     <logger name="io.vertx.ext.web.impl.RouterImpl" level="trace" />
     <logger name="io.vertx.ext.web.handler.sockjs.impl.EventBusBridgeImpl" level="trace" />
+    <logger name="io.vertx.ext.web.handler.sockjs.impl.EventBusBridgeImpl" level="trace" />
+    <logger name="work.bg.server.chat.ModelClientHub" level="trace" />
+    <logger name="work.bg.server.chat.Server" level="trace" />
+    <logger name="work.bg.server.chat.verticle.HttpServerVerticle" level="trace" />
+    <logger name="work.bg.server.chat.verticle.ModelClientHubVerticle" level="trace" />
+    <logger name="work.bg.server.chat.verticle.RedisReceiveServerVerticle" level="trace" />
+    <logger name="work.bg.server.chat.verticle.RedisSendServerVerticle" level="trace" />
+    <logger name="work.bg.server.chat.verticle.PersistLogServerVerticle" level="trace" />
 </configuration>

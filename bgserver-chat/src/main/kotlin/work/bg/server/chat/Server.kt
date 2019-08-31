@@ -29,8 +29,7 @@ import java.util.*
 import io.vertx.core.Vertx
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
-import work.bg.server.chat.verticle.HttpServerVerticle
-import work.bg.server.chat.verticle.ModelClientHubVerticle
+import work.bg.server.chat.verticle.*
 
 @Component
 class Server: ApplicationRunner{
@@ -40,18 +39,29 @@ class Server: ApplicationRunner{
     lateinit var httpServerVerticle:HttpServerVerticle
     @Autowired
     lateinit var modelClientHubVerticle: ModelClientHubVerticle
+    @Autowired
+    lateinit var redisReceiveServerVerticle:RedisReceiveServerVerticle
+    @Autowired
+    lateinit var redisSendServerVerticle: RedisSendServerVerticle
+
+    @Autowired
+    lateinit var persistLogServerVerticle: PersistLogServerVerticle
 
 
     override fun run(args: ApplicationArguments?) {
         logger.info("start chat server at ${Date()}")
         this.initialize()
-        val httpServerVerticleOptions=DeploymentOptions()
-        this.vertx.deployVerticle(this.httpServerVerticle,httpServerVerticleOptions){
+
+
+
+        val persistLogServerVerticleOptions = DeploymentOptions()
+        persistLogServerVerticleOptions.isWorker=true
+        this.vertx.deployVerticle(this.persistLogServerVerticle,persistLogServerVerticleOptions){
             if(it.succeeded()){
-                logger.info("chat server verticle start success")
+                logger.info("message log persist server verticle start success")
             }
             else{
-                logger.info("chat server verticle start fail reason ${it.cause().toString()}")
+                logger.info("message log persist server verticle start failed reason ${it.cause().toString()}")
             }
         }
 
@@ -64,6 +74,43 @@ class Server: ApplicationRunner{
                 logger.info("model client  hub verticle start fail reason ${it.cause().toString()}")
             }
         }
+
+
+        this.vertx.deployVerticle(this.redisSendServerVerticle,DeploymentOptions(
+
+        )){
+            if(it.succeeded()){
+                this.logger.info("redis sender server start success")
+            }
+            else{
+                this.logger.info("redis sender server start failed")
+            }
+        }
+
+        this.vertx.deployVerticle(this.redisReceiveServerVerticle,DeploymentOptions(
+
+        )){
+            if(it.succeeded()){
+                this.logger.info("redis receive server start success")
+            }
+            else{
+                this.logger.info("redis receive server start failed")
+            }
+        }
+
+
+
+
+        val httpServerVerticleOptions=DeploymentOptions()
+        this.vertx.deployVerticle(this.httpServerVerticle,httpServerVerticleOptions){
+            if(it.succeeded()){
+                logger.info("chat server verticle start success")
+            }
+            else{
+                logger.info("chat server verticle start fail reason ${it.cause().toString()}")
+            }
+        }
+
     }
 
     private fun initialize(){

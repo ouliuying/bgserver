@@ -31,14 +31,14 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ModelClientChatSession(var redisClient:ModelClientRedis,
-                             var model:String,
+class ModelClientChatSession(var model:String,
                              var corpID:Long,
                              var modelID:Long,
                              var chatUUID:String,
+                             var channelMeta:String?,
                              var deviceSessionIDArray:ArrayList<ModelClientChatDeviceSessionID> = arrayListOf()) {
     init {
-        this.redisClient.chatSession = this
+
     }
     lateinit var vertx: Vertx
     fun refreshTimeout(chatSessionID:String=""){
@@ -72,13 +72,5 @@ class ModelClientChatSession(var redisClient:ModelClientRedis,
         this.deviceSessionIDArray.add(
                 ModelClientChatDeviceSessionID(devType,chatSessionID)
         )
-    }
-    fun dispatchMessage(message: Message<JsonObject>){
-        this.redisClient.publish(message,this)
-    }
-    @Fluent
-    fun subscribeToRedis(handler:Handler<AsyncResult<UInt>>):ModelClientChatSession{
-        this.redisClient.subscribe(handler)
-        return this
     }
 }

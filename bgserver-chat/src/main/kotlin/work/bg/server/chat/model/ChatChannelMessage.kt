@@ -56,6 +56,11 @@ class ChatChannelMessage:ContextModel("chat_channel_message","public") {
             FieldType.STRING,
             "接收ChatUUID")
 
+    val uuid = ModelField(null,
+            "uuid",
+            FieldType.STRING,
+            "信息UUID")
+
     val message = ModelField(null,
             "message",
             FieldType.TEXT,

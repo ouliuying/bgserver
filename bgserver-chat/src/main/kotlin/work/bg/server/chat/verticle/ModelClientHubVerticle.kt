@@ -25,6 +25,8 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject
+import org.apache.commons.logging.LogFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import work.bg.server.chat.ChatEventBusConstant
 import work.bg.server.chat.ModelClientChatSession
@@ -32,28 +34,19 @@ import work.bg.server.chat.ModelClientHub
 
 @Component
 class ModelClientHubVerticle: AbstractVerticle() {
+    @Value("\${bg.chat.redis.url}")
+    private lateinit var redisUrl:String
+    private val logger = LogFactory.getLog(javaClass)
     override fun start() {
         val eb = vertx.eventBus()
-        eb.consumer<JsonObject>("chat.to.server.message"){ message ->
-            message.body()?.let {
-                if(!it.isEmpty){
-                    val chatSessionID = it.getString(ChatEventBusConstant.CHAT_SESSION_ID)
-                    chatSessionID?.let {
-                        if(chatSessionID.isNotEmpty() &&
-                                chatSessionID.isBlank()){
-                           val mccs =  ModelClientHub.getModelClientChatSessionBySessionID(chatSessionID,true)
-                            if(mccs!=null){
-                                mccs.dispatchMessage(message)
-                            }
-                            else{
-                                 ModelClientHub.getRegModelClientChatSessionFromRedis(chatSessionID, Handler<AsyncResult<ModelClientChatSession>> {
-                                     if(it.succeeded()){
-                                         it.result().dispatchMessage(message)
-                                     }
-                                 })
-                            }
-                        }
-                    }
+        ModelClientHub.redisUrl=this.redisUrl
+        eb.consumer<String>(ChatEventBusConstant.INNER_REGISTER_CLIENT_TO_SERVER).handler{ sessionID ->
+            this.logger.trace("${ChatEventBusConstant.INNER_REGISTER_CLIENT_TO_SERVER} receive $sessionID")
+            if(!sessionID.body().isNullOrBlank() && !sessionID.body().isNullOrEmpty()){
+                val chatSessionID = sessionID.body()
+                if(chatSessionID.isNotEmpty() &&
+                        chatSessionID.isNotBlank()){
+                        ModelClientHub.registerClient(chatSessionID)
                 }
             }
         }

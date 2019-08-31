@@ -41,6 +41,7 @@ class ModelClientRedis(var redis:Redis,channelMeta:String?) {
         this.redis.handler{
             this.receiveScribeResponse(it)
         }
+
     }
     private fun receiveScribeResponse(resp:Response?){
         resp?.let {
