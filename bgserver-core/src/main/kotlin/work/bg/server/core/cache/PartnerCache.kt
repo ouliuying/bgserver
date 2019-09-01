@@ -68,7 +68,8 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         try {
             if(corps.containsKey(corpCache.id)){
                 var cc=corps[corpCache.id]
-                corpCache.roles.forEach { _, u ->  (cc?.roles as MutableMap)[u.id]=u}
+                corpCache.roles.forEach { _, u ->
+                    (cc?.roles as MutableMap)[u.id]=u}
             }
             else
             {
@@ -124,7 +125,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         var name=corpObject.data.getValue(BaseCorp.ref?.name!!) as String
         var acRuleMeta = partnerRoleObject.data.getValue(BasePartnerRole.ref.accessControlRule) as String?
         var  role=CorpPartnerRoleCache(roleID,roleName,isSuper,acRuleMeta)
-        return CorpCache(corpID,name, mapOf(role.id to role))
+        return CorpCache(corpID,name, mutableMapOf(role.id to role))
     }
 
     fun getModelRule(app:String,model:String):CorpPartnerRoleCache.ModelRule?{

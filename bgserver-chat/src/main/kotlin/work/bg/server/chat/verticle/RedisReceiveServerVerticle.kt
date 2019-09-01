@@ -98,6 +98,9 @@ class RedisReceiveServerVerticle:AbstractVerticle() {
                 this.retryCreateRedisClient()
                 this.logger.trace("receive server connect redis failed!")
             }
+        }.exceptionHandler {
+            this.redisClient=null
+            this.retryCreateRedisClient()
         }
     }
     private fun retryCreateRedisClient(){

@@ -33,6 +33,7 @@ object ChatEventBusConstant {
     const val SERVER_TO_CLIENT_ADDRESS_HEADER = "server.to.client."
     const val INNER_CHAT_TO_SERVER_MESSAGE = "inner.chat.to.server.message"
     const val INNER_REGISTER_CLIENT_TO_SERVER = "inner.register.client.to.server"
+    const val INNER_UNREGISTER_CLIENT_FROM_SERVER = "inner.unregister.client.from.server"
     const val ADDRESS_KEY = "address"
     const val INNER_SERVER_CHANNEL_ADDRESS_HEADER = "inner.server.channel."
     const val INNER_SERVER_REDIS_IN_QUEUE_ADDRESS = "inner.server.redis.in.queue"

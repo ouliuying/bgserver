@@ -113,7 +113,35 @@ class ChatChannel:ContextModel("chat_channel","public") {
           }
           return ar
     }
-
+    @Action("doJoinChannel")
+    fun doJoinChannel(@RequestBody data:JsonObject,partnerCache: PartnerCache?):ActionResult{
+        var ar = ActionResult()
+        var modelID = data.get("modelID")?.asLong
+        modelID?.let {
+            if(partnerCache!=null && modelID>0){
+                if(ChatModelJoinChannelRel.ref.rawCount(criteria = and(eq(ChatModelJoinChannelRel.ref.joinChannel,modelID),
+                                eq(ChatModelJoinChannelRel.ref.joinPartner,partnerCache.partnerID)))>0){
+                    ar.errorCode = ErrorCode.UNKNOW
+                    ar.description= "已经加入！"
+                    return ar
+                }
+                val mo = ModelDataObject(model = ChatModelJoinChannelRel.ref)
+                mo.setFieldValue(ChatModelJoinChannelRel.ref.joinChannel,modelID)
+                mo.setFieldValue(ChatModelJoinChannelRel.ref.joinPartner,partnerCache.partnerID)
+                var ret = ChatModelJoinChannelRel.ref.acCreate(mo,partnerCache)
+                if(ret.first!=null && ret.first!!>0){
+                    ar.errorCode = ErrorCode.SUCCESS
+                }
+                else{
+                    ar.errorCode=ErrorCode.UNKNOW
+                    ar.description = ret.second
+                }
+                return ar
+            }
+        }
+        ar.errorCode = ErrorCode.RELOGIN
+        return ar
+    }
     private fun getJoinModels(mo:ModelDataObject?):JsonArray?{
         var joinModels = JsonArray()
         var ownerPartner = this.getJoinModelFromPartner(mo?.getFieldValue(this.owner) as ModelDataObject?)
@@ -125,7 +153,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
             it.toModelDataObjectArray().forEach {
                 var partnerModelDataObject = it.getFieldValue(ChatModelJoinChannelRel.ref.joinPartner) as ModelDataObject?
                 partnerModelDataObject?.let {
-                    val joinPartner = this.getJoinModelFromPartner(mo?.getFieldValue(this.owner) as ModelDataObject?)
+                    val joinPartner = this.getJoinModelFromPartner(partnerModelDataObject)
                     joinPartner?.let {
                         joinModels.add(joinPartner)
                     }

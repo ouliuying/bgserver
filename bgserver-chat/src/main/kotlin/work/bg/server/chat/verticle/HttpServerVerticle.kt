@@ -35,7 +35,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import io.vertx.ext.web.handler.sockjs.SockJSHandler
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.handler.sockjs.BridgeEvent
 import io.vertx.ext.web.handler.sockjs.BridgeOptions
+import io.vertx.redis.client.Command
+import io.vertx.redis.client.Redis
+import io.vertx.redis.client.Request
 import work.bg.server.chat.ChatEventBusConstant
 import work.bg.server.chat.message.MessageResponseType
 import java.util.*
@@ -46,16 +50,56 @@ import java.util.Date
 class HttpServerVerticle:AbstractVerticle() {
     private val logger = LogFactory.getLog(javaClass)
     lateinit var httpServer:HttpServer
+    private val sessionIDToFromUUID = mutableMapOf<String,String>()
+    private  val sockHandlerIDToSessionID = mutableMapOf<String,String>()
     @Value("\${bg.chat-server.port}")
     var port:Int=8080
-    private fun registerClientToHub(address:String?,handler: Handler<AsyncResult<Boolean>>){
-        if(address!=null){
-            val sessionID = address.substringAfterLast(".")
+    @Value("\${bg.chat.redis.url}")
+    private lateinit var redisUrl:String
+
+    private fun registerClientToHub(sessionID:String?,handler: Handler<AsyncResult<Boolean>>){
+        if(sessionID!=null){
             val eb = this.vertx.eventBus()
             eb.publish(ChatEventBusConstant.INNER_REGISTER_CLIENT_TO_SERVER,sessionID)
-            handler.handle(Future.succeededFuture(true))
         }
         handler.handle(Future.succeededFuture(true))
+    }
+
+    private  fun checkAndRegisterClientSessionID(sessionID: String,be:BridgeEvent,handler:Handler<AsyncResult<Boolean>>){
+        Redis.createClient(this.vertx,this.redisUrl).connect {
+            if(it.succeeded()){
+                val redisClient = it.result()
+                redisClient?.send(Request.cmd(Command.EXISTS).arg(sessionID)){
+                    if(it.succeeded()){
+                        val ret =  it.result().toInteger()
+                        if(ret==1){
+                            val  sockHandlerID = be.socket().writeHandlerID()
+                            val  fromUUID = be.rawMessage?.getJsonObject("headers")?.getString(ChatEventBusConstant.CHAT_FROM_UUID)
+                            this.sessionIDToFromUUID[sessionID]=fromUUID?:""
+                            this.sockHandlerIDToSessionID[sockHandlerID] = sessionID
+                            this.logger.trace("sockHanderID = $sockHandlerID fromUUID = $fromUUID sesssionID = $sessionID")
+                            this.registerClientToHub(sessionID,
+                                    Handler<AsyncResult<Boolean>> {
+                                        handler.handle(Future.succeededFuture(true))
+                                    })
+                        }
+                        else{
+                            handler.handle(Future.failedFuture("无对应sessionID，不能注册通讯节点"))
+                        }
+                    }
+                    else{
+                        handler.handle(Future.failedFuture("redis通讯失败：${it.cause().toString()}"))
+                    }
+                }?.exceptionHandler {
+                    handler.handle(Future.failedFuture(it))
+                }
+            }
+            else{
+                handler.handle(Future.failedFuture(it.cause()))
+            }
+        }.exceptionHandler {
+            handler.handle(Future.failedFuture(it))
+        }
     }
     override fun start() {
         var option = HttpServerOptions()
@@ -76,13 +120,24 @@ class HttpServerVerticle:AbstractVerticle() {
                     be?.let {
                         when(be.type()){
                             BridgeEventType.REGISTERED->{
-                              this.registerClientToHub(be?.rawMessage?.getString(ChatEventBusConstant.ADDRESS_KEY), Handler<AsyncResult<Boolean>> {
-                                  be?.tryComplete(true)
-                              })
+                                val sessionID = be.rawMessage?.getString(ChatEventBusConstant.ADDRESS_KEY)?.substringAfterLast(".")
+                                if(!(sessionID.isNullOrEmpty() || sessionID.isNullOrBlank())){
+                                    this.checkAndRegisterClientSessionID(sessionID,be, Handler {
+                                        if(it.succeeded()){
+                                            be.complete(true)
+                                        }
+                                        else{
+                                            be.tryFail("check session failed")
+                                        }
+
+                                    })
+                                }
+                                else{
+                                    be.tryFail("cant get session id")
+                                }
                             }
                             else->{
-                               // this.logger.info("type = ${be?.type()}  rawmessage = ${be.rawMessage?.toString()}")
-                                be.tryComplete(true)
+                                be.complete(true)
                             }
                         }
                     }
@@ -90,7 +145,7 @@ class HttpServerVerticle:AbstractVerticle() {
                 catch (ex:Exception){
                     ex.printStackTrace()
                     if(!be.future().isComplete){
-                        be.tryComplete(true)
+                        be.tryFail(ex)
                     }
                 }
 

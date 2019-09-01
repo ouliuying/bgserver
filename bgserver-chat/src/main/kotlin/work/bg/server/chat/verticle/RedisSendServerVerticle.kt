@@ -79,6 +79,8 @@ class RedisSendServerVerticle:AbstractVerticle() {
             else{
                 this.restartSendRedisServer()
             }
+        }.exceptionHandler {
+            this.restartSendRedisServer()
         }
     }
     private  fun restartSendRedisServer(){

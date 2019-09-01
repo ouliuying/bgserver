@@ -50,6 +50,7 @@ class ModelClientHubVerticle: AbstractVerticle() {
                 }
             }
         }
+
     }
 
     override fun stop() {

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service
 import work.bg.server.core.model.*
 import work.bg.server.core.mq.*
 import work.bg.server.core.mq.specialized.ConstRelRegistriesField
+import java.lang.Exception
 import java.time.Duration
 
 @Component
@@ -60,24 +61,29 @@ class PartnerCacheRegistry{
     }
     protected  fun createPartnerCache(partnerKey:PartnerCacheKey): PartnerCache {
 
-        var partnerData=basePartner?.rawRead(*basePartner?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
-                criteria = eq(this.basePartner?.id!!,partnerKey.partnerID)!!,
-                attachedFields = arrayOf(AttachedField(this.basePartner?.corps!!),AttachedField(this.basePartner?.partnerRoles!!)))
+        try {
+            var partnerData=basePartner?.rawRead(*basePartner?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
+                    criteria = eq(this.basePartner?.id!!,partnerKey.partnerID)!!,
+                    attachedFields = arrayOf(AttachedField(this.basePartner?.corps!!),AttachedField(this.basePartner?.partnerRoles!!)))
 
-        var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject).
-                data?.get(BaseCorpPartnerRel.ref) as ModelDataArray?)?.data?.firstOrNull {
-            (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject).data.getValue(BaseCorp.ref!!.id) as Long?==partnerKey.corpID
+            var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject).
+                    data?.get(BaseCorpPartnerRel.ref) as ModelDataArray?)?.data?.firstOrNull {
+                (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject).data.getValue(BaseCorp.ref!!.id) as Long?==partnerKey.corpID
+            }
+
+            var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.corp!!) as ModelDataObject
+            var partnerRoleModelDataObject = corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.partnerRole!!) as ModelDataObject
+
+            var roleID=partnerRoleModelDataObject.data.getValue(BasePartnerRole.ref?.id!!) as Long?
+
+            return PartnerCache(mapOf(
+                    "corpObject" to corpModelDataObject,
+                    "partnerRoleObject" to partnerRoleModelDataObject
+            ),partnerKey.partnerID,partnerKey.corpID,roleID!!)
         }
-
-        var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.corp!!) as ModelDataObject
-        var partnerRoleModelDataObject = corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.partnerRole!!) as ModelDataObject
-
-        var roleID=partnerRoleModelDataObject.data.getValue(BasePartnerRole.ref?.id!!) as Long?
-
-        return PartnerCache(mapOf(
-                "corpObject" to corpModelDataObject,
-                "partnerRoleObject" to partnerRoleModelDataObject
-        ),partnerKey.partnerID,partnerKey.corpID,roleID!!)
+        catch (ex:Exception){
+          throw ex
+        }
     }
     fun get(key:PartnerCacheKey):PartnerCache?{
         return this.partnersCache?.get(key)
