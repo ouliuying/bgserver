@@ -21,8 +21,10 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
+import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import work.bg.server.core.RefSingleton
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.spring.boot.annotation.Action
@@ -35,6 +37,7 @@ import java.util.*
 
 @Model("chat")
 class Chat:ContextModel("chat","public") {
+    private val logger = LogFactory.getLog(javaClass)
     @Value("\${bg.chat.redis.url}")
     private lateinit var redisUrl:String
 
@@ -57,8 +60,18 @@ class Chat:ContextModel("chat","public") {
     }
 
     @Action("activeChatSession")
-    fun activeChatSession(sessionID:String):ActionResult?{
-        return null
+    fun activeChatSession(@RequestParam("sessionID") sessionID:String):ActionResult?{
+        this.logger.info("active session $sessionID")
+        var ar =ActionResult()
+        try {
+            var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
+            var ret = pool.resource.expire(sessionID,1800)
+            ar.errorCode=ErrorCode.SUCCESS
+        }
+        catch (ex: Exception){
+            ex.printStackTrace()
+        }
+        return ar
     }
 
     private fun getChannelMetaByChatSessionID(chatSessionID:String):String?{

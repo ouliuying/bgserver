@@ -159,14 +159,21 @@ class HttpServerVerticle:AbstractVerticle() {
                 eb.consumer<JsonObject>(ChatEventBusConstant.CLIENT_TO_SERVER_ADDRESS).handler { message ->
                     val msgObj = message.body()
                     val sessionID = msgObj?.getString(ChatEventBusConstant.CHAT_SESSION_ID)
-                    this.logger.trace("redirect receive client message to ${ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS} ${msgObj?.toString()}")
-                    val resp = createUpdateUUIDResponseMessage(msgObj)
-                    resp?.let {
-                        eb.publish("${ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_HEADER}$sessionID",
-                                resp)
+                    if(!(sessionID.isNullOrBlank() || sessionID.isNullOrEmpty())){
+                        val fromUUID = this.sessionIDToFromUUID[sessionID]
+                        if(fromUUID!=null){
+                            msgObj.put(ChatEventBusConstant.CHAT_FROM_UUID,fromUUID)
+                            this.logger.trace("redirect receive client message to ${ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS} ${msgObj?.toString()}")
+                            val resp = createUpdateUUIDResponseMessage(msgObj)
+                            resp?.let {
+                                eb.publish("${ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_HEADER}$sessionID",
+                                        resp)
+                            }
+                            this.logger.trace("server receive msg ${msgObj?.toString()}")
+                            eb.publish(ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS,msgObj)
+                        }
                     }
-                    this.logger.trace("server receive msg ${msgObj?.toString()}")
-                    eb.publish(ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS,msgObj)
+
                 }
             }
             else{
