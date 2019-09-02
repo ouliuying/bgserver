@@ -16,9 +16,12 @@
   -->
 <ui>
     <inherit>
-        <xpath expression="/ui/model[@app='core'][@name='partner']/view/list" op="append" app="core">
-            <field name="department"/>
-        </xpath>
+
+<!--        <xpath expression="/ui/model[@app='core'][@name='partner']/view/list" op="append" app="core">-->
+<!--            <field name="departments"/>-->
+<!--        </xpath>-->
+
+
 
         <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">
             <field name="department"/>
@@ -28,12 +31,20 @@
             <field name="department"/>
         </xpath>
 
-        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"/>
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']" op="append" app="core">
+            <field name="departments" style="relation"/>
         </xpath>
 
-        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"/>
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']/ref/views" op="append" app="core">
+            <view type="create" ownerField="departments" refType="none" model="departmentPartnerRel" app="corp"></view>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']" op="append" app="core">
+            <field name="departments" style="relation"/>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']/ref/views" op="append" app="core">
+            <view type="edit" ownerField="departments" refType="none" model="departmentPartnerRel" app="corp"></view>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
@@ -159,6 +170,7 @@
                 </actions>
             </ref>
             <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="department.name" type="many2OneDataSetSelect" style="head"/>
         </view>
         <view type="detail">
             <ref>
@@ -169,6 +181,7 @@
                 </actions>
             </ref>
             <field name="partner.userName" type="static" style="head"/>
+            <field name="department.name" type="static" style="head"/>
         </view>
         <view type="create">
             <ref>
@@ -178,7 +191,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect"/>
+            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="department.name" type="many2OneDataSetSelect" style="head"/>
         </view>
     </model>
 

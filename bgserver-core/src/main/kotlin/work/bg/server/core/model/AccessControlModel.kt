@@ -1762,7 +1762,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                         return  Pair(null,"创建失败")
                                     }
                                 }
-                                else{
+                                else if(fv.value.hasNormalField()){
                                     fv.value.context=modelDataObject.context
                                     var ret=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value,
                                             null,
@@ -1787,7 +1787,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                             return  Pair(null,"创建失败")
                                         }
                                     }
-                                    else
+                                    else if(tfvc.hasNormalField())
                                     {
                                         tfvc.context=modelDataObject.context
                                         var ret=(tmf?.first as AccessControlModel?)?.rawEdit(tfvc,
@@ -1814,7 +1814,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                         return  Pair(null,"创建失败")
                                     }
                                 }
-                                else{
+                                else if(fv.value.hasNormalField()){
                                     var tmf=this.getTargetModelField(fv.field)
                                     fv.value.data.add(FieldValue(tmf?.second!!,mIDFV.value))
                                     fv.value.context=modelDataObject.context
@@ -1845,7 +1845,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                         return Pair(null,"创建失败")
                                                     }
                                                 }
-                                                else if(mfvc.idFieldValue!=null){
+                                                else if(mfvc.idFieldValue!=null && mfvc.hasNormalField()){
                                                     mfvc.context=modelDataObject.context
                                                     var ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
                                                     if(ret==null || ret.second!=null){
@@ -1866,7 +1866,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                             return Pair(null,ret?.second)
                                                         }
                                                     }
-                                                    else if(mfvc.idFieldValue!=null){
+                                                    else if(mfvc.idFieldValue!=null && mfvc.hasNormalField()){
                                                         mfvc.context=modelDataObject.context
                                                         var ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
                                                         if(ret==null || ret.second!=null){
