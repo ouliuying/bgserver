@@ -63,12 +63,10 @@ version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 allOpen {
-    annotation("work.bg.server.core.spring.boot.annotation.Model")
-
-    // annotations("com.another.Annotation", "com.third.Annotation")
+    annotation("dynamic.model.web.spring.boot.annotation.Model")
 }
 allOpen {
-    annotation("work.bg.server.core.spring.boot.annotation.Action")
+    annotation("dynamic.model.web.spring.boot.annotation.Action")
 }
 
 repositories {
@@ -108,6 +106,7 @@ dependencies{
     compile group: 'redis.clients', name: 'jedis', version: '3.1.0'
 
 }
+
 dependencies{
     compile project(':bgserver-core')
     compile project(':bgserver-corp')

@@ -79,7 +79,7 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
 
 
     override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
-        return super.getModelFields(BaseCorpPartnerRel::class)
+        return super.getModelFields(AccessControlModel::class)
     }
 
     override fun corpIsolationFields(): Array<ModelField>? {

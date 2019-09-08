@@ -62,12 +62,12 @@ version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 allOpen {
-    annotation("work.bg.server.core.spring.boot.annotation.Model")
+    annotation("dynamic.model.web.spring.boot.annotation.Model")
 
     // annotations("com.another.Annotation", "com.third.Annotation")
 }
 allOpen {
-    annotation("work.bg.server.core.spring.boot.annotation.Action")
+    annotation("dynamic.model.web.spring.boot.annotation.Action")
 }
 
 repositories {

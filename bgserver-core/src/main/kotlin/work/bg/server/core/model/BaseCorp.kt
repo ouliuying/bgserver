@@ -38,12 +38,13 @@ open class BaseCorp(table:String, schema:String):ContextModel(table,schema){
   constructor():this("base_corp","public")
 
   override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
-    return super.getModelFields(BaseCorp::class)
+    return super.getModelFields(AccessControlModel::class)
   }
 
   override fun corpIsolationFields(): Array<ModelField>? {
     return null
   }
+
   val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
   val name= dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, "名称")
   val website= dynamic.model.query.mq.ModelField(null, "website", dynamic.model.query.mq.FieldType.STRING, "网站")

@@ -135,7 +135,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     fun acRead(vararg fields: dynamic.model.query.mq.FieldBase,
-               model:ModelBase?=null,
+               model:AccessControlModel?=null,
                criteria: dynamic.model.query.mq.ModelExpression?,
                partnerCache:PartnerCache,
                orderBy: dynamic.model.query.mq.OrderBy?=null,
@@ -311,7 +311,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
     open fun rawRead(vararg fields: dynamic.model.query.mq.FieldBase,
-                     model:ModelBase?=null,
+                     model:AccessControlModel?=null,
                      criteria: dynamic.model.query.mq.ModelExpression?,
                      orderBy: dynamic.model.query.mq.OrderBy?=null,
                      pageIndex:Int?=null,
@@ -538,11 +538,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
 
-        //TODO now
+
         rmfs.forEach {
             modelRelationMatcher = ModelRelationMatcher()
-
-            var rmf=this.getRelationModelField(it.value.first().field as dynamic.model.query.mq.FieldBase)
+            var rmf=model.getRelationModelField(it.value.first().field as FieldBase)
             var idField=model?.fields?.getIdField()
             var rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
             var subSelect=select(idField!!,fromModel = model!!).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
@@ -551,12 +550,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             modelRelationMatcher.addMatchData(model,idField,rmf?.first,rIDField)
             var joinModels=ArrayList<dynamic.model.query.mq.join.JoinModel>()
             it.value.forEach allField@{rrf->
-                var sRmf=this.getRelationModelField(rrf.field as dynamic.model.query.mq.FieldBase)
-                var targetMF=this.getTargetModelField(rrf.field as dynamic.model.query.mq.FieldBase)
-                var jField=sRmf?.first?.fields?.getFieldByTargetField(targetMF?.second)
+                val relationMF = model.getRelationModelField(rrf.field as FieldBase)?:return@allField
+                val targetMF= model.getTargetModelField(rrf.field as FieldBase)?:return@allField
+                var jField= relationMF.first?.fields?.getFieldByTargetField(targetMF.second)?:return@allField
                 if(useAccessControl){
                     //var rmfFields=partnerCache?.acFilterReadFields(sRmf?.first?.fields?.getAllPersistFields()?.values?.toTypedArray()!!)
-                    var targetMFFields=targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!//partnerCache?.acFilterReadFields(targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    var targetMFFields=targetMF?.first?.fields?.
+                            getAllPersistFields(true)?.
+                            values?.toTypedArray()!!
                     if(targetMFFields!=null){
                         //rtFields.addAll(rmfFields)
                         rtFields.addAll(targetMFFields)
@@ -567,7 +568,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }else{
                     rtFields.addAll(targetMF?.first?.fields?.getAllPersistFields(true)?.values!!)
                 }
-                modelRelationMatcher.addMatchData(rmf?.first,sRmf?.second,targetMF?.first,targetMF?.second)
+                modelRelationMatcher.addMatchData(rmf?.first,
+                        relationMF.second,
+                        targetMF?.first,
+                        targetMF?.second)
                 if(rrf.canBeEmpty){
                     joinModels.add(leftJoin(targetMF?.first, eq(jField!!,targetMF?.second!!)!!))
                 }
@@ -596,7 +600,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 attachedCriteriaArr.forEach {mIt->
                     mLst.add(mIt!!)
                 }
-                mLst.add(subSelect)
+                mLst.add(subCriteria)
                 subCriteria=and(*mLst.toTypedArray())
             }
 
@@ -953,18 +957,18 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return mainModelDataArray
     }
 
-    protected open fun getRelationModelField(field: dynamic.model.query.mq.FieldBase):Pair<ModelBase?, dynamic.model.query.mq.FieldBase?>?{
-        if((field is dynamic.model.query.mq.Many2ManyField)){
-            var model=this.appModel?.getModel((field as dynamic.model.query.mq.RefRelationField).relationModelTable!!)
-            var mField=model?.fields?.getField((field as dynamic.model.query.mq.RefRelationField).relationModelFieldName)
+    protected open fun getRelationModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
+        if((field is Many2ManyField)){
+            var model=this.appModel?.getModel((field as RefRelationField).relationModelTable)?:return null
+            var mField=model?.fields?.getField((field as RefRelationField).relationModelFieldName)?:return null
             return Pair(model,mField)
         }
         return null
     }
-    protected  open fun getTargetModelField(field: dynamic.model.query.mq.FieldBase):Pair<ModelBase?, dynamic.model.query.mq.FieldBase?>?{
+    protected  open fun getTargetModelField(field: dynamic.model.query.mq.FieldBase):Pair<ModelBase, dynamic.model.query.mq.FieldBase>?{
         if(field is dynamic.model.query.mq.RefTargetField){
-            var model=this.appModel?.getModel(field.targetModelTable!!)
-            var mField=model?.fields?.getField(field.targetModelFieldName)
+            var model=this.appModel?.getModel(field.targetModelTable)?:return null
+            var mField=model?.fields?.getField(field.targetModelFieldName)?:return null
             return Pair(model,mField)
         }
         return null
