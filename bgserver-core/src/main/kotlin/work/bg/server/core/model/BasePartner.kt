@@ -23,15 +23,19 @@ package work.bg.server.core.model
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
 import javax.servlet.http.HttpSession
 import work.bg.server.core.constant.SessionTag
 
-import work.bg.server.errorcode.ErrorCode
+import dynamic.model.web.errorcode.ErrorCode
 import org.springframework.web.bind.annotation.RequestParam
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.and
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.model.AppModel
+import dynamic.model.query.mq.specialized.ConstRelRegistriesField
+import dynamic.model.web.spring.boot.model.ActionResult
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
 import work.bg.server.core.acrule.ModelReadFieldFilterRule
 import work.bg.server.core.acrule.bean.ModelEditPartnerInnerRecordFieldsValueFilterBean
@@ -40,118 +44,119 @@ import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheKey
 import work.bg.server.core.model.billboard.PartnerTagBillboard
-import work.bg.server.core.mq.*
-import work.bg.server.core.mq.specialized.ConstRelRegistriesField
-import work.bg.server.core.spring.boot.model.ActionResult
+
 
 
 @Model(name = "partner",title="员工")
-class  BasePartner(table:String,schema:String): ContextModel(table,schema){
+open class  BasePartner(table:String, schema:String): ContextModel(table,schema){
     @Value("\${bg.work.auth-url}")
     private  val authUrl:String?= null
-    companion object :RefSingleton<BasePartner>{
+    companion object : RefSingleton<BasePartner> {
         override lateinit var ref: BasePartner
     }
     @Autowired
     lateinit var readPartnerInnerFilterBean:ModelReadPartnerInnerFilterBean
     @Autowired
     lateinit var editPartnerInnerFilterBean:ModelEditPartnerInnerRecordFieldsValueFilterBean
-    val id=ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
-    val userName=ModelField(null,
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val userName= dynamic.model.query.mq.ModelField(null,
             "user_name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "用户名",
-            index = arrayListOf(FieldIndex(unique = true)))
-    val password=ModelField(null,
+            index = arrayListOf(dynamic.model.query.mq.FieldIndex(unique = true)))
+    val password= dynamic.model.query.mq.ModelField(null,
             "password",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "密码")
-    val name=ModelField(null,
+    val name= dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "姓名")
-    val birthday=ModelField(null,
+    val birthday= dynamic.model.query.mq.ModelField(null,
             "birthday",
-            FieldType.DATE,
+            dynamic.model.query.mq.FieldType.DATE,
             "生日")
-    val mobile=ModelField(null,
+    val mobile= dynamic.model.query.mq.ModelField(null,
             "mobile",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "手机")
-    val nickName=ModelField(null,
+    val nickName= dynamic.model.query.mq.ModelField(null,
             "nick_name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "昵称")
-    val userTitle=ModelField(null,
+    val userTitle= dynamic.model.query.mq.ModelField(null,
             "user_title",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "用户标题")
-    val userIcon=ModelField(null,
+    val userIcon= dynamic.model.query.mq.ModelField(null,
             "user_icon",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "图标")
-    val userComment=ModelField(null,
+    val userComment= dynamic.model.query.mq.ModelField(null,
             "user_comment",
-            FieldType.TEXT,
+            dynamic.model.query.mq.FieldType.TEXT,
             "用户注释")
 
-    val tag=ModelField(null,
+    val tag= dynamic.model.query.mq.ModelField(null,
             "tag",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "用户标识",
-            index = arrayListOf(FieldIndex(unique = true)),
+            index = arrayListOf(dynamic.model.query.mq.FieldIndex(unique = true)),
             defaultValue = PartnerTagBillboard())
 
-    val telephone=ModelField(null,
+    val telephone= dynamic.model.query.mq.ModelField(null,
             "telephone",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "电话")
-    val email=ModelField(null,
+    val email= dynamic.model.query.mq.ModelField(null,
             "email",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "E-Mail")
-    val syncTag=ModelField(null,
+    val syncTag= dynamic.model.query.mq.ModelField(null,
             "sync_tag",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "信息同步Tag")
-    val accessTokenKey=ModelField(null,
+    val accessTokenKey= dynamic.model.query.mq.ModelField(null,
             "access_token_key",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "Token")
 
-    val corps=ModelMany2ManyField(null,
+    val corps= dynamic.model.query.mq.ModelMany2ManyField(null,
             "corp_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "公司",
             "public.base_corp_partner_rel",
             "corp_id",
-    "public.base_corp",
+            "public.base_corp",
             "id")
 
-    val partnerRoles=ModelMany2ManyField(null,
+    val partnerRoles= dynamic.model.query.mq.ModelMany2ManyField(null,
             "partner_role_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "角色",
             "public.base_corp_partner_rel",
             "partner_role_id",
-    "public.base_partner_role",
+            "public.base_partner_role",
             "id")
     //function fields
-    val setCurrentCorpAsDefault by lazy {ProxyRelationModelField<Int>(null,
-            BaseCorpPartnerRel.ref.isDefaultCorp,
-            "set_current_corp_as_default",
-            BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
-            "当前公司为默认")}
+    val setCurrentCorpAsDefault by lazy {
+        dynamic.model.query.mq.ProxyRelationModelField<Int, PartnerCache>(null,
+                BaseCorpPartnerRel.ref.isDefaultCorp,
+                "set_current_corp_as_default",
+                BaseCorpPartnerRel.ref.isDefaultCorp.fieldType,
+                "当前公司为默认")
+    }
 
-    val modelLogs = ModelOne2ManyField(null,
+    val modelLogs = dynamic.model.query.mq.ModelOne2ManyField(null,
             "model_logs",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "日志",
             targetModelTable = "public.base_model_log",
             targetModelFieldName = "partner_id")
@@ -203,10 +208,10 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
         return this.editPartnerInnerFilterBean
     }
     @Action(name="login")
-    fun login(@RequestParam userName:String,@RequestParam password:String,@RequestParam devType:Int,session:HttpSession):ActionResult?{
+    open fun login(@RequestParam userName:String, @RequestParam password:String, @RequestParam devType:Int, session:HttpSession):ActionResult?{
         var md5Password= work.bg.server.util.MD5.hash(password)
         var partner=this.rawRead(criteria = and(eq(this.userName,userName)!!,eq(this.password,md5Password)!!),
-                attachedFields = arrayOf(AttachedField(this.corps),AttachedField(this.partnerRoles)))
+                attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.corps), dynamic.model.query.mq.AttachedField(this.partnerRoles)))
         return when{
             partner!=null->{
                     var id=partner?.data?.firstOrNull()?.getValue(this.id) as Long?
@@ -214,17 +219,17 @@ class  BasePartner(table:String,schema:String): ContextModel(table,schema){
                         var ar = ActionResult()
                         var corpPartnerRels = (partner?.data?.
                                 firstOrNull()?.
-                                getValue(ConstRelRegistriesField.ref!!) as ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
-                        as ModelDataArray?
+                                getValue(ConstRelRegistriesField.ref!!) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
+                        as dynamic.model.query.mq.ModelDataArray?
                         corpPartnerRels?.data?.sortByDescending {
-                            (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?)?.data?.getValue(BasePartnerRole.ref!!.isSuper) as Int
+                            (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref!!.isSuper) as Int
                         }
-                        var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?
-                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as ModelDataObject?
+                        var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?
+                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as dynamic.model.query.mq.ModelDataObject?
                         var corpID=corpObject?.data?.getValue(BaseCorp.ref!!.id) as Long?
                         var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                         var corps=corpPartnerRels?.data?.map {
-                            it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject
+                            it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject
                         }
                         if(corpID!=null && corpID>0){
                             session.setAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY, PartnerCacheKey(id, corpID, devType))

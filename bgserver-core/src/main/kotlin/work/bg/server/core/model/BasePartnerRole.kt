@@ -21,64 +21,65 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.model.AppModel
 import work.bg.server.core.acrule.inspector.*
-import work.bg.server.core.mq.*
 import work.bg.server.core.model.billboard.CurrCorpBillboard
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.web.spring.boot.annotation.Model
+
 
 @Model("partnerRole", "角色")
 class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
-    companion object :RefSingleton<BasePartnerRole>{
+    companion object : RefSingleton<BasePartnerRole> {
         override lateinit var ref: BasePartnerRole
     }
 
-    val id=ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name=ModelField(null,
+    val name= dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "名称")
 
 
 
-    val corp=ModelMany2OneField(null,
+    val corp= dynamic.model.query.mq.ModelMany2OneField(null,
             "corp_id",
-             FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "公司",
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
             defaultValue = CurrCorpBillboard(),
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val partners=ModelMany2ManyField(null,
+    val partners= dynamic.model.query.mq.ModelMany2ManyField(null,
             "partner_id",
-             FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "用户",
             "public.base_corp_partner_rel",
             "partner_id",
             "public.base_partner",
             "id")
 
-    val accessControlRule = ModelField(null,
+    val accessControlRule = dynamic.model.query.mq.ModelField(null,
             "ac_rule",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "权限配置",
             defaultValue = "")
 
-    val isSuper=ModelField(null,
+    val isSuper= dynamic.model.query.mq.ModelField(null,
             "is_super",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "管理员",
             defaultValue = 0)
 
-    val apps=ModelOne2ManyField(null,"m_partner_role_id",
-            FieldType.BIGINT,
+    val apps= dynamic.model.query.mq.ModelOne2ManyField(null, "m_partner_role_id",
+            dynamic.model.query.mq.FieldType.BIGINT,
             title = "应用",
             targetModelTable = "public.base_app",
             targetModelFieldName = "partner_role_id")
@@ -87,14 +88,14 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
 
     fun getInstallApps(id:Long):List<String>{
         val apps = mutableListOf<String>()
-        var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(AttachedField(this.apps)))?.firstOrNull()
+        var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.apps)))?.firstOrNull()
         d?.let {
             (it.getFieldValue(this.isSuper) as Int?)?.let {isSuper->
                 if(isSuper>0){
                     return AppModel.ref.appPackageManifests.keys.toList()
                 }
             }
-            val pApps = it.getFieldValue(this.apps) as ModelDataArray?
+            val pApps = it.getFieldValue(this.apps) as dynamic.model.query.mq.ModelDataArray?
             pApps?.let {mda->
                 mda.toModelDataObjectArray().forEach {
                     mdo->

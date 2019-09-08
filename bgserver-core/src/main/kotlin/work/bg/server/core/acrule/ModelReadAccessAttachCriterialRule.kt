@@ -22,11 +22,11 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package work.bg.server.core.acrule
 
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelExpression
+import dynamic.model.query.mq.ModelExpression
+import dynamic.model.query.mq.model.ModelBase
 
 
 interface ModelReadAccessAttachCriterialRule<T>:ModelReadAccessControlRule<T> {
-     operator fun invoke(model: ModelBase, partnerCache: PartnerCache,criteria:ModelExpression?):ModelExpression?
+     operator fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression?
      var config:String
 }

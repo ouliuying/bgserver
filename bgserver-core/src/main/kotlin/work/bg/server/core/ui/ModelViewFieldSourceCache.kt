@@ -21,8 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.ui
 
+import dynamic.model.query.mq.model.AppModel
 import work.bg.server.util.MethodInvocation
-import work.bg.server.core.spring.boot.model.AppModel
+
 
 
 

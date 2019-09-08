@@ -21,33 +21,41 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import com.google.gson.JsonObject
+import dynamic.model.query.mq.*
+import dynamic.model.query.mq.model.ModelBase
+import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.ui.ModelView
+import kotlin.reflect.KClass
+
 @Model(name = "corp", title="公司")
-class BaseCorp(table:String,schema:String):ContextModel(table,schema){
-  companion object:RefSingleton<BaseCorp>{
+open class BaseCorp(table:String, schema:String):ContextModel(table,schema){
+  companion object: RefSingleton<BaseCorp> {
     override lateinit var ref: BaseCorp
   }
 
   constructor():this("base_corp","public")
 
-  override fun skipCorpIsolationFields(): Boolean {
-      return true
+  override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
+    return super.getModelFields(BaseCorp::class)
   }
 
-  val id=ModelField(null,"id",FieldType.BIGINT,"标识",primaryKey = FieldPrimaryKey())
-  val name=ModelField(null,"name",FieldType.STRING,"名称")
-  val website=ModelField(null,"website",FieldType.STRING,"网站")
-  val address=ModelField(null,"address",FieldType.STRING,"地址")
-  val telephone=ModelField(null,"telephone",FieldType.STRING,"电话")
-  val fax=ModelField(null,"fax",FieldType.STRING,"传真")
-  val comment=ModelField(null,"comment",FieldType.TEXT,"注释")
-  val partners=ModelMany2ManyField(null,"partner_id",FieldType.BIGINT,"用户","public.base_corp_partner_rel","partner_id",
-          "base_partner","id")
-  val partnerRoles=ModelOne2ManyField(null,
+  override fun corpIsolationFields(): Array<ModelField>? {
+    return null
+  }
+  val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+  val name= dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, "名称")
+  val website= dynamic.model.query.mq.ModelField(null, "website", dynamic.model.query.mq.FieldType.STRING, "网站")
+  val address= dynamic.model.query.mq.ModelField(null, "address", dynamic.model.query.mq.FieldType.STRING, "地址")
+  val telephone= dynamic.model.query.mq.ModelField(null, "telephone", dynamic.model.query.mq.FieldType.STRING, "电话")
+  val fax= dynamic.model.query.mq.ModelField(null, "fax", dynamic.model.query.mq.FieldType.STRING, "传真")
+  val comment= dynamic.model.query.mq.ModelField(null, "comment", dynamic.model.query.mq.FieldType.TEXT, "注释")
+  val partners= dynamic.model.query.mq.ModelMany2ManyField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "用户", "public.base_corp_partner_rel", "partner_id",
+          "base_partner", "id")
+  val partnerRoles= dynamic.model.query.mq.ModelOne2ManyField(null,
           "m_corp_id",
-          FieldType.BIGINT,"角色",
+          dynamic.model.query.mq.FieldType.BIGINT, "角色",
           "public.base_partner_role",
           "corp_id")
 }

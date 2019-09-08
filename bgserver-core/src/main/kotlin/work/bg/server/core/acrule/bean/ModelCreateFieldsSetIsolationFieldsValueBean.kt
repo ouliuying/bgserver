@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelCreateRecordFieldsValueInitializeRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.ModelDataObject
-import work.bg.server.core.mq.ModelField
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.ModelField
 
 @Component
 class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueInitializeRule<Any> {
@@ -38,8 +38,10 @@ class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueI
         set(value) {
             this._config=value
         }
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
-        if(modelData.model!=null && !(modelData.model as AccessControlModel).skipCorpIsolationFields()){
+    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject,
+                        partnerCache: PartnerCache,
+                        data: Any?): Pair<Boolean, String> {
+        if(modelData.model!=null && (modelData.model as AccessControlModel).corpIsolationFields()!=null){
             var createCorpID = (modelData.model as AccessControlModel).createCorpID
             var lastModifyCorpID = (modelData.model as AccessControlModel).lastModifyCorpID
             var createPartnerID = (modelData.model as AccessControlModel).createPartnerID
@@ -55,13 +57,13 @@ class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueI
         }
         return Pair(true,"")
     }
-    private  fun setFieldValue(modelData: ModelDataObject,field:ModelField,value:Any?){
+    private  fun setFieldValue(modelData: dynamic.model.query.mq.ModelDataObject, field: dynamic.model.query.mq.ModelField, value:Any?){
         var index=modelData.data?.setValue(field,value)
        if(index<0){
             modelData.fields?.add(field)
         }
     }
-    operator fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache): Pair<Boolean, String> {
+    operator fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache): Pair<Boolean, String> {
        return this.invoke(modelData,partnerCache,null)
     }
 

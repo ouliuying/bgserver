@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.BasePartner
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.ModelDataObject
 
 @Component
 class ModelEditPartnerInnerRecordFieldsValueFilterBean: ModelEditRecordFieldsValueFilterRule<Unit> {
@@ -36,7 +36,7 @@ class ModelEditPartnerInnerRecordFieldsValueFilterBean: ModelEditRecordFieldsVal
             _config=value
         }
 
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Unit?): Pair<Boolean, String> {
+    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Unit?): Pair<Boolean, String> {
         if(modelData.hasFieldValue(BasePartner.ref.password)){
             var password = modelData.getFieldValue(BasePartner.ref.password)
             if(password!=null && !(password as String).isNullOrEmpty()){

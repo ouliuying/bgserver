@@ -21,13 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelMany2OneField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("chatChannelMessage")
 class ChatChannelMessage:ContextModel("chat_channel_message","public") {
@@ -35,34 +31,34 @@ class ChatChannelMessage:ContextModel("chat_channel_message","public") {
         override lateinit var ref: ChatChannelMessage
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val channelUUID = ModelField(null,
+    val channelUUID = dynamic.model.query.mq.ModelField(null,
             "channel_uuid",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "频道UUID")
 
-    val fromChatUUID = ModelField(null,
+    val fromChatUUID = dynamic.model.query.mq.ModelField(null,
             "from_chat_uuid",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "发起ChatUUID")
 
-    val toChatUUID = ModelField(null,
+    val toChatUUID = dynamic.model.query.mq.ModelField(null,
             "to_chat_uuid",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "接收ChatUUID")
 
-    val uuid = ModelField(null,
+    val uuid = dynamic.model.query.mq.ModelField(null,
             "uuid",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "信息UUID")
 
-    val message = ModelField(null,
+    val message = dynamic.model.query.mq.ModelField(null,
             "message",
-            FieldType.TEXT,
+            dynamic.model.query.mq.FieldType.TEXT,
             "信息")
 }

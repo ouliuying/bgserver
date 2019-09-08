@@ -21,37 +21,33 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.product.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2ManyField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="productUOM")
 class ProductUOM :ContextModel("product_uom","public"){
     companion object : RefSingleton<ProductUOM> {
         override lateinit var ref: ProductUOM
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val name = ModelField(null,
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val name = dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "名称",
             defaultValue = "")
-    val comment = ModelField(null,
+    val comment = dynamic.model.query.mq.ModelField(null,
             "c_comment",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "注释",
             defaultValue = "")
-    val products=ModelOne2ManyField(null,
+    val products= dynamic.model.query.mq.ModelOne2ManyField(null,
             "product_umo",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "对应产品",
             targetModelTable = "public.product_product",
             targetModelFieldName = "uom_id")

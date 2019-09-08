@@ -21,13 +21,13 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
-import work.bg.server.core.config.AppNamePackage
-import work.bg.server.core.config.AppPackageManifest
+import dynamic.model.query.config.AppNamePackage
+import dynamic.model.query.config.AppPackageManifest
 
 class AppName : AppNamePackage {
-    override  fun get():AppPackageManifest{
+    override  fun get(): AppPackageManifest {
         return AppPackageManifest("corp",
-                "公司部门","/svg/department-app.svg",
+                "公司部门", "/svg/department-app.svg",
                 "在公司和员工直接添加部门的支持",
                 1)
     }

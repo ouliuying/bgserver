@@ -21,13 +21,13 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
-import work.bg.server.core.config.AppNamePackage
-import work.bg.server.core.config.AppPackageManifest
+import dynamic.model.query.config.AppNamePackage
+import dynamic.model.query.config.AppPackageManifest
 
 class AppName : AppNamePackage {
-    override  fun get():AppPackageManifest{
+    override  fun get(): AppPackageManifest {
         return AppPackageManifest("sms",
-                "短信平台","/svg/sms-app.svg",
+                "短信平台", "/svg/sms-app.svg",
                 "短信平台，http://www.c8686.com",
                 1)
     }

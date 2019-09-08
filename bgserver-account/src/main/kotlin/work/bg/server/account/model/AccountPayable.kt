@@ -23,13 +23,9 @@
 
 package work.bg.server.account.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2OneField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 //应付款
 @Model("accountPayable")
@@ -38,15 +34,15 @@ class AccountPayable:ContextModel("account_payable","public") {
         override lateinit var ref: AccountPayable
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val orderInvoice= ModelOne2OneField(null,
+    val orderInvoice= dynamic.model.query.mq.ModelOne2OneField(null,
             "order_invoice_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "发票",
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "id")

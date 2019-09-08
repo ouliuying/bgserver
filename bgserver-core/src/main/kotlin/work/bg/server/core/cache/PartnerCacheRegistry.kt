@@ -25,13 +25,13 @@ package work.bg.server.core.cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.specialized.ConstRelRegistriesField
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import work.bg.server.core.model.*
-import work.bg.server.core.mq.*
-import work.bg.server.core.mq.specialized.ConstRelRegistriesField
 import java.lang.Exception
 import java.time.Duration
 
@@ -64,15 +64,15 @@ class PartnerCacheRegistry{
         try {
             var partnerData=basePartner?.rawRead(*basePartner?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
                     criteria = eq(this.basePartner?.id!!,partnerKey.partnerID)!!,
-                    attachedFields = arrayOf(AttachedField(this.basePartner?.corps!!),AttachedField(this.basePartner?.partnerRoles!!)))
+                    attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.basePartner?.corps!!), dynamic.model.query.mq.AttachedField(this.basePartner?.partnerRoles!!)))
 
-            var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject).
-                    data?.get(BaseCorpPartnerRel.ref) as ModelDataArray?)?.data?.firstOrNull {
-                (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject).data.getValue(BaseCorp.ref!!.id) as Long?==partnerKey.corpID
+            var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject).
+                    data?.get(BaseCorpPartnerRel.ref) as dynamic.model.query.mq.ModelDataArray?)?.data?.firstOrNull {
+                (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject).data.getValue(BaseCorp.ref!!.id) as Long?==partnerKey.corpID
             }
 
-            var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.corp!!) as ModelDataObject
-            var partnerRoleModelDataObject = corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.partnerRole!!) as ModelDataObject
+            var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.corp!!) as dynamic.model.query.mq.ModelDataObject
+            var partnerRoleModelDataObject = corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.partnerRole!!) as dynamic.model.query.mq.ModelDataObject
 
             var roleID=partnerRoleModelDataObject.data.getValue(BasePartnerRole.ref?.id!!) as Long?
 

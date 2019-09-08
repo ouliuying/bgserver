@@ -23,37 +23,36 @@ package work.bg.server.sms.model
 
 import com.google.gson.JsonObject
 import org.springframework.web.bind.annotation.RequestBody
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.ui.ModelView
-import work.bg.server.errorcode.ErrorCode
+import dynamic.model.web.errorcode.ErrorCode
+import dynamic.model.web.spring.boot.model.ActionResult
 
 @Model("smsSetting")
 class SmsSetting:ContextModel("sms_setting","public") {
     companion object : RefSingleton<SmsSetting> {
         override lateinit var ref: SmsSetting
     }
-    val id=ModelField(null,"id",FieldType.BIGINT,"标识",primaryKey = FieldPrimaryKey())
-    val userName = ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val userName = dynamic.model.query.mq.ModelField(null,
             "userName",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "账号")
 
-    val password = ModelField(null,
+    val password = dynamic.model.query.mq.ModelField(null,
             "password",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "密码")
 
     @Action(name="edit")
-    override fun editAction(@RequestBody modelData: ModelData?, pc: PartnerCache): ActionResult?{
+    override fun editAction(@RequestBody modelData: dynamic.model.query.mq.ModelData?, pc: PartnerCache): ActionResult?{
         var ar= ActionResult()
         if(modelData!=null){
-            if(modelData is ModelDataObject){
+            if(modelData is dynamic.model.query.mq.ModelDataObject){
                 if(modelData.idFieldValue?.value!=null){
                     var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
                     if(ret?.first!=null && ret?.first!! > 0){
@@ -78,19 +77,19 @@ class SmsSetting:ContextModel("sms_setting","public") {
 
 
     protected override fun loadEditModelViewData(mv: ModelView,
-                                             viewData:MutableMap<String,Any>,
-                                             pc:PartnerCache,
-                                             ownerFieldValue: FieldValue?,
-                                             toField: FieldBase?,
-                                             ownerModelID: Long?,
-                                             reqData: JsonObject?):ModelDataObject?{
+                                                 viewData:MutableMap<String,Any>,
+                                                 pc:PartnerCache,
+                                                 ownerFieldValue: dynamic.model.query.mq.FieldValue?,
+                                                 toField: dynamic.model.query.mq.FieldBase?,
+                                                 ownerModelID: Long?,
+                                                 reqData: JsonObject?): dynamic.model.query.mq.ModelDataObject?{
         val fields = this.getModelViewFields(mv)
         var data = this.acRead(*fields.toTypedArray(), criteria = null, partnerCache = pc)
         data?.let {
             if(it.data.count()>0){
                 return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
-                    it is ModelMany2ManyField
-                }.toTypedArray())) as ModelDataObject?
+                    it is dynamic.model.query.mq.ModelMany2ManyField
+                }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
             }
         }
         val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
@@ -99,8 +98,8 @@ class SmsSetting:ContextModel("sms_setting","public") {
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
-                        _f is ModelMany2ManyField
-                    }.toTypedArray())) as ModelDataObject?
+                        _f is dynamic.model.query.mq.ModelMany2ManyField
+                    }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
                 }
             }
         }

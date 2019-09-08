@@ -21,14 +21,13 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="leadInteractionStatus",title = "线索状态")
 class LeadInteractionStatus:ContextModel("crm_lead_interaction_status","public") {
@@ -36,20 +35,20 @@ class LeadInteractionStatus:ContextModel("crm_lead_interaction_status","public")
         override lateinit var ref: LeadInteractionStatus
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name = ModelField(null,
+    val name = dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "名称",
             defaultValue = "")
 
-    val leads=ModelOne2ManyField(null,
-            "leads",FieldType.BIGINT,
+    val leads= dynamic.model.query.mq.ModelOne2ManyField(null,
+            "leads", dynamic.model.query.mq.FieldType.BIGINT,
             "线索",
             targetModelTable = "public.crm_lead",
             targetModelFieldName = "interaction_status_id")

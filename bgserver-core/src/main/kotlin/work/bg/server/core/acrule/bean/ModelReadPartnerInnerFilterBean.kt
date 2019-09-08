@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelReadFieldFilterRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.BasePartner
-import work.bg.server.core.mq.FieldBase
+import dynamic.model.query.mq.FieldBase
 
 @Component
 class ModelReadPartnerInnerFilterBean:ModelReadFieldFilterRule {
@@ -36,7 +36,7 @@ class ModelReadPartnerInnerFilterBean:ModelReadFieldFilterRule {
             _config=value
         }
 
-    override fun invoke(field: FieldBase, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
+    override fun invoke(field: dynamic.model.query.mq.FieldBase, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
         if(field.isSame(BasePartner.ref.password)){
            return Pair(true,"")
         }

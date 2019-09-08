@@ -23,68 +23,63 @@
 
 package work.bg.server.product.model
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
-import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.ui.ModelView
 
 
 @Model(name="product")
-class Product:ContextModel("product_product","public") {
+open class Product:ContextModel("product_product","public") {
     companion object : RefSingleton<Product> {
         override lateinit var ref: Product
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val name = ModelField(null,
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val name = dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "名称",
             defaultValue = "")
-    val cost = ModelField(null,
+    val cost = dynamic.model.query.mq.ModelField(null,
             "cost",
-            FieldType.DECIMAL,
+            dynamic.model.query.mq.FieldType.DECIMAL,
             title = "成本",
             defaultValue = 0)
-    val price = ModelField(null,
+    val price = dynamic.model.query.mq.ModelField(null,
             "price",
-            FieldType.DECIMAL,
+            dynamic.model.query.mq.FieldType.DECIMAL,
             title = "售价",
             defaultValue = 0)
-    val uom =  ModelMany2OneField(null,
+    val uom = dynamic.model.query.mq.ModelMany2OneField(null,
             "uom_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             title = "单位",
-            targetModelTable ="public.product_uom",
+            targetModelTable = "public.product_uom",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
 
-    val img =  ModelField(null,
+    val img = dynamic.model.query.mq.ModelField(null,
             "img",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             title = "图片",
             defaultValue = 0)
 
-    val attributeMap = ModelOne2ManyField(null,
+    val attributeMap = dynamic.model.query.mq.ModelOne2ManyField(null,
             "attribute_map",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "属性集",
             targetModelTable = "public.product_attribute_value_map",
             targetModelFieldName = "product_id")
 
-    val skuPattern = ModelOne2OneField(null,
+    val skuPattern = dynamic.model.query.mq.ModelOne2OneField(null,
             "sku_pattern",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "Sku生成模式",
             targetModelTable = "public.product_sku_pattern",
             targetModelFieldName = "product_id",

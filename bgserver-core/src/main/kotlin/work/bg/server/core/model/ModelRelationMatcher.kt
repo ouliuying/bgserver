@@ -21,16 +21,16 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import work.bg.server.core.mq.FieldBase
-import work.bg.server.core.mq.ModelBase
+import dynamic.model.query.mq.FieldBase
+import dynamic.model.query.mq.model.ModelBase
 
 class ModelRelationMatcher {
     private  var matchMap= mutableMapOf<MatchDataKey,MatchField>()
     fun addMatchData(fromModel: ModelBase?,
-                     fromField:FieldBase?,
+                     fromField: dynamic.model.query.mq.FieldBase?,
                      toModel: ModelBase?,
-                     toField:FieldBase?,
-                     realFromField:FieldBase?=null){
+                     toField: dynamic.model.query.mq.FieldBase?,
+                     realFromField: dynamic.model.query.mq.FieldBase?=null){
         this.matchMap[MatchDataKey(fromModel, toModel)]= MatchField(fromField,toField,realFromField)
     }
     fun getRelationMatchField(fromModel: ModelBase?, toModel: ModelBase?):MatchField?{
@@ -42,8 +42,8 @@ class ModelRelationMatcher {
             val toModel: ModelBase?
     )
     data class MatchField(
-            val fromField:FieldBase?,
-            val toField:FieldBase?,
-            val realFromField:FieldBase?
+            val fromField: dynamic.model.query.mq.FieldBase?,
+            val toField: dynamic.model.query.mq.FieldBase?,
+            val realFromField: dynamic.model.query.mq.FieldBase?
     )
 }

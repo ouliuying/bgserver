@@ -36,10 +36,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import work.bg.server.core.model.BasePartner
 import work.bg.server.core.model.BasePartnerAppShortcut
-import work.bg.server.core.mq.AttachedField
-import work.bg.server.core.mq.ModelData
-import work.bg.server.core.mq.ModelDataArray
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.AttachedField
+import dynamic.model.query.mq.ModelData
+import dynamic.model.query.mq.ModelDataArray
+import dynamic.model.query.mq.ModelDataObject
 import work.bg.server.core.ui.UICache
 import work.bg.server.sms.SmsSender
 import work.bg.server.sms.job.SmsJob
@@ -84,7 +84,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeCreate(obj)
         }
@@ -97,7 +97,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeCreate(obj)
         }
@@ -111,7 +111,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeCreate(obj)
         }
@@ -125,7 +125,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeCreate(obj)
         }
@@ -138,7 +138,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeEdit(obj)
         }
@@ -146,13 +146,13 @@ class HttpRequestTest {
     }
     @Test
     fun returnAdminJson(){
-        var obj= ModelDataArray()
+        var obj= dynamic.model.query.mq.ModelDataArray()
         var ret=this.gson?.toJson(obj)
     }
     @Test
     fun queryAdmin(){
         var rset= BasePartner.ref?.rawRead(*BasePartner.ref?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
-                model=BasePartner.ref,criteria = null,attachedFields = arrayOf(AttachedField(BasePartner.ref?.corps!!)))
+                model=BasePartner.ref,criteria = null,attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(BasePartner.ref?.corps!!)))
         print(rset?.fromIdValue)
     }
     @Test
@@ -175,7 +175,7 @@ class HttpRequestTest {
         print(path)
         var bts=inputStream.readBytes()
         var json=String(bts)
-        var obj=this.gson?.fromJson(json,ModelData::class.java)
+        var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
             BasePartner.ref?.safeCreate(obj)
         }

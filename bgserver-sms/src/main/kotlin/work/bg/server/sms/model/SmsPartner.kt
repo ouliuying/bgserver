@@ -21,21 +21,19 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelOne2ManyField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.crm.model.CrmPartner
 
 @Model("partner")
-class SmsPartner:CrmPartner() {
+open class SmsPartner:CrmPartner() {
     companion object : RefSingleton<SmsPartner> {
         override lateinit var ref: SmsPartner
     }
-    val smsJobLog = ModelOne2ManyField(null,"sms_job_log",FieldType.BIGINT,
-            "短信发送Job",targetModelTable = "public.sms_send_job_log",targetModelFieldName = "partner_id")
-    val smsSendHistory = ModelOne2ManyField(null,"sms_send_history",FieldType.BIGINT,
-            "短信发送记录",targetModelTable = "public.sms_send_history",targetModelFieldName = "partner_id")
-    val smsTimerQueue = ModelOne2ManyField(null,"sms_timer_queue",FieldType.BIGINT,
-            "短信定时队列",targetModelTable = "public.sms_timer_queue",targetModelFieldName = "partner_id")
+    val smsJobLog = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_job_log", dynamic.model.query.mq.FieldType.BIGINT,
+            "短信发送Job", targetModelTable = "public.sms_send_job_log", targetModelFieldName = "partner_id")
+    val smsSendHistory = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_send_history", dynamic.model.query.mq.FieldType.BIGINT,
+            "短信发送记录", targetModelTable = "public.sms_send_history", targetModelFieldName = "partner_id")
+    val smsTimerQueue = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_timer_queue", dynamic.model.query.mq.FieldType.BIGINT,
+            "短信定时队列", targetModelTable = "public.sms_timer_queue", targetModelFieldName = "partner_id")
 }

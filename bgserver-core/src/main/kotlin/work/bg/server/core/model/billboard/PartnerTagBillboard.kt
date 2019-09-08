@@ -21,9 +21,11 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model.billboard
 
+import dynamic.model.query.mq.billboard.ConstantFieldBillboard
+import dynamic.model.query.mq.billboard.FieldDefaultValueBillboard
 import work.bg.server.core.model.BasePartner
 
-class PartnerTagBillboard(override val constant: Boolean=false): FieldDefaultValueBillboard,ConstantFieldBillboard{
+class PartnerTagBillboard(override val constant: Boolean=false): FieldDefaultValueBillboard, ConstantFieldBillboard {
     override fun looked(glass: Any?): Any {
         //todo add policy generator
        var ret= BasePartner.ref.rawMax(BasePartner.ref.tag)

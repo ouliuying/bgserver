@@ -27,12 +27,13 @@ import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelReadIsolationRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelExpression
-import work.bg.server.core.mq.and
-import work.bg.server.core.mq.eq
+import dynamic.model.query.mq.ModelExpression
+import dynamic.model.query.mq.and
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.model.ModelBase
+
 @Component
-class ModelReadCorpIsolationBean:ModelReadIsolationRule<ModelExpression> {
+class ModelReadCorpIsolationBean:ModelReadIsolationRule<dynamic.model.query.mq.ModelExpression> {
     private lateinit var _config:String
     override var config: String
         get() = _config
@@ -42,8 +43,8 @@ class ModelReadCorpIsolationBean:ModelReadIsolationRule<ModelExpression> {
 
     override fun invoke(model: ModelBase,
                         partnerCache: PartnerCache,
-                        criteria: ModelExpression?): ModelExpression? {
-        if(!model.skipCorpIsolationFields())
+                        criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression? {
+        if((model as AccessControlModel).corpIsolationFields()!=null)
         {
             var acModel = model as AccessControlModel
             return if(criteria!=null){

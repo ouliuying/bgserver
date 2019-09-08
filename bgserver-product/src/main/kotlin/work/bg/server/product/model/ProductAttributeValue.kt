@@ -23,38 +23,34 @@
 
 package work.bg.server.product.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelMany2OneField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="productAttributeValue")
 class ProductAttributeValue:ContextModel("product_attribute_value","public") {
     companion object : RefSingleton<ProductAttributeValue> {
         override lateinit var ref: ProductAttributeValue
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val attribute=ModelMany2OneField(null,
+    val attribute= dynamic.model.query.mq.ModelMany2OneField(null,
             "attribute_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "属性",
             targetModelTable = "public.product_attribute",
             targetModelFieldName = "id")
 
-    val attrValue=ModelField(null,
+    val attrValue= dynamic.model.query.mq.ModelField(null,
             "attr_value",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "值")
-    val attrValueComment=ModelField(null,
+    val attrValueComment= dynamic.model.query.mq.ModelField(null,
             "attr_value_comment",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "值注释")
 }

@@ -21,10 +21,15 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.util
 
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.jvm.isAccessible
+
 class MethodInvocation(private val instance:Any,private val methodName:String){
      operator fun invoke():Any?{
-         var method=instance::class.java.getDeclaredMethod(methodName)!!
-         method.isAccessible=true
-         return method(instance)
+         var method=instance::class.memberFunctions.find {
+             it.name == methodName
+         }//.java.getDeclaredMethod(methodName)!!
+         method?.isAccessible=true
+         return method?.call(instance)
     }
 }

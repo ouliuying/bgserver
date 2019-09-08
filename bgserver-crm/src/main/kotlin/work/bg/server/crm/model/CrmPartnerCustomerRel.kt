@@ -23,10 +23,9 @@
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("crmPartnerCustomerRel")
 class CrmPartnerCustomerRel:ContextModel("crm_partner_customer_rel","public") {
@@ -34,32 +33,32 @@ class CrmPartnerCustomerRel:ContextModel("crm_partner_customer_rel","public") {
         override lateinit var ref: CrmPartnerCustomerRel
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val partner= ModelMany2OneField(null,
+    val partner= dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action= ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val customer= ModelMany2OneField(null,
+    val customer= dynamic.model.query.mq.ModelMany2OneField(null,
             "customer_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action= ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val ownFlag = ModelField(null,
+    val ownFlag = dynamic.model.query.mq.ModelField(null,
             "ownFlag",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "占有",
-            defaultValue = 0,comment = "0,默认不占有，1占有")
+            defaultValue = 0, comment = "0,默认不占有，1占有")
 
 }

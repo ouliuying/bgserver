@@ -21,12 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.BaseCorp
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelOne2ManyField
-import work.bg.server.core.mq.One2ManyField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("corp", "公司")
 class DepartmentCorp :BaseCorp(){
@@ -34,8 +31,8 @@ class DepartmentCorp :BaseCorp(){
         override lateinit var ref: DepartmentCorp
     }
 
-    val departments = ModelOne2ManyField(null,
-            "m_corp_id",FieldType.BIGINT,
+    val departments = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "m_corp_id", dynamic.model.query.mq.FieldType.BIGINT,
             "部门",
             targetModelTable = "public.department",
             targetModelFieldName = "corp_id")

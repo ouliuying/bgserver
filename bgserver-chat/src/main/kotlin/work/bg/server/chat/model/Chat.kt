@@ -25,15 +25,14 @@ import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
-import work.bg.server.errorcode.ErrorCode
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.errorcode.ErrorCode
+import dynamic.model.web.spring.boot.model.ActionResult
 import java.lang.Exception
 import java.net.URI
-import java.util.*
 
 @Model("chat")
 class Chat:ContextModel("chat","public") {

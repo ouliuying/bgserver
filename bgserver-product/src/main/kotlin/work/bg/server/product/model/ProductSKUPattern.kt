@@ -23,42 +23,38 @@
 
 package work.bg.server.product.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.FieldPrimaryKey
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2OneField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="productSKUPattern")
 class ProductSKUPattern:ContextModel("product_sku_pattern","public") {
     companion object : RefSingleton<ProductSKUPattern> {
         override lateinit var ref: ProductSKUPattern
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name=ModelField(null,
+    val name= dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "名称")
 
-    val skuPattern = ModelField(null,
+    val skuPattern = dynamic.model.query.mq.ModelField(null,
             "sku_pattern",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "Sku模式")
 
-    val skuCount= ModelField(null,
+    val skuCount= dynamic.model.query.mq.ModelField(null,
             "sku_count",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "Sku数量")
-    val product = ModelOne2OneField(null,
+    val product = dynamic.model.query.mq.ModelOne2OneField(null,
             "product_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")

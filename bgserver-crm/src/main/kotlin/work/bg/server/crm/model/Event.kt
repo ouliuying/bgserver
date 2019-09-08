@@ -23,50 +23,49 @@
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="event",title = "活动")
 class Event:ContextModel("crm_event","public") {
     companion object : RefSingleton<Event> {
         override lateinit var ref: Event
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name = ModelField(null,"name", FieldType.STRING,title = "名称",defaultValue = "")
-    val budgetCost = ModelField(null,"budget_cost", FieldType.DECIMAL,title = "预算",defaultValue=0)
-    val actualCost = ModelField(null,"actual_cost", FieldType.DECIMAL,title = "实际花费",defaultValue=0)
-    val comment = ModelField(null,"comment", FieldType.STRING,title = "注释",defaultValue = "")
-    val startTime = ModelField(null,"start_time", FieldType.STRING,title = "开始时间")
-    val endTime = ModelField(null,"end_time", FieldType.STRING,title = "结束时间")
+    val name = dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, title = "名称", defaultValue = "")
+    val budgetCost = dynamic.model.query.mq.ModelField(null, "budget_cost", dynamic.model.query.mq.FieldType.DECIMAL, title = "预算", defaultValue = 0)
+    val actualCost = dynamic.model.query.mq.ModelField(null, "actual_cost", dynamic.model.query.mq.FieldType.DECIMAL, title = "实际花费", defaultValue = 0)
+    val comment = dynamic.model.query.mq.ModelField(null, "comment", dynamic.model.query.mq.FieldType.STRING, title = "注释", defaultValue = "")
+    val startTime = dynamic.model.query.mq.ModelField(null, "start_time", dynamic.model.query.mq.FieldType.STRING, title = "开始时间")
+    val endTime = dynamic.model.query.mq.ModelField(null, "end_time", dynamic.model.query.mq.FieldType.STRING, title = "结束时间")
 
     //负责人
-    val magPartners = ModelMany2ManyField(null,
+    val magPartners = dynamic.model.query.mq.ModelMany2ManyField(null,
             "manager_partner_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             title = "负责人",
             relationModelTable = "public.crm_partner_event_rel",
             relationModelFieldName = "partner_id",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id")
 
-    val leads = ModelOne2ManyField(null,"leads",FieldType.BIGINT,"线索",
+    val leads = dynamic.model.query.mq.ModelOne2ManyField(null, "leads", dynamic.model.query.mq.FieldType.BIGINT, "线索",
             targetModelTable = "public.crm_lead",
             targetModelFieldName = "event_id")
 
-    val customers = ModelOne2ManyField(null,
+    val customers = dynamic.model.query.mq.ModelOne2ManyField(null,
             "customers",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "event_id")

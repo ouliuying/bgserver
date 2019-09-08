@@ -23,10 +23,9 @@ package work.bg.server.core.ui
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import dynamic.model.query.mq.model.AppModel
 import org.apache.commons.logging.LogFactory
 import org.dom4j.dom.DOMElement
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.model.AppModel
 
 class ModelView(val app:String?,val model:String?,val viewType:String?) {
     private val logger = LogFactory.getLog(javaClass)
@@ -79,7 +78,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                 val mField = model?.getFieldByPropertyName(propertyName)
                 if(mField!=null){
                     f.relationData=when(mField){
-                        is Many2ManyField->{
+                        is dynamic.model.query.mq.Many2ManyField ->{
                             val rModel = AppModel.ref.getModel(mField.relationModelTable!!)
                             val rField = rModel?.fields?.getField(mField.relationModelFieldName)
                             var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
@@ -95,7 +94,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                 null
                             }
                         }
-                        is Many2OneField->{
+                        is dynamic.model.query.mq.Many2OneField ->{
                             var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
                             var tField=tModel?.fields?.getField(mField.targetModelFieldName)
                             if(tModel!=null && tField!=null){
@@ -107,7 +106,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                 null
                             }
                         }
-                        is One2ManyField->{
+                        is dynamic.model.query.mq.One2ManyField ->{
                             var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
                             var tField=tModel?.fields?.getField(mField.targetModelFieldName)
                             if(tModel!=null && tField!=null){
@@ -126,7 +125,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                                 null
                             }
                         }
-                        is One2OneField->{
+                        is dynamic.model.query.mq.One2OneField ->{
                             var tModel = AppModel.ref.getModel(mField.targetModelTable!!)
                             var tField=tModel?.fields?.getField(mField.targetModelFieldName)
                             if(tModel!=null && tField!=null){

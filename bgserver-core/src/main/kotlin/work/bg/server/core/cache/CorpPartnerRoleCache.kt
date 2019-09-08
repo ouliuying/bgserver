@@ -21,12 +21,12 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.cache
 
+import dynamic.model.query.mq.model.ModelBase
+import dynamic.model.web.spring.boot.model.AppModelWeb
 import org.apache.commons.logging.LogFactory
 import org.dom4j.DocumentHelper
 import org.dom4j.Element
 import work.bg.server.core.acrule.*
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.spring.boot.model.AppModel
 
 class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false,val acRule:String?=null) {
     lateinit var modelCreateAccessControlRules:MutableMap<String, MutableList<ModelCreateAccessControlRule<*>>>
@@ -42,7 +42,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
         this.parseAcRule()
         this.cacheAcRule()
     }
-    inline  fun <reified T>  getModelCreateAccessControlRules(model:ModelBase):List<T> {
+    inline  fun <reified T>  getModelCreateAccessControlRules(model: ModelBase):List<T> {
         var name = model.meta.tag
         var rules = modelCreateAccessControlRules[name]
         var typeCreateRules = mutableListOf<T>()
@@ -188,7 +188,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     private fun createCreateAccessControlRuleBean(rb: ModelRule.RuleBean):ModelCreateAccessControlRule<*>?{
         var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
         return if(bt!=null){
-            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelCreateAccessControlRule<*>?)
+            var bean=(AppModelWeb.ref.appContext?.getBean(bt) as ModelCreateAccessControlRule<*>?)
             bean?.config = rb.config
             bean
         }
@@ -199,7 +199,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     private  fun createReadAccessControlRuleBean(rb:ModelRule.RuleBean):ModelReadAccessAttachCriterialRule<*>?{
         var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
         return if(bt!=null){
-            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelReadAccessAttachCriterialRule<*>?)
+            var bean=(AppModelWeb.ref.appContext?.getBean(bt) as ModelReadAccessAttachCriterialRule<*>?)
             bean?.config = rb.config
             bean
         }
@@ -210,7 +210,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     private  fun createEditAccessControlRuleBean(rb:ModelRule.RuleBean):ModelEditAccessControlRule<*>?{
         var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
         return if(bt!=null){
-            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelEditAccessControlRule<*>?)
+            var bean=(AppModelWeb.ref.appContext?.getBean(bt) as ModelEditAccessControlRule<*>?)
             bean?.config = rb.config
             bean
         }
@@ -221,7 +221,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
     private  fun createDeleteAccessControlRuleBean(rb:ModelRule.RuleBean):ModelDeleteAccessControlRule<*>?{
         var bt = org.springframework.util.ClassUtils.forName(rb.name,this.javaClass.classLoader)
         return if(bt!=null){
-            var bean=(AppModel.ref.appContext?.getBean(bt) as ModelDeleteAccessControlRule<*>?)
+            var bean=(AppModelWeb.ref.appContext?.getBean(bt) as ModelDeleteAccessControlRule<*>?)
             bean?.config = rb.config
             bean
         }

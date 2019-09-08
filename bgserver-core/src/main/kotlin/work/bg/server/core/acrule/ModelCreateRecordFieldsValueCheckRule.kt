@@ -22,7 +22,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package work.bg.server.core.acrule
 
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.ModelDataObject
 
 interface ModelCreateRecordFieldsValueCheckRule<T>:ModelCreateAccessControlRule<T> {
 

@@ -26,10 +26,9 @@
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="customerOpportunityOrderQuotation")
 class CustomerOpportunityOrderQuotation:
@@ -38,37 +37,37 @@ class CustomerOpportunityOrderQuotation:
         override lateinit var ref: CustomerOpportunityOrderQuotation
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
 
-    val opportunity=ModelOne2OneField(null,
+    val opportunity= dynamic.model.query.mq.ModelOne2OneField(null,
             "opportunity_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "id"
-            )
+    )
 
-    val order=ModelOne2OneField(null,
+    val order= dynamic.model.query.mq.ModelOne2OneField(null,
             "order_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "订单",
             targetModelTable = "public.crm_customer_order",
             targetModelFieldName = "id"
     )
 
-    var tpl = ModelMany2OneField(null,
-            "tpl_id",FieldType.BIGINT,
+    var tpl = dynamic.model.query.mq.ModelMany2OneField(null,
+            "tpl_id", dynamic.model.query.mq.FieldType.BIGINT,
             "模板",
             targetModelTable = "public.crm_customer_opportunity_order_quotation_template",
             targetModelFieldName = "id")
 
-    val comment= ModelField(null,
+    val comment= dynamic.model.query.mq.ModelField(null,
             "comment",
-            FieldType.TEXT,
+            dynamic.model.query.mq.FieldType.TEXT,
             "注释")
 }

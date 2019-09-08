@@ -21,19 +21,19 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.cache
 
+import dynamic.model.query.mq.model.ModelBase
+import dynamic.model.web.context.ContextType
 import work.bg.server.core.acrule.AccessControlRule
 import work.bg.server.core.acrule.ModelEditAccessControlRule
 import work.bg.server.core.model.*
-import work.bg.server.core.spring.boot.model.AppModel
 import java.util.concurrent.locks.StampedLock
 import work.bg.server.core.context.ModelExpressionContext
-import work.bg.server.core.mq.*
 import work.bg.server.core.ui.*
 
 class PartnerCache(partnerData:Map<String,Any?>?,
                    val partnerID:Long,
                    val corpID:Long,
-                   val roleID:Long) {
+                   val roleID:Long):ContextType {
     var modelExpressionContext: ModelExpressionContext = ModelExpressionContext(partnerID, corpID, roleID)
     companion object {
         private val locker=StampedLock()
@@ -57,8 +57,8 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     }
 
     private fun buildPartnerCache(partnerData:Map<String,Any?>?){
-        var corpObject=partnerData?.get("corpObject") as ModelDataObject
-        var partnerRoleObject=partnerData?.get("partnerRoleObject") as ModelDataObject
+        var corpObject=partnerData?.get("corpObject") as dynamic.model.query.mq.ModelDataObject
+        var partnerRoleObject=partnerData?.get("partnerRoleObject") as dynamic.model.query.mq.ModelDataObject
        // var roleModelsArray=partnerData?.get("roleModelArray") as ModelDataArray
         var corpCache=buildCorpCache(corpID,corpObject,partnerRoleObject)
         rebuildCorp(corpCache)
@@ -94,7 +94,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         roleData["name"]=role?.name
         return map
     }
-    inline  fun <reified T>  getModelCreateAccessControlRules(model:ModelBase):List<T>?{
+    inline  fun <reified T>  getModelCreateAccessControlRules(model: ModelBase):List<T>?{
         return this.currRole?.getModelCreateAccessControlRules(model)
     }
     inline  fun <reified T> getModelReadAccessControlRules(model:ModelBase):List<T>?{
@@ -117,8 +117,8 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     }
 
     private  fun buildCorpCache(corpID:Long,
-                                corpObject:ModelDataObject,
-                                partnerRoleObject:ModelDataObject):CorpCache{
+                                corpObject: dynamic.model.query.mq.ModelDataObject,
+                                partnerRoleObject: dynamic.model.query.mq.ModelDataObject):CorpCache{
         var roleID=partnerRoleObject.data.getValue(BasePartnerRole.ref.id) as Long
         var roleName=partnerRoleObject.data.getValue(BasePartnerRole.ref.name) as String
         var isSuper=(partnerRoleObject.data.getValue(BasePartnerRole.ref.isSuper) as Int)>0

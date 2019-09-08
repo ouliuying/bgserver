@@ -1,53 +1,52 @@
 package work.bg.server.core.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("modelLog")
 class BaseModelLog:ContextModel("base_model_log","public") {
     companion object: RefSingleton<BaseModelLog> {
         override lateinit var ref: BaseModelLog
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val app= ModelField(null,
+    val app= dynamic.model.query.mq.ModelField(null,
             "app",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "应用")
 
-    val model= ModelField(null,
+    val model= dynamic.model.query.mq.ModelField(null,
             "model",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "模型")
-    val modelID= ModelField(null,
+    val modelID= dynamic.model.query.mq.ModelField(null,
             "model_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "模型ID")
 
-    val data= ModelField(null,
+    val data= dynamic.model.query.mq.ModelField(null,
             "data",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "数据")
 
-    val partner = ModelMany2OneField(null,
+    val partner = dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "操作人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+    override fun addCreateModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
     }
 
-    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+    override fun addEditModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
     }
 }

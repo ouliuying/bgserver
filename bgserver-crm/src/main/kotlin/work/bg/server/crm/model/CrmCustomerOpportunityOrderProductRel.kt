@@ -24,13 +24,13 @@
 package work.bg.server.crm.model
 
 import work.bg.server.util.TypeConvert
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.eq
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import java.math.BigInteger
 
 @Model("crmCustomerOpportunityOrderProductRel")
@@ -38,39 +38,39 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
     companion object : RefSingleton<CrmCustomerOpportunityOrderProductRel> {
         override lateinit var ref: CrmCustomerOpportunityOrderProductRel
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val product = ModelMany2OneField(null,
+    val product = dynamic.model.query.mq.ModelMany2OneField(null,
             "product_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val customerOpportunity=ModelMany2OneField(null,
+    val customerOpportunity= dynamic.model.query.mq.ModelMany2OneField(null,
             "customer_opportunity_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val customerOrder=ModelMany2OneField(null,
+    val customerOrder= dynamic.model.query.mq.ModelMany2OneField(null,
             "customer_order_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_order",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val count = ModelField(null,
+    val count = dynamic.model.query.mq.ModelField(null,
             "count",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "产品数量")
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
@@ -87,22 +87,22 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
         )
     }
 
-    override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
+    override fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
         var (result,msg) =  super.afterCreateObject(modelDataObject, useAccessControl, pc)
         if(!result){
             return Pair(result,msg)
         }
         val order = modelDataObject.getFieldValue(this.customerOrder)
         val opportunity = modelDataObject.getFieldValue((this.customerOpportunity))
-        val orderID = (if(order is ModelDataObject) order?.idFieldValue?.value as BigInteger? else order as BigInteger?)?.toLong()
-        val opportunityID = (if(opportunity is ModelDataObject) opportunity?.idFieldValue?.value as BigInteger? else opportunity as BigInteger?)?.toLong()
+        val orderID = (if(order is dynamic.model.query.mq.ModelDataObject) order?.idFieldValue?.value as BigInteger? else order as BigInteger?)?.toLong()
+        val opportunityID = (if(opportunity is dynamic.model.query.mq.ModelDataObject) opportunity?.idFieldValue?.value as BigInteger? else opportunity as BigInteger?)?.toLong()
         var id = modelDataObject.idFieldValue?.value
         id?.let {
-            var mo = ModelDataObject(model=this)
+            var mo = dynamic.model.query.mq.ModelDataObject(model = this)
             mo.setFieldValue(this.id,id)
             if(orderID==null && opportunityID!=null){
                 val opportunityObj=CustomerOpportunity.ref.rawRead(criteria = eq(CustomerOpportunity.ref.id,opportunityID),partnerCache = pc,useAccessControl = useAccessControl)?.firstOrNull()
-                val orderObj = opportunityObj?.getFieldValue(CustomerOpportunity.ref.order) as ModelDataObject?
+                val orderObj = opportunityObj?.getFieldValue(CustomerOpportunity.ref.order) as dynamic.model.query.mq.ModelDataObject?
                 val orderObjID =TypeConvert.getLong(orderObj?.idFieldValue?.value as Number?)
                 if(orderObjID!=null){
                     mo.setFieldValue(this.customerOrder,orderObjID)
@@ -110,7 +110,7 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
             }
             else if(orderID!=null && opportunityID==null){
                 val orderObj=CustomerOrder.ref.rawRead(criteria = eq(CustomerOrder.ref.id,orderID),partnerCache = pc,useAccessControl = useAccessControl)?.firstOrNull()
-                val opportunityObj = orderObj?.getFieldValue(CustomerOrder.ref.opportunity) as ModelDataObject?
+                val opportunityObj = orderObj?.getFieldValue(CustomerOrder.ref.opportunity) as dynamic.model.query.mq.ModelDataObject?
                 val opportunityObjID = TypeConvert.getLong(opportunityObj?.idFieldValue?.value as Number?)
                 if(opportunityObjID!=null){
                     mo.setFieldValue(this.customerOpportunity,opportunityObjID)

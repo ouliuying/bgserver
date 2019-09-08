@@ -21,15 +21,14 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
 import work.bg.server.core.model.billboard.CurrCorpBillboard
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("department", "部门")
 class Department:ContextModel("corp_department",
@@ -37,46 +36,46 @@ class Department:ContextModel("corp_department",
     companion object : RefSingleton<Department> {
         override lateinit var ref: Department
     }
-    val id=ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val name=ModelField(null,
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val name= dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "名称")
-    val comment = ModelField(null,
+    val comment = dynamic.model.query.mq.ModelField(null,
             "comment",
-            FieldType.TEXT,
+            dynamic.model.query.mq.FieldType.TEXT,
             "注释")
-    val corp = ModelMany2OneField(null,
+    val corp = dynamic.model.query.mq.ModelMany2OneField(null,
             "corp_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             null,
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
             defaultValue = CurrCorpBillboard(),
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
-    val partners=ModelMany2ManyField(null,
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+    val partners= dynamic.model.query.mq.ModelMany2ManyField(null,
             "partner_id",
-            FieldType.BIGINT,"员工",
+            dynamic.model.query.mq.FieldType.BIGINT, "员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
             relationModelTable = "public.department_partner_rel",
             relationModelFieldName = "partner_id")
 
-    val parent=ModelMany2OneField(null,"parent_id",
-            FieldType.BIGINT,
+    val parent= dynamic.model.query.mq.ModelMany2OneField(null, "parent_id",
+            dynamic.model.query.mq.FieldType.BIGINT,
             "上级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",
             defaultValue = null,
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val children = ModelOne2ManyField(null,
+    val children = dynamic.model.query.mq.ModelOne2ManyField(null,
             "m_parent_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             title = "下级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "parent_id")

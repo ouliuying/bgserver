@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.spring.boot
 
+import dynamic.model.query.mq.model.AppModel
 import org.apache.commons.logging.LogFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.SpringApplicationRunListener
@@ -28,7 +29,6 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
 import work.bg.server.util.MethodInvocation
-import work.bg.server.core.spring.boot.model.AppModel
 import work.bg.server.core.ui.UICache
 import java.util.*
 
@@ -59,7 +59,7 @@ class CoreApplicationRunListener(val app:SpringApplication,vararg val args:Strin
     }
 
     override fun started(context: ConfigurableApplicationContext?) {
-        var appModel=(context as ApplicationContext).getBean(AppModel::class.java)
+        var appModel= AppModel.ref
         var uiCache =(context as ApplicationContext).getBean(UICache::class.java)
         MethodInvocation(appModel, "initialize")()
         MethodInvocation(uiCache, "loadUI")()

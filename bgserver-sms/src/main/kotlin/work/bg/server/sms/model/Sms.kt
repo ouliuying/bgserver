@@ -21,12 +21,11 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
-import work.bg.server.crm.model.CrmPartner
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
 
 @Model("sms")
 class Sms:ContextModel("sms","public") {
@@ -35,7 +34,7 @@ class Sms:ContextModel("sms","public") {
     }
 
     @Action("sendSms")
-    fun sendSms():ActionResult?{
+    fun sendSms(): ActionResult?{
         var ar=ActionResult()
 
         return ar

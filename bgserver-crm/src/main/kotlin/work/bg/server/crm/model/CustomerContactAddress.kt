@@ -21,38 +21,36 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
-import java.lang.reflect.Field
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="customerContactAddress",title = "客户联系人")
 class CustomerContactAddress:ContextModel("customer_contact_address","public"){
     companion object : RefSingleton<CustomerContactAddress> {
         override lateinit var ref: CustomerContactAddress
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val name = ModelField(null,"name", FieldType.STRING,title = "姓名",defaultValue = "")
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val name = dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, title = "姓名", defaultValue = "")
 
-    val customer = ModelMany2OneField(null,"customer_id",FieldType.BIGINT,"客户",
+    val customer = dynamic.model.query.mq.ModelMany2OneField(null, "customer_id", dynamic.model.query.mq.FieldType.BIGINT, "客户",
             targetModelTable = "public.customer",
             targetModelFieldName = "id",
-            foreignKey=FieldForeignKey(action=ForeignKeyAction.CASCADE))
-    val mobile = ModelField(null,"mobile",FieldType.STRING,title = "手机",defaultValue = "")
-    val telephone = ModelField(null,"telephone",FieldType.STRING,title = "电话",defaultValue = "")
-    val email = ModelField(null,"email",FieldType.STRING,title = "email",defaultValue = "")
-    val department = ModelField(null,"department",FieldType.STRING,title = "部门",defaultValue = "")
-    val province = ModelField(null,"province", FieldType.STRING,title = "省",defaultValue = "")
-    val city = ModelField(null,"city", FieldType.STRING,title = "市",defaultValue = "")
-    val district = ModelField(null,"district", FieldType.STRING,title = "区/县",defaultValue = "")
-    val streetAddress = ModelField(null,"street_address",FieldType.STRING,"详细地址",defaultValue = "")
-    val sex = ModelField(null,"sex",FieldType.INT,title = "性别",defaultValue = "")
-    val birthday = ModelField(null,"birthday",FieldType.DATE,title = "生日",defaultValue = "")
-    val comment = ModelField(null,"c_comment",FieldType.DATE,title = "注释",defaultValue = "")
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+    val mobile = dynamic.model.query.mq.ModelField(null, "mobile", dynamic.model.query.mq.FieldType.STRING, title = "手机", defaultValue = "")
+    val telephone = dynamic.model.query.mq.ModelField(null, "telephone", dynamic.model.query.mq.FieldType.STRING, title = "电话", defaultValue = "")
+    val email = dynamic.model.query.mq.ModelField(null, "email", dynamic.model.query.mq.FieldType.STRING, title = "email", defaultValue = "")
+    val department = dynamic.model.query.mq.ModelField(null, "department", dynamic.model.query.mq.FieldType.STRING, title = "部门", defaultValue = "")
+    val province = dynamic.model.query.mq.ModelField(null, "province", dynamic.model.query.mq.FieldType.STRING, title = "省", defaultValue = "")
+    val city = dynamic.model.query.mq.ModelField(null, "city", dynamic.model.query.mq.FieldType.STRING, title = "市", defaultValue = "")
+    val district = dynamic.model.query.mq.ModelField(null, "district", dynamic.model.query.mq.FieldType.STRING, title = "区/县", defaultValue = "")
+    val streetAddress = dynamic.model.query.mq.ModelField(null, "street_address", dynamic.model.query.mq.FieldType.STRING, "详细地址", defaultValue = "")
+    val sex = dynamic.model.query.mq.ModelField(null, "sex", dynamic.model.query.mq.FieldType.INT, title = "性别", defaultValue = "")
+    val birthday = dynamic.model.query.mq.ModelField(null, "birthday", dynamic.model.query.mq.FieldType.DATE, title = "生日", defaultValue = "")
+    val comment = dynamic.model.query.mq.ModelField(null, "c_comment", dynamic.model.query.mq.FieldType.DATE, title = "注释", defaultValue = "")
 
 }

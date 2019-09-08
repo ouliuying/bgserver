@@ -27,13 +27,13 @@ import org.springframework.stereotype.Component
 import work.bg.server.core.context.ModelExpressionContext
 import work.bg.server.core.acrule.ModelRuleCriteriaProcessor
 import work.bg.server.core.context.CriteriaStatementUtil
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelCriteria
-import work.bg.server.core.mq.ModelExpression
+import dynamic.model.query.mq.ModelCriteria
+import dynamic.model.query.mq.ModelExpression
+import dynamic.model.query.mq.model.ModelBase
 
 @Scope(value = "prototype")
 class ModelRuleCriteriaProcessorBean:ModelRuleCriteriaProcessor {
-    override fun parse(criteriaStatement: String,model:ModelBase?, context: ModelExpressionContext): ModelExpression? {
+    override fun parse(criteriaStatement: String, model: ModelBase?, context: ModelExpressionContext): dynamic.model.query.mq.ModelExpression? {
         return CriteriaStatementUtil.parse(criteriaStatement,model,context)
     }
 }

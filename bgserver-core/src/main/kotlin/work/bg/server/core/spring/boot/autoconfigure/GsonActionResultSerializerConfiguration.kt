@@ -28,22 +28,22 @@ import org.springframework.boot.autoconfigure.gson.GsonProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import work.bg.server.core.spring.boot.model.ActionResult
 import java.lang.reflect.Type
 import com.google.gson.JsonObject
-import work.bg.server.core.constant.ModelReservedKey
+import dynamic.model.query.constant.ModelReservedKey
+import dynamic.model.query.mq.model.AppModel
+import dynamic.model.query.mq.specialized.ConstGetRecordRefField
+import dynamic.model.query.mq.specialized.ConstRelRegistriesField
+import dynamic.model.query.mq.specialized.ConstSetRecordRefField
+import dynamic.model.web.spring.boot.model.ActionResult
 import work.bg.server.core.context.JsonClauseResolver
-import work.bg.server.core.exception.ModelErrorException
-import work.bg.server.core.mq.*
-import work.bg.server.core.mq.specialized.ConstGetRecordRefField
-import work.bg.server.core.mq.specialized.ConstRelRegistriesField
-import work.bg.server.core.mq.specialized.ConstSetRecordRefField
-import work.bg.server.core.spring.boot.model.AppModel
-import work.bg.server.core.spring.boot.model.ReadActionParam
+import dynamic.model.query.exception.ModelErrorException
+import dynamic.model.query.mq.ModelData
+import dynamic.model.web.spring.boot.model.ReadActionParam
 import work.bg.server.core.ui.MenuNode
 import work.bg.server.core.ui.MenuTree
 import work.bg.server.core.ui.ModelView
-import work.bg.server.errorcode.ErrorCode
+import dynamic.model.web.errorcode.ErrorCode
 import java.text.SimpleDateFormat
 
 //Gson convert  ActionResult ，spring application.properties/prefer gson
@@ -61,9 +61,9 @@ class GsonActionResultSerializerConfiguration {
         override fun customize(gsonBuilder: GsonBuilder?) {
             gsonBuilder?.registerTypeHierarchyAdapter(ActionResult::class.java,
                     ActionResultAdapter())
-            gsonBuilder?.registerTypeHierarchyAdapter(ModelData::class.java,
+            gsonBuilder?.registerTypeHierarchyAdapter(dynamic.model.query.mq.ModelData::class.java,
                     ModelDataDeserializerAdapter())
-            gsonBuilder?.registerTypeHierarchyAdapter(ModelData::class.java,
+            gsonBuilder?.registerTypeHierarchyAdapter(dynamic.model.query.mq.ModelData::class.java,
                     ModelDataSerializerAdapter())
 
 
@@ -81,15 +81,15 @@ class GsonActionResultSerializerConfiguration {
             gsonBuilder?.registerTypeAdapter(ReadActionParam::class.java,ReadActionParamAdapter())
         }
     }
-    class ModelDataDeserializerAdapter: JsonDeserializer<ModelData>{
+    class ModelDataDeserializerAdapter: JsonDeserializer<dynamic.model.query.mq.ModelData>{
         override fun deserialize(json: JsonElement?,
                                  typeOfT: Type?,
-                                 context: JsonDeserializationContext?): ModelData? {
+                                 context: JsonDeserializationContext?): dynamic.model.query.mq.ModelData? {
             var jsonObj=json?.asJsonObject
             return fillModelDataObject(jsonObj)
         }
 
-        private fun fillModelDataObject(jsonObj:JsonObject?):ModelData?{
+        private fun fillModelDataObject(jsonObj:JsonObject?): dynamic.model.query.mq.ModelData?{
             if(jsonObj!= null){
                 var app=jsonObj?.get("app")?.asString
                 var model=jsonObj?.get("model")?.asString
@@ -113,11 +113,11 @@ class GsonActionResultSerializerConfiguration {
                                                      fromField:JsonObject?,
                                                      toField:JsonObject?,
                                                      fromIdValue:Long?,
-                                                     record:JsonObject?):ModelData?{
+                                                     record:JsonObject?): dynamic.model.query.mq.ModelData?{
             var model=AppModel.ref?.getModel(appName!!,modelName!!)
             var fieldValues=fillModelFieldValueArrayFromOneRecord(appName,modelName,record)
             if(!fieldValues.isEmpty()){
-                var mdo= ModelDataObject(fieldValues,model)
+                var mdo= dynamic.model.query.mq.ModelDataObject(fieldValues, model)
                 mdo.fromIdValue=fromIdValue
                 if(fromField!=null){
                     var fromApp=fromField.get("app")?.asString
@@ -147,9 +147,9 @@ class GsonActionResultSerializerConfiguration {
         }
         private  fun fillModelFieldValueArrayFromOneRecord(appName:String?,
                                                        modelName:String?,
-                                                       record:JsonObject?):FieldValueArray{
+                                                       record:JsonObject?): dynamic.model.query.mq.FieldValueArray {
             var model=AppModel.ref?.getModel(appName!!,modelName!!)
-            var fieldValues= FieldValueArray()
+            var fieldValues= dynamic.model.query.mq.FieldValueArray()
             if(model!=null){
                 record?.entrySet()?.forEach {
                     var fd=model.getFieldByPropertyName(it.key)
@@ -166,12 +166,12 @@ class GsonActionResultSerializerConfiguration {
                                 when {
                                     record.isJsonArray -> {
                                         var mmfc=this.fillModelDataArrayImp(app!!,model!!,fromField,toField,fromIdValue,record.asJsonArray)
-                                        fieldValues.add(FieldValue(fd,mmfc))
+                                        fieldValues.add(dynamic.model.query.mq.FieldValue(fd, mmfc))
                                     }
                                     record.isJsonObject -> {
 
                                         var mfc=this.fillModelDataObjectImp(app!!,model!!,fromField,toField,fromIdValue,record.asJsonObject)
-                                        fieldValues.add(FieldValue(fd,mfc))
+                                        fieldValues.add(dynamic.model.query.mq.FieldValue(fd, mfc))
                                     }
                                     else ->{
 
@@ -181,45 +181,45 @@ class GsonActionResultSerializerConfiguration {
                         }
                         else if(it.value.isJsonPrimitive){
                             var fdValue=when{
-                                fd.fieldType == FieldType.INT->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.INT->{
                                     it.value.asInt
                                 }
-                                fd.fieldType == FieldType.BIGINT->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.BIGINT->{
                                     it.value.asBigInteger
                                 }
-                                fd.fieldType == FieldType.DATE ->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.DATE ->{
                                     var df = SimpleDateFormat("yyyy-MM-dd")
                                     df.parse(it.value.asString)
                                 }
-                                fd.fieldType == FieldType.DATETIME->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.DATETIME->{
                                     var df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                                     df.parse(it.value.asString)
                                 }
-                                fd.fieldType == FieldType.NUMBER->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.NUMBER->{
                                     it.value.asNumber
                                 }
-                                fd.fieldType == FieldType.STRING || fd.fieldType == FieldType.TEXT->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.STRING || fd.fieldType == dynamic.model.query.mq.FieldType.TEXT->{
                                     it.value.asString
                                 }
-                                fd.fieldType == FieldType.TIME->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.TIME->{
                                     var df = SimpleDateFormat("HH:mm:ss")
                                     df.parse(it.value.asString)
                                 }
-                                fd.fieldType == FieldType.DECIMAL->{
+                                fd.fieldType == dynamic.model.query.mq.FieldType.DECIMAL->{
                                     it.value.asBigDecimal
                                 }
                                 else->{
                                     it.value.asString
                                 }
                             }
-                            fieldValues.add(FieldValue(fd,fdValue))
+                            fieldValues.add(dynamic.model.query.mq.FieldValue(fd, fdValue))
                         }
                     }
                     else{
                         when {
                             it.key.compareTo(ModelReservedKey.relRegistriesFieldKey,true)==0 -> {
                                 var relModelSet=it.value.asJsonObject
-                                var mDSO = ModelDataSharedObject()
+                                var mDSO = dynamic.model.query.mq.ModelDataSharedObject()
                                 relModelSet.entrySet().forEach {je->
                                     var jsonObj=je.value.asJsonObject
                                     var app=jsonObj?.get("app")?.asString
@@ -228,7 +228,7 @@ class GsonActionResultSerializerConfiguration {
                                     var toField=jsonObj?.get("toField")?.asJsonObject
                                     var fromIdValue=jsonObj?.get("fromIdValue")?.asLong
                                     var record=jsonObj?.get("record")
-                                    var modelKey=AppModel.ref?.getModel(app!!, model!!)
+                                    var modelKey= AppModel.ref?.getModel(app!!, model!!)
                                     if(record!=null)
                                     {
                                         if(record.isJsonArray){
@@ -247,13 +247,13 @@ class GsonActionResultSerializerConfiguration {
                                     }
 
                                 }
-                                fieldValues.add(FieldValue(ConstRelRegistriesField.ref,mDSO))
+                                fieldValues.add(dynamic.model.query.mq.FieldValue(ConstRelRegistriesField.ref, mDSO))
                             }
                             it.key.compareTo(ModelReservedKey.getRecordRefKey,true)==0 -> {
-                                fieldValues.add(FieldValue(ConstGetRecordRefField.ref,it.value.asString))
+                                fieldValues.add(dynamic.model.query.mq.FieldValue(ConstGetRecordRefField.ref, it.value.asString))
                             }
                             it.key.compareTo(ModelReservedKey.setRecordRefKey,true)==0 -> {
-                                fieldValues.add(FieldValue(ConstSetRecordRefField.ref,it.value.asString))
+                                fieldValues.add(dynamic.model.query.mq.FieldValue(ConstSetRecordRefField.ref, it.value.asString))
                             }
                         }
                     }
@@ -268,9 +268,9 @@ class GsonActionResultSerializerConfiguration {
                                           toField:JsonObject?,
                                           fromIdValue:Long?,
 
-                                                          record:JsonArray?):ModelDataArray?{
+                                                          record:JsonArray?): dynamic.model.query.mq.ModelDataArray?{
             var model=AppModel.ref?.getModel(appName!!,modelName!!)
-            var mmfkv=ModelDataArray(model=model)
+            var mmfkv= dynamic.model.query.mq.ModelDataArray(model = model)
             mmfkv.fromIdValue=fromIdValue
             if(fromField!=null){
                 var fromApp=fromField.get("app")?.asString
@@ -303,12 +303,12 @@ class GsonActionResultSerializerConfiguration {
             return mmfkv
         }
     }
-    class ModelDataSerializerAdapter:JsonSerializer<ModelData>{
-        override fun serialize(src: ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+    class ModelDataSerializerAdapter:JsonSerializer<dynamic.model.query.mq.ModelData>{
+        override fun serialize(src: dynamic.model.query.mq.ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             var ret= buildModelData(src,typeOfSrc,context)
             return ret?:JsonObject()
         }
-        private  fun buildFields(fields:ArrayList<FieldBase>?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonArray?{
+        private  fun buildFields(fields:ArrayList<dynamic.model.query.mq.FieldBase>?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonArray?{
             var ja=JsonArray()
             if(fields!=null){
                 fields.forEach {
@@ -322,7 +322,7 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private fun buildField(field:FieldBase?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
+        private fun buildField(field: dynamic.model.query.mq.FieldBase?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
             if(field!=null){
                 var model=field.model
                 var jo=JsonObject()
@@ -331,7 +331,7 @@ class GsonActionResultSerializerConfiguration {
                 jo.addProperty("name",field.propertyName)
                 jo.addProperty("type",field.fieldType.toString())
                 when(field){
-                    is ModelField->{
+                    is dynamic.model.query.mq.ModelField ->{
                         jo.addProperty("title",field.title)
                         jo.addProperty("comment",field.comment)
                     }
@@ -340,13 +340,13 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private  fun buildObject(fvArr:FieldValueArray, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
+        private  fun buildObject(fvArr: dynamic.model.query.mq.FieldValueArray, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
             if(fvArr.count()>0){
                 var jo=JsonObject()
                 fvArr.forEach {
                     when(it.value){
-                        is ModelData->{
-                            jo.add(it.field.propertyName,this.buildModelData(it.value,typeOfSrc,context))
+                        is dynamic.model.query.mq.ModelData ->{
+                            jo.add(it.field.propertyName,this.buildModelData(it.value as ModelData,typeOfSrc,context))
                         }
                         else->{
                             if(it.value!=null){
@@ -362,7 +362,7 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private  fun buildArray(fvArrs:ArrayList<FieldValueArray>, typeOfSrc: Type?, context: JsonSerializationContext?):JsonArray?{
+        private  fun buildArray(fvArrs:ArrayList<dynamic.model.query.mq.FieldValueArray>, typeOfSrc: Type?, context: JsonSerializationContext?):JsonArray?{
             if(fvArrs.count()>0){
                 var ja=JsonArray()
                 fvArrs.forEach {
@@ -375,11 +375,11 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private  fun buildModelData(modelData:ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
+        private  fun buildModelData(modelData: dynamic.model.query.mq.ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
             val obj = JsonObject()
             if(modelData!=null){
                 when(modelData){
-                    is ModelDataObject,is ModelDataArray->{
+                    is dynamic.model.query.mq.ModelDataObject,is dynamic.model.query.mq.ModelDataArray ->{
                         var model=modelData.model
                         var app=model?.meta?.appName
                         var modelName=model?.meta?.name
@@ -411,19 +411,19 @@ class GsonActionResultSerializerConfiguration {
                             obj.addProperty("fromIdValue",modelData.fromIdValue!!)
                         }
                         if(modelData.isObject()){
-                            var record=buildObject((modelData as ModelDataObject).data, typeOfSrc, context)
+                            var record=buildObject((modelData as dynamic.model.query.mq.ModelDataObject).data, typeOfSrc, context)
                             if(record!=null){
                                 obj.add("record",record)
                             }
                         }
                         else{
-                            var record=buildArray((modelData as ModelDataArray).data, typeOfSrc, context)
+                            var record=buildArray((modelData as dynamic.model.query.mq.ModelDataArray).data, typeOfSrc, context)
                             if(record!=null){
                                 obj.add("record",record)
                             }
                         }
                     }
-                    is ModelDataSharedObject->{
+                    is dynamic.model.query.mq.ModelDataSharedObject ->{
                         var regJson=JsonObject()
                         modelData.data.forEach { t, u ->
                             var jd=this.buildModelData(u, typeOfSrc, context)
@@ -580,15 +580,15 @@ class GsonActionResultSerializerConfiguration {
                 val app=obj["app"].asString
                 val model=obj["model"].asString
                 val modelObj=AppModel.ref.getModel(app,model)
-                var raFields=null as ArrayList<FieldBase>?
-                var raOrderBy= null as OrderBy?
+                var raFields=null as ArrayList<dynamic.model.query.mq.FieldBase>?
+                var raOrderBy= null as dynamic.model.query.mq.OrderBy?
                 var pageIndex=1
                 var pageSize=10
-                var raCriteria=null as ModelExpression?
-                var raAttachedFields:ArrayList<AttachedField>?=null
+                var raCriteria=null as dynamic.model.query.mq.ModelExpression?
+                var raAttachedFields:ArrayList<dynamic.model.query.mq.AttachedField>?=null
                 if(modelObj!=null){
                     if(obj.has("fields")){
-                        var fields= arrayListOf<FieldBase>()
+                        var fields= arrayListOf<dynamic.model.query.mq.FieldBase>()
                         obj["fields"].asJsonArray.forEach {
                             var name=it.asString
                             var f=modelObj.fields.getFieldByPropertyName(name)
@@ -599,24 +599,24 @@ class GsonActionResultSerializerConfiguration {
                         raFields=fields
                     }
                     if(obj.has("orderByFields")){
-                        var orderFields= arrayListOf<OrderBy.OrderField>()
+                        var orderFields= arrayListOf<dynamic.model.query.mq.OrderBy.OrderField>()
                         obj["orderByFields"].asJsonArray.forEach {
                             var o=it.asJsonObject
                             var fName=o["field"].asString
                             var fd=modelObj.fields.getFieldByPropertyName(fName)
-                            var fdOT= OrderBy.Companion.OrderType.ASC
+                            var fdOT= dynamic.model.query.mq.OrderBy.Companion.OrderType.ASC
                             if(o.has("orderType")){
                                 var oType=o["orderType"].asString
                                 if(oType.compareTo("desc",true)==0){
-                                    fdOT=OrderBy.Companion.OrderType.DESC
+                                    fdOT= dynamic.model.query.mq.OrderBy.Companion.OrderType.DESC
                                 }
                             }
                             if(fd!=null){
-                                orderFields.add(OrderBy.OrderField(fd,fdOT))
+                                orderFields.add(dynamic.model.query.mq.OrderBy.OrderField(fd,fdOT))
                             }
                         }
                         if(orderFields.count()>0){
-                            raOrderBy= OrderBy(*orderFields.toTypedArray())
+                            raOrderBy= dynamic.model.query.mq.OrderBy(*orderFields.toTypedArray())
                         }
                     }
                     if(obj.has("clause")){
@@ -628,8 +628,8 @@ class GsonActionResultSerializerConfiguration {
                        fCs.forEach {
                            var fobj=it.asJsonObject
                            var attachedField=modelObj.fields.getFieldByPropertyName(fobj["name"].asString)
-                           if(attachedField!=null && attachedField is RefTargetField){
-                               var c=null as ModelExpression?
+                           if(attachedField!=null && attachedField is dynamic.model.query.mq.RefTargetField){
+                               var c=null as dynamic.model.query.mq.ModelExpression?
                                var canBeEmpty=true
                                if(fobj.has("clause")){
                                     c=JsonClauseResolver(fobj["clause"].asJsonObject,modelObj).criteria()
@@ -640,7 +640,7 @@ class GsonActionResultSerializerConfiguration {
                                        canBeEmpty=false
                                    }
                                }
-                               raAttachedFields.add(AttachedField(attachedField,c,canBeEmpty))
+                               raAttachedFields.add(dynamic.model.query.mq.AttachedField(attachedField, c, canBeEmpty))
                            }
                        }
                     }
@@ -651,7 +651,7 @@ class GsonActionResultSerializerConfiguration {
                 if(obj.has("pageSize")){
                     pageSize=obj["pageSize"].asInt
                 }
-                return ReadActionParam(raFields,raCriteria,raAttachedFields,raOrderBy,pageSize,pageIndex)
+                return ReadActionParam(raFields, raCriteria, raAttachedFields, raOrderBy, pageSize, pageIndex)
             }
             else{
                 throw ModelErrorException("解析clause错误")

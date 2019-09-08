@@ -21,13 +21,12 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.crm.field.ModelFullAddressField
 
 @Model(name="customer",title = "客户")
@@ -35,35 +34,35 @@ class Customer: ContextModel("crm_customer","public") {
     companion object : RefSingleton<Customer> {
         override lateinit var ref: Customer
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name = ModelField(null,"name",FieldType.STRING,title = "姓名",defaultValue = "")
+    val name = dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, title = "姓名", defaultValue = "")
 
-    val isCorp = ModelField(null,"is_corp",FieldType.INT,title = "公司",defaultValue = -1)
+    val isCorp = dynamic.model.query.mq.ModelField(null, "is_corp", dynamic.model.query.mq.FieldType.INT, title = "公司", defaultValue = -1)
 
-    val event = ModelMany2OneField(null,
-            "event_id",FieldType.BIGINT,
+    val event = dynamic.model.query.mq.ModelMany2OneField(null,
+            "event_id", dynamic.model.query.mq.FieldType.BIGINT,
             title = "活动",
             targetModelTable = "public.crm_event",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
 
     //个人属性
-    val mobile =  ModelField(null,"mobile",FieldType.STRING,title = "手机",defaultValue = "")
-    val sex =  ModelField(null,"sex",FieldType.INT,title = "性别",defaultValue = -1)
+    val mobile = dynamic.model.query.mq.ModelField(null, "mobile", dynamic.model.query.mq.FieldType.STRING, title = "手机", defaultValue = "")
+    val sex = dynamic.model.query.mq.ModelField(null, "sex", dynamic.model.query.mq.FieldType.INT, title = "性别", defaultValue = -1)
     //公司属性
-    val fax =  ModelField(null,"fax",FieldType.STRING,title = "传真",defaultValue = "")
+    val fax = dynamic.model.query.mq.ModelField(null, "fax", dynamic.model.query.mq.FieldType.STRING, title = "传真", defaultValue = "")
     //通用属性
-    val telephone =  ModelField(null,"telephone",FieldType.STRING,title = "电话",defaultValue = "")
-    val email =  ModelField(null,"email",FieldType.STRING,title = "email",defaultValue = "")
-    val province = ModelField(null,"province", FieldType.STRING,title = "省",defaultValue = "")
-    val city = ModelField(null,"city", FieldType.STRING,title = "市",defaultValue = "")
-    val district = ModelField(null,"district", FieldType.STRING,title = "区/县",defaultValue = "")
-    val streetAddress = ModelField(null,"street_address",FieldType.STRING,"详细地址",defaultValue = "")
+    val telephone = dynamic.model.query.mq.ModelField(null, "telephone", dynamic.model.query.mq.FieldType.STRING, title = "电话", defaultValue = "")
+    val email = dynamic.model.query.mq.ModelField(null, "email", dynamic.model.query.mq.FieldType.STRING, title = "email", defaultValue = "")
+    val province = dynamic.model.query.mq.ModelField(null, "province", dynamic.model.query.mq.FieldType.STRING, title = "省", defaultValue = "")
+    val city = dynamic.model.query.mq.ModelField(null, "city", dynamic.model.query.mq.FieldType.STRING, title = "市", defaultValue = "")
+    val district = dynamic.model.query.mq.ModelField(null, "district", dynamic.model.query.mq.FieldType.STRING, title = "区/县", defaultValue = "")
+    val streetAddress = dynamic.model.query.mq.ModelField(null, "street_address", dynamic.model.query.mq.FieldType.STRING, "详细地址", defaultValue = "")
     val fullAddress by lazy {
         ModelFullAddressField(null,
                 "fullAddress",
@@ -73,37 +72,37 @@ class Customer: ContextModel("crm_customer","public") {
                 this.streetAddress,
                 this.gson)
     }
-    val website =  ModelField(null,"website",FieldType.STRING,title = "网址",defaultValue = "")
-    val comment =  ModelField(null,"c_comment",FieldType.STRING,title = "注释",defaultValue = "")
-    val contactAddresses = ModelOne2ManyField(null,"contact_address_id",FieldType.BIGINT,"联系人",
-            targetModelTable = "public.customer_contact_address",targetModelFieldName = "customer_id")
+    val website = dynamic.model.query.mq.ModelField(null, "website", dynamic.model.query.mq.FieldType.STRING, title = "网址", defaultValue = "")
+    val comment = dynamic.model.query.mq.ModelField(null, "c_comment", dynamic.model.query.mq.FieldType.STRING, title = "注释", defaultValue = "")
+    val contactAddresses = dynamic.model.query.mq.ModelOne2ManyField(null, "contact_address_id", dynamic.model.query.mq.FieldType.BIGINT, "联系人",
+            targetModelTable = "public.customer_contact_address", targetModelFieldName = "customer_id")
 
     //对应占有,辅助员工
-    val partners = ModelMany2ManyField(null,"own_partner_id",FieldType.BIGINT,title = "占有人",
+    val partners = dynamic.model.query.mq.ModelMany2ManyField(null, "own_partner_id", dynamic.model.query.mq.FieldType.BIGINT, title = "占有人",
             relationModelTable = "public.crm_partner_customer_rel",
             relationModelFieldName = "partner_id",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
 
     //最新交流人
-    val commPartner = ModelMany2OneField(null,
+    val commPartner = dynamic.model.query.mq.ModelMany2OneField(null,
             "comm_partner_id",
-            FieldType.BIGINT,title = "最新联系人",
+            dynamic.model.query.mq.FieldType.BIGINT, title = "最新联系人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
 
-    val communications = ModelOne2ManyField(null,
+    val communications = dynamic.model.query.mq.ModelOne2ManyField(null,
             "communications",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "沟通记录",
             targetModelTable = "public.crm_lead_customer_communication_history",
             targetModelFieldName = "customer_id")
 
-    val opportunities = ModelOne2ManyField(null,
+    val opportunities = dynamic.model.query.mq.ModelOne2ManyField(null,
             "opportnities",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "customer_id")

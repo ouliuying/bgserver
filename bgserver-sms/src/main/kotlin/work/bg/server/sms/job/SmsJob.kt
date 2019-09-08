@@ -28,11 +28,11 @@ import org.quartz.Job
 import org.quartz.JobExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import work.bg.server.core.mq.FieldValueArray
-import work.bg.server.core.mq.ModelDataArray
-import work.bg.server.core.mq.ModelDataObject
-import work.bg.server.core.mq.eq
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.query.mq.FieldValueArray
+import dynamic.model.query.mq.ModelDataArray
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.eq
+import dynamic.model.web.spring.boot.model.AppModelWeb
 import work.bg.server.sms.bean.C8686SenderBean
 import work.bg.server.sms.bean.DefaultSmsSender
 import work.bg.server.kafka.SmsClient
@@ -56,7 +56,7 @@ class SmsJob:Job {
     lateinit var gson:Gson
     override fun execute(context: JobExecutionContext?) {
        val dmap  = context?.jobDetail?.jobDataMap
-        AppModel.ref.appContext?.autowireCapableBeanFactory?.autowireBeanProperties(
+        AppModelWeb.ref.appContext?.autowireCapableBeanFactory?.autowireBeanProperties(
                 this,
                 AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE,
                 false)
@@ -146,9 +146,9 @@ class SmsJob:Job {
             corpID:Long?
     ):Boolean{
         val shModel = SmsSendHistory.ref
-        var ma=ModelDataArray(model=shModel)
+        var ma= dynamic.model.query.mq.ModelDataArray(model = shModel)
         mobiles.forEach {
-            var fvs = FieldValueArray()
+            var fvs = dynamic.model.query.mq.FieldValueArray()
             fvs.setValue(shModel.ip,ip)
             fvs.setValue(shModel.mobile,it)
             fvs.setValue(shModel.message,msg)

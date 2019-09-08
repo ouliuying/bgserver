@@ -21,8 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import work.bg.server.core.mq.FieldBase
-import work.bg.server.core.mq.ModelExpression
+import dynamic.model.query.mq.FieldBase
+import dynamic.model.query.mq.ModelExpression
 
-class FieldRule(val field:FieldBase,ruleExpression:ModelExpression) {
+class FieldRule(val field: dynamic.model.query.mq.FieldBase, ruleExpression: dynamic.model.query.mq.ModelExpression) {
 }

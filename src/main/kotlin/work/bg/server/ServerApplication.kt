@@ -22,18 +22,19 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package work.bg.server
 
 import org.apache.commons.logging.LogFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import work.bg.server.core.runServer
-import work.bg.server.core.spring.boot.annotation.ModelScan
-import org.springframework.scheduling.quartz.SchedulerFactoryBean
-import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer
-import org.springframework.context.annotation.Bean
+import dynamic.model.web.spring.boot.annotation.ModelScan
+import org.springframework.context.annotation.ComponentScan
 import java.util.*
 
 
-@SpringBootApplication
-@ModelScan(packageNames = ["work.bg.server.core.model",
+@SpringBootApplication()
+@ComponentScan(basePackages = ["work.bg.server",
+    "dynamic.model.query",
+    "dynamic.model.web"])
+@ModelScan(packageNames = [
+    "work.bg.server.core.model",
     "work.bg.server.corp.model",
     "work.bg.server.product.model",
     "work.bg.server.crm.model",

@@ -21,13 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.context
 
-import work.bg.server.core.exception.ModelErrorException
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelCriteria
-import work.bg.server.core.mq.ModelExpression
-import work.bg.server.core.mq.notIn
+import dynamic.model.query.exception.ModelErrorException
+import dynamic.model.query.mq.model.ModelBase
 import java.lang.StringBuilder
-import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 class CriteriaStatementUtil {
@@ -37,7 +33,7 @@ class CriteriaStatementUtil {
         const val BRACKET_SUFFIX = ")"
     }
     companion object {
-        fun parse(statement:String,model:ModelBase?, context: ModelExpressionContext): ModelExpression?{
+        fun parse(statement:String, model: ModelBase?, context: ModelExpressionContext): dynamic.model.query.mq.ModelExpression?{
              return CriteriaTree(statement).build()
         }
 
@@ -407,7 +403,7 @@ class CriteriaStatementUtil {
                     statement.substringAfter(CriteriaKey.SPACE))
         }
 
-        fun build():ModelExpression?{
+        fun build(): dynamic.model.query.mq.ModelExpression?{
 
 
            return null

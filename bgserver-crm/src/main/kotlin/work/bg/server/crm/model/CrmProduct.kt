@@ -23,10 +23,8 @@
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelMany2ManyField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.product.model.Product
 
 @Model("product")
@@ -35,9 +33,9 @@ class CrmProduct:Product(){
         override lateinit var ref: CrmProduct
     }
 
-    val customerOpportunities = ModelMany2ManyField(null,
+    val customerOpportunities = dynamic.model.query.mq.ModelMany2ManyField(null,
             "customer_opportunities",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             relationModelTable = "crm_customer_opportunity_product_rel",
             relationModelFieldName = "customer_opportunity_id",

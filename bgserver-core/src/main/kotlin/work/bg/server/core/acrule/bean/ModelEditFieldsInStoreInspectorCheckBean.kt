@@ -21,23 +21,25 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.mq.and
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.notEq
 import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueCheckInStoreRule
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.*
 
 @Component
 class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>> {
     private lateinit var _config:String
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
-        var idFV: FieldValue = modelData.idFieldValue ?: return Pair(true,"")
+    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
+        var idFV: dynamic.model.query.mq.FieldValue = modelData.idFieldValue ?: return Pair(true,"")
         data?.forEach {
             when(it){
                 is ModelFieldUnique ->{
-                    var targetFieldValues= FieldValueArray()
+                    var targetFieldValues= dynamic.model.query.mq.FieldValueArray()
                     modelData.data.forEach {fv->
                         if(it.targetFields.count { sit->sit.isSame(fv.field) }>0){
                             targetFieldValues.setValue(fv.field, fv.value)

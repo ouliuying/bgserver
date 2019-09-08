@@ -28,7 +28,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import org.springframework.beans.factory.annotation.Autowired
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.ModelDataObject
 import work.bg.server.sms.MobileHelper
 import java.util.UUID
 import work.bg.server.sms.SmsTimerType
@@ -101,7 +101,7 @@ class DefaultSmsSender: SmsSender {
                            useAccessControl: Boolean,
                            partnerCache:PartnerCache?):Boolean{
         val tm = SmsSendJobLog.ref
-        val mo = ModelDataObject(model=tm)
+        val mo = dynamic.model.query.mq.ModelDataObject(model = tm)
         mo.setFieldValue(tm.jobName,jobName)
         mo.setFieldValue(tm.jobGroup,jobGroup)
         mo.setFieldValue(tm.triggerName,triggerName)
@@ -207,7 +207,7 @@ class DefaultSmsSender: SmsSender {
                                   useAccessControl: Boolean,
                                   partnerCache:PartnerCache?):Long?{
         val refSTQ = SmsTimerQueue.ref
-        val mo = ModelDataObject(model=SmsTimerQueue.ref)
+        val mo = dynamic.model.query.mq.ModelDataObject(model = SmsTimerQueue.ref)
         mo.setFieldValue(refSTQ.mobiles,mobiles.joinToString(","))
         mo.setFieldValue(refSTQ.message,message)
         mo.setFieldValue(refSTQ.timerValue,timingDate)

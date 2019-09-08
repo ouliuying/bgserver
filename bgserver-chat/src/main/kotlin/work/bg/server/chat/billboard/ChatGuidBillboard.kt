@@ -21,9 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.billboard
 
-import work.bg.server.core.model.BasePartner
-import work.bg.server.core.model.billboard.ConstantFieldBillboard
-import work.bg.server.core.model.billboard.FieldDefaultValueBillboard
+import dynamic.model.query.mq.billboard.ConstantFieldBillboard
+import dynamic.model.query.mq.billboard.FieldDefaultValueBillboard
 import java.util.*
 typealias ChatChannelGuidBillboard = ChatGuidBillboard
 class ChatGuidBillboard(override val constant: Boolean=false) : FieldDefaultValueBillboard, ConstantFieldBillboard {

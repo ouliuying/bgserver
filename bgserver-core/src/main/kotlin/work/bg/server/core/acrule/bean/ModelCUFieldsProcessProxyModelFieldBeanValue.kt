@@ -21,10 +21,12 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.mq.ModelDataArray
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.ModelDataSharedObject
 import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelCreateRecordFieldsValueInitializeRule
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.*
 
 @Component
 class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValueInitializeRule<Any> {
@@ -34,24 +36,28 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
         set(value) {
             _config=value
         }
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
+    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject,
+                        partnerCache: PartnerCache,
+                        data: Any?): Pair<Boolean, String> {
         this.invokeFieldArray(modelData.data,partnerCache,data)
         return Pair(true,"")
     }
 
-    private fun invokeFieldArray(fieldValueArray:FieldValueArray,partnerCache: PartnerCache, data: Any?){
+    private fun invokeFieldArray(fieldValueArray: dynamic.model.query.mq.FieldValueArray,
+                                 partnerCache: PartnerCache,
+                                 data: Any?){
         var cloneArr = arrayListOf(*fieldValueArray.toTypedArray())
         cloneArr.forEach {
             when {
-                it.field is FunctionField<*> -> it.field.inverse(fieldValueArray,partnerCache,null,data)
-                it.value is ModelDataObject -> this.invoke(it.value,partnerCache,null)
-                it.value is ModelDataArray -> this.invokeArray(it.value,partnerCache,null)
-                it.value is ModelDataSharedObject -> it.value.data.forEach { _, u ->
+                it.field is dynamic.model.query.mq.FunctionField<*,*> -> (it.field as dynamic.model.query.mq.FunctionField<*,PartnerCache>).inverse(fieldValueArray,partnerCache,null,data)
+                it.value is dynamic.model.query.mq.ModelDataObject -> this.invoke(it.value as ModelDataObject,partnerCache,null)
+                it.value is dynamic.model.query.mq.ModelDataArray -> this.invokeArray(it.value as ModelDataArray,partnerCache,null)
+                it.value is dynamic.model.query.mq.ModelDataSharedObject -> (it.value as ModelDataSharedObject).data.forEach { _, u ->
                     when(u){
-                        is ModelDataObject->{
+                        is dynamic.model.query.mq.ModelDataObject ->{
                             this.invoke(u,partnerCache,null)
                         }
-                        is ModelDataArray->{
+                        is dynamic.model.query.mq.ModelDataArray ->{
                             this.invokeArray(u,partnerCache,null)
                         }
                     }
@@ -60,7 +66,7 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
         }
     }
 
-    private fun invokeArray(modelData: ModelDataArray, partnerCache: PartnerCache, data: Any?){
+    private fun invokeArray(modelData: dynamic.model.query.mq.ModelDataArray, partnerCache: PartnerCache, data: Any?){
         modelData.data.forEach {
             invokeFieldArray(it,partnerCache,data)
         }

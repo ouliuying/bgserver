@@ -21,11 +21,13 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.mq.and
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.select
 import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelDeleteAccessControlRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.*
 
 @Component
 class ModelDeleteFieldsBelongToPartnerCheckBean: ModelDeleteAccessControlRule<Unit> {
@@ -36,13 +38,13 @@ class ModelDeleteFieldsBelongToPartnerCheckBean: ModelDeleteAccessControlRule<Un
             _config=value
         }
 
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Unit?): Pair<Boolean, String> {
+    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Unit?): Pair<Boolean, String> {
         if(!partnerCache.checkEditBelongToPartner(modelData.model!!)){
             return Pair(true,"")
         }
         val idFV = modelData.idFieldValue
         idFV?.let {
-            var targetFieldValues = FieldValueArray()
+            var targetFieldValues = dynamic.model.query.mq.FieldValueArray()
             targetFieldValues.setValue(it.field,it.value)
             val m = modelData.model as AccessControlModel
             targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)

@@ -21,17 +21,18 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.controller
 
+import dynamic.model.query.mq.model.AppModel
+import dynamic.model.web.context.ContextType
+import dynamic.model.web.spring.boot.model.AppModelWeb
 import org.apache.commons.logging.LogFactory
 import org.springframework.context.ApplicationContext
-import work.bg.server.core.spring.boot.model.AppModel
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.getBean
-import org.springframework.context.ApplicationContextAware
 import org.springframework.http.MediaType
-import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
-import work.bg.server.core.model.BasePartner
-import work.bg.server.core.spring.boot.annotation.ShouldLogin
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.cache.PartnerCacheKey
+import work.bg.server.core.cache.PartnerCacheRegistry
+import work.bg.server.core.constant.SessionTag
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
@@ -43,6 +44,8 @@ class ModelController constructor(val  appModel: AppModel){
     //protected val logger = LogFactory.getLog(javaClass)
     @Autowired
     private var appContext: ApplicationContext? = null
+    @Autowired
+    var partnerCacheRegistry: PartnerCacheRegistry?=null
     init {
     }
    // @ShouldLogin
@@ -53,7 +56,18 @@ class ModelController constructor(val  appModel: AppModel){
              @PathVariable("app") appName: String,
              @PathVariable("name") modelName: String,
              @PathVariable("action") actionName: String): Any? {
-        return appModel(request,response,session,appName,modelName,actionName)
+                var partnerCacheKey=session.getAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY)
+                var partnerCache=null as PartnerCache?
+                if(partnerCacheKey!=null){
+                    partnerCache= this.partnerCacheRegistry?.get(partnerCacheKey as PartnerCacheKey)
+                }
+                else{
+                    val apiToken= request.getHeader("token")
+                    if(!apiToken.isNullOrEmpty()){
+
+                    }
+                }
+                return (appModel as AppModelWeb)(request,response,session,appName,modelName,actionName,partnerCache)
     }
 
     @RequestMapping("/login",method = [RequestMethod.POST,RequestMethod.GET],produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
@@ -61,7 +75,7 @@ class ModelController constructor(val  appModel: AppModel){
                 response: HttpServletResponse,
                 session: HttpSession):Any?{
        // logger.info(userName)
-        var ret= appModel(request,response,session,"core","partner","login")
+        var ret= (appModel as AppModelWeb)(request,response,session,"core","partner","login",null as PartnerCache?)
         if(ret!=null){
             logger.info(ret.javaClass.canonicalName)
         }

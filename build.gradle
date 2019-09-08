@@ -142,6 +142,8 @@ subprojects {
 
 }
 dependencies{
+        compile project(':dynamic-model-query')
+        compile project(':dynamic-model-web')
         compile project(':bgserver-core')
         compile project(':bgserver-kafka')
         compile project(':bgserver-corp')

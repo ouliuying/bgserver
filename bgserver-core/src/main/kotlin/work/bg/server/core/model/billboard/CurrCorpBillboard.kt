@@ -21,10 +21,12 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model.billboard
 
+import dynamic.model.query.mq.billboard.ConstantFieldBillboard
+import dynamic.model.query.mq.billboard.FieldDefaultValueBillboard
 import work.bg.server.core.cache.PartnerCache
 
 class CurrCorpBillboard(override var constant:Boolean=false): FieldDefaultValueBillboard,
-        ConstantFieldBillboard{
+        ConstantFieldBillboard {
     override fun looked(glass:Any?): Long {
         return if(glass!=null){
             (glass as PartnerCache).corpID

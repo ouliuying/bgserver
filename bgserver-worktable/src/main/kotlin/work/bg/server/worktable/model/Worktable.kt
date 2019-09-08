@@ -21,11 +21,11 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.worktable.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
 import javax.servlet.http.HttpSession
 
 @Model("worktable")
@@ -35,7 +35,7 @@ class Worktable:ContextModel("worktable","public") {
     }
     @Action("loadModelLog")
     fun loadModelLog(session: HttpSession):Any?{
-        var ar=ActionResult()
+        var ar= ActionResult()
 
         return ar
     }

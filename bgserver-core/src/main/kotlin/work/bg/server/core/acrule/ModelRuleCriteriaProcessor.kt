@@ -21,12 +21,12 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule
 
-import work.bg.server.core.mq.ModelCriteria
+import dynamic.model.query.mq.ModelCriteria
 import work.bg.server.core.context.ModelExpressionContext
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelExpression
+import dynamic.model.query.mq.ModelExpression
+import dynamic.model.query.mq.model.ModelBase
 
 interface ModelRuleCriteriaProcessor {
-    open fun parse(criteriaStatement:String,model:ModelBase?,
-                   context: ModelExpressionContext): ModelExpression?
+    open fun parse(criteriaStatement:String, model: ModelBase?,
+                   context: ModelExpressionContext): dynamic.model.query.mq.ModelExpression?
 }

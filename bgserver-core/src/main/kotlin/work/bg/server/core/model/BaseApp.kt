@@ -24,17 +24,17 @@ package work.bg.server.core.model
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.springframework.web.bind.annotation.RequestBody
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.config.ActionType
-import work.bg.server.core.mq.*
-import work.bg.server.core.model.billboard.FieldValueDependentingRecordBillboard
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.query.config.ActionType
+import dynamic.model.query.mq.billboard.FieldValueDependentingRecordBillboard
+import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.model.AppModel
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
 
 @Model("app","应用")
 class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schemaName) {
@@ -44,50 +44,50 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
     }
     constructor():this("base_app","public")
 
-    val id=ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val name=ModelField(null,
+    val name= dynamic.model.query.mq.ModelField(null,
             "name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "名称")
-    val title=ModelField(null,
+    val title= dynamic.model.query.mq.ModelField(null,
             "title",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "说明",
-            defaultValue = object : FieldValueDependentingRecordBillboard{
-                override fun computeValue(fvs: FieldValueArray?,actionType:ActionType): Pair<Boolean,Any?> {
+            defaultValue = object : FieldValueDependentingRecordBillboard {
+                override fun computeValue(fvs: dynamic.model.query.mq.FieldValueArray?, actionType: ActionType): Pair<Boolean, Any?> {
                     val nameField = this@BaseApp.name
                     fvs?.let {
                         val name = it.getValue(nameField) as String?
                         name?.let {
-                            val appManifest= AppModel.ref.appPackageManifests[name]
+                            val appManifest = AppModel.ref.appPackageManifests[name]
                             appManifest?.let {
-                                return Pair(true,it.title)
+                                return Pair(true, it.title)
                             }
                         }
                     }
-                    return Pair(false,null)
+                    return Pair(false, null)
                 }
             })
 
-    val defaultFlag=ModelField(null,
+    val defaultFlag= dynamic.model.query.mq.ModelField(null,
             "default_flag",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "默认",
             defaultValue = 0)
 
-    val partnerRole=ModelMany2OneField(null,
+    val partnerRole= dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_role_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             targetModelTable = "public.base_partner_role",
             targetModelFieldName = "id",
             title = "角色",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE)
-            )
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE)
+    )
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
@@ -103,7 +103,7 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
 
     @Action("loadAppContainer")
     fun loadAppContainer(@RequestBody appData :JsonObject,
-                         partnerCache:PartnerCache):ActionResult?{
+                         partnerCache:PartnerCache): ActionResult?{
         var res = ActionResult()
         var app= appData["app"].asString
         var menu = appData["menu"].asJsonObject
@@ -124,12 +124,12 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
                                partnerCache:PartnerCache):ActionResult?{
         var ret= ActionResult()
         BasePartnerAppShortcut.ref.acDelete(criteria = eq(BasePartnerAppShortcut.ref.partner,partnerCache.partnerID),partnerCache = partnerCache)
-        var modelDataArray=ModelDataArray(model=BasePartnerAppShortcut.ref)
+        var modelDataArray= dynamic.model.query.mq.ModelDataArray(model = BasePartnerAppShortcut.ref)
         var shortRef= BasePartnerAppShortcut.ref
         var index=0
         shortcutApps.forEach {
             var jo = it as JsonObject
-            var fvs =FieldValueArray()
+            var fvs = dynamic.model.query.mq.FieldValueArray()
             fvs.setValue(shortRef.partner,partnerCache.partnerID)
             var name = jo["name"]?.asString
             name?.let {

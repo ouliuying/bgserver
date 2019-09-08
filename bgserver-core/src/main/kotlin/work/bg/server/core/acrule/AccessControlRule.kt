@@ -23,9 +23,8 @@ package work.bg.server.core.acrule
 
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.context.ModelExpressionContext
-import work.bg.server.core.mq.ModelBase
-import work.bg.server.core.mq.ModelData
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.ModelData
+import dynamic.model.query.mq.ModelDataObject
 
 interface AccessControlRule<T> {
 

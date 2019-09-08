@@ -21,32 +21,31 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("smsTimerQueue")
 class SmsTimerQueue:ContextModel("sms_timer_queue","public") {
     companion object : RefSingleton<SmsTimerQueue> {
         override lateinit var ref: SmsTimerQueue
     }
-    val id= ModelField(null,"id", FieldType.BIGINT,"标识",primaryKey = FieldPrimaryKey())
-    val sendPartner = ModelMany2OneField(null,"partner_id", FieldType.BIGINT,"发送人",
+    val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val sendPartner = dynamic.model.query.mq.ModelMany2OneField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "发送人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id")
-    val mobiles = ModelField(null,"mobiles", FieldType.STRING,"号码")
-    val message = ModelField(null,"message", FieldType.STRING,"信息")
-    val timerType = ModelField(null,"timer_type", FieldType.INT,"定时类型",comment = "")
-    val timerValue = ModelField(null,"timer_value", FieldType.DATETIME,"定时")
-    val addTime = ModelField(null,"add_time", FieldType.DATETIME,"添加时间")
-    val ip = ModelField(null,"ip",FieldType.STRING,"IP")
-    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+    val mobiles = dynamic.model.query.mq.ModelField(null, "mobiles", dynamic.model.query.mq.FieldType.STRING, "号码")
+    val message = dynamic.model.query.mq.ModelField(null, "message", dynamic.model.query.mq.FieldType.STRING, "信息")
+    val timerType = dynamic.model.query.mq.ModelField(null, "timer_type", dynamic.model.query.mq.FieldType.INT, "定时类型", comment = "")
+    val timerValue = dynamic.model.query.mq.ModelField(null, "timer_value", dynamic.model.query.mq.FieldType.DATETIME, "定时")
+    val addTime = dynamic.model.query.mq.ModelField(null, "add_time", dynamic.model.query.mq.FieldType.DATETIME, "添加时间")
+    val ip = dynamic.model.query.mq.ModelField(null, "ip", dynamic.model.query.mq.FieldType.STRING, "IP")
+    override fun addCreateModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
     }
 
-    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+    override fun addEditModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
     }
 

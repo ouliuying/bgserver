@@ -21,10 +21,10 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.inspector
 
-import work.bg.server.core.mq.ModelDataObject
-import work.bg.server.core.mq.ModelField
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.ModelField
 
-class ModelFieldRequired( override vararg val targetFields: ModelField,
-                          override val advice: String):ModelFieldInspector {
+class ModelFieldRequired(override vararg val targetFields: dynamic.model.query.mq.ModelField,
+                         override val advice: String):ModelFieldInspector {
 
 }

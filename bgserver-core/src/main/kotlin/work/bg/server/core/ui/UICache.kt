@@ -33,12 +33,10 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.context.ResourceLoaderAware
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-import work.bg.server.core.RefSingleton
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.model.AppModel
 import org.dom4j.io.SAXReader
 import org.dom4j.Element
-import work.bg.server.core.constant.ModelReservedKey
-import javax.xml.stream.events.EndElement
 
 //@ConditionalOnBean(value = [AppModel::class])
 @Component
@@ -58,11 +56,11 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     private  lateinit var  registry: BeanFactory
     private lateinit var resLoader:ResourceLoader
     @Autowired
-    private  lateinit var appModel:AppModel
+    private  lateinit var appModel: AppModel
     private  var menuTrees = mutableMapOf<String,AppMenuTree>()
     private  var modelViews = mutableMapOf<String,AppModelView>()
     private  var viewActions = mutableMapOf<String,AppModelViewAction>()
-    companion object :RefSingleton<UICache> {
+    companion object : RefSingleton<UICache> {
         override lateinit var ref: UICache
     }
     override fun afterPropertiesSet() {

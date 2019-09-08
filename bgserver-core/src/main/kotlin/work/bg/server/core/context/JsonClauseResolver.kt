@@ -24,18 +24,19 @@ package work.bg.server.core.context
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.model.AppModel
+import dynamic.model.query.mq.*
+import dynamic.model.query.mq.model.AppModel
+import dynamic.model.query.mq.model.ModelBase
 
 class JsonClauseResolver(val obj:JsonObject,
-                         val model:ModelBase,
+                         val model: ModelBase,
                          val context:ModelExpressionContext?=null){
     private  var relationModels:ArrayList<ModelBase> = arrayListOf()
     init {
         this.model.fields.forEach {
             when(it){
-                is Many2ManyField->{
-                    val tModel=AppModel.ref.getModel(it.targetModelTable!!)
+                is dynamic.model.query.mq.Many2ManyField ->{
+                    val tModel= AppModel.ref.getModel(it.targetModelTable!!)
                     if(tModel!=null){
                         this.relationModels.add(tModel)
                     }
@@ -44,13 +45,13 @@ class JsonClauseResolver(val obj:JsonObject,
                         this.relationModels.add(rModel)
                     }
                 }
-                is Many2OneField->{
+                is dynamic.model.query.mq.Many2OneField ->{
                     val tModel=AppModel.ref.getModel(it.targetModelTable!!)
                     if(tModel!=null){
                         this.relationModels.add(tModel)
                     }
                 }
-                is One2ManyField->{
+                is dynamic.model.query.mq.One2ManyField ->{
                     val tModel=AppModel.ref.getModel(it.targetModelTable!!)
                     if(tModel!=null){
                         this.relationModels.add(tModel)
@@ -60,10 +61,10 @@ class JsonClauseResolver(val obj:JsonObject,
         }
     }
 
-    fun criteria():ModelExpression?{
+    fun criteria(): dynamic.model.query.mq.ModelExpression?{
         return this.createCriteriaFromObject(this.obj)
     }
-    private fun createCriteriaFromObject(obj:JsonObject):ModelExpression?{
+    private fun createCriteriaFromObject(obj:JsonObject): dynamic.model.query.mq.ModelExpression?{
         var op=obj["op"].asString
         when{
             op.compareTo("or",true)==0->{
@@ -113,11 +114,11 @@ class JsonClauseResolver(val obj:JsonObject,
     }
 
     //TODO add sub select support
-    private fun createExpression(field:FieldBase,operator:String,value:String):ModelExpression?{
+    private fun createExpression(field: dynamic.model.query.mq.FieldBase, operator:String, value:String): dynamic.model.query.mq.ModelExpression?{
 
         return null
     }
-    private fun createFieldExpression(field:FieldBase,operator:String,value:String):ModelExpression?{
+    private fun createFieldExpression(field: dynamic.model.query.mq.FieldBase, operator:String, value:String): dynamic.model.query.mq.ModelExpression?{
         try {
             var cField=this.getFieldByPropertyName(value)
             if(field!=null){
@@ -140,9 +141,9 @@ class JsonClauseResolver(val obj:JsonObject,
         }
         return null
     }
-    private fun createVariableExpression(field:FieldBase,
+    private fun createVariableExpression(field: dynamic.model.query.mq.FieldBase,
                                          operator:String,
-                                         value:String):ModelExpression?{
+                                         value:String): dynamic.model.query.mq.ModelExpression?{
         try {
             var kv = this.context?.valueFromContextKey(value)?:return null
             if(kv!!.first){
@@ -171,18 +172,18 @@ class JsonClauseResolver(val obj:JsonObject,
         }
         return null
     }
-    private fun createConstantExpression(field:FieldBase,operator:String,value:String):ModelExpression?{
+    private fun createConstantExpression(field: dynamic.model.query.mq.FieldBase, operator:String, value:String): dynamic.model.query.mq.ModelExpression?{
         try {
             var cValue = if(operator.compareTo("in",true)==0 ||
                     Regex("\\s*not\\s+in\\s*",RegexOption.IGNORE_CASE).matches(operator)){
                 var items=JsonParser().parse(value) as JsonArray
                 var iValues= arrayListOf<Any?>()
                 items.forEach {
-                    iValues.add(ModelFieldConvert.toTypeValue(field,it.asString))
+                    iValues.add(dynamic.model.query.mq.ModelFieldConvert.toTypeValue(field,it.asString))
                 }
                 iValues.toTypedArray()
             } else{
-                ModelFieldConvert.toTypeValue(field,value)
+                dynamic.model.query.mq.ModelFieldConvert.toTypeValue(field,value)
             }
             return when{
                 operator.compareTo("=",true)==0 ->  eq(field,cValue)
@@ -208,7 +209,7 @@ class JsonClauseResolver(val obj:JsonObject,
         }
         return null
     }
-    private  fun getFieldByPropertyName(fieldName:String):FieldBase?{
+    private  fun getFieldByPropertyName(fieldName:String): dynamic.model.query.mq.FieldBase?{
         val app=this.model.meta.appName
         val model=this.model.meta.name
         val fieldNameItems=fieldName.split('.')
@@ -232,14 +233,14 @@ class JsonClauseResolver(val obj:JsonObject,
         return null
     }
 
-    private  fun createCriteriaFromArray(jArr:JsonArray):Array<ModelExpression>?{
-        var exps= arrayListOf<ModelExpression>()
+    private  fun createCriteriaFromArray(jArr:JsonArray):Array<dynamic.model.query.mq.ModelExpression>?{
+        var exps= arrayListOf<dynamic.model.query.mq.ModelExpression>()
         jArr.forEach {
             var c=this.createCriteriaFromObject(it.asJsonObject)
             if(c!=null){
                 exps.add(c)
             }
         }
-        return if(exps.count()>0) exps.toTypedArray() as Array<ModelExpression> else null
+        return if(exps.count()>0) exps.toTypedArray() as Array<dynamic.model.query.mq.ModelExpression> else null
     }
 }

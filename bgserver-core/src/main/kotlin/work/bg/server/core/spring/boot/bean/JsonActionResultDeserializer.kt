@@ -26,10 +26,10 @@ import com.fasterxml.jackson.core.ObjectCodec
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import dynamic.model.web.spring.boot.model.ActionResult
 import org.springframework.boot.jackson.JsonComponent
 import org.springframework.boot.jackson.JsonObjectDeserializer
 import org.springframework.stereotype.Component
-import work.bg.server.core.spring.boot.model.ActionResult
 @JsonComponent
 class JsonActionResultDeserializer: JsonObjectDeserializer<ActionResult>() {
     override fun deserializeObject(jsonParser: JsonParser?, context: DeserializationContext?, codec: ObjectCodec?, tree: JsonNode?): ActionResult {

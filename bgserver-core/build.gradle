@@ -143,7 +143,10 @@ dependencies {
     compile group: 'jaxen', name: 'jaxen', version: "$jaxen_version"
 
 }
-
+dependencies{
+    compile project(':dynamic-model-query')
+    compile project(':dynamic-model-web')
+}
 compileKotlin {
     kotlinOptions.jvmTarget = "$jvmTarget_version"
 }

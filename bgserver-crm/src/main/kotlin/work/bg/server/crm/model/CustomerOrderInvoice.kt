@@ -23,53 +23,52 @@
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import java.math.BigInteger
 
 //订单发票
 
 @Model("customerOrderInvoice")
-class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
+open class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
     companion object : RefSingleton<CustomerOrderInvoice> {
         override lateinit var ref: CustomerOrderInvoice
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val order = ModelOne2OneField(null,
+    val order = dynamic.model.query.mq.ModelOne2OneField(null,
             "order_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "订单",
             targetModelTable = "public.crm_customer_order",
             targetModelFieldName = "id")
 
-    val fromCorpName = ModelField(null,
+    val fromCorpName = dynamic.model.query.mq.ModelField(null,
             "from_corp_name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "开票方")
 
-    val toCorpName = ModelField(null,
+    val toCorpName = dynamic.model.query.mq.ModelField(null,
             "to_corp_name",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "受票方")
 
-    val amount=ModelField(null,
+    val amount= dynamic.model.query.mq.ModelField(null,
             "amount",
-            FieldType.NUMBER,
+            dynamic.model.query.mq.FieldType.NUMBER,
             "金额")
 
-    val accountPartner = ModelMany2OneField(null,
+    val accountPartner = dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "开票人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
@@ -77,23 +76,23 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
 
 
     //0 普通发票，1 增值税发票 2 收据
-    val typ =ModelField(null,
+    val typ = dynamic.model.query.mq.ModelField(null,
             "typ",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "类型",
             defaultValue = 0)
-    val comment =ModelField(null,"comment",FieldType.TEXT,"附加说明")
+    val comment = dynamic.model.query.mq.ModelField(null, "comment", dynamic.model.query.mq.FieldType.TEXT, "附加说明")
 
 
 
 
-    override fun afterCreateObject(modelDataObject: ModelDataObject,
+    override fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
                                    useAccessControl: Boolean,
                                    pc: PartnerCache?): Pair<Boolean, String?> {
 
         modelDataObject.getFieldValue(this.order)?.let {
             when(it){
-                is ModelDataObject->{
+                is dynamic.model.query.mq.ModelDataObject ->{
                     it.idFieldValue?.value?.let {
                         CustomerOrder.ref.setStep((it as BigInteger).toLong(),CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
                     }

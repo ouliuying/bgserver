@@ -21,37 +21,35 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
-import java.lang.reflect.Field
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model(name="leadCustomerCommunicationHistory",title = "沟通记录")
 class LeadCustomerCommunicationHistory:ContextModel("crm_lead_customer_communication_history","public") {
     companion object : RefSingleton<LeadCustomerCommunicationHistory> {
         override lateinit var ref: LeadCustomerCommunicationHistory
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val content = ModelField(null,"content",FieldType.TEXT,
-            "沟通细节",comment = "json format,client parse and show")
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val content = dynamic.model.query.mq.ModelField(null, "content", dynamic.model.query.mq.FieldType.TEXT,
+            "沟通细节", comment = "json format,client parse and show")
 
-    val partner = ModelMany2OneField(null,"partner_id",FieldType.BIGINT,"员工",
+    val partner = dynamic.model.query.mq.ModelMany2OneField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val lead = ModelMany2OneField(null,"lead_id",FieldType.BIGINT,"线索",
+    val lead = dynamic.model.query.mq.ModelMany2OneField(null, "lead_id", dynamic.model.query.mq.FieldType.BIGINT, "线索",
             targetModelTable = "public.crm_lead",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val customer = ModelMany2OneField(null,"customer_id",FieldType.BIGINT,"客户",
+    val customer = dynamic.model.query.mq.ModelMany2OneField(null, "customer_id", dynamic.model.query.mq.FieldType.BIGINT, "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action=ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 }

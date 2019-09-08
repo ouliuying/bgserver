@@ -1,0 +1,109 @@
+buildscript {
+    ext{
+        kotlin_version = "1.3.41"
+        spring_boot_version = "2.1.6.RELEASE"
+        dependency_management_plugin_version="1.0.7.BUILD-SNAPSHOT"
+        junit_version = "4.12"
+        kotlintest_runner_junit5_version="3.1.10"
+        jvmTarget_version ="1.8"
+        spring_version = "5.1.8.RELEASE"
+    }
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/libs-snapshot' }
+        maven { url 'https://repo.spring.io/plugins-snapshot' }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "io.spring.gradle:spring-build-conventions:$spring_build_conventions_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version" // See https://kotlinlang.org/docs/reference/compiler-plugins.html#kotlin-spring-compiler-plugin
+        //classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_plugin_version"
+    }
+    repositories {
+
+    }
+}
+apply plugin: "java"
+apply plugin: "kotlin"
+apply plugin: "kotlin-spring" /*
+ *
+ *  *
+ *  *  *
+ *  *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
+ *  *  *  * https://bg.work
+ *  *  *  *
+ *  *  *  *This program is free software: you can redistribute it and/or modify
+ *  *  *  *it under the terms of the GNU Affero General Public License as published by
+ * t *  *  *he Free Software Foundation, either version 3 of the License.
+ *
+ *  *  *  *This program is distributed in the hope that it will be useful,
+ *  *  *  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  *  *  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  *  *  *GNU Affero General Public License for more details.
+ *
+ *  *  *  *You should have received a copy of the GNU Affero General Public License
+ *  *  *  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *   *  *
+ *   *
+ *
+ */ // See https://kotlinlang.org/docs/reference/compiler-plugins.html#kotlin-spring-compiler-plugin
+apply plugin: "io.spring.convention.root"
+apply plugin: "kotlin-allopen"
+apply plugin: "org.jetbrains.kotlin.jvm"
+group 'work.bg.model'
+version '0.0.1-SNAPSHOT'
+
+
+
+
+sourceCompatibility = 1.8
+repositories {
+    mavenCentral()
+}
+
+
+repositories {
+    mavenLocal()
+}
+
+repositories{
+    maven {
+        url 'https://repo.spring.io/libs-snapshot'
+    }
+}
+
+dependencies{
+    // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
+    compile group: 'org.springframework', name: 'spring-jdbc', version: "$spring_version"
+}
+test {
+    useJUnitPlatform()
+}
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: "$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-js', version: "$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile group: 'junit', name: 'junit', version: "$junit_version"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_runner_junit5_version"
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
+}
+dependencies{
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    compile group: 'com.google.code.gson', name: 'gson', version: "$gson_version"
+
+}
+compileKotlin {
+    kotlinOptions.jvmTarget = "$jvmTarget_version"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "$jvmTarget_version"
+}

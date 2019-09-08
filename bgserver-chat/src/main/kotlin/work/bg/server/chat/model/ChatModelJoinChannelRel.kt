@@ -21,10 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("chatModelJoinChannelRel")
 class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public") {
@@ -33,29 +32,29 @@ class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public
     }
 
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标识",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
 
-    val joinPartner= ModelMany2OneField(null,
+    val joinPartner= dynamic.model.query.mq.ModelMany2OneField(null,
             "join_partner_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "加入的员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
 
-    val joinChannel= ModelMany2OneField(null,
+    val joinChannel= dynamic.model.query.mq.ModelMany2OneField(null,
             "join_channel_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "加入的频道",
             targetModelTable = "public.chat_channel",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
 
 }

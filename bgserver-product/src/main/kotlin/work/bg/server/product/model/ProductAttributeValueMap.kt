@@ -25,11 +25,10 @@ package work.bg.server.product.model
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.ui.ModelView
 
 @Model(name="productAttributeValueMap")
@@ -39,38 +38,38 @@ class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
         override lateinit var ref: ProductAttributeValueMap
     }
 
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
 
-    val product = ModelMany2OneField(null,
+    val product = dynamic.model.query.mq.ModelMany2OneField(null,
             "product_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
 
-    val productAttribute=ModelMany2OneField(null,
+    val productAttribute= dynamic.model.query.mq.ModelMany2OneField(null,
             "product_attribute_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "属性",
             targetModelTable = "public.product_attribute",
             targetModelFieldName = "id")
 
-    val productAttributeValue = ModelMany2OneField(null,
+    val productAttributeValue = dynamic.model.query.mq.ModelMany2OneField(null,
             "product_attribute_value_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "属性值",
             targetModelTable = "public.product_attribute_value",
             targetModelFieldName = "id")
     override fun fillCreateModelViewMeta(mv: ModelView,
-                                         modelData: ModelData?,
+                                         modelData: dynamic.model.query.mq.ModelData?,
                                          viewData: MutableMap<String, Any>,
                                          pc: PartnerCache,
-                                         ownerFieldValue: FieldValue?,
-                                         toField: FieldBase?,
+                                         ownerFieldValue: dynamic.model.query.mq.FieldValue?,
+                                         toField: dynamic.model.query.mq.FieldBase?,
                                          reqData: JsonObject?): ModelView {
         mv.fields.forEach {
             if (it.name == this.productAttribute.propertyName) {
@@ -86,7 +85,7 @@ class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
                                     criteria = null,
                                     pageIndex = 1,
                                     pageSize = 10,
-                                    attachedFields = arrayOf(AttachedField(ProductAttribute.ref.values)))
+                                    attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(ProductAttribute.ref.values)))
                             if (dataArray != null) {
                                 var jArr = JsonArray()
                                 dataArray.toModelDataObjectArray().forEach { it ->

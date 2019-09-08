@@ -21,8 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import work.bg.server.core.config.AppNamePackage
-import work.bg.server.core.config.AppPackageManifest
+import dynamic.model.query.config.AppNamePackage
+import dynamic.model.query.config.AppPackageManifest
 
 class AppName : AppNamePackage {
     override  fun get(): AppPackageManifest {

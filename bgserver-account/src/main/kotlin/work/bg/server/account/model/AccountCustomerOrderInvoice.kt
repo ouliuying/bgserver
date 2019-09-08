@@ -23,13 +23,9 @@
 
 package work.bg.server.account.model
 
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.mq.FieldType
-import work.bg.server.core.mq.ModelDataObject
-import work.bg.server.core.mq.ModelField
-import work.bg.server.core.mq.ModelOne2OneField
-import work.bg.server.core.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.crm.model.CustomerOrderInvoice
 
 @Model("customerOrderInvoice")
@@ -37,37 +33,37 @@ class AccountCustomerOrderInvoice:CustomerOrderInvoice() {
     companion object: RefSingleton<AccountCustomerOrderInvoice> {
         override lateinit var ref: AccountCustomerOrderInvoice
     }
-    val payTyp = ModelField(null,
+    val payTyp = dynamic.model.query.mq.ModelField(null,
             "pay_type",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "应付/应收",
             defaultValue = 0)
 
 
     //-1 正在处理，0 取消 1 成功
-    val status = ModelField(null,
+    val status = dynamic.model.query.mq.ModelField(null,
             "status",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "状态",
             defaultValue = -1)
 
-    val payable = ModelOne2OneField(null,
+    val payable = dynamic.model.query.mq.ModelOne2OneField(null,
             "payable",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_payable",
             targetModelFieldName = "order_invoice_id",
             isVirtualField = true)
 
-    val receivable = ModelOne2OneField(null,
+    val receivable = dynamic.model.query.mq.ModelOne2OneField(null,
             "receivable",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_receivable",
             targetModelFieldName = "order_invoice_id",
             isVirtualField = true)
 
-    override fun afterCreateObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
+    override fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
         var ret= super.afterCreateObject(modelDataObject, useAccessControl, pc)
         if(!ret.first){
             return ret
@@ -75,12 +71,12 @@ class AccountCustomerOrderInvoice:CustomerOrderInvoice() {
         val payTyp = modelDataObject.getFieldValue(this.payTyp) as Int?
         //payType=1 应付， payType=0 应收
         if(payTyp==1){
-            var ar =ModelDataObject(model=AccountPayable.ref)
+            var ar = dynamic.model.query.mq.ModelDataObject(model = AccountPayable.ref)
             ar.setFieldValue(AccountPayable.ref.orderInvoice,modelDataObject)
             AccountPayable.ref.rawCreate(ar,useAccessControl,pc)
         }
         else{
-            var ar =ModelDataObject(model=AccountReceivable.ref)
+            var ar = dynamic.model.query.mq.ModelDataObject(model = AccountReceivable.ref)
             ar.setFieldValue(AccountReceivable.ref.orderInvoice,modelDataObject)
             AccountReceivable.ref.rawCreate(ar,useAccessControl,pc)
         }

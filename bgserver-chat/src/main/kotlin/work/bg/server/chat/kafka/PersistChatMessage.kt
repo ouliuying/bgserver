@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.util.concurrent.ListenableFutureCallback
 import work.bg.server.chat.ChatEventBusConstant
 import work.bg.server.chat.model.ChatChannelMessage
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.ModelDataObject
 import java.lang.Exception
 
 @Service
@@ -68,7 +68,7 @@ class PersistChatMessage {
         msg?.let {
             try {
                 val msgObj = JsonObject(it)
-                var mo = ModelDataObject(model=ChatChannelMessage.ref)
+                var mo = dynamic.model.query.mq.ModelDataObject(model = ChatChannelMessage.ref)
                 val channelUUID = msgObj.getString(ChatEventBusConstant.CHANNEL_UUID)
                 val fromUUID = msgObj.getString(ChatEventBusConstant.CHAT_FROM_UUID)
                 val toUUID = msgObj.getString(ChatEventBusConstant.CHAT_TO_UUID)

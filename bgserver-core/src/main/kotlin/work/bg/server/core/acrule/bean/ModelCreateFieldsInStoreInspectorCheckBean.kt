@@ -27,8 +27,8 @@ import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
-import work.bg.server.core.mq.FieldValueArray
-import work.bg.server.core.mq.ModelDataObject
+import dynamic.model.query.mq.FieldValueArray
+import dynamic.model.query.mq.ModelDataObject
 @Component
 class ModelCreateFieldsInStoreInspectorCheckBean:
         ModelCreateRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>> {
@@ -40,11 +40,11 @@ class ModelCreateFieldsInStoreInspectorCheckBean:
             set(value) {
                 this._config=value
             }
-        override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
+        override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
             data?.forEach {
                 when(it){
                     is ModelFieldUnique->{
-                        var targetFieldValues=FieldValueArray()
+                        var targetFieldValues= dynamic.model.query.mq.FieldValueArray()
                         modelData.data.forEach {fv->
                             if(it.targetFields.count { sit->sit.isSame(fv.field) }>0){
                                 targetFieldValues.setValue(fv.field,fv.value)

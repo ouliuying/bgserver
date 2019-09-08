@@ -23,15 +23,15 @@ package work.bg.server.crm.model
 
 import com.google.gson.JsonObject
 import org.springframework.web.bind.annotation.RequestBody
-import work.bg.server.core.RefSingleton
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.eq
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
-import work.bg.server.core.mq.*
-import work.bg.server.core.spring.boot.annotation.Action
-import work.bg.server.core.spring.boot.annotation.Model
-import work.bg.server.core.spring.boot.model.ActionResult
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.ui.ModelView
-import work.bg.server.errorcode.ErrorCode
+import dynamic.model.web.errorcode.ErrorCode
+import dynamic.model.web.spring.boot.model.ActionResult
 import java.math.BigInteger
 
 @Model("customerOrder")
@@ -40,74 +40,74 @@ class CustomerOrder:
     companion object : RefSingleton<CustomerOrder> {
         override lateinit var ref: CustomerOrder
     }
-    val id= ModelField(null,
+    val id= dynamic.model.query.mq.ModelField(null,
             "id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "标示",
-            primaryKey = FieldPrimaryKey())
-    val title=ModelField(null,
+            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val title= dynamic.model.query.mq.ModelField(null,
             "title",
-            FieldType.STRING,
+            dynamic.model.query.mq.FieldType.STRING,
             "标题")
 
-    val price = ModelField(null,
+    val price = dynamic.model.query.mq.ModelField(null,
             "price",
-            FieldType.NUMBER,
+            dynamic.model.query.mq.FieldType.NUMBER,
             "金额")
 
-    val customer= ModelMany2OneField(null,
+    val customer= dynamic.model.query.mq.ModelMany2OneField(null,
             "customer_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action= ForeignKeyAction.CASCADE))
+            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
-    val products = ModelMany2ManyField(null,
+    val products = dynamic.model.query.mq.ModelMany2ManyField(null,
             "products",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             relationModelTable = "public.crm_customer_opportunity_order_product_rel",
             relationModelFieldName = "product_id",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
 
-    val quotation = ModelOne2OneField(null,
+    val quotation = dynamic.model.query.mq.ModelOne2OneField(null,
             "quotation",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "报价单",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_opportunity_order_quotation",
             targetModelFieldName = "order_id")
 
-    val opportunity = ModelOne2OneField(null,
+    val opportunity = dynamic.model.query.mq.ModelOne2OneField(null,
             "opportunity_id",
-            FieldType.BIGINT,
+            dynamic.model.query.mq.FieldType.BIGINT,
             "商机",
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "id"
     )
 
-    val step = ModelField(null,
+    val step = dynamic.model.query.mq.ModelField(null,
             "step",
-            FieldType.INT,
+            dynamic.model.query.mq.FieldType.INT,
             "状态",
             defaultValue = 0)
 
-    val invoice = ModelOne2OneField(null,
+    val invoice = dynamic.model.query.mq.ModelOne2OneField(null,
             "invoice",
-            fieldType = FieldType.BIGINT,
+            fieldType = dynamic.model.query.mq.FieldType.BIGINT,
             title = "票据",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "order_id")
 
-    val sms = FunctionField<String>(null,"sms",FieldType.TEXT,"短信")
-    val mail = FunctionField<String>(null,"mail",FieldType.TEXT,"邮件")
+    val sms = dynamic.model.query.mq.FunctionField<String,PartnerCache>(null, "sms", dynamic.model.query.mq.FieldType.TEXT, "短信")
+    val mail = dynamic.model.query.mq.FunctionField<String,PartnerCache>(null, "mail", dynamic.model.query.mq.FieldType.TEXT, "邮件")
 
 
     @Action("confirmCustomerOrder")
-    fun confirmCustomerOrder(@RequestBody modelData:ModelDataObject?, pc:PartnerCache): ActionResult?{
+    fun confirmCustomerOrder(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache): ActionResult?{
         var r = ActionResult(ErrorCode.UNKNOW)
         var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
        d?.getFieldValue(this.step)?.let {
@@ -115,7 +115,7 @@ class CustomerOrder:
                 r.description="只能确认信订单"
            }
            else{
-               var mo=ModelDataObject(model=this)
+               var mo= dynamic.model.query.mq.ModelDataObject(model = this)
                mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
                mo.setFieldValue(this.step,CustomerOrderStep.CONFIRM_STEP.step)
                this.acEdit(mo,criteria = null,partnerCache = pc)
@@ -126,13 +126,13 @@ class CustomerOrder:
     }
 
     @Action("notifyOrderStepBySmsEmail")
-    fun notifyOrderStepBySmsEmail(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
+    fun notifyOrderStepBySmsEmail(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache):ActionResult?{
         var r =ActionResult()
         return r
     }
 
     @Action("confirmOrderPayment")
-    fun confirmOrderPayment(@RequestBody modelData:ModelDataObject?, pc:PartnerCache):ActionResult?{
+    fun confirmOrderPayment(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache):ActionResult?{
         var r = ActionResult(ErrorCode.UNKNOW)
         var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
         d?.getFieldValue(this.step)?.let {
@@ -140,7 +140,7 @@ class CustomerOrder:
                 r.description="未开票订单"
             }
             else{
-                var mo=ModelDataObject(model=this)
+                var mo= dynamic.model.query.mq.ModelDataObject(model = this)
                 mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
                 mo.setFieldValue(this.step,CustomerOrderStep.PAYMENT_STEP.step)
                 this.acEdit(mo,criteria = null,partnerCache = pc)
@@ -151,12 +151,12 @@ class CustomerOrder:
     }
 
 
-    override fun loadCreateModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: FieldValue?, toField: FieldBase?, ownerModelID: Long?, reqData: JsonObject?): ModelDataObject? {
+    override fun loadCreateModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: dynamic.model.query.mq.FieldValue?, toField: dynamic.model.query.mq.FieldBase?, ownerModelID: Long?, reqData: JsonObject?): dynamic.model.query.mq.ModelDataObject? {
 
         if(ownerModelID!=null && ownerModelID>0){
            var co = CustomerOpportunity.ref.acRead(criteria = eq(CustomerOpportunity.ref.id,ownerModelID),partnerCache = pc)?.firstOrNull()
             co?.let {
-                var retCO = ModelDataObject(model=this)
+                var retCO = dynamic.model.query.mq.ModelDataObject(model = this)
                 retCO.setFieldValue(CustomerOrder.ref.opportunity,co)
                 retCO.setFieldValue(CustomerOrder.ref.customer,co.getFieldValue(CustomerOpportunity.ref.customer))
                 retCO.setFieldValue(CustomerOrder.ref.price,co.getFieldValue(CustomerOpportunity.ref.price))
@@ -168,14 +168,14 @@ class CustomerOrder:
         return super.loadCreateModelViewData(mv, viewData, pc, ownerFieldValue, toField, ownerModelID, reqData)
     }
 
-    override fun afterCreateObject(modelDataObject: ModelDataObject,useAccessControl:Boolean,pc:PartnerCache?):Pair<Boolean,String?>{
+    override fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl:Boolean, pc:PartnerCache?):Pair<Boolean,String?>{
 
         //super.afterCreateObject(modelDataObject)
         var d = modelDataObject.getFieldValue(CustomerOrder.ref.opportunity)
-       if(d is ModelDataObject){
+       if(d is dynamic.model.query.mq.ModelDataObject){
           val oid= d.getFieldValue(CustomerOrder.ref.id)
            oid?.let {
-               var mo = ModelDataObject(model=CrmCustomerOpportunityOrderProductRel.ref)
+               var mo = dynamic.model.query.mq.ModelDataObject(model = CrmCustomerOpportunityOrderProductRel.ref)
                mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
               val ret=  CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
                        oid),useAccessControl,pc)
@@ -187,7 +187,7 @@ class CustomerOrder:
         else{
            d?.let {
                val oid = (d as BigInteger).toLong()
-               var mo = ModelDataObject(model=CrmCustomerOpportunityOrderProductRel.ref)
+               var mo = dynamic.model.query.mq.ModelDataObject(model = CrmCustomerOpportunityOrderProductRel.ref)
                mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
                val ret = CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
                        oid),useAccessControl,pc)
@@ -199,7 +199,7 @@ class CustomerOrder:
         return Pair(true,null)
     }
     fun setStep(id:Long,step:Int,pc:PartnerCache?,useAccessControl:Boolean){
-        var mo = ModelDataObject(model=this)
+        var mo = dynamic.model.query.mq.ModelDataObject(model = this)
         mo.setFieldValue(this.id,id)
         mo.setFieldValue(this.step,step)
         this.rawEdit(mo,criteria = null,partnerCache = pc,useAccessControl = useAccessControl)

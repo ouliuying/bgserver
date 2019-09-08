@@ -30,5 +30,7 @@ include 'bgserver-product'
 include 'bgserver-worktable'
 include 'bgserver-setting'
 include 'bgserver-sms'
+include 'dynamic-model-query'
+include 'dynamic-model-web'
 
 
