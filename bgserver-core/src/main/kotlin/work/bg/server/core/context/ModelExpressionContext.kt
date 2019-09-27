@@ -21,35 +21,37 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.context
 
-class ModelExpressionContext(val partnerID:Long,val corpID:Long,val roleID:Long){
+import java.util.concurrent.locks.StampedLock
+
+class ModelExpressionContext(val partnerID:Long,val corpID:Long,val roleID:Long,val devType:Int){
+     private val locker= StampedLock()
      internal object ContextKey {
          const val partner_id="\$partnerID$"
          const val corp_id="\$corpID$"
+         const val role_id = "\$roleID$"
+         const val dev_type = "\$devType$"
      }
-     private var contextValues:MutableMap<String,ContextValue> = mutableMapOf()
+     private  var variantTable:ContextVariantTable = ContextVariantTable()
      fun valueFromContextKey(key:String):Pair<Boolean,Any?>{
          return when(key){
              ContextKey.corp_id-> Pair(true,corpID)
              ContextKey.partner_id->Pair(true,partnerID)
+             ContextKey.dev_type -> Pair(true,devType)
+             ContextKey.role_id-> Pair(true,roleID)
              else->this.valueFromDynamicContextKey(key)
          }
      }
-    private fun valueFromDynamicContextKey(key:String):Pair<Boolean,ContextValue?>{
-        var v=this.contextValues[key]
+    private fun valueFromDynamicContextKey(key:String):Pair<Boolean,ContextVariant?>{
+        var v=this.variantTable.getVariant(key)
         return if(v!=null) {
             Pair(true,v)
-        } else Pair(false,null as ContextValue?)
-
+        } else Pair(false,null as ContextVariant?)
     }
 
-    fun put(name:String,value:ContextValue){
-        this.contextValues[name] = value
+    fun put(value:ContextVariant){
+        this.variantTable.setVariant(value)
     }
     fun remove(name:String){
-        this.contextValues.remove(name)
-    }
-    inner class ContextValue{
-        var name:String?=null
-        var value:Any?=null
+        this.variantTable.removeVariant(name)
     }
 }

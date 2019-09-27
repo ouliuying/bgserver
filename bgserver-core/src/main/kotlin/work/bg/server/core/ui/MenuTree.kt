@@ -21,10 +21,10 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.ui
 
-open class MenuNode(val app:String,val title:String?,val model:String?,val viewType:String?,val icon:String?){
+open class MenuNode(val app:String,val title:String?,val model:String?,val viewType:String?,val icon:String?,var redirectApp:String?=null){
     var children:ArrayList<MenuNode>?=null
     open fun createCopy():MenuNode{
-        var mn=MenuNode(this.app,this.title,this.model,this.viewType,this.icon)
+        var mn=MenuNode(this.app,this.title,this.model,this.viewType,this.icon,this.redirectApp)
         mn.children=this.childrenCopy()
         return mn
     }

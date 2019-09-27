@@ -30,10 +30,27 @@ open class SmsPartner:CrmPartner() {
     companion object : RefSingleton<SmsPartner> {
         override lateinit var ref: SmsPartner
     }
-    val smsJobLog = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_job_log", dynamic.model.query.mq.FieldType.BIGINT,
-            "短信发送Job", targetModelTable = "public.sms_send_job_log", targetModelFieldName = "partner_id")
-    val smsSendHistory = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_send_history", dynamic.model.query.mq.FieldType.BIGINT,
-            "短信发送记录", targetModelTable = "public.sms_send_history", targetModelFieldName = "partner_id")
-    val smsTimerQueue = dynamic.model.query.mq.ModelOne2ManyField(null, "sms_timer_queue", dynamic.model.query.mq.FieldType.BIGINT,
-            "短信定时队列", targetModelTable = "public.sms_timer_queue", targetModelFieldName = "partner_id")
+    val smsJobLog = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "sms_job_log", dynamic.model.query.mq.FieldType.BIGINT,
+            "短信发送Job",
+            targetModelTable = "public.sms_send_job_log",
+            targetModelFieldName = "partner_id")
+    val smsSendHistory = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "sms_send_history",
+            dynamic.model.query.mq.FieldType.BIGINT,
+            "短信发送记录",
+            targetModelTable = "public.sms_send_history",
+            targetModelFieldName = "partner_id")
+    val smsTimerQueue = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "sms_timer_queue",
+            dynamic.model.query.mq.FieldType.BIGINT,
+            "短信定时队列",
+            targetModelTable = "public.sms_timer_queue",
+            targetModelFieldName = "partner_id")
+    val smsReplyMessageHistory = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "sms_reply_message_history",
+            dynamic.model.query.mq.FieldType.BIGINT,
+            "回复信息",
+            targetModelTable = "public.sms_reply_message_history",
+            targetModelFieldName = "partner_id")
 }

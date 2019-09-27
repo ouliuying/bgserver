@@ -97,9 +97,7 @@ class ActionMethod constructor(val method: KFunction<*>){
         var ar= invocableMethod.invokeForRequest(webRequest as NativeWebRequest,mavContainer,session,context)
         return when(ar){
             is ActionResult ->{
-
                     ar
-
             }
             else->ar
         }

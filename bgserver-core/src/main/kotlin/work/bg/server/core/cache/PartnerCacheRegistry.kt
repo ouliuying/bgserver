@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
+import work.bg.server.core.context.ContextVariantInitializer
 import work.bg.server.core.model.*
 import java.lang.Exception
 import java.time.Duration
@@ -55,7 +56,9 @@ class PartnerCacheRegistry{
                 .build(
                         object : CacheLoader<PartnerCacheKey, PartnerCache>() {
                             override fun load(key: PartnerCacheKey): PartnerCache {
-                                return createPartnerCache(key)
+                                var pc= createPartnerCache(key)
+                                pc=this@PartnerCacheRegistry.loadPartnerCacheContext(pc)
+                                return pc
                             }
                         })
     }
@@ -79,11 +82,18 @@ class PartnerCacheRegistry{
             return PartnerCache(mapOf(
                     "corpObject" to corpModelDataObject,
                     "partnerRoleObject" to partnerRoleModelDataObject
-            ),partnerKey.partnerID,partnerKey.corpID,roleID!!)
+            ),partnerKey.partnerID,partnerKey.corpID,roleID!!,partnerKey.devType)
         }
         catch (ex:Exception){
           throw ex
         }
+    }
+    private fun loadPartnerCacheContext(partnerCache:PartnerCache):PartnerCache{
+        var initializers = dynamic.model.query.mq.model.AppModel.ref.getTypeModels<ContextVariantInitializer>()
+        initializers.forEach {
+            it.contextVariantSet(partnerCache = partnerCache)
+        }
+        return partnerCache
     }
     fun get(key:PartnerCacheKey):PartnerCache?{
         return this.partnersCache?.get(key)

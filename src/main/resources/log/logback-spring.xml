@@ -33,4 +33,5 @@
     <logger name="work.bg.server.chat.verticle.RedisReceiveServerVerticle" level="trace" />
     <logger name="work.bg.server.chat.verticle.RedisSendServerVerticle" level="trace" />
     <logger name="work.bg.server.chat.verticle.PersistLogServerVerticle" level="trace" />
+    》
 </configuration>

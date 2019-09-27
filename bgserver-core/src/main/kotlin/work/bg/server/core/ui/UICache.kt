@@ -131,6 +131,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         this.buildModel(modelFiles)
         this.buildAction(actionFiles)
     }
+
     fun getMenu(app:String,menu:String):MenuTree?
     {
         return this.menuTrees[app]?.menus?.get(menu)?.createCopy()
@@ -280,6 +281,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                         var tViewType=viewType
                         var name=""
                         var title=""
+                        var icon=null as String?
                         if(tit!=null){
                             var at=tit.attribute("app")
                             if(at!=null){
@@ -301,8 +303,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             if(at!=null){
                                 title=at.value
                             }
+                            at=tit.attribute("icon")
+                            if(at!=null){
+                                icon=at.value
+                            }
                             if(!(name.isNullOrEmpty()||title.isNullOrEmpty())){
                                 var t=Trigger(name,title,tApp,tModel,tViewType)
+                                t.icon = icon
                                 ag.triggers.add(t)
                                 val metaElem = tit.selectSingleNode("meta") as Element?
                                 metaElem?.let {
@@ -363,7 +370,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         files.forEach {
             var menus=it.doc.selectNodes("/ui/menu") as List<Element?>?
             menus?.forEach { m->
-                var mTree=buildMenuTree(m)
+                var mTree=buildMenuTree(it.appName,m)
                 if(mTree!=null){
                     this.addMenuTree(mTree)
                 }
@@ -378,7 +385,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         this.menuTrees[amt.appName]=amt
     }
 
-    private  fun buildMenuTree(menu:Element?,parentApp:String?=null):MenuTree?{
+    private  fun buildMenuTree(hostApp:String,menu:Element?,parentApp:String?=null):MenuTree?{
         if(menu!=null){
             try {
                 var appName=menu?.attributeValue("app")
@@ -393,13 +400,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 mT.children= arrayListOf()
                 elements?.forEach {
                     if(it?.name=="menuItem"){
-                        var sMN=this.buildMenuNode(it,appName)
+                        var sMN=this.buildMenuNode(hostApp,it,appName)
                         if( sMN!=null){
                             mT.children?.add(sMN)
                         }
                     }
                     else if(it?.name=="menu"){
-                        var sMT=this.buildMenuTree(it,appName)
+                        var sMT=this.buildMenuTree(hostApp,it,appName)
                         if( sMT!=null){
                             mT.children?.add(sMT)
                         }
@@ -414,7 +421,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         }
         return null
     }
-    private fun buildMenuNode(menuItem:Element?,parentApp:String?=null):MenuNode?{
+    private fun buildMenuNode(hostApp: String,menuItem:Element?,parentApp:String?=null):MenuNode?{
         if(menuItem!=null){
             try {
                 var app=menuItem?.attributeValue("app")
@@ -687,8 +694,9 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             val tEnable = tit.attributeValue("enable")
                             val tOwnerField = tit.attributeValue("ownerField")
                             val tActionName = tit.attributeValue("actionName")
+                            val tIcon = tit.attributeValue("icon")
                             try{
-                                var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tActionName,tVisible,tEnable)
+                                var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tActionName,tVisible,tIcon,tEnable)
                                 logger.debug("load rt ${rt.toString()}")
                                 triggers.add(rt)
                                 try {

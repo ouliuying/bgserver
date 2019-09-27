@@ -28,10 +28,10 @@ import org.springframework.boot.SpringApplicationRunListener
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
+import work.bg.server.core.SystemInfo
 import work.bg.server.util.MethodInvocation
 import work.bg.server.core.ui.UICache
 import java.util.*
-
 class CoreApplicationRunListener(val app:SpringApplication,vararg val args:String):SpringApplicationRunListener {
     private val logger = LogFactory.getLog(javaClass)
     init {
@@ -63,9 +63,11 @@ class CoreApplicationRunListener(val app:SpringApplication,vararg val args:Strin
         var uiCache =(context as ApplicationContext).getBean(UICache::class.java)
         MethodInvocation(appModel, "initialize")()
         MethodInvocation(uiCache, "loadUI")()
+        SystemInfo.print()
     }
 
     override fun starting() {
 
     }
+
 }

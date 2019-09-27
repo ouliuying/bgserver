@@ -48,8 +48,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
   *
   */
 
-@Service
-class SmsClient {
+
+open abstract class SmsClient {
     companion object{
         const val SMS_SUBMIT_DELIVERY_STATUS_QUEUE = "smsreceivesubmitanddeliverstatus"
         const val SMS_REPLY_QUEUE="smsreceivereplymessage"
@@ -64,17 +64,31 @@ class SmsClient {
 
     @KafkaListener(topics = [SMS_SUBMIT_DELIVERY_STATUS_QUEUE], groupId = "updatesmssendhistorystatus")
     fun popStatus(record: ConsumerRecord<String?, String?>){
-
+        if(record.key()==SUBMIT_SMS_STATUS){
+            record.value()?.let {
+                this.updateSubmitStatus(it)
+            }
+        }
+        else if(record.key()==DELIVERY_SMS_STATUS){
+            record.value()?.let {
+                this.updateDeliveryStatus(it)
+            }
+        }
     }
-
+    abstract fun updateSubmitStatus(data:String)
+    abstract fun updateDeliveryStatus(data:String)
+    abstract fun addReplyMessage(data:String)
     @KafkaListener(topics = [SMS_REPLY_QUEUE], groupId = "addreplymessage")
     fun popReply(record: ConsumerRecord<String?, String?>){
-
+        record.value()?.let {
+            this.addReplyMessage(it)
+        }
     }
 
     fun pushSubmitStatus(data:String){
         this.kafkaTemplate.send(SMS_SUBMIT_DELIVERY_STATUS_QUEUE, SUBMIT_SMS_STATUS,data)
     }
+
     fun pushDeliveryStatus(data:String){
         this.kafkaTemplate.send(SMS_SUBMIT_DELIVERY_STATUS_QUEUE, DELIVERY_SMS_STATUS,data)
     }

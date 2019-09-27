@@ -23,25 +23,19 @@ package work.bg.server.sms.job
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.apache.tomcat.jni.File
 import org.quartz.Job
 import org.quartz.JobExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import dynamic.model.query.mq.FieldValueArray
-import dynamic.model.query.mq.ModelDataArray
-import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.eq
 import dynamic.model.web.spring.boot.model.AppModelWeb
 import work.bg.server.sms.bean.C8686SenderBean
-import work.bg.server.sms.bean.DefaultSmsSender
 import work.bg.server.kafka.SmsClient
 import work.bg.server.sms.MobileHelper
 import work.bg.server.sms.SmsTimerType
 import work.bg.server.sms.model.SmsSendHistory
 import work.bg.server.sms.model.SmsSetting
 import work.bg.server.sms.model.SmsTimerQueue
-import java.io.FileReader
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -70,14 +64,14 @@ class SmsJob:Job {
                 smsTimerType=dmap["smsTimerType"] as Int
             }
             val ip = dmap["ip"] as String?
-            var userName:String=""
-            var password:String=""
+            var apiKey:String=""
+            var apiSecret:String=""
             SmsSetting.ref.rawRead(criteria = null)?.firstOrNull()?.let {
-                it.getFieldValue(SmsSetting.ref.userName)?.let {uN->
-                    userName = uN as String
+                it.getFieldValue(SmsSetting.ref.apiKey)?.let {uN->
+                    apiKey = uN as String
                 }
-                it.getFieldValue(SmsSetting.ref.password)?.let {p->
-                    password = p as String
+                it.getFieldValue(SmsSetting.ref.apiSecret)?.let {p->
+                    apiSecret = p as String
                 }
             }
             var partnerID = dmap.getLong("partnerID") as Long?
@@ -85,7 +79,7 @@ class SmsJob:Job {
             var rmRepeatFilter = dmap["repeatFilter"] as Boolean
             var mobiles = if(dmap.containsKey("mobileFile")){
                 readAllMobiles(dmap["mobileFile"] as String)
-            }else if(dmap.containsKey("mobiles")){
+            } else if(dmap.containsKey("mobiles")){
                 dmap["mobiles"] as ArrayList<String>
             }
             else {
@@ -119,7 +113,7 @@ class SmsJob:Job {
                             smsCount,
                             ip?:"",
                             partnerID,corpID)){
-                        var ret= this.smsProvider.doSend(packMobiles.toTypedArray(),msg,userName,password)
+                        var ret= this.smsProvider.doSend(packMobiles.toTypedArray(),msg,apiKey,apiSecret)
                         this.addSubmitStatusToKafka(localMsgID,
                                 ret.first,
                                 ret.second,
@@ -160,6 +154,7 @@ class SmsJob:Job {
             fvs.setValue(shModel.createPartnerID,partnerID)
             fvs.setValue(shModel.lastModifyCorpID,corpID)
             fvs.setValue(shModel.lastModifyPartnerID,partnerID)
+            fvs.setValue(shModel.sendTime,Date())
             ma.add(fvs)
         }
         val ret = shModel.safeCreate(ma)

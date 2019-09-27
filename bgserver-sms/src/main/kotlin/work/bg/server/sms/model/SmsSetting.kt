@@ -37,16 +37,17 @@ class SmsSetting:ContextModel("sms_setting","public") {
     companion object : RefSingleton<SmsSetting> {
         override lateinit var ref: SmsSetting
     }
-    val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val userName = dynamic.model.query.mq.ModelField(null,
-            "userName",
-            dynamic.model.query.mq.FieldType.STRING,
-            title = "账号")
 
-    val password = dynamic.model.query.mq.ModelField(null,
-            "password",
+    val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+    val apiKey = dynamic.model.query.mq.ModelField(null,
+            "apikey",
             dynamic.model.query.mq.FieldType.STRING,
-            title = "密码")
+            title = "ApiKey")
+
+    val apiSecret = dynamic.model.query.mq.ModelField(null,
+            "apisecret",
+            dynamic.model.query.mq.FieldType.STRING,
+            title = "ApiSecret")
 
     @Action(name="edit")
     override fun editAction(@RequestBody modelData: dynamic.model.query.mq.ModelData?, pc: PartnerCache): ActionResult?{

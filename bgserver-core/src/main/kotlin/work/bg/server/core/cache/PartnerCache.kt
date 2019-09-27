@@ -33,8 +33,9 @@ import work.bg.server.core.ui.*
 class PartnerCache(partnerData:Map<String,Any?>?,
                    val partnerID:Long,
                    val corpID:Long,
-                   val roleID:Long):ContextType {
-    var modelExpressionContext: ModelExpressionContext = ModelExpressionContext(partnerID, corpID, roleID)
+                   val roleID:Long,
+                   val devType:Int):ContextType {
+    val modelExpressionContext: ModelExpressionContext = ModelExpressionContext(partnerID, corpID, roleID,devType)
     companion object {
         private val locker=StampedLock()
         private var corps= mutableMapOf<Long,CorpCache>()
@@ -339,6 +340,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                         t.title=u.title?:t.title
                         t.viewType=u.viewType?:t.viewType
                         t.meta = u.meta?:t.meta
+                        t.icon = u.icon?:t.icon
                     }
                 }
                 return cloneTG

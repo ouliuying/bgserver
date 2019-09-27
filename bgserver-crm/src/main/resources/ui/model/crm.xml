@@ -122,7 +122,7 @@
             </ref>
             <field name="name" type="singleLineText" style="head" title="公司|姓名"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="event.name" type="many2OneDataSetSelect"/>
+            <field name="event.name" type="selectModelFromListView"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
@@ -174,7 +174,7 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="isCorp" type="singleCheckbox" style="head"/>
-            <field name="event.name" type="many2OneDataSetSelect"/>
+            <field name="event.name" type="selectModelFromListView"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
@@ -259,7 +259,7 @@
             </field>
             <field name="website" type="static"/>
             <field name="birthday" type="static" visible="isCorp!=1"/>
-            <field name="fullAddress" type="static"/>
+            <field name="fullAddress" type="chinaFullAddressStatic"/>
             <field name="comment" type="static"/>
             <field name="contactAddresses" style="relation"/>
             <field name="opportunities" style="relation"/>
@@ -393,8 +393,8 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="event.name" type="many2OneDataSetSelect"/>
+            <field name="interactionStatus.name" type="selectModelFromListView" style="head"/>
+            <field name="event.name" type="selectModelFromListView"/>
             <field name="corpName" type="singleLineText"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
@@ -416,8 +416,8 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="interactionStatus.name" type="many2OneDataSetSelect" style="head"/>
-            <field name="event.name" type="many2OneDataSetSelect"/>
+            <field name="interactionStatus.name" type="selectModelFromListView" style="head"/>
+            <field name="event.name" type="selectModelFromListView"/>
             <field name="corpName" type="singleLineText"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
@@ -448,7 +448,7 @@
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="fax" type="static"/>
-            <field name="fullAddress" type="static"/>
+            <field name="fullAddress" type="chinaFullAddressStatic"/>
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
             <field name="communications" style="relation"/>
@@ -662,7 +662,7 @@
             </ref>
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="real"/>
-            <field name="customer.name" type="many2OneDataSetSelect"/>
+            <field name="customer.name" type="selectModelFromListView"/>
             <field name="products" style="relation"/>
         </view>
         <view type="create">
@@ -679,7 +679,7 @@
             </ref>
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="real"/>
-            <field name="customer.name" type="many2OneDataSetSelect"/>
+            <field name="customer.name" type="selectModelFromListView"/>
             <field name="products" style="relation"/>
         </view>
         <view type="detail">
@@ -740,7 +740,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="tpl.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="tpl.name" type="selectModelFromListView" style="head"/>
             <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
             <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
             <field name="comment" type="multiLineText"/>
@@ -753,7 +753,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="tpl.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="tpl.name" type="selectModelFromListView" style="head"/>
             <field name="opportunity.title" type="singleLineText" style="subHead" enable="false"/>
             <field name="order.title" type="singleLineText" style="subHead" enable="false"/>
             <field name="comment" type="multiLineText"/>
@@ -832,7 +832,7 @@
             </ref>
             <field name="title" type="singleLineText" style="head"/>
             <field name="price" type="singleLineText"/>
-            <field name="customer.name" type="many2OneDataSetSelect" enable="opportunity=undefined or opportunity.id&lt;1"/>
+            <field name="customer.name" type="selectModelFromListView" enable="opportunity=undefined or opportunity.id&lt;1"/>
             <field name="opportunity.title" type="singleLineText" enable="false"/>
             <field name="products" style="relation"  visible="opportunity=undefined or opportunity.id&lt;1"/>
         </view>
@@ -984,7 +984,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="product.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="product.name" type="selectModelFromListView" style="head"/>
             <field name="count" type="singleLineText"/>
         </view>
         <view type="create">
@@ -995,7 +995,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="product.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="product.name" type="selectModelFromListView" style="head"/>
             <field name="count" type="singleLineText"/>
         </view>
         <view type="detail">
@@ -1040,7 +1040,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.name" type="selectModelFromListView" style="head"/>
             <field name="ownFlag" type="singleCheckbox"></field>
         </view>
         <view type="create">
@@ -1051,7 +1051,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.name" type="selectModelFromListView" style="head"/>
             <field name="ownFlag" type="singleCheckbox"></field>
         </view>
         <view type="detail">
@@ -1108,7 +1108,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.userName" type="selectModelFromListView" style="head"/>
             <field name="mainFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
@@ -1119,7 +1119,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.name" type="selectModelFromListView" style="head"/>
             <field name="mainFlag" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -1185,7 +1185,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.userName" type="selectModelFromListView" style="head"/>
             <field name="mainFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
@@ -1196,7 +1196,7 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.name" type="selectModelFromListView" style="head"/>
             <field name="mainFlag" type="singleCheckbox">
                 <meta>
                     <![CDATA[

@@ -382,6 +382,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         mv.fields.forEach {mvi->
             when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
+                ModelView.Field.ViewFieldType.selectModelFromListView,
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
                     if (mvi.relationData != null &&
                             mvi.meta == null &&
@@ -456,6 +457,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         mv.fields.forEach {mvi->
             when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
+                ModelView.Field.ViewFieldType.selectModelFromListView,
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect-> {
                     if (mvi.relationData != null &&
                             mvi.meta == null &&
@@ -547,6 +549,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         mv.fields.forEach {
             when(it.type){
                 ModelView.Field.ViewFieldType.many2OneDataSetSelect,
+                ModelView.Field.ViewFieldType.selectModelFromListView,
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect->{
                     if(it.relationData!=null &&
                             it.meta==null &&

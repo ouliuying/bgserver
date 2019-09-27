@@ -55,7 +55,7 @@
             <field name="name" type="singleLineText" style="head"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="uom.name" type="many2OneDataSetSelect"></field>
+            <field name="uom.name" type="selectModelFromListView"></field>
             <field name="attributeMap" style="relation"></field>
             <field name="skuPattern" style="relation"></field>
         </view>
@@ -78,7 +78,7 @@
             <field name="name" type="singleLineText" style="head"></field>
             <field name="cost" type="singleLineText"></field>
             <field name="price" type="multiLineText"></field>
-            <field name="uom.name" type="many2OneDataSetSelect"></field>
+            <field name="uom.name" type="selectModelFromListView"></field>
             <field name="attributeMap" style="relation"></field>
             <field name="skuPattern" style="relation"></field>
         </view>
@@ -312,8 +312,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="productAttribute.name" type="many2OneDataSetSelect" style="head"></field>
-            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect">
+            <field name="productAttribute.name" type="selectModelFromListView" style="head"></field>
+            <field name="productAttributeValue.attrValue" type="selectModelFromListView">
                 <ctrlProps>
                     <![CDATA[
                     {
@@ -331,8 +331,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="productAttribute.name" type="many2OneDataSetSelect" style="head"></field>
-            <field name="productAttributeValue.attrValue" type="many2OneDataSetSelect"></field>
+            <field name="productAttribute.name" type="selectModelFromListView" style="head"></field>
+            <field name="productAttributeValue.attrValue" type="selectModelFromListView"></field>
         </view>
         <view type="detail">
             <field name="productAttribute.name" type="head"></field>

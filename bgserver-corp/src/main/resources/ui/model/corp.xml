@@ -48,7 +48,7 @@
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="many2OneDataSetSelect"/>
+            <field name="departments.name" type="selectModelFromListView"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='partnerRoles']" op="insertAfter" app="core">
@@ -94,7 +94,7 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="parent.name" type="many2OneDataSetSelect"/>
+            <field name="parent.name" type="selectModelFromListView"/>
             <field name="comment" type="multiLineText"/>
             <field name="partners" style="relation"/>
         </view>
@@ -113,7 +113,7 @@
                 </views>
             </ref>
             <field name="name" type="singleLineText" style="head"/>
-            <field name="parent.name" type="many2OneDataSetSelect"/>
+            <field name="parent.name" type="selectModelFromListView"/>
             <field name="comment" type="multiLineText"/>
             <field name="children" style="relation"/>
             <field name="partners" style="relation"/>
@@ -169,8 +169,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
-            <field name="department.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.userName" type="selectModelFromListView" style="head"/>
+            <field name="department.name" type="selectModelFromListView" style="head"/>
         </view>
         <view type="detail">
             <ref>
@@ -191,8 +191,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.userName" type="many2OneDataSetSelect" style="head"/>
-            <field name="department.name" type="many2OneDataSetSelect" style="head"/>
+            <field name="partner.userName" type="selectModelFromListView" style="head"/>
+            <field name="department.name" type="selectModelFromListView" style="head"/>
         </view>
     </model>
 

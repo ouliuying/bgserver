@@ -163,8 +163,8 @@
                     </action>
                 </actions>
             </refs>
-            <field name="joinPartner.userName" type="many2OneDataSetSelect" />
-            <field name="joinChannel.name" type="many2OneDataSetSelect" />
+            <field name="joinPartner.userName" type="selectModelFromListView" />
+            <field name="joinChannel.name" type="selectModelFromListView" />
         </view>
 
         <view type="edit">
@@ -175,8 +175,8 @@
                     </action>
                 </actions>
             </refs>
-            <field name="joinPartner.userName" type="many2OneDataSetSelect" />
-            <field name="joinPartner.name" type="many2OneDataSetSelect" />
+            <field name="joinPartner.userName" type="selectModelFromListView" />
+            <field name="joinPartner.name" type="selectModelFromListView" />
         </view>
 
         <view type="detail">

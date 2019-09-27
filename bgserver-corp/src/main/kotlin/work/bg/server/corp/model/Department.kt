@@ -21,7 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
-import dynamic.model.query.mq.RefSingleton
+import com.google.gson.JsonObject
+import dynamic.model.query.mq.*
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
@@ -29,6 +30,9 @@ import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrCorpBillboard
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.context.JsonClauseResolver
+import work.bg.server.core.ui.ModelView
 
 @Model("department", "部门")
 class Department:ContextModel("corp_department",
@@ -57,6 +61,7 @@ class Department:ContextModel("corp_department",
             targetModelFieldName = "id",
             defaultValue = CurrCorpBillboard(),
             foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+
     val partners= dynamic.model.query.mq.ModelMany2ManyField(null,
             "partner_id",
             dynamic.model.query.mq.FieldType.BIGINT, "员工",
@@ -105,5 +110,33 @@ class Department:ContextModel("corp_department",
                 ModelFieldRequired(this.name,advice = "必须输入部门名称"),
                 ModelFieldNotNullOrEmpty(this.name,advice = "部门名称不能为空")
         )
+    }
+
+    override fun loadListModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: FieldValue?, toField: FieldBase?, ownerModelID: Long?, reqData: JsonObject?): ModelDataArray? {
+        if(ownerFieldValue!=null){
+            if(ownerFieldValue.value== dynamic.model.query.mq.Undefined && ownerModelID==null){
+                return null
+            }
+        }
+        val fields = this.getModelViewFields(mv).toTypedArray()
+        val pageIndex = reqData?.get("pageIndex")?.asInt?:1
+        val pageSize = reqData?.get("pageSize")?.asInt?:10
+        val jCriteria = reqData?.get("criteria")?.asJsonObject
+        //TODO parse javascript criteria
+
+        var criteria = null as dynamic.model.query.mq.ModelExpression?
+        jCriteria?.let {
+            criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
+        }
+        val (ret,ownerCriteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
+        if(ret){
+            criteria = if(criteria!=null && ownerCriteria!=null) and(ownerCriteria,criteria!!) else if(criteria!=null) criteria  else ownerCriteria
+        }
+        var data = this.acRead(*fields,partnerCache = pc,pageIndex = 0,pageSize =null,criteria = criteria)
+        var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
+        viewData["totalCount"]=totalCount
+        return this.toClientModelData(data,arrayListOf(*fields.filter {_f->
+            _f is dynamic.model.query.mq.ModelMany2ManyField
+        }.toTypedArray())) as dynamic.model.query.mq.ModelDataArray?
     }
 }

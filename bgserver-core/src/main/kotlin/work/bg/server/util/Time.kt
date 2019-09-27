@@ -21,10 +21,15 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.util
 
+import java.text.SimpleDateFormat
 import java.util.*
 
 object  Time{
     fun now():Date{
         return Date()
+    }
+    fun getDate(value:String):Date{
+        var df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+       return  df.parse(value)
     }
 }

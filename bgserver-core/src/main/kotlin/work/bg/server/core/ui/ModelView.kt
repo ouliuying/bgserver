@@ -201,6 +201,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          object ViewFieldType{
              const val many2OneDataSetSelect="many2OneDataSetSelect"
              const val many2ManyDataSetSelect = "many2ManyDataSetSelect"
+             const val selectModelFromListView = "selectModelFromListView"
          }
          var title:String=""
          var icon:String=""
@@ -254,10 +255,11 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                          val ownerField:String?,
                          val actionName:String?,
                          val visible:String?,
+                         val icon:String?,
                          val enable:String?){
             var meta:JsonObject?=null
             override fun toString(): String {
-                return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title} ${this.actionName}  ${this.visible} ${this.enable}"
+                return "${this.app} ${this.model} ${this.viewType} ${this.ownerField} ${this.name} ${this.title} ${this.actionName}  ${this.visible} ${this.icon} ${this.enable}"
             }
         }
     }

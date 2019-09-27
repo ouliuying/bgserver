@@ -40,6 +40,7 @@ import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
+import work.bg.server.core.context.ContextVariantInitializer
 import work.bg.server.sms.model.SmsPartner
 import work.bg.server.util.TypeConvert
 import java.lang.Exception
@@ -48,7 +49,7 @@ import java.util.*
 import javax.servlet.http.HttpSession
 
 @Model("partner")
-class ChatPartner: SmsPartner() {
+class ChatPartner: SmsPartner(), ContextVariantInitializer {
 
     @Value("\${bg.chat.redis.url}")
     private lateinit var redisUrl:String
@@ -57,6 +58,11 @@ class ChatPartner: SmsPartner() {
         override lateinit var ref: ChatPartner
     }
 
+    override fun contextVariantSet(partnerCache: PartnerCache?) {
+        partnerCache?.let {
+
+        }
+    }
     val chatUUID = dynamic.model.query.mq.ModelField(null,
             "chat_uuid",
             dynamic.model.query.mq.FieldType.STRING,
@@ -80,7 +86,10 @@ class ChatPartner: SmsPartner() {
 
 
     @Action(name="login")
-    override fun login(@RequestParam userName:String, @RequestParam password:String, @RequestParam devType:Int, session: HttpSession): ActionResult?{
+    override fun login(@RequestParam userName:String,
+                       @RequestParam password:String,
+                       @RequestParam devType:Int,
+                       session: HttpSession): ActionResult?{
         var md5Password= work.bg.server.util.MD5.hash(password)
         var partner=this.rawRead(criteria = and(eq(this.userName,userName)!!, eq(this.password,md5Password)!!),
                 attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.corps), dynamic.model.query.mq.AttachedField(this.partnerRoles)))

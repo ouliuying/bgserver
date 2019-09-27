@@ -69,6 +69,15 @@ open class  AppModel(
     fun fieldsFromTable(table:String): FieldCollection?{
         return this.tableModelMap?.get(table)?.fields
     }
+    inline fun<reified T>  getTypeModels(): List<T>{
+        var models = arrayListOf<T>()
+        this.models?.forEach {
+            if(it is T){
+                models.add(it)
+            }
+        }
+        return models
+    }
     fun getModel(table:String?): ModelBase?{
         if(table.isNullOrEmpty()){
             return null

@@ -78,8 +78,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" style="head" type="many2OneDataSetSelect"/>
-            <field name="partnerRole.name" style="head" type="many2OneDataSetSelect"/>
+            <field name="partner.name" style="head" type="selectModelFromListView"/>
+            <field name="partnerRole.name" style="head" type="selectModelFromListView"/>
             <field name="isDefaultCorp" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -99,8 +99,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="partner.name" style="head" type="many2OneDataSetSelect"/>
-            <field name="partnerRole.name" style="head" type="many2OneDataSetSelect"/>
+            <field name="partner.name" style="head" type="selectModelFromListView"/>
+            <field name="partnerRole.name" style="head" type="selectModelFromListView"/>
             <field name="isDefaultCorp" type="singleCheckbox">
                 <meta>
                     <![CDATA[
@@ -442,7 +442,7 @@
                 <source app="core" model="app" method="loadInstallApps"/>
             </field>
             <field name="title" type="singleLineText"/>
-            <field name="partnerRole.name" type="many2OneDataSetSelect"/>
+            <field name="partnerRole.name" type="selectModelFromListView"/>
         </view>
         <view type="edit">
             <ref>
@@ -454,7 +454,7 @@
             </ref>
             <field name="name" type="select" style="head"/>
             <field name="title" type="singleLineText"/>
-            <field name="partnerRole" type="many2OneDataSetSelect"/>
+            <field name="partnerRole" type="selectModelFromListView"/>
         </view>
         <view type="detail">
             <ref>
@@ -466,7 +466,7 @@
             </ref>
             <field name="name" type="enumStatic"/>
             <field name="title" type="singleLineText"/>
-            <field name="partnerRole.name" type="many2OneDataSetSelect" enable="false"/>
+            <field name="partnerRole.name" type="selectModelFromListView" enable="false"/>
         </view>
     </model>
     <model name="modelLog" app="core">

@@ -33,11 +33,13 @@ data class Trigger(val name:String,
     var visible:String?=null
     var ownerField:String?=null
     var actionName:String?=null
+    var icon:String?=null
     var meta:JsonObject?=null
 
     fun createCopy():Trigger{
         val t= Trigger(name,title,app,model,viewType)
         t.meta = meta
+        t.icon=icon
         return t
     }
 }

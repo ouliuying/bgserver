@@ -79,6 +79,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: "$junit_version"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_runner_junit5_version"
     compile "org.springframework.boot:spring-boot-starter-quartz:$spring_boot_version"
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
+
 }
 
 dependencies{

@@ -16,45 +16,45 @@
   -->
 
 <ui>
-    <action viewType="create" app="*" model="*">
+    <action viewType="create" app="*" model="*" >
         <group name="main">
-            <trigger title="保存" name="doCreate"></trigger>
+            <trigger title="保存" name="doCreate" icon="/svg/action/save.svg"/>
         </group>
     </action>
 
     <action viewType="edit" app="*" model="*">
         <group name="main">
-            <trigger title="保存" name="doSave"></trigger>
+            <trigger title="保存" name="doSave" icon="/svg/action/save.svg"/>
         </group>
     </action>
 
     <action viewType="list" app="*" model="*">
 
         <group name="main">
-            <trigger title="添加" name="toAdd"></trigger>
+            <trigger title="添加" name="toAdd" icon="/svg/action/add.svg"/>
         </group>
 
 
         <group name="opAction">
-            <trigger title="详情" name="toDetail" viewType="detail"></trigger>
-            <trigger title="删除" name="doDelete"></trigger>
+            <trigger title="详情" name="toDetail" viewType="detail" icon="/svg/action/detail.svg"/>
+            <trigger title="删除" name="doDelete"  icon="/svg/action/delete.svg"/>
         </group>
 
         <group name="selSingleItemAction">
-            <trigger title="选定" name="doSelSingleItem"></trigger>
+            <trigger title="选定" name="doSelSingleItem"  icon="/svg/action/singleSel.svg"/>
         </group>
 
     </action>
 
     <action viewType="detail" app="*" model="*">
         <group name="main">
-            <trigger title="编辑" name="toEdit"></trigger>
+            <trigger title="编辑" name="toEdit"  icon="/svg/action/edit.svg"/>
         </group>
     </action>
 
     <action viewType="modelAction" app="*" model="*">
         <group name="main">
-            <trigger title="确定" name="doSave"></trigger>
+            <trigger title="确定" name="doSave"  icon="/svg/action/save.svg"/>
         </group>
     </action>
 

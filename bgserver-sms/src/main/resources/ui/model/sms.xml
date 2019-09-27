@@ -28,8 +28,8 @@
                     </action>
                 </actions>
             </ref>
-            <field name="userName" type="singleLineText" style="head"/>
-            <field name="password" type="password"/>
+            <field name="apiKey" type="singleLineText" style="head"/>
+            <field name="apiSecret" type="password"/>
         </view>
     </model>
     <model name="sms" app="sms">

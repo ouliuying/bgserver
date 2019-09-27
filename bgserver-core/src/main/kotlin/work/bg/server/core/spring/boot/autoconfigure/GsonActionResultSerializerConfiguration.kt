@@ -481,6 +481,9 @@ class GsonActionResultSerializerConfiguration {
                 jObj.addProperty("title",node.title)
                 jObj.addProperty("viewType",node.viewType)
                 jObj.addProperty("icon",node.icon)
+                if(!(node.redirectApp.isNullOrEmpty() || node.redirectApp.isNullOrBlank())){
+                    jObj.addProperty("redirectApp",node.redirectApp)
+                }
             }
             return jObj
         }
@@ -549,6 +552,7 @@ class GsonActionResultSerializerConfiguration {
 
             val obj = JsonObject()
             if (value != null) {
+
                 obj.addProperty("errorCode",value.errorCode.code)
                 obj.addProperty("description", value.description?:value.errorCode.description)
                 if (value.bag.count() > 0) {

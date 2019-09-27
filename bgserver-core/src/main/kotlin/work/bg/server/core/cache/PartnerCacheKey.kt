@@ -23,4 +23,6 @@ package work.bg.server.core.cache
 
 import java.io.Serializable
 
-data class PartnerCacheKey(val partnerID:Long,val corpID:Long,val devType:Int): Serializable
+data class PartnerCacheKey(val partnerID:Long,
+                           val corpID:Long,
+                           val devType:Int): Serializable

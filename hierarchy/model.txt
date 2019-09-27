@@ -46,6 +46,8 @@ work.bg.server.sms.model.Sms, work.bg.server.core.model.ContextModel, work.bg.se
 ============
 work.bg.server.sms.model.SmsSetting, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
+work.bg.server.sms.model.SmsReplyMessageHistory, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
+============
 work.bg.server.sms.model.SmsSendHistory, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
 work.bg.server.account.model.AccountReceivable, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase

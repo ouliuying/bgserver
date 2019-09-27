@@ -48,8 +48,13 @@ class ModelRegister constructor(): ImportBeanDefinitionRegistrar,
 
     override fun setResourceLoader(resourceLoader: ResourceLoader) {
         this.resourceLoader = resourceLoader
-        this.applicationContext=resourceLoader as ApplicationContext
-        appModel?.appContext = applicationContext
+        when(resourceLoader){
+            is ApplicationContext -> {
+                this.applicationContext = resourceLoader
+                appModel?.appContext = applicationContext
+            }
+        }
+
     }
 
     override fun registerBeanDefinitions(importingClassMetadata:
