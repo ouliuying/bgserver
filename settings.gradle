@@ -32,5 +32,6 @@ include 'bgserver-setting'
 include 'bgserver-sms'
 include 'dynamic-model-query'
 include 'dynamic-model-web'
-
+include 'bgserver-qiye-weixin'
+include 'bgserver-freeswitch-callcenter'
 

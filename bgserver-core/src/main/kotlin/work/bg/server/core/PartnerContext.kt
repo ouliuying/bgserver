@@ -31,5 +31,4 @@ class PartnerContext constructor(){
         sysParnter.isSysPartner=true
         return sysParnter
     }
-
 }

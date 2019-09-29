@@ -21,28 +21,32 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.field
 
-import com.google.gson.Gson
-import dynamic.model.query.mq.and
-import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.*
 import dynamic.model.query.mq.model.ModelBase
 import work.bg.server.chat.model.ChatModelJoinChannelRel
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.util.TypeConvert
 
 class PartnerJoinStatusField(model: ModelBase?,
                              name:String,
                              title:String?,
-                             val owner: dynamic.model.query.mq.FieldBase?): dynamic.model.query.mq.FunctionField<Int,PartnerCache>(model,
+                             val owner: FieldBase?): FunctionField<Int,PartnerCache>(model,
         name,
-        dynamic.model.query.mq.FieldType.STRING,
-        title,null,null,depFields= arrayOf(owner)){
-    override fun compute(fieldValueArray: dynamic.model.query.mq.FieldValueArray, partnerCache: PartnerCache?, data: Any?): Int? {
+        FieldType.STRING,
+        title,
+        null,
+        null,
+        depFields= arrayOf(owner)){
+    override fun compute(fieldValueArray: FieldValueArray,
+                         partnerCache: PartnerCache?,
+                         data: Any?): Int? {
         if(owner!=null){
             val currPartnerID = partnerCache?.partnerID
            val ownerObj =  fieldValueArray.getValue(owner)
             if(ownerObj!=null){
-                val mo = ownerObj as dynamic.model.query.mq.ModelDataObject
+                val mo = ownerObj as ModelDataObject
                 var idValue = mo.idFieldValue
-                val partnerID = work.bg.server.util.TypeConvert.getLong(idValue?.value as Number)
+                val partnerID = TypeConvert.getLong(idValue?.value as Number)
                 if(currPartnerID!=null && currPartnerID == partnerID){
                     return 1
                 }
