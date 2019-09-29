@@ -29,5 +29,6 @@ enum class ErrorCode(val code:Int, val description:String){
     USERNAMEORPASSWORDILLEGAL(3,"UserName or password is illegal"),
     CREATEMODELFAIL(4,"没有提交任何数据！"),
     UPDATEMODELFAIL(5,"model update failed"),
+    UPLOAD_FILE_FAIL(5,"上传文件失败，请确认支持的文件类型"),
     UNKNOW(9999,"system busy error")
 }

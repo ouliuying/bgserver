@@ -10,7 +10,11 @@ work.bg.server.chat.model.ChatPartner, work.bg.server.sms.model.SmsPartner, work
 ============
 work.bg.server.core.model.BasePartnerRole, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
+work.bg.server.core.model.StorageEntity, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
+============
 work.bg.server.core.model.BaseCorpPartnerRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
+============
+work.bg.server.core.model.BasePartnerStorageEntityRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
 work.bg.server.product.model.ProductAttributeValueMap, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============

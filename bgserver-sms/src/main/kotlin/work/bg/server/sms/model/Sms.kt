@@ -23,6 +23,7 @@ package work.bg.server.sms.model
 
 import com.google.gson.JsonObject
 import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.eq
 import dynamic.model.web.errorcode.ErrorCode
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Action
@@ -33,6 +34,7 @@ import org.dom4j.io.SAXReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.StorageEntity
 import work.bg.server.kafka.SmsClient
 import work.bg.server.sms.bean.DefaultSmsSender
 import java.io.StringReader
@@ -83,8 +85,37 @@ class Sms:ContextModel("sms","public") {
     }
 
     @Action("importSendSms")
-    fun importSendSms(partnerCache: PartnerCache):ActionResult?{
+    fun importSendSms(@RequestBody data:JsonObject,partnerCache: PartnerCache):ActionResult?{
         var ar=ActionResult()
+        val requestName = data["requestName"].asString
+        val message = data["message"].asString
+        val rmRepeat = data["rmRepeat"].asBoolean
+        val timerValue = data["timerValue"].asString
+        val timerType = data["timerType"].asInt
+        val fileEntity = StorageEntity.ref.rawRead(model=StorageEntity.ref,criteria = eq(StorageEntity.ref.requestName,requestName))?.firstOrNull()
+        if(fileEntity==null){
+            ar.errorCode=ErrorCode.UNKNOW
+            ar.description="提交文件不存在"
+            return ar
+        }
+        if(message.isNullOrBlank() || message.isNullOrEmpty()){
+            ar.errorCode=ErrorCode.UNKNOW
+            ar.description="短信内容不能为空"
+            return ar
+        }
+        if(timerType<0){
+            smsSender.sendFile(fileEntity.getFieldValue(StorageEntity.ref.serverPath) as String,
+                    message =message,
+                    repeatFilter = rmRepeat,
+                    useAccessControl = true,
+                    partnerCache = partnerCache)
+        }
+        else if(timerType==0){
+            var timeingDate=work.bg.server.util.Time.getDate(timerValue)
+            smsSender.timingSendFileOnce(fileEntity.getFieldValue(StorageEntity.ref.serverPath) as String,message = message,
+                    repeatFilter = rmRepeat,
+                    timingDate = timeingDate,useAccessControl = true,partnerCache = partnerCache)
+        }
         return ar
     }
 

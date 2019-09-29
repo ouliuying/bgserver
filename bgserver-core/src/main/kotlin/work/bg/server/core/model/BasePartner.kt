@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
+import dynamic.model.query.mq.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import dynamic.model.web.spring.boot.annotation.Action
@@ -30,9 +31,6 @@ import work.bg.server.core.constant.SessionTag
 
 import dynamic.model.web.errorcode.ErrorCode
 import org.springframework.web.bind.annotation.RequestParam
-import dynamic.model.query.mq.RefSingleton
-import dynamic.model.query.mq.and
-import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.model.AppModel
 import dynamic.model.query.mq.specialized.ConstRelRegistriesField
 import dynamic.model.web.spring.boot.model.ActionResult
@@ -160,6 +158,15 @@ open class  BasePartner(table:String, schema:String): ContextModel(table,schema)
             "日志",
             targetModelTable = "public.base_model_log",
             targetModelFieldName = "partner_id")
+
+    val storageEntities = ModelMany2ManyField(null,
+            "storageEntities",
+            FieldType.BIGINT,
+            "文件资源",
+            relationModelTable = "public.base_partner_storage_entity_rel",
+            relationModelFieldName = "storage_entity_id",
+            targetModelTable = "public.base_storage_entity",
+            targetModelFieldName = "id")
 
 
     constructor():this("base_partner","public")

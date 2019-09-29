@@ -20,6 +20,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
   */
 
 package dynamic.model.web.errorcode
+
+import com.google.gson.JsonObject
+
 fun ErrorCode.jsonFormat():Map<String,Any?> {
     var map= mutableMapOf<String,Any?>()
     map.put("errorCode",this.code)
@@ -35,7 +38,14 @@ fun ErrorCode.reLogin(redirectUrl:String?):Map<String,Any?>{
     map.put("redirectURL",redirectUrl)
     return map
 }
-
+fun ErrorCode.reLoginJson(redirectUrl:String?):JsonObject{
+    // return String.format("""{"errorCode":${this.code},"errorMsg":"${this.description}","redirectURL":"${redirectUrl}"}""")
+    var jo = JsonObject()
+    jo.addProperty("errorCode",this.code)
+    jo.addProperty("errorMsg",this.description)
+    jo.addProperty("redirectURL",redirectUrl)
+    return jo
+}
 fun ErrorCode.jsonFormat(extraData:Map<String,Any?>):Map<String,Any?>{
     var map= mutableMapOf<String,Any?>()
     map.put("errorCode",this.code)

@@ -83,6 +83,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 
+// https://mvnrepository.com/artifact/org.apache.any23/apache-any23-encoding
+    compile group: 'org.apache.any23', name: 'apache-any23-encoding', version: '2.3'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    compile group: 'org.apache.poi', name: 'poi', version: '4.1.0'
+
 
 }
 

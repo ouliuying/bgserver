@@ -28,6 +28,7 @@ import org.springframework.web.method.HandlerMethod
 import work.bg.server.core.constant.SessionTag
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.errorcode.reLogin
+import dynamic.model.web.errorcode.reLoginJson
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -47,7 +48,7 @@ class ShouldLoginInterceptor constructor(private val unauthRedirectUrl:String?):
                 response.contentType="application/json"
                 response.characterEncoding="utf-8"
                 response.status=200
-                response.writer.print(ErrorCode.RELOGIN.reLogin(this.unauthRedirectUrl))
+                response.writer.print(ErrorCode.RELOGIN.reLoginJson(this.unauthRedirectUrl))
                 response.writer.close()
                 return false
             }

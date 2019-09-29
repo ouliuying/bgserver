@@ -26,29 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-
-/*
- *
- *  *
- *  *  * Copyright (c) Shanghai Xing Ye, Co. Ltd.
- *  *  * https://bg.work
- *  *  *
- *  *  *This program is free software: you can redistribute it and/or modify
- *  *  *it under the terms of the GNU Affero General Public License as published by
-t *  *  *he Free Software Foundation, either version 3 of the License.
-
- *  *  *This program is distributed in the hope that it will be useful,
- *  *  *but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  *  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  *  *GNU Affero General Public License for more details.
-
- *  *  *You should have received a copy of the GNU Affero General Public License
- *  *  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  *  *
-  *
-  */
-
-
 open abstract class SmsClient {
     companion object{
         const val SMS_SUBMIT_DELIVERY_STATUS_QUEUE = "smsreceivesubmitanddeliverstatus"
