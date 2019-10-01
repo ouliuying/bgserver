@@ -21,33 +21,22 @@
  *
  */
 
-package work.bg.server.chat.verticle
+package work.bg.server.core.storage
 
-import io.vertx.core.AbstractVerticle
-import io.vertx.core.Handler
-import io.vertx.core.Verticle
-import io.vertx.core.json.JsonObject
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import work.bg.server.chat.ChatEventBusConstant
-import work.bg.server.chat.kafka.PersistChatMessage
 
 @Component
-class PersistLogServerVerticle:AbstractVerticle() {
-    @Autowired
-    lateinit var persistStore:PersistChatMessage
-    override fun start() {
-        this.vertx.eventBus().consumer<JsonObject>(ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS){
-            it.body()?.let { msgObj->
-                persistStore.write(msgObj.toString(), Handler {
+class ImgeFileType:FileType {
+    override val filter: Regex
+        get() = Regex(".+\\.((png)|(jpeg)|(jpg)|(gif))$",RegexOption.IGNORE_CASE)
+    override val isTransient: Int
+        get() = 0
+    override val title: String
+        get() = "图片"
+    override val typ: String
+        get() = "image"
 
-                })
-            }
-        }
-    }
-
-    override fun stop() {
-
-
+    override fun process(file: String): Any? {
+        return null
     }
 }

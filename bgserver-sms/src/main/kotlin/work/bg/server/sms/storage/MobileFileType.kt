@@ -44,7 +44,7 @@ import java.io.File
 @Component
 class MobileFileType:FileType {
     override val filter: Regex
-        get() = Regex("\\.((txt)|(csv)|(xls)|(xlsx)$)",RegexOption.IGNORE_CASE)
+        get() = Regex(".+\\.((txt)|(csv)|(xls)|(xlsx)$)",RegexOption.IGNORE_CASE)
     override val isTransient: Int
         get() = 1
     override val title: String

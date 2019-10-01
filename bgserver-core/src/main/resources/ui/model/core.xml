@@ -220,6 +220,7 @@
             <field name="password" style="head" type="singleLineText"/>
             <field name="name" style="subHead" type="singleLineText"/>
             <field name="nickName" style="subHead" type="singleLineText"/>
+            <field name="userIcon" style="subHead" type="selectImage"/>
             <field name="birthday" type="date"/>
             <field name="mobile" type="mobile"/>
             <field name="telephone" type="telephone"/>
@@ -244,6 +245,7 @@
             <field name="password" style="head" type="singleLineText"/>
             <field name="name" style="subHead" type="singleLineText"/>
             <field name="nickName" style="subHead" type="singleLineText"/>
+            <field name="userIcon" style="subHead" type="selectImage"/>
             <field name="birthday" type="date"/>
             <field name="mobile" type="mobile"/>
 <!--            <field name="setCurrentCorpAsDefault" type="singleCheckbox">-->
@@ -278,6 +280,16 @@
             <field name="userName" style="head" type="static"/>
             <field name="name" style="subHead" type="static"/>
             <field name="nickName" style="subHead" type="static"/>
+            <field name="userIcon" style="subHead" type="staticImagePreview">
+                <meta>
+                    <![CDATA[
+                        {
+                         "width":"48",
+                         "height":"48"
+                        }
+                      ]]>
+                </meta>
+            </field>
             <field name="birthday" type="static"/>
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
@@ -469,6 +481,38 @@
             <field name="partnerRole.name" type="selectModelFromListView" enable="false"/>
         </view>
     </model>
+
+
+    <model name="partnerStorageEntityRel" app="core">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub|singleSelection"/>
+                    </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="storageEntity.clientName" title="文件名称"/>
+            <field name="storageEntity.requestName" title="链接" type="staticImagePreview">
+                <meta>
+                    <![CDATA[
+                        {
+                         "width":"48",
+                         "height":"48"
+                        }
+                      ]]>
+                </meta>
+            </field>>
+            <field name="storageEntity.createTime" title="添加时间"/>
+        </view>
+    </model>
+
     <model name="modelLog" app="core">
         <view type="list">
             <field name="app" type="static"/>

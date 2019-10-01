@@ -239,7 +239,7 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
             this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.IS)
             var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.IsExpression).field, "%" + (expression as dynamic.model.query.mq.condition.IsExpression).value + "%")
+            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue(expression.field, expression.value)
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.IsNotExpression).field)
@@ -247,7 +247,7 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
             this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.IS_NOT)
             var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.IsNotExpression).field, "%" + (expression as dynamic.model.query.mq.condition.IsNotExpression).value + "%")
+            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue(expression.field, expression.value)
         }
     }
     private  fun buildLikeExpression(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?){
@@ -331,7 +331,7 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
             else->{
                 var namedParameter=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedParameter)
-                this.namedParameters.put(columnName, dynamic.model.query.mq.FieldValue(checkValueExpression.field, checkValueExpression.value))
+                this.namedParameters[columnName] = dynamic.model.query.mq.FieldValue(checkValueExpression.field, checkValueExpression.value)
             }
         }
     }

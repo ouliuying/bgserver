@@ -28,6 +28,12 @@ import dynamic.model.web.errorcode.jsonFormat
 import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.model.ActionResult
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.util.FileCopyUtils
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import work.bg.server.core.cache.PartnerCache
@@ -37,7 +43,8 @@ import work.bg.server.core.constant.SessionTag
 import work.bg.server.core.model.StorageEntity
 import work.bg.server.core.spring.boot.annotation.ShouldLogin
 import work.bg.server.core.storage.FileStorage
-import java.nio.file.FileStore
+import java.io.FileInputStream
+import java.nio.file.Paths
 import javax.servlet.http.HttpSession
 
 @RestController
@@ -46,9 +53,10 @@ class StorageFileController {
     lateinit var fileStorage:FileStorage
     @Autowired
     lateinit var partnerCacheRegistry: PartnerCacheRegistry
+
     @ShouldLogin
     @RequestMapping("/storage/upload/{fileType:^[a-z]{1,20}$}")
-    fun uploadTempFile(@RequestParam("file") file:MultipartFile,
+    fun uploadFile(@RequestParam("file") file:MultipartFile,
                        @PathVariable("fileType") fileType:String,session: HttpSession):Map<String,Any?> {
         val fe = fileStorage.save(file,fileType = fileType)
         if(fe==null){
@@ -64,6 +72,34 @@ class StorageFileController {
                     "requestName" to requestName,
                     "bag" to fe.attachedData
             ))
+        }
+    }
+
+    @RequestMapping("/storage/file/{requestName}")
+    fun getFile(@PathVariable("requestName") requestName:String?=null):Any?{
+        if(requestName.isNullOrBlank()||requestName.isNullOrEmpty()){
+            return null
+        }
+        val serverFile = StorageEntity.ref.getServerFile(requestName = requestName)
+        return serverFile?.let {
+            var ext = serverFile.substringAfterLast(".").toLowerCase()
+            val file = UrlResource(Paths.get(serverFile).toUri())
+            when{
+                ext.compareTo("jpg")==0||
+                ext.compareTo("jpeg")==0->{
+                    return  ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body<Resource>(file)
+                }
+                ext.compareTo("gif")==0->{
+                    return  ResponseEntity.ok().contentType(MediaType.IMAGE_GIF).body<Resource>(file)
+                }
+                ext.compareTo("png")==0->{
+                    return  ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body<Resource>(file)
+                }
+                else ->{
+                    return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + file.filename + "\"").body<Resource>(file)
+                }
+            }
         }
     }
 }

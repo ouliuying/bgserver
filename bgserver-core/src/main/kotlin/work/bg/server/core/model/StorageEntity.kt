@@ -109,4 +109,11 @@ class StorageEntity:ContextModel("base_storage_entity","public") {
         }
         return null
     }
+
+    fun getServerFile(requestName:String):String?{
+        var r = this.rawRead(model=this,criteria = eq(this.requestName,requestName))?.firstOrNull()
+        return r?.let {
+            it.getFieldValue(this.serverPath) as String?
+        }
+    }
 }

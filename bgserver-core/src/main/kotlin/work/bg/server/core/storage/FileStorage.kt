@@ -59,6 +59,7 @@ class FileStorage: InitializingBean, BeanPostProcessor {
        }
         return bean
     }
+
     private fun getNewFileName(originalFilename:String):String{
         val ext = originalFilename.substringAfterLast(".")
         return if(ext==originalFilename) work.bg.server.util.GUID.randString() else work.bg.server.util.GUID.randString()+"."+ext
@@ -77,6 +78,7 @@ class FileStorage: InitializingBean, BeanPostProcessor {
         return this.saveImp(file,fileType = fileType,
                 clientFileName = filename)
     }
+
     private fun saveImp(file:MultipartFile,
                 fileType:String,
                 clientFileName:String):FileEntity?{
@@ -86,7 +88,7 @@ class FileStorage: InitializingBean, BeanPostProcessor {
                 return null
             }
             val basePath = if(it.isTransient>0) this.tmpPath else this.path
-            val destPath = Paths.get(basePath,getNewFileName(clientFileName))
+            val destPath = Paths.get("static",basePath,getNewFileName(clientFileName))
             Files.copy(file.inputStream,destPath, StandardCopyOption.REPLACE_EXISTING)
             var tryCount = 100
             while (tryCount>0 && Files.notExists(destPath)){

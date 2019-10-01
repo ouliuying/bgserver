@@ -42,6 +42,10 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
 abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
+    private val LONG_ZERO:Long = 0L
+    private val INTEGER_ZERO:Int = 0
+    private val DOUBLE_ZERO:Double = 0.toDouble()
+    private val FLOAT_ZERO:Float = 0f
     private val logger = LogFactory.getLog(javaClass)
     @Autowired
     protected lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
@@ -154,13 +158,34 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                              limit:Int?=null): ModelDataArray? {
       return this.query(*fields,fromModel = this,joinModels = joinModels,criteria = criteria,groupBy = groupBy,orderBy = orderBy,offset = offset,limit = limit)
     }
-
+    private fun unwrapValue(value:Any?):Any?{
+        when(value){
+            is ModelDataObject->{
+                return if(value==null) {
+                    null
+                } else value.idFieldValue?.value
+            }
+            is ModelDataSharedObject->{
+                return null
+            }
+            is ModelDataArray->{
+                return value?.data?.map { fva->
+                    val idField = value.model?.fields?.getIdField()
+                    return idField?.let {
+                        fva.getValue(idField)
+                    }
+                }
+            }
+            else-> return value
+        }
+    }
     protected open fun fieldValueToParameters(fieldValues:Map<String, FieldValue>?):Map<String, SqlParameterValue?>?{
         if (fieldValues!=null) {
             var mp = mutableMapOf<String, SqlParameterValue?>()
             fieldValues.forEach {
                 var jdbcType = it.value.field.fieldType.value
-                var p = SqlParameterValue(jdbcType.vendorTypeNumber, it.value.value)
+                val pVal = unwrapValue(it.value.value)
+                var p = SqlParameterValue(jdbcType.vendorTypeNumber, pVal)
                 mp[it.key] = p
             }
             return mp
@@ -198,12 +223,44 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
             JDBCType.TIMESTAMP->record.getTimestamp(index)
             JDBCType.LONGNVARCHAR,JDBCType.NVARCHAR,JDBCType.LONGVARCHAR,JDBCType.VARCHAR->record.getString(index)
             JDBCType.NUMERIC,JDBCType.DECIMAL->record.getBigDecimal(index)
-            JDBCType.INTEGER->record.getInt(index)
-            JDBCType.BIGINT->record.getLong(index)
+            JDBCType.INTEGER->{
+               val v =  record.getInt(index)
+                return if (v!=0) {
+                    v
+                } else (if (record.wasNull()) null else v)
+            }
+            JDBCType.BIGINT->{
+                val v = record.getLong(index)
+                return if(v!=LONG_ZERO){
+                    v
+                }
+                else
+                {
+                    if (record.wasNull()) null else v
+                }
+            }
             JDBCType.DATE->record.getDate(index)
             JDBCType.TIME->record.getTime(index)
-            JDBCType.DOUBLE->record.getDouble(index)
-            JDBCType.FLOAT->record.getFloat(index)
+            JDBCType.DOUBLE->{
+
+                val v = record.getDouble(index)
+                return if(v!=DOUBLE_ZERO){
+                    v
+                }
+                else
+                {
+                    if (record.wasNull()) null else v
+                }
+            }
+            JDBCType.FLOAT->{
+
+                val v = record.getFloat(index)
+                return if(v!=FLOAT_ZERO){
+                    v
+                } else {
+                    if (record.wasNull()) null else v
+                }
+            }
             else->null
         }
     }
