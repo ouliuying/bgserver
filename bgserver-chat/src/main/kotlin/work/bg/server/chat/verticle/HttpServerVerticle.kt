@@ -191,10 +191,12 @@ class HttpServerVerticle:AbstractVerticle() {
             this.logger.trace("new uuid = $uuid")
             message.put(ChatEventBusConstant.CHAT_MESSAGE_UUID,uuid)
             val channelUUID = message.getString(ChatEventBusConstant.CHANNEL_UUID)
+            val toUUID = message.getString(ChatEventBusConstant.CHAT_TO_UUID)
             return JsonObject(mapOf(
                     "type" to  MessageResponseType.UPDATE_MESSAGE_UUID_TYPE.typ,
                     "isResponse" to 1,
                     "seq" to  seq,
+                    "toUUID" to toUUID,
                     "uuid" to  uuid,
                     "channelUUID" to channelUUID,
                     "timestamp" to Date().toInstant().epochSecond

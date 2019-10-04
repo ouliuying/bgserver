@@ -34,22 +34,33 @@ import javax.servlet.http.HttpServletResponseWrapper
 
 class ResetRequestFilter:Filter {
     private val skipUrls:ArrayList<String> = arrayListOf(
-           "/ac/chat/chat/loadChannelMeta"
+           "/ac/chat/chat/loadChannelMeta",
+            "/storage/file",
+            "/storage/upload"
     )
     private  val logger = LogFactory.getLog(javaClass)
+    private fun isSkipUrl(uri:String):Boolean{
+        skipUrls.forEach {
+            if(uri.contains(it,true)){
+                return@isSkipUrl true
+            }
+        }
+        return false
+    }
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
         val req = ResetRequestWrapper(request as HttpServletRequest)
         val res = ResetResponseWrapper(response as HttpServletResponse)
-        chain?.doFilter(req, res)
-        val reqBody = req.bodyText
-        val resBody = res.bodyText
-        if(req.requestURI !in skipUrls){
+        if(!this.isSkipUrl(req.requestURI)){
+            chain?.doFilter(req, res)
+            val reqBody = req.bodyText
+            val resBody = res.bodyText
             logger.info("""
-
             Logging Request method =  ${req.method}  url =  ${req.requestURI}  body = $reqBody
             ====>Response : content-type = ${res.contentType} ret body = $resBody"
-        """)
+            """)
+        }
+        else{
+            chain?.doFilter(req, res)
         }
     }
-
 }

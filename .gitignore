@@ -22,3 +22,4 @@
 /**/out/*
 !/**/resources/log/**/*.xml
 !/**/resources/msg/**/*.json
+/static/*

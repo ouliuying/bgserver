@@ -106,7 +106,7 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
     }
 
     override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
-        return arrayOf(ModelFieldRequired(this.corp,this.partner,this.partnerRole,advice = "缺少必要的字段"),
+        return arrayOf(ModelFieldRequired(this.partner,this.partnerRole,advice = "缺少必要的字段"),
                 ModelFieldMustCoexist(partnerRole,isDefaultCorp,advice = "必須选择用户角色"))
     }
 

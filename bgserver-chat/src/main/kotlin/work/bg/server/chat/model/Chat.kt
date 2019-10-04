@@ -73,12 +73,18 @@ class Chat:ContextModel("chat","public") {
         return ar
     }
 
-    private fun getChannelMetaByChatSessionID(chatSessionID:String):String?{
+    fun getChannelMetaByChatSessionID(chatSessionID:String):String?{
         try {
             var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
             var ret = pool.resource.hgetAll(chatSessionID)
             return ret?.let {
-                return it["channelMeta"]
+                val corpID = it["corpID"]?.toLong()
+                val model = it["model"]
+                val modelID = it["modelID"]?.toLong()
+                if(model=="partner" && corpID!=null && corpID>0 &&modelID!=null && modelID>0) {
+                     ChatPartner.ref.getPartnerChannelMeta(corpID =corpID,partnerID = modelID)
+                }
+                else null
             }
         }
         catch (ex: Exception){

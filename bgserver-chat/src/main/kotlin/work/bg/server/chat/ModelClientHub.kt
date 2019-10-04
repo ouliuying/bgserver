@@ -36,6 +36,11 @@ import io.vertx.redis.client.RedisAPI
 import io.vertx.redis.client.RedisOptions
 import org.apache.commons.logging.LogFactory
 import java.net.URI
+import org.bouncycastle.crypto.tls.ConnectionEnd.server
+import work.bg.server.chat.ChannelConsumer
+import work.bg.server.chat.ModelClientChatSession
+import work.bg.server.chat.model.ChatPartner
+
 
 object ModelClientHub {
     lateinit var vertx: Vertx
@@ -176,9 +181,11 @@ object ModelClientHub {
             }
         }
     }
-    private fun readModelClientChatSessionFromRedis(chatSessionID: String,handler:Handler<AsyncResult<ModelClientChatSession>>){
+    private fun readModelClientChatSessionFromRedis(chatSessionID: String,
+                                                    handler:Handler<AsyncResult<ModelClientChatSession>>){
         var tryCount = 0
-        this.getRegModelClientChatSessionFromRedis(chatSessionID,Handler<AsyncResult<ModelClientChatSession>>{
+        this.getRegModelClientChatSessionFromRedis(chatSessionID,
+                Handler<AsyncResult<ModelClientChatSession>>{
             if(it.succeeded()){
                 handler.handle(it)
             }
@@ -236,25 +243,49 @@ object ModelClientHub {
                                         "model" -> model=value?.toString()
                                         "modelID" -> modelID = value?.toLong()
                                         "devType" -> devType = value?.toInteger()
-                                        "channelMeta" -> channelMeta = value?.toString()
                                         "chatUUID" ->chatUUID = value?.toString()
                                     }
                                 }
-                                this.logger.trace("corpID = $corpID model = $model modelID = $modelID devType = $devType channelMeta = $channelMeta chatUUID = $chatUUID")
-                                if(corpID!=null && model!=null && modelID!=null && devType!=null && chatUUID!=null){
-                                       val mccs = ModelClientChatSession(model,
-                                               corpID,
-                                               modelID,
-                                               chatUUID,
-                                               channelMeta,
-                                               arrayListOf(ModelClientChatDeviceSessionID(devType,chatSessionID)
-                                       ))
-                                        mccs.vertx = this.vertx
-                                    handler.handle(Future.succeededFuture(mccs))
-                                }
-                                else{
-                                    handler.handle(Future.failedFuture(resp.toString()))
-                                }
+                                this.vertx.executeBlocking<String?>({ promise ->
+                                    // Call some blocking API that takes a significant amount of time to return
+                                    try {
+                                        val result = when{
+                                            model?.compareTo("partner",true)==0->{
+                                                ChatPartner.ref.getPartnerChannelMeta(partnerID = modelID!!,
+                                                        corpID = corpID!!)
+                                            }
+                                            else->null
+                                        }
+                                        promise.complete(result)
+                                    }
+                                    catch (ex:Exception){
+                                        promise.fail(ex.message)
+                                    }
+                                }, { res ->
+                                    if(res.succeeded()){
+                                        channelMeta = res.result()
+
+                                        this.logger.info("corpID = $corpID model = $model modelID = $modelID devType = $devType channelMeta = $channelMeta chatUUID = $chatUUID")
+                                        if(corpID!=null && model!=null && modelID!=null && devType!=null && chatUUID!=null){
+                                            val mccs = ModelClientChatSession(model,
+                                                    corpID,
+                                                    modelID,
+                                                    chatUUID,
+                                                    channelMeta,
+                                                    arrayListOf(ModelClientChatDeviceSessionID(devType,chatSessionID)
+                                                    ))
+                                            mccs.vertx = this.vertx
+                                            handler.handle(Future.succeededFuture(mccs))
+                                        }
+                                        else{
+                                            handler.handle(Future.failedFuture(resp.toString()))
+                                        }
+                                    }
+                                    else{
+                                        this.logger.trace("read channel meta failed")
+                                        handler.handle(Future.failedFuture("read channel meta failed"))
+                                    }
+                                })
                             }
                             else{
                                 this.logger.trace("get chat sesion id $chatSessionID relation data failed,cause:${it.cause()}")

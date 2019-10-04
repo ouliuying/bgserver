@@ -75,7 +75,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
             "broadcast_type",
             dynamic.model.query.mq.FieldType.INT,
             "投递方式",
-            defaultValue = 0)
+            defaultValue = 0,comment = "1 表示广播，0 p2p")
 
     val owner = dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_id",
@@ -105,9 +105,11 @@ class ChatChannel:ContextModel("chat_channel","public") {
           val ar = ActionResult(ErrorCode.RELOGIN)
           if(partnerCache!=null){
               val uuid = data.get("uuid")?.asString
-              val mo= this.acRead(criteria = eq(this.uuid,uuid),partnerCache = partnerCache,attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.joinPartners)))?.firstOrNull()
+              val mo= this.acRead(criteria = eq(this.uuid,uuid),
+                      partnerCache = partnerCache,
+                      attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.joinPartners)))?.firstOrNull()
               ar.errorCode = ErrorCode.SUCCESS
-              val joinModels = getJoinModels(mo)
+              val joinModels = getJoinPartners(mo)
               joinModels?.let {
                   ar.bag["joinModels"]= joinModels
               }
@@ -143,7 +145,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
         ar.errorCode = ErrorCode.RELOGIN
         return ar
     }
-    private fun getJoinModels(mo: dynamic.model.query.mq.ModelDataObject?):JsonArray?{
+    private fun getJoinPartners(mo: dynamic.model.query.mq.ModelDataObject?):JsonArray?{
         var joinModels = JsonArray()
         var ownerPartner = this.getJoinModelFromPartner(mo?.getFieldValue(this.owner) as dynamic.model.query.mq.ModelDataObject?)
         ownerPartner?.let {

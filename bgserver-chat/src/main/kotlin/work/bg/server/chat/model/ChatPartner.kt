@@ -95,10 +95,12 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                 attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.corps), dynamic.model.query.mq.AttachedField(this.partnerRoles)))
         return when{
             partner!=null->{
-                var id=partner?.data?.firstOrNull()?.getValue(this.id) as Long?
+                val firstPartner = partner.firstOrNull()
+                var id=firstPartner?.getFieldValue(this.id) as Long?
                 if(id!=null && id>0) {
-                    val chatUUID = partner?.firstOrNull()?.
+                    val chatUUID = firstPartner?.
                             getFieldValue(this.chatUUID) as String?
+                    val icon = firstPartner?.getFieldValue(this.userIcon) as String?
                     var ar = ActionResult()
                     var corpPartnerRels = (partner?.data?.
                             firstOrNull()?.
@@ -122,11 +124,12 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                             var partner = mutableMapOf<String, Any?>()
                             ar.bag["partner"] = partner
                             partner["status"] = 1
+                            partner["icon"] = icon
                             partner["partnerID"] = id
                             partner["corpID"]=corpID
                             partner["chatUUID"] =chatUUID
-                            var channelMeta = getChannelMeta(id,corpID)
-                            var chatSessionID = this.queryChatSessionID(id,corpID,devType,channelMeta?:"",chatUUID?:"")
+                          //  var channelMeta = getChannelMeta(id,corpID)
+                            var chatSessionID = this.queryChatSessionID(id,corpID,devType,chatUUID?:"")
                             if(chatSessionID.isNullOrEmpty()){
                                 return ActionResult(ErrorCode.UNKNOW,"获取企信授权失败")
                             }
@@ -154,7 +157,7 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
         }
     }
 
-    private  fun getChannelMeta(partnerID: Long,corpID: Long):String?{
+    fun getPartnerChannelMeta(partnerID: Long,corpID: Long):String?{
         val chModel = ChatChannel.ref
         var channels = ChatChannel.ref.rawRead(criteria = or(eq(
                 chModel.defaultFlag,1
@@ -180,7 +183,6 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
     private fun queryChatSessionID(partnerID:Long,
                                    corpID:Long,
                                    devType:Int,
-                                   channelMeta:String,
                                    chatUUID:String):String?{
         try {
             var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
@@ -190,8 +192,7 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                     "corpID" to corpID.toString(),
                     "chatUUID" to chatUUID,
                     "model" to "partner",
-                    "devType" to devType.toString(),
-                    "channelMeta" to channelMeta
+                    "devType" to devType.toString()
             ))
             return if(ret.compareTo("ok",true)==0){
                 pool.resource.expire(chatSessionID,1800)
