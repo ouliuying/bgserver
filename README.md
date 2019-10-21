@@ -292,6 +292,11 @@ class Customer:ContextModel("crm_customer","public"){
         export default hookView.withHook(withRouter(connect(mapStateToProps)(CustomView)))
 ```
 ### 业务扩展
-
+|   |  |
+| ------------- | ------------- |
+| 支持 | [金云办公 https://www.bg.work ](https://www.bg.work)|
+| 办公设计交流 |![办公设计交流](static/image/bg.work办公设计交流群二维码.png)|
+| 开发交流 |![开发交流群](static/image/bg.work开发交流群二维码.png)|
+| 项目合作 |![项目合作交流群](static/image/bg.work项目合作群二维码.png)|
 
 
