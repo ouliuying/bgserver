@@ -7,13 +7,13 @@ bg.work是综合性办公框架，
 <div style="text-align: center;">
     <img src="static/logo/logo.svg"/>
 </div>
-
+-------------------------------------------------------
 
 [项目主站](https://www.bg.work)
 
-
+-----------------------------------------------------------------------------------------
 ##框架说明
-
+----------------------------------------------------------------------
 ###数据访问
 Model类图
 ![Model hierarchy](static/image/modelinherit.png)
@@ -175,7 +175,7 @@ val customerProductRels = (customer.getFieldValue(Customer.ref.ConstRelRegistrie
 customerProductRels?.toModelDataObjectArray()?.forEach{ cpRel->
     val productModelDataObject = cpRel.getFieldValue(CustomerProductRel.ref.product) as ModelDataObject?
     val name = productModelDataObject?.getFieldValue(Product.ref.name) as String?
-    val price = productModelDataObject?.getFieldValue(Product.ref.price) as String Number?
+    val price = productModelDataObject?.getFieldValue(Product.ref.price) as Number?
 }
 
 // read customer + addresses + consumedProducts
