@@ -181,8 +181,8 @@ val customer =  Customer.ref.rawRead(criteria=eq(Customer.ref.id,1),attachedFiel
 ```
 
 ###权限管理
-* 针对 model 设置 curd 权限
-* 针对 model field 设置 curd 权限
+* 针对 model 设置 crud 权限
+* 针对 model field 设置 crud 权限
 * [更多](https://www.bg.work)
 
 ### model action
