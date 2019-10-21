@@ -8,7 +8,7 @@ bg.work是综合性办公框架，
     <img src="static/logo/logo.svg"/>
 </div>
 
-![Bg.work Logo](static/logo/logo.svg)
+
 [项目主站](https://www.bg.work)
 
 
