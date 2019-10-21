@@ -294,6 +294,13 @@ class Customer:ContextModel("crm_customer","public"){
         }
         export default hookView.withHook(withRouter(connect(mapStateToProps)(CustomView)))
 ```
+
+
+### 配置
+
+* redis server
+* kafka server
+
 ### 业务扩展
 |   |  |
 | ------------- | ------------- |
