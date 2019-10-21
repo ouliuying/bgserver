@@ -12,6 +12,9 @@ bg.work是综合性办公框架，
 [项目主站 https://www.bg.work ](https://www.bg.work)
 
 -----------------------------------------------------------------------------------------
+## 界面
+
+![admin screen](static/image/softscreen.png)
 
 ## 框架说明
 
