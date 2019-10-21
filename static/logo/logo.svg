@@ -1,0 +1,11 @@
+<!-- 
+   created by ouyang 2019-04-22
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 800 800" version="1.1">
+    <g fill="#34495e">
+        <path d="M250 50 l0 500 200 0 0 -100 -100 0 0 -400z"/>
+        <path  d="M550 750 l0 -500 -200 0 0 100 100 0 0 400z"/>
+        <path fill="#34495e" d="M5 340 A400 400 0 0 1 795 340 l-107 0 A300 300 0 0 0 107 340Z"/>
+        <path fill="#e74c3c" d="M5 460 A400 400 0 0 0 795 460 l-107 0 A300 300 0 0 1 107 460Z"/>
+    </g>
+</svg>
