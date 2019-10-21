@@ -227,7 +227,71 @@ class Customer:ContextModel("crm_customer","public"){
 ```
 
 ### 界面
-    
+> React
+>
+>Rect Router
+>
+>Redux
+>
+>Ant Design React
+>
+>bg.work Tag Hook
+>
+>
+[bg web client 代码 ](https://github.com/ouliuying/bgapp)
+```javascript
+    class BaseView extends React.Component{
+        render(){
+            let self = this
+            return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
+                        <div>
+                            <hookView.Hook hookTag="header"  render={()=>{
+                                   return <div>Header</div>
+                             }}></hookView.Hook>
+                             <hookView.Hook hookTag="body"  render={()=>{
+                                    return <div>body</div>
+                              }}></hookView.Hook>
+                              <hookView.Hook hookTag="footer"  render={()=>{
+                                    return <div>footer</div>
+                              }}></hookView.Hook>
+                        <div>
+                   </hookView.HookProvider>
+        }
+    }
+    export default hookView.withHook(withRouter(connect(mapStateToProps)(BaseView)))
+```
+个性化BaseView
+```javascript
+     import  BaseView from './BaseView'
+     class CustomView extends React.Component{
+           overrideRender(hookTag,props){
+                switch(hookTag){
+                    case "header":
+                        {
+                            return <div>custom header</div>
+                        }
+                     case "body":
+                        {
+                            return <div>custom body</div>
+                        }
+                     case "header":
+                        {
+                            return <div>custom footer</div>
+                        }                        
+                    default:
+                            return null
+                }
+            }
+            render(){
+                let self = this
+                return <hookView.HookProvider value={{cmmHost:self.cmmHost,parent:self}}>
+                         <BaseView />
+                       </hookView.HookProvider>
+            }
+        }
+        export default hookView.withHook(withRouter(connect(mapStateToProps)(CustomView)))
+```
 ### 业务扩展
+
 
 
