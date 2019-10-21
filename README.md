@@ -187,11 +187,11 @@ val customer =  Customer.ref.rawRead(criteria=eq(Customer.ref.id,1),attachedFiel
 ```
 
 ### 权限管理
-* 针对 model 设置 crud 权限
-* 针对 model field 设置 crud 权限
+* 针对 Model 设置 CRUD 权限
+* 针对 Model field 设置 CRUD 权限
 * [更多](https://www.bg.work)
 
-### model action
+### Model Action
 >外部与 bg.work办公平台 交互主要调用 model action
 ```kotlin
 class Customer:ContextModel("crm_customer","public"){
