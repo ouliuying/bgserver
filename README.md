@@ -20,7 +20,7 @@ bg.work是综合性办公框架，
 ### 数据访问
 
 Model类图
-![Model hierarchy](static/image/modelinherit.png)
+![Model hierarchy](static/image/ModelInherit.png)
 
 ```kotlin
  @Model(name = "customer", title="客户")
