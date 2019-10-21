@@ -4,9 +4,8 @@ bg.work是综合性办公框架，
 当前框架包含：多公司、角色及权限支持，部门管理，
 产品，CRM，企业内部通讯IM，企业微信，企业短信，呼叫中心等。
 
-<div style="text-align: center;">
-    <img src="static/logo/logo.svg"/>
-</div>
+
+![logo](static/logo/logo.svg)
 
 -------------------------------------------------------
 
