@@ -230,6 +230,158 @@ class Customer:ContextModel("crm_customer","public"){
 ```
 
 ### 界面
+
++ 配置化
+    + 界面设置
+ ```xml
+<model name="productAttribute" app="product">
+        <view type="list">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                    <action>
+                        <group name="opAction"  refType = "main"></group>
+                    </action>
+                    <action>
+
+                    </action>
+                </actions>
+                <views>
+
+                </views>
+                <menus>
+
+                </menus>
+            </ref>
+            <field name="id"></field>
+            <field name="name" type="static"></field>
+            <field name="comment" type="static"></field>
+        </view>
+        <view type="create">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
+            <field name="values" style="relation"></field>
+        </view>
+        <view type="edit">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="sub|main">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="singleLineText" style="head"></field>
+            <field name="comment" type="multiLineText" style="normal"></field>
+            <field name="values" style="relation"></field>
+        </view>
+        <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main"  refType = "main|sub"></group>
+                    </action>
+                </actions>
+                <menus>
+                </menus>
+                <views>
+                    <view type="list" ownerField="values" model="productAttributeValue" refType="none">
+                    </view>
+                </views>
+            </ref>
+            <field name="name" type="static" style="head"></field>
+            <field name="comment" type="static" style="normal"></field>
+            <field name="values" style="relation"></field>
+        </view>
+    </model>
+```
+   + 界面继承
+```xml
+  <inherit>
+
+
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view/edit" op="append" app="core">
+            <field name="events" style="relation"/>
+            <field name="customers" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="orderInvoices" style="relation"/>
+            <field name="orderReceipts" style="relation"/>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view/detail" op="append" app="core">
+            <field name="events" style="relation"/>
+            <field name="customers" style="relation"/>
+            <field name="leads" style="relation"/>
+            <field name="orderInvoices" style="relation"/>
+            <field name="orderReceipts" style="relation"/>
+        </xpath>
+
+        <xpath expression="/ui/model[@app='product'][@name='product']/view/detail" op="append" app="product">
+            <field name="customerOpportunities" style="relation"/>
+        </xpath>
+        <xpath expression="/ui/model[@app='product'][@name='product']/view/edit" op="append" app="product">
+            <field name="customerOpportunities" style="relation"/>
+        </xpath>
+    </inherit>
+```
+#### 说明
+>field
+>>name 对应的属性名称
+>
+>>type 对应界面控件
+>
+>>style 对应界面控件所在位置
+>
+>> enable 控件是否可用
+>
+>>visible 控件是否可见
+>
+>
+>
+>
+>
+>
+>
+>---------------------------------------------------------------
+### visible 或 enable 表达式
+```text
+ visible = true //显示控件
+ enable = true //控件可用
+
+ visible = id>0 //model id 大于 0 时显示
+ enable = id!=0 //model id 不等于 0 时 可用
+
+ visible == (id>0 and name!="") or age<11 //id 大于0 且 name 不为空 或者  age 小于 11 时可见
+ enable = name=="Bob" //当 name 等于 Bob时，控件可用
+
+```
+### 界面继承
+```text
+ 界面继承 是在 对应的 model 通过继承添加字段是，我们也可以通过XML界面继承来保持代码和界面配置的一致性
+```
+
++ 个性化
 > React
 >
 >Rect Router
