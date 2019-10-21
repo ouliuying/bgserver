@@ -105,7 +105,8 @@ class Customer:ContextModel("crm_customer", "public"){
         val mobile = ModelField(null, "mobile",FieldType.STRING,"手机号")
         val addresses = ModelOne2ManyField(null,"addresses",FeildType.BIGINT,"地址","public.crm_customer_address","customer")
         val threePartyOAuth2Data =  ModelOne2OneField(null, "customer_id",FeildType.BIGINT,"第三方授权","public.crm_three_party_oauth2_data","customer_id", isVirtualField = True)
-}       val consumedProducts = ModelMany2ManyField(null,"consumed_products",FieldType.BIGINT,"已消费产品","public.crm_customer_product_rel","product_id","public.crm_product","id")
+        val consumedProducts = ModelMany2ManyField(null,"consumed_products",FieldType.BIGINT,"已消费产品","public.crm_customer_product_rel","product_id","public.crm_product","id")
+}
 
 //每个 Customer 有多个 address
 @Model("customerAddress","客户地址")
@@ -176,8 +177,6 @@ customerProductRels?.toModelDataObjectArray()?.forEach{ cpRel->
 
 // read customer + addresses + consumedProducts
 val customer =  Customer.ref.rawRead(criteria=eq(Customer.ref.id,1),attachedFields=arrayOf(Customer.ref.addresses, Customer.ref.consumedProducts)).firstOrNull()
-.....
-
 ```
 
 ###权限管理
