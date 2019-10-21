@@ -378,7 +378,7 @@ class Customer:ContextModel("crm_customer","public"){
 ```
 ### 界面继承
 ```text
- 界面继承 是在 对应的 model 通过继承添加字段是，我们也可以通过XML界面继承来保持代码和界面配置的一致性
+ 界面继承是为了解决通过Model继承添加的字段也可以通过XML界面继承来添加
 ```
 
 + 个性化
