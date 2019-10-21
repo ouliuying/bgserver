@@ -186,7 +186,7 @@ customerProductRels?.toModelDataObjectArray()?.forEach{ cpRel->
 val customer =  Customer.ref.rawRead(criteria=eq(Customer.ref.id,1),attachedFields=arrayOf(Customer.ref.addresses, Customer.ref.consumedProducts)).firstOrNull()
 ```
 
-###权限管理
+### 权限管理
 * 针对 model 设置 crud 权限
 * 针对 model field 设置 crud 权限
 * [更多](https://www.bg.work)
