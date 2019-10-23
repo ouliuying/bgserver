@@ -27,9 +27,9 @@ import work.bg.server.core.cache.PartnerCache
 
 class CurrCorpBillboard(override var constant:Boolean=false): FieldDefaultValueBillboard,
         ConstantFieldBillboard {
-    override fun looked(glass:Any?): Long {
+    override fun looked(glass:Any?): Long? {
         return if(glass!=null){
-            (glass as PartnerCache).corpID
+            (glass as PartnerCache?)?.corpID
         }
         else{
            0

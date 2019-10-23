@@ -31,10 +31,10 @@ import work.bg.server.core.context.ModelExpressionContext
 import work.bg.server.core.ui.*
 
 class PartnerCache(partnerData:Map<String,Any?>?,
-                   val partnerID:Long,
-                   val corpID:Long,
-                   val roleID:Long,
-                   val devType:Int):ContextType {
+                   val partnerID:Long?,
+                   val corpID:Long?,
+                   val roleID:Long?,
+                   val devType:Int?):ContextType {
     val modelExpressionContext: ModelExpressionContext = ModelExpressionContext(partnerID, corpID, roleID,devType)
     companion object {
         private val locker=StampedLock()
@@ -58,11 +58,16 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     }
 
     private fun buildPartnerCache(partnerData:Map<String,Any?>?){
-        var corpObject=partnerData?.get("corpObject") as dynamic.model.query.mq.ModelDataObject
-        var partnerRoleObject=partnerData?.get("partnerRoleObject") as dynamic.model.query.mq.ModelDataObject
+        if(partnerData==null){
+            return
+        }
+        var corpObject=partnerData?.get("corpObject") as dynamic.model.query.mq.ModelDataObject?
+        var partnerRoleObject=partnerData?.get("partnerRoleObject") as dynamic.model.query.mq.ModelDataObject?
        // var roleModelsArray=partnerData?.get("roleModelArray") as ModelDataArray
-        var corpCache=buildCorpCache(corpID,corpObject,partnerRoleObject)
-        rebuildCorp(corpCache)
+        if(corpObject!=null && partnerRoleObject!=null){
+            var corpCache=buildCorpCache(corpID?:0,corpObject,partnerRoleObject)
+            rebuildCorp(corpCache)
+        }
     }
     private  fun rebuildCorp(corpCache:CorpCache){
         var tamp= locker.writeLock()
@@ -174,6 +179,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         }
         return null
     }
+
     fun getAccessControlMenu(app:String?,name:String?):MenuTree?{
         if(app.isNullOrEmpty() || name.isNullOrEmpty()){
             return null

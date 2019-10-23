@@ -23,7 +23,7 @@ package work.bg.server.core.context
 
 import java.util.concurrent.locks.StampedLock
 
-class ModelExpressionContext(val partnerID:Long,val corpID:Long,val roleID:Long,val devType:Int){
+class ModelExpressionContext(val partnerID:Long?,val corpID:Long?,val roleID:Long?,val devType:Int?){
      private val locker= StampedLock()
      internal object ContextKey {
          const val partner_id="\$partnerID$"

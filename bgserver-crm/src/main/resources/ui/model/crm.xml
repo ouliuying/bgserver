@@ -17,13 +17,8 @@
   ~  */
   ~
   -->
-
 <ui>
-
     <inherit>
-
-
-
         <xpath expression="/ui/model[@app='core'][@name='partner']/view/edit" op="append" app="core">
             <field name="events" style="relation"/>
             <field name="customers" style="relation"/>

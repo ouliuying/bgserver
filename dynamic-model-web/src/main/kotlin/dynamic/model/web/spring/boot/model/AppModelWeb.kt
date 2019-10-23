@@ -51,6 +51,10 @@ class AppModelWeb(modelMetaDatas: List<ModelMetaData>,
 
     init {
         logger.info("AppModel load start at ${Date()}")
+        buildAppModelRegistries(modelMetaDatas)
+    }
+    fun buildAppModelRegistries(modelMetaDatas: List<ModelMetaData>){
+        this.appModelRegistries.clear()
         modelMetaDatas.forEach {
             if (this.appModelRegistries.containsKey(it.appName)){
                 this.appModelRegistries[it.appName]?.addModel(it)
@@ -77,6 +81,7 @@ class AppModelWeb(modelMetaDatas: List<ModelMetaData>,
 
     private fun overrideModelMeta(modelMetaDatas:MutableList<ModelMetaData?>):List<ModelMetaData>?{
         var overrideModelMetaDatas= mutableListOf<ModelMetaData?>()
+        var sortAppModelMetaDatas = mutableListOf<ModelMetaData?>()
         while (modelMetaDatas.count()>0){
             var fmmd=modelMetaDatas.first()
             var cls=(fmmd?.beanDefinitionHolder?.beanDefinition as GenericBeanDefinition?)?.beanClass
@@ -87,9 +92,18 @@ class AppModelWeb(modelMetaDatas: List<ModelMetaData>,
             modelMetaDatas.removeAll(fmmds)
             var (minFmmd,maxFmmd)=this.getMaxMinLevelModelMeta(fmmds)
             var mmd= ModelMetaData(minFmmd!!.appName, minFmmd.modelName, minFmmd!!.title, maxFmmd!!.beanDefinitionHolder, minFmmd.index)
+            fmmds.forEach {
+                it?.let {
+                    sortAppModelMetaDatas.add(ModelMetaData(minFmmd.appName, minFmmd.modelName, minFmmd.title, it.beanDefinitionHolder, it.index))
+                }
+            }
             overrideModelMetaDatas.add(mmd)
         }
-        return overrideModelMetaDatas as List<ModelMetaData>?
+        buildAppModelRegistries(sortAppModelMetaDatas as List<ModelMetaData>)
+        this.appModelRegistries.forEach {
+            it.value.refresh()
+        }
+        return overrideModelMetaDatas as List<ModelMetaData>
     }
     private fun getMaxMinLevelModelMeta(fmmds:List<ModelMetaData?>):Pair<ModelMetaData?, ModelMetaData?>{
         var fmmd=fmmds.first()

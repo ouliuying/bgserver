@@ -22,5 +22,5 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package dynamic.model.query.mq.billboard
 
 interface FieldDefaultValueBillboard {
-    open fun looked(glass:Any?):Any
+    open fun looked(glass:Any?):Any?
 }

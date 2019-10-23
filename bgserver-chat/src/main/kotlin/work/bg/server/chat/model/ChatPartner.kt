@@ -39,6 +39,8 @@ import work.bg.server.core.model.BasePartnerRole
 import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.errorcode.ErrorCode
+import dynamic.model.web.errorcode.reLogin
+import dynamic.model.web.errorcode.reLoginJson
 import dynamic.model.web.spring.boot.model.ActionResult
 import work.bg.server.core.context.ContextVariantInitializer
 import work.bg.server.sms.model.SmsPartner
@@ -107,10 +109,10 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                             getValue(ConstRelRegistriesField.ref!!) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
                             as dynamic.model.query.mq.ModelDataArray?
                     corpPartnerRels?.data?.sortByDescending {
-                        (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref!!.isSuper) as Int
+                        (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
                     }
-                    var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?
-                    var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as dynamic.model.query.mq.ModelDataObject?
+                    var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject?
+                    var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.partnerRole) as dynamic.model.query.mq.ModelDataObject?
                     var corpID=corpObject?.data?.getValue(BaseCorp.ref!!.id) as Long?
                     var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                     var corps=corpPartnerRels?.data?.map {
@@ -126,8 +128,8 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                             partner["status"] = 1
                             partner["icon"] = icon
                             partner["partnerID"] = id
-                            partner["corpID"]=corpID
-                            partner["chatUUID"] =chatUUID
+                            partner["corpID"] = corpID
+                            partner["chatUUID"] = chatUUID
                           //  var channelMeta = getChannelMeta(id,corpID)
                             var chatSessionID = this.queryChatSessionID(id,corpID,devType,chatUUID?:"")
                             if(chatSessionID.isNullOrEmpty()){
@@ -225,5 +227,17 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
             }
         }
         return ret
+    }
+    @Action("checkLogin")
+    fun checkLogin(session: HttpSession):ActionResult{
+        var ar = ActionResult()
+        var partnerCacheKey=session.getAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY) as PartnerCacheKey?
+        var partnerCache= if(partnerCacheKey!=null) this.partnerCacheRegistry?.get(partnerCacheKey) else null
+        if(partnerCache!=null){
+            ar.errorCode = ErrorCode.SUCCESS
+            return ar
+        }
+        ar.errorCode = ErrorCode.RELOGIN
+        return ar
     }
 }

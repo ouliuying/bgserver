@@ -24,6 +24,7 @@
 package dynamic.model.web.spring.boot.model
 
 import dynamic.model.query.mq.model.ModelMetaData
+import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.GenericBeanDefinition
 import kotlin.reflect.full.isSuperclassOf
 
@@ -51,8 +52,8 @@ class ModelLineGraphNode {
         return this
     }
     private fun isChild(childNode: ModelLineGraphNode):Boolean{
-        return (this.modelMetaData?.beanDefinitionHolder as GenericBeanDefinition).beanClass::class.
-                isSuperclassOf((childNode.modelMetaData?.beanDefinitionHolder as GenericBeanDefinition).beanClass::class)
+        return (this.modelMetaData?.beanDefinitionHolder?.beanDefinition as GenericBeanDefinition).beanClass::class.
+                isSuperclassOf((childNode.modelMetaData?.beanDefinitionHolder?.beanDefinition as GenericBeanDefinition).beanClass::class)
         //return false
     }
 
