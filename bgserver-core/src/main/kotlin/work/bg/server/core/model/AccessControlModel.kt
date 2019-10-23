@@ -249,6 +249,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun getModelEditAccessFieldFilterRule():ModelEditRecordFieldsValueFilterRule<*>?{
         return null
     }
+    protected  open fun getModelCreateAccessFieldFilterRule():ModelCreateRecordFieldsValueFilterRule<*>?{
+        return null
+    }
     open fun filterAcModelFields(fields:Array<dynamic.model.query.mq.FieldBase>, model:ModelBase, partnerCache: PartnerCache?):Array<dynamic.model.query.mq.FieldBase>{
         if(partnerCache!=null){
             var rFields = arrayListOf<dynamic.model.query.mq.FieldBase>()
@@ -1199,6 +1202,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             it(modelDataObject,partnerCache,null)
         }
 
+        var filter = this.getModelCreateAccessFieldFilterRule()
+        filter?.let {
+            it(modelDataObject,partnerCache,null)
+        }
     }
 
     protected  open fun runEditFieldsFilterRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache){

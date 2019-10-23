@@ -34,8 +34,10 @@ import org.springframework.web.bind.annotation.RequestParam
 import dynamic.model.query.mq.model.AppModel
 import dynamic.model.query.mq.specialized.ConstRelRegistriesField
 import dynamic.model.web.spring.boot.model.ActionResult
+import work.bg.server.core.acrule.ModelCreateRecordFieldsValueFilterRule
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
 import work.bg.server.core.acrule.ModelReadFieldFilterRule
+import work.bg.server.core.acrule.bean.ModelCreatePartnerInnerRecordFieldsValueFilterBean
 import work.bg.server.core.acrule.bean.ModelEditPartnerInnerRecordFieldsValueFilterBean
 import work.bg.server.core.acrule.bean.ModelReadPartnerInnerFilterBean
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
@@ -59,6 +61,8 @@ open class  BasePartner(table:String, schema:String): ContextModel(table,schema)
     lateinit var readPartnerInnerFilterBean:ModelReadPartnerInnerFilterBean
     @Autowired
     lateinit var editPartnerInnerFilterBean:ModelEditPartnerInnerRecordFieldsValueFilterBean
+    @Autowired
+    lateinit var createPartnerInnerFilterBean: ModelCreatePartnerInnerRecordFieldsValueFilterBean
     val id= dynamic.model.query.mq.ModelField(null,
             "id",
             dynamic.model.query.mq.FieldType.BIGINT,
@@ -213,6 +217,9 @@ open class  BasePartner(table:String, schema:String): ContextModel(table,schema)
 
     override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*>? {
         return this.editPartnerInnerFilterBean
+    }
+    override fun getModelCreateAccessFieldFilterRule(): ModelCreateRecordFieldsValueFilterRule<*>? {
+        return this.createPartnerInnerFilterBean
     }
     @Action(name="login")
     open fun login(@RequestParam userName:String, @RequestParam password:String, @RequestParam devType:Int, session:HttpSession):ActionResult?{
