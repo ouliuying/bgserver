@@ -86,7 +86,8 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeCreate(obj)
+           var ret =  BasePartner.ref?.safeCreate(obj)
+            print(ret.second)
         }
         print(obj)
     }
