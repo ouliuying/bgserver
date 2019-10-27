@@ -43,19 +43,15 @@ class ProductSKUPattern:ContextModel("product_sku_pattern","public") {
             dynamic.model.query.mq.FieldType.STRING,
             "名称")
 
-    val skuPattern = dynamic.model.query.mq.ModelField(null,
-            "sku_pattern",
+    val pattern = dynamic.model.query.mq.ModelField(null,
+            "pattern",
             dynamic.model.query.mq.FieldType.STRING,
             "Sku模式")
 
-    val skuCount= dynamic.model.query.mq.ModelField(null,
-            "sku_count",
-            dynamic.model.query.mq.FieldType.INT,
-            "Sku数量")
-    val product = dynamic.model.query.mq.ModelOne2OneField(null,
-            "product_id",
+    val products = dynamic.model.query.mq.ModelOne2ManyField(null,
+            "products",
             dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             targetModelTable = "public.product_product",
-            targetModelFieldName = "id")
+            targetModelFieldName = "sku_pattern_id")
 }

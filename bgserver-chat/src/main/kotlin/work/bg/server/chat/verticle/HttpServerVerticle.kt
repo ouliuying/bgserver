@@ -104,6 +104,7 @@ class HttpServerVerticle:AbstractVerticle() {
     override fun start() {
         var option = HttpServerOptions()
         option.port=port
+        option.host="0.0.0.0"
         this.httpServer=this.vertx.createHttpServer(option)
 
         val router = Router.router(vertx)

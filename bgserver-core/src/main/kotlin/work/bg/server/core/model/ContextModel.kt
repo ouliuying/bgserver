@@ -181,7 +181,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return null
     }
 
-    private fun getOwnerFieldAndRefField(ownerField: JsonObject?,app:String,model:String):Pair<dynamic.model.query.mq.FieldValue?, dynamic.model.query.mq.FieldBase?>{
+    private fun getOwnerFieldAndRefField(ownerField: JsonObject?,
+                                         app:String,model:String):Pair<FieldValue?, FieldBase?>{
         ownerField?.let {
             val ownerApp = it["app"]?.asString
             val ownerModel = it["model"]?.asString
@@ -739,7 +740,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
             }
         }
-        val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
+        val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,
+                toField,
+                ownerModelID)
         if(ret) {
             var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
             data?.let {
@@ -752,7 +755,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return null
     }
-    protected fun getCriteriaByOwnerModelParam(ownerFieldValue: dynamic.model.query.mq.FieldValue?, toField: dynamic.model.query.mq.FieldBase?, ownerModelID: Long?):Pair<Boolean, dynamic.model.query.mq.ModelExpression?>{
+    protected fun getCriteriaByOwnerModelParam(ownerFieldValue: FieldValue?,
+                                               toField: FieldBase?,
+                                               ownerModelID: Long?):Pair<Boolean, ModelExpression?>{
 
         if(ownerFieldValue!=null && toField!=null){
             if(this.isPersistField(toField)){

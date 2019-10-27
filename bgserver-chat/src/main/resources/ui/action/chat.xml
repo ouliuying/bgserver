@@ -23,7 +23,7 @@
         <group name="OpChannelAction">
             <trigger title="加入"
                      name="doJoinChannel"
-                     viewType="modelActionConfirm">
+                     viewType="modelActionConfirm" icon="/svg/action/chat-join-channel.svg">
                 <meta>
                     <![CDATA[
                     {
@@ -35,7 +35,7 @@
             </trigger>
             <trigger title="退出"
                      name="doExitChannel"
-                     viewType="modelActionConfirm">
+                     viewType="modelActionConfirm" icon="/svg/action/chat-exit-channel.svg">
                 <meta>
                     <![CDATA[
                     {

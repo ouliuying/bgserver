@@ -31,8 +31,5 @@ class  HomeController(){
     fun index(): String{
         return "index.html"
     }
-    @RequestMapping("/login",method = [RequestMethod.GET, RequestMethod.HEAD])
-    fun login(): String{
-        return "login.html"
-    }
+
 }

@@ -21,65 +21,126 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import dynamic.model.query.mq.RefSingleton
+import com.google.gson.JsonObject
+import dynamic.model.query.mq.*
+import dynamic.model.web.errorcode.ErrorCode
+import dynamic.model.web.spring.boot.annotation.Action
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.DefaultTransactionDefinition
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.crm.field.ModelFullAddressField
+import work.bg.server.util.TypeConvert
+import java.lang.Exception
 
 @Model(name="lead",title = "线索")
 class Lead:ContextModel("crm_lead","public") {
     companion object : RefSingleton<Lead> {
         override lateinit var ref: Lead
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val name = dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, title = "姓名", defaultValue = "")
-    val corpName = dynamic.model.query.mq.ModelField(null, "corp_name", dynamic.model.query.mq.FieldType.STRING, title = "公司名称", defaultValue = "")
-    val mobile = dynamic.model.query.mq.ModelField(null, "mobile", dynamic.model.query.mq.FieldType.STRING, title = "手机", defaultValue = "")
-    val telephone = dynamic.model.query.mq.ModelField(null, "telephone", dynamic.model.query.mq.FieldType.STRING, title = "电话", defaultValue = "")
-    val fax = dynamic.model.query.mq.ModelField(null, "fax", dynamic.model.query.mq.FieldType.STRING, title = "传真", defaultValue = "")
-    val province = dynamic.model.query.mq.ModelField(null, "province", dynamic.model.query.mq.FieldType.STRING, title = "省", defaultValue = "")
-    val city = dynamic.model.query.mq.ModelField(null, "city", dynamic.model.query.mq.FieldType.STRING, title = "市", defaultValue = "")
-    val district = dynamic.model.query.mq.ModelField(null, "district", dynamic.model.query.mq.FieldType.STRING, title = "区/县", defaultValue = "")
-    val streetAddress = dynamic.model.query.mq.ModelField(null, "street_address", dynamic.model.query.mq.FieldType.STRING, "详细地址", defaultValue = "")
+            primaryKey = FieldPrimaryKey())
+    val name = ModelField(null,
+            "name",
+            FieldType.STRING,
+            title = "姓名",
+            defaultValue = "")
+    val corpName = ModelField(null,
+            "corp_name",
+            FieldType.STRING,
+            title = "公司名称",
+            defaultValue = "")
+    val isCorp = ModelField(null,
+            "is_corp",
+            FieldType.INT,
+            title = "公司",
+            defaultValue = -1)
+    val mobile = ModelField(null,
+            "mobile",
+            FieldType.STRING,
+            title = "手机",
+            defaultValue = "")
+    val telephone = ModelField(null,
+            "telephone",
+            FieldType.STRING,
+            title = "电话",
+            defaultValue = "")
+    val fax = ModelField(null,
+            "fax",
+            FieldType.STRING,
+            title = "传真",
+            defaultValue = "")
+    val province = ModelField(null,
+            "province",
+            FieldType.STRING,
+            title = "省",
+            defaultValue = "")
+    val city = ModelField(null,
+            "city",
+            FieldType.STRING,
+            title = "市",
+            defaultValue = "")
+    val district = ModelField(null,
+            "district",
+            FieldType.STRING,
+            title = "区/县",
+            defaultValue = "")
+    val streetAddress = ModelField(null,
+            "street_address",
+            FieldType.STRING,
+            "详细地址",
+            defaultValue = "")
 
-    val partners = dynamic.model.query.mq.ModelMany2ManyField(null,
+    val toCustomer = ModelOne2OneField(null,
+            "to_customer_id",
+            FieldType.BIGINT,
+            "转化客户",
+            targetModelTable = "public.crm_customer",
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
+
+    val partners = ModelMany2ManyField(null,
             "own_partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT, title = "占有人",
+            FieldType.BIGINT, title = "占有人",
             relationModelTable = "public.crm_partner_lead_rel",
             relationModelFieldName = "partner_id",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     //最新交流人
-    val commPartner = dynamic.model.query.mq.ModelMany2OneField(null,
+    val commPartner = ModelMany2OneField(null,
             "comm_partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT, title = "联系人",
+            FieldType.BIGINT, title = "联系人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
+            foreignKey = FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
 
-    val event = dynamic.model.query.mq.ModelMany2OneField(null,
+    val event = ModelMany2OneField(null,
             "event_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "活动",
             targetModelTable = "public.crm_event",
             targetModelFieldName = "id")
 
-    val communications = dynamic.model.query.mq.ModelOne2ManyField(null,
+    val communications = ModelOne2ManyField(null,
             "communications",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "沟通记录",
             targetModelTable = "public.crm_lead_customer_communication_history",
             targetModelFieldName = "lead_id")
 
-    val interactionStatus= dynamic.model.query.mq.ModelMany2OneField(null,
+    val interactionStatus= ModelMany2OneField(null,
             "interaction_status_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "最近状态",
             targetModelTable = "public.crm_lead_interaction_status",
             targetModelFieldName = "id")
@@ -93,5 +154,82 @@ class Lead:ContextModel("crm_lead","public") {
                     this.streetAddress,
                     this.gson)
     }
+    @Action("createCustomer")
+    fun createCustomer(@RequestBody data:JsonObject?, partnerCache: PartnerCache):ActionResult{
+        var ar = ActionResult()
+        val modelID =data?.get("modelID")?.asLong
+        if(modelID!=null){
+            val modelData = this.rawRead(criteria = eq(this.id,modelID),partnerCache = partnerCache,useAccessControl = true)?.firstOrNull()
+            modelData?.let {
+
+                val def = DefaultTransactionDefinition()
+                def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
+                val status = txManager?.getTransaction(def)
+                try {
+                    var mo = ModelDataObject(model = Customer.ref)
+                    mo.setFieldValue(Customer.ref.name,modelData.getFieldValue(this.name))
+                    mo.setFieldValue(Customer.ref.corpName,modelData.getFieldValue(this.corpName))
+                    mo.setFieldValue(Customer.ref.isCorp,modelData.getFieldValue(this.isCorp))
+                    mo.setFieldValue(Customer.ref.mobile,modelData.getFieldValue(this.mobile))
+                    mo.setFieldValue(Customer.ref.telephone,modelData.getFieldValue(this.telephone))
+                    mo.setFieldValue(Customer.ref.fax,modelData.getFieldValue(this.fax))
+                    mo.setFieldValue(Customer.ref.province,modelData.getFieldValue(this.province))
+                    mo.setFieldValue(Customer.ref.city,modelData.getFieldValue(this.city))
+                    mo.setFieldValue(Customer.ref.district,modelData.getFieldValue(this.district))
+                    mo.setFieldValue(Customer.ref.streetAddress,modelData.getFieldValue(this.streetAddress))
+                    val eventData = modelData.getFieldValue(this.event)
+                    val eventID =  ModelDataObject.getModelDataObjectID(eventData)
+                    eventData?.let {
+                        mo.setFieldValue(Customer.ref.event,eventID)
+                    }
+
+                    val commPartnerObj = modelData.getFieldValue(this.commPartner)
+                    val comPartnerID =  ModelDataObject.getModelDataObjectID(commPartnerObj)
+                    comPartnerID?.let {
+                        mo.setFieldValue(Customer.ref.commPartner,comPartnerID)
+                    }
+
+                    val ret = Customer.ref.rawCreate(mo)
+                    if(ret.first!=null && ret.first!! > 0.toLong()){
+
+                        val partnerRels = CrmPartnerLeadRel.ref.rawRead(criteria = eq(CrmPartnerLeadRel.ref.lead,modelID))?.toModelDataObjectArray()
+                        partnerRels?.let {
+                            it.forEach {
+                                val relMo = ModelDataObject(model=CrmPartnerCustomerRel.ref)
+                                relMo.setFieldValue(CrmPartnerCustomerRel.ref.customer,ret.first)
+                                relMo.setFieldValue(CrmPartnerCustomerRel.ref.ownFlag,it.getFieldValue(CrmPartnerLeadRel.ref.ownFlag))
+                                val partnerID = ModelDataObject.getModelDataObjectID(it.getFieldValue(CrmPartnerLeadRel.ref.partner))
+                                relMo.setFieldValue(CrmPartnerCustomerRel.ref.partner,partnerID)
+                                CrmPartnerCustomerRel.ref.rawCreate(relMo,partnerCache = partnerCache,useAccessControl = true)
+                            }
+                        }
+                        //TODO add communications
+
+                        var uModelData = ModelDataObject(model=this)
+                        uModelData.setFieldValue(this.id,modelID)
+                        uModelData.setFieldValue(this.toCustomer,ret.first)
+                        this.rawEdit(uModelData,useAccessControl = true,partnerCache = partnerCache)
+                    }
+                    ar.errorCode = ErrorCode.SUCCESS
+                    txManager?.commit(status)
+                    return ar
+                }
+                catch (ex:Exception){
+                    ex.printStackTrace()
+                    txManager?.rollback(status)
+                }
+                finally {
+
+
+                }
+
+            }
+        }
+
+        ar.errorCode = ErrorCode.UNKNOW
+        return ar
+    }
+
+
 
 }

@@ -25,6 +25,7 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.constant.ModelReservedKey
 import dynamic.model.query.mq.model.ModelBase
+import sun.plugin.com.TypeConverter
 
 
 class ModelDataObject(override var data: dynamic.model.query.mq.FieldValueArray = dynamic.model.query.mq.FieldValueArray(),
@@ -33,7 +34,31 @@ class ModelDataObject(override var data: dynamic.model.query.mq.FieldValueArray 
         get()= data.firstOrNull{
             it.field.name== ModelReservedKey.idFieldName
         }
-
+    companion object{
+        fun getModelDataObjectID(modelObject:Any?):Long?{
+            when(modelObject){
+                is ModelDataObject?->{
+                    val v = modelObject?.idFieldValue?.value
+                    return v?.let {
+                        when (it) {
+                            is Long -> it
+                            is Number -> it.toLong()
+                            else -> null
+                        }
+                    }
+                }
+                is Long?->{
+                    return modelObject
+                }
+                is Number? ->{
+                    return modelObject?.toLong()
+                }
+                else ->{
+                    return null
+                }
+            }
+        }
+    }
     override fun isObject(): Boolean {
         return true
     }

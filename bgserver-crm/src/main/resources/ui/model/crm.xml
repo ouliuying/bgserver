@@ -48,11 +48,13 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"/>
+                        <group name="main" refType="main|sub|singleSelection"/>
                     </action>
+
                     <action>
                         <group name="opAction" refType="main|sub"/>
                     </action>
+
                     <action>
                         <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
@@ -90,6 +92,7 @@
             <field name="birthday" type="static"/>
             <field name="comment" type="static"/>
         </view>
+
         <view type="create">
             <ref>
 
@@ -203,6 +206,7 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+
                 </actions>
                 <views>
                     <view type="list"
@@ -427,6 +431,26 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="createCustomerFromLeadAndToCustomer" refType="main|sub">
+                            <trigger name="createCustomer"
+                                     visible="toCustomer.id=0 or toCustomer.id=null or toCustomer.id=undefined" actionName="createCustomer">
+                                <meta>
+                                    <![CDATA[
+                                        {
+                                         "title":"提示",
+                                         "message":"确定要生成客户吗？"
+                                        }
+                                      ]]>
+                                </meta>
+                            </trigger>
+                            <trigger name="toCustomer" visible="toCustomer.id>0" actionName="toCustomer">
+                                <meta>
+                                    <![CDATA[{"action":"redirect","toView":"detail","toApp":"crm","toModel":"customer","fieldName":"toCustomer"}]]>
+                                </meta>
+                            </trigger>
+                        </group>
+                    </action>
                 </actions>
                 <views>
                     <view type="list" model="crmPartnerLeadRel" ownerField="partners" refType="none"/>
@@ -443,6 +467,7 @@
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="fax" type="static"/>
+            <field name="toCustomer" type="static" visible="false"/>
             <field name="fullAddress" type="chinaFullAddressStatic"/>
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
@@ -468,7 +493,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
             </ref>
@@ -478,7 +503,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
             </ref>
@@ -488,7 +513,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main"/>
+                        <group name="main" refType="main"/>
                     </action>
                 </actions>
             </ref>
@@ -518,10 +543,10 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                     <action>
-                        <group name="opAction" refType="main|sub"></group>
+                        <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
@@ -1010,7 +1035,7 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                     <action>
                         <group name="selSingleItemAction" refType="singleSelection"/>
@@ -1031,29 +1056,29 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
             <field name="partner.name" type="selectModelFromListView" style="head"/>
-            <field name="ownFlag" type="singleCheckbox"></field>
+            <field name="ownFlag" type="singleCheckbox"/>
         </view>
         <view type="create">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>
             <field name="partner.name" type="selectModelFromListView" style="head"/>
-            <field name="ownFlag" type="singleCheckbox"></field>
+            <field name="ownFlag" type="singleCheckbox"/>
         </view>
         <view type="detail">
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"></group>
+                        <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
             </ref>

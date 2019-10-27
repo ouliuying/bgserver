@@ -23,16 +23,25 @@
 
 package work.bg.server.product.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import dynamic.model.web.spring.boot.annotation.Model
+import org.springframework.beans.factory.annotation.Autowired
+import work.bg.server.core.acrule.ModelCreateRecordFieldsValueFilterRule
+import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
 import work.bg.server.core.model.ContextModel
+import work.bg.server.product.acrule.bean.ModelCreateProductInnerRecordFieldsValueFilterBean
+import work.bg.server.product.acrule.bean.ModelEditProductInnerRecordFieldsValueFilterBean
 
 
 @Model(name="product")
 open class Product:ContextModel("product_product","public") {
+    @Autowired
+    private lateinit var createInnerRecordFieldsValueFilterBean:ModelCreateProductInnerRecordFieldsValueFilterBean
+    @Autowired
+    private lateinit var editInnerRecordInnerFieldsValueFilterBean:ModelEditProductInnerRecordFieldsValueFilterBean
     companion object : RefSingleton<Product> {
         override lateinit var ref: Product
     }
@@ -77,14 +86,23 @@ open class Product:ContextModel("product_product","public") {
             targetModelTable = "public.product_attribute_value_map",
             targetModelFieldName = "product_id")
 
-    val skuPattern = dynamic.model.query.mq.ModelOne2OneField(null,
-            "sku_pattern",
+    val sku = ModelField(null,"sku", FieldType.STRING,"SKU")
+
+    val skuPattern = ModelMany2OneField(null,
+            "sku_pattern_id",
             dynamic.model.query.mq.FieldType.BIGINT,
             "Sku生成模式",
             targetModelTable = "public.product_sku_pattern",
-            targetModelFieldName = "product_id",
-            isVirtualField = true)
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
 
+    override fun getModelCreateAccessFieldFilterRule(): ModelCreateRecordFieldsValueFilterRule<*>? {
+        return this.createInnerRecordFieldsValueFilterBean
+    }
+
+    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*>? {
+        return this.editInnerRecordInnerFieldsValueFilterBean
+    }
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
                 ModelFieldUnique(this.name,advice = "产品名称已经存在",isolationType = ModelFieldUnique.IsolationType.IN_CORP)

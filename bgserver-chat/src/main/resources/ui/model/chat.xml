@@ -34,7 +34,7 @@
                                      actionName="doJoinChannel"/>
                             <trigger name="doExitChannel"
                                      actionName="doExitChannel"/>
-                        </group>>
+                        </group>
                     </action>
                 </actions>
             </ref>
@@ -86,7 +86,25 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="defaultFlag" type="singleCheckbox"/>
-            <field name="broadcastType" type="singleCheckbox"/>
+            <field name="broadcastType" type="radioCheckBoxGroup">
+                <meta>
+                    <![CDATA[
+                    {
+                     "defaultValue":1,
+                     "options":[
+                        {
+                          "value":0,
+                          "text":"点对点"
+                        },
+                         {
+                          "value":1,
+                          "text":"广播"
+                        }
+                     ]
+                    }
+                  ]]>
+                </meta>
+            </field>
         </view>
         <view type="edit">
             <ref>
@@ -98,7 +116,25 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="defaultFlag" type="singleCheckbox"/>
-            <field name="broadcastType" type="singleCheckbox"/>
+            <field name="broadcastType" type="radioCheckBoxGroup">
+                <meta>
+                    <![CDATA[
+                    {
+                     "defaultValue":1,
+                     "options":[
+                        {
+                          "value":0,
+                          "text":"点对点"
+                        },
+                         {
+                          "value":1,
+                          "text":"广播"
+                        }
+                     ]
+                    }
+                  ]]>
+                </meta>
+            </field>
         </view>
         <view type="detail">
             <ref>
@@ -149,10 +185,10 @@
                     </action>
                 </actions>
             </refs>
-            <field name="joinPartner.name" type="static" />
-            <field name="joinPartner.userName" type="static" />
-            <field name="joinChannel.name" type="static" />
-            <field name="joinChannel.uuid" type="static" />
+            <field name="joinPartner.name" type="static" title="姓名" />
+            <field name="joinPartner.userName" type="static" title="用户名" />
+            <field name="joinChannel.name" type="static"  title="通道名称"/>
+            <field name="joinChannel.uuid" type="static"  title="通道UUID"/>
         </view>
 
         <view type="create">

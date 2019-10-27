@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.context.request.RequestContextHolder
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.cache.PartnerCacheKey
 import work.bg.server.core.cache.PartnerCacheRegistry
@@ -69,8 +70,12 @@ class ModelController constructor(val  appModel: AppModel){
                 }
                 return (appModel as AppModelWeb)(request,response,session,appName,modelName,actionName,partnerCache)
     }
-
-    @RequestMapping("/login",method = [RequestMethod.POST,RequestMethod.GET],produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+    @RequestMapping("/app/dynamic/*","/login","/login/*",method = [RequestMethod.GET])
+    fun redirect(resp:HttpServletResponse){
+        resp.status=HttpServletResponse.SC_TEMPORARY_REDIRECT
+        resp.sendRedirect("/")
+    }
+    @RequestMapping("/login",method = [RequestMethod.POST],produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     fun login(request: HttpServletRequest,
                 response: HttpServletResponse,
                 session: HttpSession):Any?{

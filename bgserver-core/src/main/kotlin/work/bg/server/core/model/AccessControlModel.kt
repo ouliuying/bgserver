@@ -1554,6 +1554,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             this.addCreateModelLog(modelDataObject,useAccessControl,partnerCache)
             return Pair(nID,null)
         } catch (ex:Exception){
+            ex.printStackTrace()
             return Pair(null,ex.message)
         }
     }
@@ -1659,7 +1660,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     open fun rawEdit(modelDataObject: dynamic.model.query.mq.ModelDataObject,
-                     criteria: dynamic.model.query.mq.ModelExpression?,
+                     criteria: dynamic.model.query.mq.ModelExpression?=null,
                      useAccessControl: Boolean=false,
                      partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 

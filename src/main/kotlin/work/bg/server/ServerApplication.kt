@@ -25,10 +25,18 @@ import org.apache.commons.logging.LogFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import work.bg.server.core.runServer
 import dynamic.model.web.spring.boot.annotation.ModelScan
+import org.apache.catalina.session.JDBCStore
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession
+import org.springframework.transaction.PlatformTransactionManager
 import java.util.*
+import javax.sql.DataSource
 
-
+@EnableJdbcHttpSession
 @SpringBootApplication()
 @ComponentScan(basePackages = ["work.bg.server",
     "dynamic.model.query",
@@ -48,6 +56,14 @@ class ServerApplication{
     init {
         logger.info("bg.work server start ${Date()}")
     }
+//         @Bean
+//        public fun dataSource():DataSource {
+//                return
+//         }
+//        @Bean
+//        public fun transactionManager(dataSource: DataSource): PlatformTransactionManager {
+//             return DataSourceTransactionManager(dataSource);
+//        }
 }
 
 fun main(args: Array<String>){

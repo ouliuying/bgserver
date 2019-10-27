@@ -43,10 +43,16 @@ class PartnerJoinStatusField(model: ModelBase?,
         if(owner!=null){
             val currPartnerID = partnerCache?.partnerID
            val ownerObj =  fieldValueArray.getValue(owner)
-            if(ownerObj!=null){
-                val mo = ownerObj as ModelDataObject
+            if(ownerObj!=null && ownerObj is ModelDataObject){
+                val mo = ownerObj
                 var idValue = mo.idFieldValue
                 val partnerID = TypeConvert.getLong(idValue?.value as Number)
+                if(currPartnerID!=null && currPartnerID == partnerID){
+                    return 1
+                }
+            }
+            else if(ownerObj!=null && ownerObj is Number){
+                val partnerID = TypeConvert.getLong(ownerObj)
                 if(currPartnerID!=null && currPartnerID == partnerID){
                     return 1
                 }

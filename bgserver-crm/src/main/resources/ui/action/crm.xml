@@ -38,4 +38,11 @@
             <trigger title="确认回款" model="customerOrder" viewType="detail" name="order_step5"/>
         </group>
     </action>
+    <action viewType="detail" app="crm" model="lead">
+        <group name="createCustomerFromLeadAndToCustomer">
+            <trigger title="生成客户" model="lead" viewType="modelActionConfirm" name="createCustomer"
+                     actionName="createCustomer"/>
+            <trigger title="关联客户" model="customer" viewType="detail" name="toCustomer" actionName="toCustomer"/>
+        </group>
+    </action>
 </ui>
