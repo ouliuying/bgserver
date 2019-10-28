@@ -21,7 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 //商机
@@ -30,51 +30,51 @@ class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
     companion object : RefSingleton<CustomerOpportunity> {
         override lateinit var ref: CustomerOpportunity
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val title= dynamic.model.query.mq.ModelField(null,
+    val title= ModelField(null,
             "title",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "标题")
 
-    val price = dynamic.model.query.mq.ModelField(null,
+    val price = ModelField(null,
             "price",
-            dynamic.model.query.mq.FieldType.NUMBER,
+            FieldType.NUMBER,
             "金额")
 
-    val customer= dynamic.model.query.mq.ModelMany2OneField(null,
+    val customer= ModelMany2OneField(null,
             "customer_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val products = dynamic.model.query.mq.ModelMany2ManyField(null,
+    val products = ModelMany2ManyField(null,
             "products",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "产品",
             relationModelTable = "public.crm_customer_opportunity_order_product_rel",
             relationModelFieldName = "product_id",
             targetModelTable = "public.product_product",
             targetModelFieldName = "id")
 
-    val quotation = dynamic.model.query.mq.ModelOne2OneField(null,
+    val quotation = ModelOne2OneField(null,
             "quotation",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "报价单",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_opportunity_order_quotation",
             targetModelFieldName = "opportunity_id"
     )
 
-    val order = dynamic.model.query.mq.ModelOne2OneField(null,
+    val order = ModelOne2OneField(null,
             "opportunity",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "订单",
             isVirtualField = true,
             targetModelTable = "public.crm_customer_order",

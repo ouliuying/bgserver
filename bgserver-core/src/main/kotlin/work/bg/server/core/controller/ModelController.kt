@@ -70,7 +70,7 @@ class ModelController constructor(val  appModel: AppModel){
                 }
                 return (appModel as AppModelWeb)(request,response,session,appName,modelName,actionName,partnerCache)
     }
-    @RequestMapping("/app/dynamic/*","/login","/login/*",method = [RequestMethod.GET])
+    @RequestMapping("/app/dynamic/**","/login","/login/**",method = [RequestMethod.GET])
     fun redirect(resp:HttpServletResponse){
         resp.status=HttpServletResponse.SC_TEMPORARY_REDIRECT
         resp.sendRedirect("/")

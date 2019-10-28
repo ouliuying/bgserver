@@ -19,5 +19,18 @@
   -->
 
 <ui>
-
+    <action viewType="detail" app="account" model="accountReceivable">
+        <group name="setAccountReceivableStatus">
+            <trigger title="确认收款" model="accountReceivable" viewType="modelActionConfirm" name="confirmReceivable"
+                     actionName="confirmReceivable"/>
+            <trigger title="废弃应收" model="accountReceivable" viewType="modelActionConfirm" name="dropReceivable" actionName="dropReceivable"/>
+        </group>
+    </action>
+    <action viewType="detail" app="account" model="accountPayable">
+        <group name="setAccountPayableStatus">
+            <trigger title="确认付款" model="accountPayable" viewType="modelActionConfirm" name="confirmPayable"
+                     actionName="confirmPayable"/>
+            <trigger title="废弃应付" model="accountPayable" viewType="modelActionConfirm" name="dropPayable" actionName="dropPayable"/>
+        </group>
+    </action>
 </ui>

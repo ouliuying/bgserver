@@ -42,6 +42,19 @@
     </inherit>
     <model name="accountPayable" app="account">
         <view type="list">
+            <ref>
+                <actions>
+<!--                    <action>-->
+<!--                        <group name="main" refType="main|sub"/>-->
+<!--                    </action>-->
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="static"/>
             <field name="orderInvoice.status" type="enumStatic" title="状态">
                 <meta>
@@ -70,18 +83,106 @@
             <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
         </view>
         <view type="create">
-
+<!--            <ref>-->
+<!--                <actions>-->
+<!--                    <action>-->
+<!--                        <group name="main" refType="main|sub"/>-->
+<!--                    </action>-->
+<!--                </actions>-->
+<!--            </ref>-->
+<!--            <field name="partner.name" type="static"/>-->
+<!--            <field name="partnerRole.name" type="static"/>-->
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
 
+                    <action>
+                        <group name="setAccountPayableStatus" refType="main|sub">
+                            <trigger title="确认付款" name="confirmPayable"
+                                     actionName="confirmPayable" visible="orderInvoice.status&lt;0">
+                                <meta>
+                                    <![CDATA[
+                                        {
+                                         "title":"提示",
+                                         "message":"确认应付款？"
+                                        }
+                                      ]]>
+                                </meta>
+                            </trigger>
+                            <trigger title="废弃应付"  name="dropPayable" actionName="dropPayable" visible="orderInvoice.status&lt;0">
+                                <meta>
+                                    <![CDATA[
+                                        {
+                                         "title":"提示",
+                                         "message":"取消应付款？"
+                                        }
+                                      ]]>
+                                </meta>
+                            </trigger>
+                        </group>
+                    </action>
+
+                </actions>
+            </ref>
+            <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
+            <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
+            <field name="orderInvoice.status" type="enumStatic" title="状态">
+                <meta>
+                    <![CDATA[
+                    {
+                        "-1":"正在处理",
+                        "0":"取消",
+                        "1":"成功"
+                    }
+                ]]>
+                </meta>
+
+            </field>
+            <field name="orderInvoice.typ" type="enumStatic" title="类型">
+                <meta>
+                    <![CDATA[
+                    {
+                        "0":"普通发票",
+                        "1":"增值税发票",
+                        "2":"收据"
+                    }
+                ]]>
+                </meta>
+            </field>
+
+            <field name="comment" type="static"/>
         </view>
     </model>
 
     <model name="accountReceivable" app="account">
         <view type="list">
+            <ref>
+                <actions>
+<!--                    <action>-->
+<!--                        <group name="main" refType="main|sub"/>-->
+<!--                    </action>-->
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
+                </actions>
+            </ref>
             <field name="id" type="static"/>
             <field name="orderInvoice.status" type="enumStatic" title="状态">
                 <meta>
@@ -113,10 +214,74 @@
 
         </view>
         <view type="edit">
-
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                </actions>
+            </ref>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="detail">
+            <ref>
+                <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="setAccountReceivableStatus" refType="main|sub">
+                            <trigger title="确认收款" name="confirmReceivable"
+                                     actionName="confirmReceivable" visible="orderInvoice.status&lt;0">
+                                <meta>
+                                    <![CDATA[
+                                        {
+                                         "title":"提示",
+                                         "message":"确认应收款？"
+                                        }
+                                      ]]>
+                                </meta>
+                            </trigger>
+                            <trigger title="废弃应收"  name="dropReceivable" actionName="dropReceivable" visible="orderInvoice.status&lt;0">
+                                <meta>
+                                    <![CDATA[
+                                        {
+                                         "title":"提示",
+                                         "message":"取消应收款？"
+                                        }
+                                      ]]>
+                                </meta>
+                            </trigger>
+                        </group>
+                    </action>
+                </actions>
+            </ref>
+            <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
+            <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
+            <field name="orderInvoice.status" type="enumStatic" title="状态">
+                <meta>
+                    <![CDATA[
+                    {
+                        "-1":"正在处理",
+                        "0":"取消",
+                        "1":"成功"
+                    }
+                ]]>
+                </meta>
 
+            </field>
+            <field name="orderInvoice.typ" type="enumStatic" title="类型">
+                <meta>
+                    <![CDATA[
+                    {
+                        "0":"普通发票",
+                        "1":"增值税发票",
+                        "2":"收据"
+                    }
+                ]]>
+                </meta>
+            </field>
+            <field name="comment" type="static"/>
         </view>
     </model>
 

@@ -23,7 +23,7 @@
 
 package work.bg.server.crm.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
@@ -38,37 +38,37 @@ open class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","publi
         override lateinit var ref: CustomerOrderInvoice
     }
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val order = dynamic.model.query.mq.ModelOne2OneField(null,
+    val order = ModelOne2OneField(null,
             "order_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "订单",
             targetModelTable = "public.crm_customer_order",
             targetModelFieldName = "id")
 
-    val fromCorpName = dynamic.model.query.mq.ModelField(null,
+    val fromCorpName = ModelField(null,
             "from_corp_name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "开票方")
 
-    val toCorpName = dynamic.model.query.mq.ModelField(null,
+    val toCorpName = ModelField(null,
             "to_corp_name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "受票方")
 
-    val amount= dynamic.model.query.mq.ModelField(null,
+    val amount= ModelField(null,
             "amount",
-            dynamic.model.query.mq.FieldType.NUMBER,
+            FieldType.NUMBER,
             "金额")
 
-    val accountPartner = dynamic.model.query.mq.ModelMany2OneField(null,
+    val accountPartner = ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "开票人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
@@ -76,23 +76,32 @@ open class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","publi
 
 
     //0 普通发票，1 增值税发票 2 收据
-    val typ = dynamic.model.query.mq.ModelField(null,
+    val typ = ModelField(null,
             "typ",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "类型",
             defaultValue = 0)
-    val comment = dynamic.model.query.mq.ModelField(null, "comment", dynamic.model.query.mq.FieldType.TEXT, "附加说明")
+
+//    //-1 正在处理，0 取消 1 成功
+//    val status = ModelField(null,
+//            "status",
+//            FieldType.INT,
+//            "状态",
+//            defaultValue = -1)
+
+
+    val comment = ModelField(null, "comment", FieldType.TEXT, "附加说明")
 
 
 
 
-    override fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    override fun afterCreateObject(modelDataObject: ModelDataObject,
                                    useAccessControl: Boolean,
                                    pc: PartnerCache?): Pair<Boolean, String?> {
 
         modelDataObject.getFieldValue(this.order)?.let {
             when(it){
-                is dynamic.model.query.mq.ModelDataObject ->{
+                is ModelDataObject ->{
                     it.idFieldValue?.value?.let {
                         CustomerOrder.ref.setStep((it as BigInteger).toLong(),CustomerOrderStep.INVOICE_STEP.step,pc,useAccessControl)
                     }

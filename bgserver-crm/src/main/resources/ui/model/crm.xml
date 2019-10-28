@@ -711,14 +711,14 @@
                     <action>
                         <group name="createOrEditQuotation" refType="main|sub">
                             <trigger model="customerOpportunityOrderQuotation" ownerField="quotation" viewType="create" name="createQuotation"
-                                     visible="quotation.id&lt;1"/>
+                                     visible="quotation.id=null or quotation.id=undefined or quotation.id&lt;1"/>
                             <trigger model="customerOpportunityOrderQuotation" ownerField="quotation" viewType="edit" name="editQuotation"
                                      visible="quotation.id&gt;0"/>
                         </group>
 
                         <group name="createOrGotoOrder" refType="main|sub">
                             <trigger model="customerOrder" ownerField="order" viewType="create" name="createOrder"
-                                     visible="quotation.id&gt;0 and order.id&lt;1"/>
+                                     visible="quotation.id&gt;0 and (order.id=undefined or order.id=null or order.id&lt;1)"/>
                             <trigger model="customerOrder" ownerField="order" viewType="detail" name="gotoOrderDetail"
                                      visible="quotation.id&gt;0 and order.id&gt;0"/>
                         </group>
@@ -742,6 +742,9 @@
         <view type="list">
             <ref>
                 <actions>
+                    <action>
+                        <group name="main" refType="main|sub"/>
+                    </action>
                     <action>
                         <group name="opAction" refType="main|sub"/>
                     </action>
@@ -934,6 +937,12 @@
                     <action>
                         <group name="main" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="opAction" refType="main|sub"></group>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
                 </actions>
             </ref>
             <field name="id" type="static" style="head"/>
@@ -973,9 +982,9 @@
                     </action>
                 </actions>
             </ref>
-            <field name="fromCorpName" type="singleLineText"/>
-            <field name="toCorpName" type="singleLineText"/>
-            <field name="amount" type="singleLineText"/>
+            <field name="fromCorpName" type="static"/>
+            <field name="toCorpName" type="static"/>
+            <field name="amount" type="static"/>
         </view>
     </model>
     <model name="crmCustomerOpportunityOrderProductRel" app="crm">
@@ -1253,10 +1262,13 @@
             <ref>
                 <actions>
                     <action>
-                        <group name="main" refType="main|sub"/>
+                        <group name="main" refType="main|sub|singleSelection"/>
                     </action>
                     <action>
                         <group name="opAction" refType="main|sub"/>
+                    </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                 </actions>
             </ref>
@@ -1274,7 +1286,7 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="tpl" type="multiLineText"/>
-            <field name="comment" type="singleLineText"/>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="create">
             <ref>
@@ -1286,7 +1298,7 @@
             </ref>
             <field name="name" type="singleLineText" style="head"/>
             <field name="tpl" type="multiLineText"/>
-            <field name="comment" type="singleLineText"/>
+            <field name="comment" type="multiLineText"/>
         </view>
         <view type="detail">
             <ref>
