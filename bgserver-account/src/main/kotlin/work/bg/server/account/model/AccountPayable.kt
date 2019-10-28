@@ -57,7 +57,8 @@ class AccountPayable:ContextModel("account_payable","public") {
             FieldType.BIGINT,
             "发票",
             targetModelTable = "public.crm_customer_order_invoice",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
     @Action("confirmPayable")
     fun confirmPayable(@RequestBody data: JsonObject?,
                           partnerCache: PartnerCache):Any?{

@@ -128,6 +128,13 @@ class ChatChannel:ContextModel("chat_channel","public") {
                     ar.description= "已经加入！"
                     return ar
                 }
+
+                if(this.rawCount(criteria = and(eq(this.owner,partnerCache.partnerID),eq(this.id,modelID)))>0){
+                    ar.errorCode = ErrorCode.UNKNOW
+                    ar.description= "已经加入！"
+                    return ar
+                }
+
                 val mo = dynamic.model.query.mq.ModelDataObject(model = ChatModelJoinChannelRel.ref)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinChannel,modelID)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinPartner,partnerCache.partnerID)

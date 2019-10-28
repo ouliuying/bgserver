@@ -56,7 +56,8 @@ class AccountReceivable:ContextModel("account_receivable","public") {
             FieldType.BIGINT,
             "发票",
             targetModelTable = "public.crm_customer_order_invoice",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
 
     @Action("confirmReceivable")
     fun confirmReceivable(@RequestBody data:JsonObject?,

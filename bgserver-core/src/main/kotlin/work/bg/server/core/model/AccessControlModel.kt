@@ -101,12 +101,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     @Autowired
     lateinit var gson: Gson
     /*Corp Isolation Fields Begin*/
-    val createTime= dynamic.model.query.mq.ModelField(null, "create_time", dynamic.model.query.mq.FieldType.DATETIME, "添加时间", defaultValue = TimestampBillboard(constant = true))
-    val lastModifyTime= dynamic.model.query.mq.ModelField(null, "last_modify_time", dynamic.model.query.mq.FieldType.DATETIME, "最近修改时间", defaultValue = TimestampBillboard())
-    val createPartnerID= dynamic.model.query.mq.ModelField(null, "create_partner_id", dynamic.model.query.mq.FieldType.BIGINT, "添加人", defaultValue = CurrPartnerBillboard(true))
-    val lastModifyPartnerID= dynamic.model.query.mq.ModelField(null, "last_modify_partner_id", dynamic.model.query.mq.FieldType.BIGINT, "最近修改人", defaultValue = CurrPartnerBillboard())
-    val createCorpID= dynamic.model.query.mq.ModelField(null, "create_corp_id", dynamic.model.query.mq.FieldType.BIGINT, "添加公司", defaultValue = CurrCorpBillboard(true))
-    val lastModifyCorpID= dynamic.model.query.mq.ModelField(null, "last_modify_corp_id", dynamic.model.query.mq.FieldType.BIGINT, "最近修改公司", defaultValue = CurrCorpBillboard())
+    val createTime= ModelField(null, "create_time", FieldType.DATETIME, "添加时间", defaultValue = TimestampBillboard(constant = true))
+    val lastModifyTime= ModelField(null, "last_modify_time", FieldType.DATETIME, "最近修改时间", defaultValue = TimestampBillboard())
+    val createPartnerID= ModelField(null, "create_partner_id", FieldType.BIGINT, "添加人", defaultValue = CurrPartnerBillboard(true))
+    val lastModifyPartnerID= ModelField(null, "last_modify_partner_id", FieldType.BIGINT, "最近修改人", defaultValue = CurrPartnerBillboard())
+    val createCorpID= ModelField(null, "create_corp_id", FieldType.BIGINT, "添加公司", defaultValue = CurrCorpBillboard(true))
+    val lastModifyCorpID= ModelField(null, "last_modify_corp_id", FieldType.BIGINT, "最近修改公司", defaultValue = CurrCorpBillboard())
     /*Corp Isolation Fields End*/
 
 
@@ -114,7 +114,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     init {
 
     }
-    open fun corpIsolationFields():Array<dynamic.model.query.mq.ModelField>?{
+    open fun corpIsolationFields():Array<ModelField>?{
         return arrayOf(
                 createTime,
                 lastModifyTime,
@@ -134,15 +134,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return true
     }
 
-    fun acRead(vararg fields: dynamic.model.query.mq.FieldBase,
+    fun acRead(vararg fields: FieldBase,
                model:AccessControlModel?=null,
-               criteria: dynamic.model.query.mq.ModelExpression?,
+               criteria: ModelExpression?,
                partnerCache:PartnerCache,
-               orderBy: dynamic.model.query.mq.OrderBy?=null,
+               orderBy: OrderBy?=null,
                pageIndex:Int?=null,
                pageSize:Int?=null,
-               attachedFields:Array<dynamic.model.query.mq.AttachedField>?=null,
-               relationPaging:Boolean=false): dynamic.model.query.mq.ModelDataArray?{
+               attachedFields:Array<AttachedField>?=null,
+               relationPaging:Boolean=false): ModelDataArray?{
 
             if (model == null) return this.rawRead(*fields,
                 model = this,
@@ -155,7 +155,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 useAccessControl = true,
                 partnerCache = partnerCache)
 
-            var acCriteria=null as dynamic.model.query.mq.ModelExpression?
+            var acCriteria=null as ModelExpression?
             acCriteria=if(acCriteria!=null) {
                 if(criteria!=null){
                     and(acCriteria,criteria)
@@ -178,17 +178,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     }
     //todo rebuild criteria to remove redundant
-    open fun smartReconcileCriteria(criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression?{
+    open fun smartReconcileCriteria(criteria: ModelExpression?): ModelExpression?{
         return criteria
     }
-    open fun beforeRead(vararg queryFields: dynamic.model.query.mq.FieldBase,
-                        criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun beforeRead(vararg queryFields: FieldBase,
+                        criteria: ModelExpression?,
                         model:ModelBase,
                         useAccessControl:Boolean,
                         partnerCache: PartnerCache?=null,
-                        joinModels:Array<dynamic.model.query.mq.join.JoinModel>?=null):Pair<dynamic.model.query.mq.ModelExpression?,Array<dynamic.model.query.mq.FieldBase>>{
+                        joinModels:Array<dynamic.model.query.mq.join.JoinModel>?=null):Pair<ModelExpression?,Array<FieldBase>>{
         var ruleCriteria=criteria
-        var newQueryFields = arrayListOf<dynamic.model.query.mq.FieldBase>()
+        var newQueryFields = arrayListOf<FieldBase>()
         if (useAccessControl && partnerCache!=null){
             var models = arrayListOf<ModelBase>(model)
             joinModels?.let {
@@ -252,9 +252,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun getModelCreateAccessFieldFilterRule():ModelCreateRecordFieldsValueFilterRule<*>?{
         return null
     }
-    open fun filterAcModelFields(fields:Array<dynamic.model.query.mq.FieldBase>, model:ModelBase, partnerCache: PartnerCache?):Array<dynamic.model.query.mq.FieldBase>{
+    open fun filterAcModelFields(fields:Array<FieldBase>, model:ModelBase, partnerCache: PartnerCache?):Array<FieldBase>{
         if(partnerCache!=null){
-            var rFields = arrayListOf<dynamic.model.query.mq.FieldBase>()
+            var rFields = arrayListOf<FieldBase>()
             val rule=partnerCache.getModelRule(model.meta.appName,model.meta.name)
             rule?.let {
                 fields.forEach {f->
@@ -265,27 +265,27 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         }
                     }
                 }
-                return rFields.toArray() as Array<dynamic.model.query.mq.FieldBase>
+                return rFields.toArray() as Array<FieldBase>
             }
         }
         return fields
     }
-    private fun sortFields(model:ModelBase, targetFields:ArrayList<dynamic.model.query.mq.FieldBase>,
-                           fs:ArrayList<dynamic.model.query.mq.FieldBase>,
-                           o2ofs:ArrayList<dynamic.model.query.mq.FieldBase>,
-                           o2mfs:ArrayList<dynamic.model.query.mq.AttachedField>,
-                           m2ofs:ArrayList<dynamic.model.query.mq.FieldBase>,
-                           m2mfs:ArrayList<dynamic.model.query.mq.AttachedField>,
-                           ownerMany2OneFields:ArrayList<dynamic.model.query.mq.ModelMany2OneField>){
+    private fun sortFields(model:ModelBase, targetFields:ArrayList<FieldBase>,
+                           fs:ArrayList<FieldBase>,
+                           o2ofs:ArrayList<FieldBase>,
+                           o2mfs:ArrayList<AttachedField>,
+                           m2ofs:ArrayList<FieldBase>,
+                           m2mfs:ArrayList<AttachedField>,
+                           ownerMany2OneFields:ArrayList<ModelMany2OneField>){
         targetFields.forEach {
             when(it){
-                is dynamic.model.query.mq.One2OneField ->{
+                is One2OneField ->{
                     o2ofs.add(it)
                 }
-                is dynamic.model.query.mq.One2ManyField ->{
-                    o2mfs.add(dynamic.model.query.mq.AttachedField(it))
+                is One2ManyField ->{
+                    o2mfs.add(AttachedField(it))
                 }
-                is dynamic.model.query.mq.Many2OneField ->{
+                is Many2OneField ->{
                     val tf = this.getTargetModelField(it)
                     val ret = tf?.first?.isSame(model)
                     if(ret==null || !ret){
@@ -293,11 +293,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                     else{
                         fs.add(it)
-                        ownerMany2OneFields.add(it as dynamic.model.query.mq.ModelMany2OneField)
+                        ownerMany2OneFields.add(it as ModelMany2OneField)
                     }
                 }
-                is dynamic.model.query.mq.Many2ManyField ->{
-                    m2mfs.add(dynamic.model.query.mq.AttachedField(it))
+                is Many2ManyField ->{
+                    m2mfs.add(AttachedField(it))
                 }
                 else->{
                     if(model.isSame(it.model)){
@@ -313,16 +313,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
     }
-    open fun rawRead(vararg fields: dynamic.model.query.mq.FieldBase,
+    open fun rawRead(vararg fields: FieldBase,
                      model:AccessControlModel?=null,
-                     criteria: dynamic.model.query.mq.ModelExpression?,
-                     orderBy: dynamic.model.query.mq.OrderBy?=null,
+                     criteria: ModelExpression?,
+                     orderBy: OrderBy?=null,
                      pageIndex:Int?=null,
                      pageSize:Int?=null,
-                     attachedFields:Array<dynamic.model.query.mq.AttachedField>?=null,
+                     attachedFields:Array<AttachedField>?=null,
                      relationPaging:Boolean=false,
                      useAccessControl: Boolean=false,
-                     partnerCache:PartnerCache?=null): dynamic.model.query.mq.ModelDataArray?{
+                     partnerCache:PartnerCache?=null): ModelDataArray?{
         if(model==null){
             return this.rawRead(*fields,
                     model=this,
@@ -345,12 +345,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 return null
             }
         }
-        var fs=ArrayList<dynamic.model.query.mq.FieldBase>()
-        var o2ofs=ArrayList<dynamic.model.query.mq.FieldBase>()
-        var o2mfs=ArrayList<dynamic.model.query.mq.AttachedField>()
-        var m2ofs=ArrayList<dynamic.model.query.mq.FieldBase>()
-        var m2mfs=ArrayList<dynamic.model.query.mq.AttachedField>()
-        var ownerMany2OneFields = ArrayList<dynamic.model.query.mq.ModelMany2OneField>()
+        var fs=ArrayList<FieldBase>()
+        var o2ofs=ArrayList<FieldBase>()
+        var o2mfs=ArrayList<AttachedField>()
+        var m2ofs=ArrayList<FieldBase>()
+        var m2mfs=ArrayList<AttachedField>()
+        var ownerMany2OneFields = ArrayList<ModelMany2OneField>()
         if(fields.isEmpty()){
             var pFields= model?.fields?.getAllPersistFields()?.values?.toTypedArray()
             if(partnerCache!=null){
@@ -361,7 +361,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
         else{
-            var pFields: Array<dynamic.model.query.mq.FieldBase>?= fields as Array<dynamic.model.query.mq.FieldBase>?
+            var pFields: Array<FieldBase>?= fields as Array<FieldBase>?
             pFields = if(useAccessControl){
                // partnerCache?.acFilterReadFields(fields as Array<FieldBase>)
                 pFields
@@ -380,10 +380,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             it.getFullName()
         }.toTypedArray()))
         o2mfs= arrayListOf(*(o2mfs.distinctBy {
-            (it.field as dynamic.model.query.mq.FieldBase).getFullName()
+            (it.field as FieldBase).getFullName()
         }.toTypedArray()))
         m2mfs= arrayListOf(*(m2mfs.distinctBy {
-            (it.field as dynamic.model.query.mq.FieldBase).getFullName()
+            (it.field as FieldBase).getFullName()
         }.toTypedArray()))
         ownerMany2OneFields= arrayListOf(*(ownerMany2OneFields.distinctBy {
             it.getFullName()
@@ -406,7 +406,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 else{
                     fs.addAll(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                 }
-                var o2oFd= it as dynamic.model.query.mq.ModelOne2OneField
+                var o2oFd= it as ModelOne2OneField
                 if(o2oFd.isVirtualField){
                     var idf=o2oFd.model?.fields?.getIdField()
                     modelRelationMatcher.addMatchData(model,o2oFd,mf?.first,mf?.second,idf)
@@ -469,22 +469,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         mDataArray?.model=model
         mDataArray=this.reconstructSingleRelationModelRecordSet(mDataArray,modelRelationMatcher)
 
-        var rmfs= mutableMapOf<String,MutableList<dynamic.model.query.mq.AttachedField>>()
+        var rmfs= mutableMapOf<String,MutableList<AttachedField>>()
         m2mfs.forEach {
-            val field=it.field as dynamic.model.query.mq.RefRelationField
+            val field=it.field as RefRelationField
             if(field.relationModelTable!=null){
                 if(rmfs.containsKey(field.relationModelTable!!)){
                     rmfs[field.relationModelTable!!]?.add(it)
                 }
                 else{
-                    var mlst= mutableListOf<dynamic.model.query.mq.AttachedField>()
+                    var mlst= mutableListOf<AttachedField>()
                     mlst.add(it)
                     rmfs[field.relationModelTable!!]=mlst
                 }
             }
         }
 
-        var to2mfs=ArrayList<dynamic.model.query.mq.AttachedField>()
+        var to2mfs=ArrayList<AttachedField>()
         to2mfs.addAll(o2mfs)
 
 //        to2mfs.forEach {
@@ -504,37 +504,37 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
 
         attachedFields?.forEach {
-            if(it.field is dynamic.model.query.mq.Many2ManyField){
-                var rrf=it.field as dynamic.model.query.mq.RefRelationField
+            if(it.field is Many2ManyField){
+                var rrf=it.field as RefRelationField
                 if(rrf.relationModelTable!=null){
                     if(rmfs.containsKey(rrf.relationModelTable!!)){
                         var fList=rmfs[rrf.relationModelTable!!]
-                        if(fList!!.filter {rt-> (rt.field as dynamic.model.query.mq.FieldBase).getFullName()==(rrf as dynamic.model.query.mq.FieldBase).getFullName() }.count()<1){
+                        if(fList!!.filter {rt-> (rt.field as FieldBase).getFullName()==(rrf as FieldBase).getFullName() }.count()<1){
                             fList.add(it)
                         }
                         else{
                             fList.removeIf { xit ->
-                                (xit.field as dynamic.model.query.mq.FieldBase).isSame(rrf as dynamic.model.query.mq.FieldBase)
+                                (xit.field as FieldBase).isSame(rrf as FieldBase)
                             }
                             fList.add(it)
                         }
                     }
                     else{
-                        var mlst= mutableListOf<dynamic.model.query.mq.AttachedField>()
+                        var mlst= mutableListOf<AttachedField>()
                         mlst.add(it)
                         rmfs[rrf.relationModelTable!!]=mlst
                     }
                 }
             }
-            else if(it.field is dynamic.model.query.mq.One2ManyField){
-                var rtf=it.field as dynamic.model.query.mq.RefTargetField
-                if(o2mfs.filter { rt-> (rt.field as dynamic.model.query.mq.FieldBase).getFullName()==(it.field as dynamic.model.query.mq.FieldBase).getFullName() }.count()<1)
+            else if(it.field is One2ManyField){
+                var rtf=it.field as RefTargetField
+                if(o2mfs.filter { rt-> (rt.field as FieldBase).getFullName()==(it.field as FieldBase).getFullName() }.count()<1)
                 {
                     o2mfs.add(it)
                 }
                 else{
                     o2mfs.removeIf { xit ->
-                        (xit.field as dynamic.model.query.mq.FieldBase).isSame(rtf as dynamic.model.query.mq.FieldBase)
+                        (xit.field as FieldBase).isSame(rtf as FieldBase)
                     }
                     o2mfs.add(it)
                 }
@@ -548,7 +548,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var idField=model?.fields?.getIdField()
             var rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
             var subSelect=select(idField!!,fromModel = model!!).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
-            var rtFields=ArrayList<dynamic.model.query.mq.FieldBase>()
+            var rtFields=ArrayList<FieldBase>()
             rtFields.addAll(rmf?.first?.fields?.getAllPersistFields(true)?.values!!)
             modelRelationMatcher.addMatchData(model,idField,rmf?.first,rIDField)
             var joinModels=ArrayList<dynamic.model.query.mq.join.JoinModel>()
@@ -583,7 +583,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
 
-            var rOrderBy=null as dynamic.model.query.mq.OrderBy?
+            var rOrderBy=null as OrderBy?
             var rOffset=null as Int?
             var rLimit=null as Int?
             //todo add support pagesize every field
@@ -599,7 +599,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }.stream().map { x->x.criteria }.toList()
             var subCriteria = selectIn(rIDField!!,subSelect)
             if(attachedCriteriaArr.count()>0){
-                var mLst= mutableListOf<dynamic.model.query.mq.ModelExpression>()
+                var mLst= mutableListOf<ModelExpression>()
                 attachedCriteriaArr.forEach {mIt->
                     mLst.add(mIt!!)
                 }
@@ -622,7 +622,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     orderBy = rOrderBy,
                     offset = rOffset,
                     limit = rLimit)
-            var fieldArr=it.value.stream().map { x->x.field }.toList() as List<dynamic.model.query.mq.FieldBase>
+            var fieldArr=it.value.stream().map { x->x.field }.toList() as List<FieldBase>
             mDataArray=reconstructMultipleRelationModelRecordSet(model,
                     fieldArr.toTypedArray(),
                     mDataArray,rmf.first,
@@ -634,11 +634,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         o2mfs.forEach {
             modelRelationMatcher = ModelRelationMatcher()
-            var targetMF=this.getTargetModelField(it.field as dynamic.model.query.mq.FieldBase)
+            var targetMF=this.getTargetModelField(it.field as FieldBase)
             if(targetMF!=null){
                 var subSelect=select(model?.fields?.getIdField()!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
 
-                var rOrderBy=null as dynamic.model.query.mq.OrderBy?
+                var rOrderBy=null as OrderBy?
                 var rOffset=null as Int?
                 var rLimit=null as Int?
                 //todo add support pagesize every field
@@ -671,7 +671,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 limit = rLimit)
 
                         mDataArray=reconstructMultipleRelationModelRecordSet(model,
-                                arrayOf(it.field as dynamic.model.query.mq.FieldBase),
+                                arrayOf(it.field as FieldBase),
                                 mDataArray,
                                 null,
                                 postFS,
@@ -699,7 +699,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             orderBy = rOrderBy,offset = rOffset,limit = rLimit)
 
                     mDataArray= reconstructMultipleRelationModelRecordSet(model,
-                            arrayOf(it.field as dynamic.model.query.mq.FieldBase),
+                            arrayOf(it.field as FieldBase),
                             mDataArray,
                             null,
                             postFS,
@@ -739,47 +739,47 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         this.doFillModelFunctionFields(mDataArray,useAccessControl,partnerCache)
         return mDataArray
     }
-    fun getRelationFieldTo(model: dynamic.model.query.mq.FieldBase): dynamic.model.query.mq.FieldBase?{
+    fun getRelationFieldTo(model: FieldBase): FieldBase?{
 
 
 
         return null
     }
-    protected open fun doFillModelFunctionFields(modelDataArray: dynamic.model.query.mq.ModelDataArray?, useAccessControl: Boolean, partnerCache: PartnerCache?){
+    protected open fun doFillModelFunctionFields(modelDataArray: ModelDataArray?, useAccessControl: Boolean, partnerCache: PartnerCache?){
         val model=modelDataArray?.model
-        val functions = model?.fields?.getTypeFields<dynamic.model.query.mq.FunctionField<*,*>>()?.values?.toTypedArray()?: arrayOf()
+        val functions = model?.fields?.getTypeFields<FunctionField<*,*>>()?.values?.toTypedArray()?: arrayOf()
         modelDataArray?.data?.forEach {
             this.doFillFieldValueArrayFunctionFields(*functions,fieldValueArray = it,useAccessControl = useAccessControl,partnerCache = partnerCache)
         }
     }
-    protected open fun doFillModelFunctionFields(modelDataObject: dynamic.model.query.mq.ModelDataObject?, useAccessControl: Boolean, partnerCache: PartnerCache?){
+    protected open fun doFillModelFunctionFields(modelDataObject: ModelDataObject?, useAccessControl: Boolean, partnerCache: PartnerCache?){
         val model=modelDataObject?.model
-        val functions = model?.fields?.getTypeFields<dynamic.model.query.mq.FunctionField<*,*>>()?.values?.toTypedArray()?: arrayOf()
+        val functions = model?.fields?.getTypeFields<FunctionField<*,*>>()?.values?.toTypedArray()?: arrayOf()
         modelDataObject?.let {
             this.doFillFieldValueArrayFunctionFields(*functions,fieldValueArray = modelDataObject.data,
                     useAccessControl = useAccessControl,
                     partnerCache = partnerCache)
         }
     }
-    private fun doFillFieldValueArrayFunctionFields(vararg functionFields: dynamic.model.query.mq.FieldBase?, fieldValueArray: dynamic.model.query.mq.FieldValueArray, useAccessControl: Boolean, partnerCache: PartnerCache?){
+    private fun doFillFieldValueArrayFunctionFields(vararg functionFields: FieldBase?, fieldValueArray: FieldValueArray, useAccessControl: Boolean, partnerCache: PartnerCache?){
         functionFields.forEach {
-            if(it is dynamic.model.query.mq.FunctionField<*,*>){
+            if(it is FunctionField<*,*>){
 
-                val compValue = (it as dynamic.model.query.mq.FunctionField<*,PartnerCache>).compute(fieldValueArray,partnerCache,null)
+                val compValue = (it as FunctionField<*,PartnerCache>).compute(fieldValueArray,partnerCache,null)
                 fieldValueArray.setValue(it,compValue)
             }
         }
         fieldValueArray.forEach {
             when {
-                it.field is dynamic.model.query.mq.ProxyRelationModelField<*,*> -> (it.field as dynamic.model.query.mq.ProxyRelationModelField<*,PartnerCache>).inverse(fieldValueArray,partnerCache,null,null)
-                it.value is dynamic.model.query.mq.ModelDataObject -> this.doFillModelFunctionFields(it.value as ModelDataObject,useAccessControl,partnerCache)
-                it.value is dynamic.model.query.mq.ModelDataArray ->  this.doFillModelFunctionFields(it.value as ModelDataArray,useAccessControl,partnerCache)
-                it.value is dynamic.model.query.mq.ModelDataSharedObject -> (it.value as ModelDataSharedObject).data.forEach { _, u ->
+                it.field is ProxyRelationModelField<*,*> -> (it.field as ProxyRelationModelField<*,PartnerCache>).inverse(fieldValueArray,partnerCache,null,null)
+                it.value is ModelDataObject -> this.doFillModelFunctionFields(it.value as ModelDataObject,useAccessControl,partnerCache)
+                it.value is ModelDataArray ->  this.doFillModelFunctionFields(it.value as ModelDataArray,useAccessControl,partnerCache)
+                it.value is ModelDataSharedObject -> (it.value as ModelDataSharedObject).data.forEach { _, u ->
                     when(u){
-                        is dynamic.model.query.mq.ModelDataObject ->{
+                        is ModelDataObject ->{
                             this.doFillModelFunctionFields(u,useAccessControl,partnerCache)
                         }
-                        is dynamic.model.query.mq.ModelDataArray ->{
+                        is ModelDataArray ->{
                             this.doFillModelFunctionFields(u,useAccessControl,partnerCache)
                         }
                     }
@@ -788,22 +788,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
     protected  open fun reconstructMultipleRelationModelRecordSet(model:ModelBase?,
-                                                                  fields:Array<dynamic.model.query.mq.FieldBase>,
-                                                                  reqMainArray: dynamic.model.query.mq.ModelDataArray?,
+                                                                  fields:Array<FieldBase>,
+                                                                  reqMainArray: ModelDataArray?,
                                                                   relModel:ModelBase?,
-                                                                  targetFields:Array<dynamic.model.query.mq.FieldBase>,
-                                                                  relDataArray: dynamic.model.query.mq.ModelDataArray?,
-                                                                  modelRelationMatcher: ModelRelationMatcher): dynamic.model.query.mq.ModelDataArray?{
-        var mainArray = dynamic.model.query.mq.ModelDataArray(model = model, fields = reqMainArray?.fields)
+                                                                  targetFields:Array<FieldBase>,
+                                                                  relDataArray: ModelDataArray?,
+                                                                  modelRelationMatcher: ModelRelationMatcher): ModelDataArray?{
+        var mainArray = ModelDataArray(model = model, fields = reqMainArray?.fields)
         val idField = model?.fields?.getIdField()?: return reqMainArray
         reqMainArray?.data?.forEach {
             var mId = it.getValue(idField) as Long
-            var fvs = dynamic.model.query.mq.FieldValueArray()
+            var fvs = FieldValueArray()
             fvs.addAll(it)
             if(relModel!=null){ //m2m
                 val field = relModel.fields?.getFieldByTargetField(idField)
                 val relArray = this.readM2MModelDataArrayFromMultiModelDataArray(relModel,field!!,mId,fields,relDataArray)
-                var mds = (fvs.getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?: dynamic.model.query.mq.ModelDataSharedObject()
+                var mds = (fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?: ModelDataSharedObject()
                 relArray?.let {
                     mds.data[relModel]=relArray
                     fvs.setValue(ConstRelRegistriesField.ref,mds)
@@ -823,13 +823,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     private  fun readM2MModelDataArrayFromMultiModelDataArray(relModel:ModelBase,
-                                                              field: dynamic.model.query.mq.FieldBase,
+                                                              field: FieldBase,
                                                               fieldValue:Long,
-                                                              relFields:Array<dynamic.model.query.mq.FieldBase>,
-                                                              dataArray: dynamic.model.query.mq.ModelDataArray?): dynamic.model.query.mq.ModelDataArray?{
+                                                              relFields:Array<FieldBase>,
+                                                              dataArray: ModelDataArray?): ModelDataArray?{
 
         var relReadFields = this.getModelFieldsFromMultiDataArray(relModel,dataArray)
-        var relDataArray = dynamic.model.query.mq.ModelDataArray(model = relModel, fields = relReadFields)
+        var relDataArray = ModelDataArray(model = relModel, fields = relReadFields)
         field?.let {
             dataArray?.data?.filter {
                 (it.getValue(field) as Long)==fieldValue
@@ -842,15 +842,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     var tFV = this.readOneModelFieldValueFromMultiModelFieldValue(tReadFields,fv)
                     var rf = this.getRelationModelField(it)
                     rf?.let {
-                        relFieldValue.setValue(rf.second!!, dynamic.model.query.mq.ModelDataObject(fields = tReadFields, data = tFV, model = tf?.first))
+                        relFieldValue.setValue(rf.second!!, ModelDataObject(fields = tReadFields, data = tFV, model = tf?.first))
                     }
                 }
             }
         }
         return relDataArray
     }
-    private fun readOneModelFieldValueFromMultiModelFieldValue(modelFields:ArrayList<dynamic.model.query.mq.FieldBase>, multiModelFieldValue: dynamic.model.query.mq.FieldValueArray): dynamic.model.query.mq.FieldValueArray {
-        var n = dynamic.model.query.mq.FieldValueArray()
+    private fun readOneModelFieldValueFromMultiModelFieldValue(modelFields:ArrayList<FieldBase>, multiModelFieldValue: FieldValueArray): FieldValueArray {
+        var n = FieldValueArray()
         modelFields.forEach {
             if(multiModelFieldValue.containFieldKey(it)){
                 n.setValue(it,multiModelFieldValue.getValue(it))
@@ -859,16 +859,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return n
     }
     private  fun readO2MModelDataArrayFromMultiModelDataArray(model:ModelBase?,
-                                                              field: dynamic.model.query.mq.FieldBase?,
+                                                              field: FieldBase?,
                                                               fieldValue:Long,
-                                                              dataArray: dynamic.model.query.mq.ModelDataArray?): dynamic.model.query.mq.ModelDataArray?{
+                                                              dataArray: ModelDataArray?): ModelDataArray?{
         var fields = this.getModelFieldsFromMultiDataArray(model,dataArray)
-        var modelDataArray= dynamic.model.query.mq.ModelDataArray(model = model, fields = fields)
+        var modelDataArray= ModelDataArray(model = model, fields = fields)
         field?.let {
             dataArray?.data?.filter {
                 (it.getValue(field) as Long)==fieldValue
             }?.forEach { fv->
-                var nFv = dynamic.model.query.mq.FieldValueArray()
+                var nFv = FieldValueArray()
                 fields.forEach {
                     val v =fv.getValue(it)
                     nFv.setValue(it,v)
@@ -879,8 +879,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return modelDataArray
     }
 
-    private  fun getModelFieldsFromMultiDataArray(model:ModelBase?,dataArray: dynamic.model.query.mq.ModelDataArray?):ArrayList<dynamic.model.query.mq.FieldBase>{
-        var fields = arrayListOf<dynamic.model.query.mq.FieldBase>()
+    private  fun getModelFieldsFromMultiDataArray(model:ModelBase?,dataArray: ModelDataArray?):ArrayList<FieldBase>{
+        var fields = arrayListOf<FieldBase>()
          model?.let {
              var d = dataArray?.data?.firstOrNull()
              d?.forEach {
@@ -892,22 +892,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return fields
     }
 
-    private fun setOrReplaceFieldValueArrayItem(fVArr: dynamic.model.query.mq.FieldValueArray, field: dynamic.model.query.mq.FieldBase, value:Any?){
+    private fun setOrReplaceFieldValueArrayItem(fVArr: FieldValueArray, field: FieldBase, value:Any?){
         var index=fVArr.indexOfFirst {
             it.field.isSame(field)
         }
         if(index>-1){
-            fVArr[index]= dynamic.model.query.mq.FieldValue(field, value)
+            fVArr[index]= FieldValue(field, value)
         }
         else{
-            fVArr.add(dynamic.model.query.mq.FieldValue(field, value))
+            fVArr.add(FieldValue(field, value))
         }
     }
-    protected open fun reconstructSingleRelationModelRecordSet(mDataArray: dynamic.model.query.mq.ModelDataArray?,
-                                                               modelRelationMatcher: ModelRelationMatcher): dynamic.model.query.mq.ModelDataArray?{
+    protected open fun reconstructSingleRelationModelRecordSet(mDataArray: ModelDataArray?,
+                                                               modelRelationMatcher: ModelRelationMatcher): ModelDataArray?{
         var mainModel = mDataArray?.model
-        var mainModelFields=ArrayList<dynamic.model.query.mq.FieldBase>()
-        var subModels= mutableMapOf<ModelBase?, dynamic.model.query.mq.ModelDataObject>()
+        var mainModelFields=ArrayList<FieldBase>()
+        var subModels= mutableMapOf<ModelBase?, ModelDataObject>()
         mDataArray?.fields?.forEach {
             if(mainModel!=it.model){
                if(subModels.contains(it.model)){
@@ -915,9 +915,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                }
                else
                {
-                   var fields=ArrayList<dynamic.model.query.mq.FieldBase>()
+                   var fields=ArrayList<FieldBase>()
                    fields.add(it)
-                   var mrDataObject= dynamic.model.query.mq.ModelDataObject(fields = fields, model = it.model)
+                   var mrDataObject= ModelDataObject(fields = fields, model = it.model)
                    var mfd=modelRelationMatcher.getRelationMatchField(mainModel,it.model)
                    mrDataObject.fromField=mfd?.fromField
                    subModels[it.model]=mrDataObject
@@ -927,9 +927,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 mainModelFields.add(it)
             }
         }
-        var mainModelDataArray = dynamic.model.query.mq.ModelDataArray(fields = mainModelFields, model = mainModel)
+        var mainModelDataArray = ModelDataArray(fields = mainModelFields, model = mainModel)
         mDataArray?.data?.forEach { fvArr->
-            var mainRecord= dynamic.model.query.mq.FieldValueArray()
+            var mainRecord= FieldValueArray()
             mainModelDataArray.fields?.forEach {mf->
                 //var key= it.getFullName()
                 //mainRecord[it.propertyName]= mit[key]
@@ -942,7 +942,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
             subModels.values.forEach {
-                var subRecord = dynamic.model.query.mq.FieldValueArray()
+                var subRecord = FieldValueArray()
                 it.fields?.forEach {fb->
                     var fv=fvArr.firstOrNull {sf->
                         sf.field.isSame(fb)
@@ -952,8 +952,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
                 mainModelDataArray.fields?.add(it.fromField!!)
-                var cloneModelObject= dynamic.model.query.mq.ModelDataObject(data = subRecord, model = it.model)
-                mainRecord.add(dynamic.model.query.mq.FieldValue(it.fromField!!, cloneModelObject))
+                var cloneModelObject= ModelDataObject(data = subRecord, model = it.model)
+                mainRecord.add(FieldValue(it.fromField!!, cloneModelObject))
             }
             mainModelDataArray.data.add(mainRecord)
         }
@@ -968,8 +968,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return null
     }
-    protected  open fun getTargetModelField(field: dynamic.model.query.mq.FieldBase):Pair<ModelBase, dynamic.model.query.mq.FieldBase>?{
-        if(field is dynamic.model.query.mq.RefTargetField){
+    protected  open fun getTargetModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
+        if(field is RefTargetField){
             var model=this.appModel?.getModel(field.targetModelTable)?:return null
             var mField=model?.fields?.getField(field.targetModelFieldName)?:return null
             return Pair(model,mField)
@@ -980,12 +980,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
 
 
-    fun acCreate(modelData: dynamic.model.query.mq.ModelData,
+    fun acCreate(modelData: ModelData,
                  partnerCache:PartnerCache):Pair<Long?,String?>{
             return this.safeCreate(modelData,useAccessControl=true,partnerCache = partnerCache)
     }
 
-    open fun safeCreate(modelData: dynamic.model.query.mq.ModelData,
+    open fun safeCreate(modelData: ModelData,
                         useAccessControl: Boolean=false,
                         partnerCache:PartnerCache?=null):Pair<Long?,String?>{
         if(useAccessControl && partnerCache==null){
@@ -1025,35 +1025,35 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(0,errorMessage)
     }
 
-    open fun getCreateFieldValue(field: dynamic.model.query.mq.FieldBase, value:Any?, partnerCache:PartnerCache?=null, fvs: dynamic.model.query.mq.FieldValueArray?=null): dynamic.model.query.mq.FieldValue?{
+    open fun getCreateFieldValue(field: FieldBase, value:Any?, partnerCache:PartnerCache?=null, fvs: FieldValueArray?=null): FieldValue?{
             return when (field) {
-                is dynamic.model.query.mq.ProxyRelationModelField<*,*> -> null
+                is ProxyRelationModelField<*,*> -> null
                 else -> when(value){
-                    is dynamic.model.query.mq.ModelDataObject ->{
+                    is ModelDataObject ->{
                         return if(value.idFieldValue!=null){
-                            dynamic.model.query.mq.FieldValue(field, value.idFieldValue?.value)
+                            FieldValue(field, value.idFieldValue?.value)
                         } else{
                             null//FieldValue(field,null)
                         }
                     }
                     is FieldDefaultValueBillboard ->{
                         return when(value){
-                            is CurrCorpBillboard-> dynamic.model.query.mq.FieldValue(field, value.looked(partnerCache))
-                            is CurrPartnerBillboard-> dynamic.model.query.mq.FieldValue(field, value.looked(partnerCache))
+                            is CurrCorpBillboard-> FieldValue(field, value.looked(partnerCache))
+                            is CurrPartnerBillboard-> FieldValue(field, value.looked(partnerCache))
 
-                            else-> dynamic.model.query.mq.FieldValue(field, value.looked(null))
+                            else-> FieldValue(field, value.looked(null))
                         }
                     }
                     is FieldValueDependentingRecordBillboard ->{
                         val ret = value.looked(fvs, ActionType.CREATE)
                         return if(ret.first){
-                            dynamic.model.query.mq.FieldValue(field, ret.second)
+                            FieldValue(field, ret.second)
                         } else{
                             null
                         }
                     }
                     else->{
-                        return if(value!=null) dynamic.model.query.mq.FieldValue(field, value) else null
+                        return if(value!=null) FieldValue(field, value) else null
                     }
                 }
             }
@@ -1061,15 +1061,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
 
-    open fun getEditFieldValue(field: dynamic.model.query.mq.FieldBase, value:Any?, partnerCache:PartnerCache?=null, fvs: dynamic.model.query.mq.FieldValueArray?=null): dynamic.model.query.mq.FieldValue?{
+    open fun getEditFieldValue(field: FieldBase, value:Any?, partnerCache:PartnerCache?=null, fvs: FieldValueArray?=null): FieldValue?{
         return when (field) {
-            is dynamic.model.query.mq.ProxyRelationModelField<*,*> -> null
+            is ProxyRelationModelField<*,*> -> null
             else -> when(value){
-                is dynamic.model.query.mq.ModelDataObject ->{
+                is ModelDataObject ->{
                     value.idFieldValue?.let {
                         it.value?.let {
                             val lz:Long=0
-                            return if((it as BigInteger).toLong()!=lz) dynamic.model.query.mq.FieldValue(field, it) else null
+                            return if((it as BigInteger).toLong()!=lz) FieldValue(field, it) else null
                         }
                     }
                     return null
@@ -1080,30 +1080,30 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 is FieldValueDependentingRecordBillboard ->{
                     var ret = value?.looked(fvs, ActionType.EDIT)
                     return if(ret.first){
-                        dynamic.model.query.mq.FieldValue(field, ret.second)
+                        FieldValue(field, ret.second)
                     }
                     else{
                         null
                     }
                 }
                 else->{
-                    if(value!=null) dynamic.model.query.mq.FieldValue(field, value) else null
+                    if(value!=null) FieldValue(field, value) else null
                 }
             }
         }
     }
 
 
-    open fun rawCreate(data: dynamic.model.query.mq.ModelData,
+    open fun rawCreate(data: ModelData,
                        useAccessControl: Boolean=false,
                        partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
 
         when(data){
-            is dynamic.model.query.mq.ModelDataObject ->{
+            is ModelDataObject ->{
                 return rawCreateObject(data,useAccessControl,partnerCache)
             }
-            is dynamic.model.query.mq.ModelDataArray ->{
+            is ModelDataArray ->{
                 return rawCreateArray(data,useAccessControl,partnerCache)
             }
         }
@@ -1111,11 +1111,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     // muse call in safeCreate
-    protected open fun rawCreateArray(modelDataArray: dynamic.model.query.mq.ModelDataArray,
+    protected open fun rawCreateArray(modelDataArray: ModelDataArray,
                                       useAccessControl: Boolean=false,
                                       partnerCache:PartnerCache?=null):Pair<Long?,String?>{
         for (d in modelDataArray.data){
-            var obj= dynamic.model.query.mq.ModelDataObject(d, model = modelDataArray.model, fields = modelDataArray.fields)
+            var obj= ModelDataObject(d, model = modelDataArray.model, fields = modelDataArray.fields)
             obj.context=modelDataArray.context
             var ret=(modelDataArray.model as AccessControlModel).rawCreateObject(obj,useAccessControl,partnerCache)
             if(ret.first==null|| ret.second!=null){
@@ -1124,7 +1124,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return Pair(1,null)
     }
-    protected  open fun beforeCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected  open fun beforeCreateObject(modelDataObject: ModelDataObject,
                                            useAccessControl: Boolean=false,
                                            partnerCache:PartnerCache?=null):Pair<Boolean,String?>
     {
@@ -1134,11 +1134,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
-                if((it is dynamic.model.query.mq.FunctionField<*,*>) || (it is dynamic.model.query.mq.ModelOne2ManyField)
-                        ||(it is dynamic.model.query.mq.ModelMany2ManyField)){
+                if((it is FunctionField<*,*>) || (it is ModelOne2ManyField)
+                        ||(it is ModelMany2ManyField)){
                     return@forEach
                 }
-                val oit = it as dynamic.model.query.mq.ModelField
+                val oit = it as ModelField
                 var fv = modelDataObject.data.firstOrNull { fv->
                     fv.field.getFullName() == oit.getFullName()
                 }
@@ -1175,7 +1175,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return null
     }
 
-    protected  open fun runCreateFieldsFilterRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache){
+    protected  open fun runCreateFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
@@ -1208,7 +1208,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
 
-    protected  open fun runEditFieldsFilterRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache){
+    protected  open fun runEditFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
@@ -1253,7 +1253,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             value
         }
     }
-    protected open fun runCreateFieldsCheckRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
+    protected open fun runCreateFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
         val model = modelDataObject.model?:this
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
@@ -1302,7 +1302,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun getModelEditFieldsInStoreInspectors():Array<ModelFieldInspector>?{
         return null
     }
-    protected open fun runEditFieldsCheckRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
+    protected open fun runEditFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
         val model = modelDataObject.model?:this
 
         var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
@@ -1348,7 +1348,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(true,null)
     }
 
-    protected open fun runCreateFieldsInitializeRules(modelDataObject: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache){
+    protected open fun runCreateFieldsInitializeRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
         this.createRecordSetIsolationFields(modelDataObject,partnerCache)
         this.cuFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
@@ -1358,7 +1358,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             it(modelDataObject,partnerCache,null)
         }
     }
-    protected  open fun rawCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected  open fun rawCreateObject(modelDataObject: ModelDataObject,
                                         useAccessControl: Boolean=false,
                                         partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
@@ -1368,10 +1368,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         if(constGetRefField!=null){
             return if(modelDataObject.context?.refRecordMap?.containsKey(constGetRefField.value as String)!!){
-                var fvc=modelDataObject.context?.refRecordMap?.get(constGetRefField.value as String) as dynamic.model.query.mq.ModelDataObject
+                var fvc=modelDataObject.context?.refRecordMap?.get(constGetRefField.value as String) as ModelDataObject
                 var idValue=fvc?.idFieldValue?.value as Long?
                 if(idValue!=null) {
-                    modelDataObject.data.add(dynamic.model.query.mq.FieldValue(modelDataObject.model?.fields?.getIdField()!!, idValue))
+                    modelDataObject.data.add(FieldValue(modelDataObject.model?.fields?.getIdField()!!, idValue))
                     Pair(idValue,null)
                 } else{
                     Pair(null,"cant find the ref record")
@@ -1394,11 +1394,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         modelDataObject.data.forEach {
             when(it.field){
-                is dynamic.model.query.mq.Many2OneField,is dynamic.model.query.mq.One2OneField ->{
-                    if(it.field is dynamic.model.query.mq.One2OneField && (it.field as One2OneField).isVirtualField){
+                is Many2OneField,is One2OneField ->{
+                    if(it.field is One2OneField && (it.field as One2OneField).isVirtualField){
                         return@forEach
                     }
-                    if(it.value is dynamic.model.query.mq.ModelDataObject){
+                    if(it.value is ModelDataObject){
                         if((it.value as ModelDataObject).idFieldValue==null){
                             (it.value as ModelDataObject).context=modelDataObject.context
                             var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,useAccessControl,partnerCache)
@@ -1406,7 +1406,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 return id?:Pair(null,"创建失败")
                             }
                             var idField= (it.value as ModelDataObject)?.model?.fields?.getIdField()
-                            (it.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(idField!!, id?.first))
+                            (it.value as ModelDataObject).data.add(FieldValue(idField!!, id?.first))
                         }
                         else if((it.value as ModelDataObject).hasNormalField()){
                             (it.value as ModelDataObject).context=modelDataObject.context
@@ -1432,13 +1432,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //        }
 
         return try {
-            var fVCShadow= dynamic.model.query.mq.ModelDataObject(model = modelDataObject.model)
+            var fVCShadow= ModelDataObject(model = modelDataObject.model)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
-                if((it is dynamic.model.query.mq.FunctionField<*,*>) || (it is dynamic.model.query.mq.ModelOne2ManyField)
-                        ||(it is dynamic.model.query.mq.ModelMany2ManyField)){
+                if((it is FunctionField<*,*>)
+                        || (it is ModelOne2ManyField)
+                        ||(it is ModelMany2ManyField)
+                        ||(it is One2OneField && (it as One2OneField).isVirtualField)){
                     return@forEach
                 }
-                val oit = it as dynamic.model.query.mq.ModelField
+                val oit = it as ModelField
                 var fv = modelDataObject.data.firstOrNull { fv->
                     fv.field.getFullName() == oit.getFullName()
                 }
@@ -1457,7 +1459,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(nID==null || nID<1){
                 return Pair(null,"创建失败")
             }
-            modelDataObject.data.add(dynamic.model.query.mq.FieldValue(
+            modelDataObject.data.add(FieldValue(
                     modelDataObject.model?.fields?.getIdField()!!,
                     nID
             ))
@@ -1470,21 +1472,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             modelDataObject.data.forEach {
                 fv->
                 when(fv.field){
-                    is dynamic.model.query.mq.One2ManyField ->{
-                        if(fv.value is dynamic.model.query.mq.ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
+                    is One2ManyField ->{
+                        if(fv.value is ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
                             var tmf=this.getTargetModelField(fv.field)
-                            (fv.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, nID))
+                            (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                             (fv.value as ModelDataObject).context=modelDataObject.context
                             var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                             if (o2m==null || o2m.second!=null){
                                 return  Pair(null,o2m?.second?:"创建失败")
                             }
                         }
-                        else if(fv.value is dynamic.model.query.mq.ModelDataArray){
+                        else if(fv.value is ModelDataArray){
                             var tmf=this.getTargetModelField(fv.field)
                             (fv.value as ModelDataArray).context=modelDataObject.context
                             (fv.value as ModelDataArray).data.forEach {
-                                    it.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, nID))
+                                    it.add(FieldValue(tmf?.second!!, nID))
                             }
                             var ret=this.rawCreateArray(fv.value as ModelDataArray,useAccessControl,partnerCache)
                             if(ret.first==null ||ret.second!=null){
@@ -1492,11 +1494,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             }
                         }
                     }
-                    is dynamic.model.query.mq.One2OneField ->{
+                    is One2OneField ->{
                         if((fv.field as One2OneField).isVirtualField){
-                            if(fv.value is dynamic.model.query.mq.ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
+                            if(fv.value is ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
                                 var tmf=this.getTargetModelField(fv.field)
-                                (fv.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, nID))
+                                (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                                 (fv.value as ModelDataObject).context=modelDataObject.context
                                 var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                                 if (o2o==null || o2o.second!=null){
@@ -1507,28 +1509,28 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                     is ConstRelRegistriesField->{
                         when(fv.value){
-                            is dynamic.model.query.mq.ModelDataSharedObject ->{
+                            is ModelDataSharedObject ->{
                                 for( kv in (fv.value as ModelDataSharedObject).data) {
                                     when(kv.value){
-                                        is dynamic.model.query.mq.ModelDataObject ->{
-                                            var mfvc= kv.value as dynamic.model.query.mq.ModelDataObject
+                                        is ModelDataObject ->{
+                                            var mfvc= kv.value as ModelDataObject
                                             mfvc.context=modelDataObject.context
                                             var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                             if(tField!=null && mfvc.idFieldValue==null){
-                                                mfvc.data.add(dynamic.model.query.mq.FieldValue(tField, nID))
+                                                mfvc.data.add(FieldValue(tField, nID))
                                                 var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                 if(ret==null || ret.second!=null){
                                                     return Pair(null,"创建失败")
                                                 }
                                             }
                                         }
-                                        is dynamic.model.query.mq.ModelDataArray ->{
-                                            var mmfvc= kv.value as dynamic.model.query.mq.ModelDataArray
+                                        is ModelDataArray ->{
+                                            var mmfvc= kv.value as ModelDataArray
                                             mmfvc.context=modelDataObject.context
                                             for(mkv in mmfvc.data){
                                                 var tField=mmfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                 if(tField!=null){
-                                                    mkv.add(dynamic.model.query.mq.FieldValue(tField, nID))
+                                                    mkv.add(FieldValue(tField, nID))
                                                 }
                                             }
                                             var ret=rawCreateArray(mmfvc,useAccessControl,partnerCache)
@@ -1564,17 +1566,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //
 //        return Pair(true,null)
 //    }
-    protected  open fun afterCreateObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected  open fun afterCreateObject(modelDataObject: ModelDataObject,
                                           useAccessControl:Boolean,
                                           pc:PartnerCache?):Pair<Boolean,String?>{
         return Pair(true,"")
     }
-    protected open fun addCreateModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected open fun addCreateModelLog(modelDataObject: ModelDataObject,
                                          useAccessControl:Boolean,
                                          pc:PartnerCache?){
 
     }
-    protected  open fun beforeEditCheck(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected  open fun beforeEditCheck(modelDataObject: ModelDataObject,
                                         useAccessControl: Boolean,
                                         partnerCache:PartnerCache?):Pair<Boolean,String?>{
 
@@ -1594,8 +1596,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
 
 
-    open fun acEdit(modelData: dynamic.model.query.mq.ModelData,
-                    criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun acEdit(modelData: ModelData,
+                    criteria: ModelExpression?,
                     partnerCache:PartnerCache):Pair<Long?,String?>{
         if(modelData.isEmpty()){
             return Pair(0,"提交数据为空")
@@ -1608,8 +1610,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
 
 
-    open fun safeEdit(modelData: dynamic.model.query.mq.ModelData,
-                      criteria: dynamic.model.query.mq.ModelExpression?=null,
+    open fun safeEdit(modelData: ModelData,
+                      criteria: ModelExpression?=null,
                       useAccessControl: Boolean=false,
                       partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
@@ -1655,12 +1657,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(0,"更新失败")
     }
     //todo add model role constraint
-    open fun getACEditFieldValue(field: dynamic.model.query.mq.FieldBase, value:Any?, useAccessControl: Boolean, partnerCache: PartnerCache?, useDefault:Boolean=false): dynamic.model.query.mq.FieldValue?{
-        return dynamic.model.query.mq.FieldValue(field, value)
+    open fun getACEditFieldValue(field: FieldBase, value:Any?, useAccessControl: Boolean, partnerCache: PartnerCache?, useDefault:Boolean=false): FieldValue?{
+        return FieldValue(field, value)
     }
 
-    open fun rawEdit(modelDataObject: dynamic.model.query.mq.ModelDataObject,
-                     criteria: dynamic.model.query.mq.ModelExpression?=null,
+    open fun rawEdit(modelDataObject: ModelDataObject,
+                     criteria: ModelExpression?=null,
                      useAccessControl: Boolean=false,
                      partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
@@ -1681,7 +1683,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             if(useAccessControl)
             {
-                var acCriteria=null as dynamic.model.query.mq.ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
+                var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
                         and(tCriteria, acCriteria)
@@ -1691,11 +1693,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             modelDataObject.data.forEach {
                 when(it.field){
-                    is dynamic.model.query.mq.Many2OneField,is dynamic.model.query.mq.One2OneField ->{
-                        if(it.field is dynamic.model.query.mq.One2OneField && (it.field as One2OneField).isVirtualField){
+                    is Many2OneField,is One2OneField ->{
+                        if(it.field is One2OneField && (it.field as One2OneField).isVirtualField){
                             return@forEach
                         }
-                        if(it.value is dynamic.model.query.mq.ModelDataObject){
+                        if(it.value is ModelDataObject){
                             if((it.value as ModelDataObject).idFieldValue==null){
                                 (it.value as ModelDataObject).context=modelDataObject.context
                                 var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,
@@ -1704,7 +1706,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 if(id==null ||id.second!=null){
                                     return id?:Pair(null,"创建失败")
                                 }
-                                (it.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue((it.value as ModelDataObject)?.model?.fields?.getIdField()!!, id?.first))
+                                (it.value as ModelDataObject).data.add(FieldValue((it.value as ModelDataObject)?.model?.fields?.getIdField()!!, id?.first))
                             }
                             else if((it.value as ModelDataObject).hasNormalField()){
                                 (it.value as ModelDataObject).context=modelDataObject.context
@@ -1719,14 +1721,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
 
-            var fVCShadow= dynamic.model.query.mq.ModelDataObject(model = modelDataObject.model, fields = modelDataObject.fields)
+            var fVCShadow= ModelDataObject(model = modelDataObject.model, fields = modelDataObject.fields)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
 
-                if((it is dynamic.model.query.mq.FunctionField<*,*>) || (it is dynamic.model.query.mq.ModelOne2ManyField)
-                        ||(it is dynamic.model.query.mq.ModelMany2ManyField)){
+                if((it is FunctionField<*,*>)
+                        || (it is ModelOne2ManyField)
+                        ||(it is ModelMany2ManyField)
+                        ||(it is One2OneField && (it as One2OneField).isVirtualField)){
                     return@forEach
                 }
-                val oit = it as dynamic.model.query.mq.ModelField
+                val oit = it as ModelField
                 if(oit.isIdField()){
                     return@forEach
                 }
@@ -1758,13 +1762,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 modelDataObject.data.forEach {
                     fv->
                     when(fv.field){
-                        is dynamic.model.query.mq.One2ManyField ->{
-                            if(fv.value is dynamic.model.query.mq.ModelDataObject){
+                        is One2ManyField ->{
+                            if(fv.value is ModelDataObject){
                                 var tmf=this.getTargetModelField(fv.field)
                                 if((fv.value as ModelDataObject).idFieldValue==null)
                                 {
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    (fv.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, mIDFV.value))
+                                    (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
                                             partnerCache)
@@ -1783,13 +1787,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     }
                                 }
                             }
-                            else if(fv.value is dynamic.model.query.mq.ModelDataArray){
+                            else if(fv.value is ModelDataArray){
                                 var tmf=this.getTargetModelField(fv.field)
                                 (fv.value as ModelDataArray).data.forEach {
-                                    var tfvc= dynamic.model.query.mq.ModelDataObject(it, (fv.value as ModelDataArray).model)
+                                    var tfvc= ModelDataObject(it, (fv.value as ModelDataArray).model)
                                     if(tfvc.idFieldValue==null){
                                         tfvc.context=modelDataObject.context
-                                        tfvc.data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, mIDFV.value))
+                                        tfvc.data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                         var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(tfvc,
                                                 useAccessControl,
                                                 partnerCache)
@@ -1811,11 +1815,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 }
                             }
                         }
-                       is dynamic.model.query.mq.One2OneField ->{
-                            if((fv.field as One2OneField).isVirtualField && (fv.value is dynamic.model.query.mq.ModelDataObject)){
+                       is One2OneField ->{
+                            if((fv.field as One2OneField).isVirtualField && (fv.value is ModelDataObject)){
                                 if((fv.value as ModelDataObject).idFieldValue==null){
                                     var tmf=this.getTargetModelField(fv.field)
-                                    (fv.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, mIDFV.value))
+                                    (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
                                     var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
@@ -1826,7 +1830,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 }
                                 else if((fv.value as ModelDataObject).hasNormalField()){
                                     var tmf=this.getTargetModelField(fv.field)
-                                    (fv.value as ModelDataObject).data.add(dynamic.model.query.mq.FieldValue(tmf?.second!!, mIDFV.value))
+                                    (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
                                     var o2o=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
                                             criteria=null,
@@ -1840,16 +1844,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         }
                         is ConstRelRegistriesField->{
                             when(fv.value){
-                                is dynamic.model.query.mq.ModelDataSharedObject ->{
+                                is ModelDataSharedObject ->{
                                     for( kv in (fv.value as ModelDataSharedObject).data) {
                                         when(kv.value){
-                                            is dynamic.model.query.mq.ModelDataObject ->{
-                                                var mfvc= kv.value as dynamic.model.query.mq.ModelDataObject
+                                            is ModelDataObject ->{
+                                                var mfvc= kv.value as ModelDataObject
                                                 mfvc.context=modelDataObject.context
                                                 var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                 if(tField!=null && mfvc.idFieldValue==null){
                                                     mfvc.context=modelDataObject.context
-                                                    mfvc.data.add(dynamic.model.query.mq.FieldValue(tField, mIDFV.value))
+                                                    mfvc.data.add(FieldValue(tField, mIDFV.value))
                                                     var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                     if(ret==null || ret.second!=null){
                                                         return Pair(null,"创建失败")
@@ -1863,14 +1867,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                     }
                                                 }
                                             }
-                                            is dynamic.model.query.mq.ModelDataArray ->{
-                                                var mmfvc= kv.value as dynamic.model.query.mq.ModelDataArray
+                                            is ModelDataArray ->{
+                                                var mmfvc= kv.value as ModelDataArray
                                                 for(mkv in mmfvc.data){
-                                                    var mfvc= dynamic.model.query.mq.ModelDataObject(mkv, mmfvc.model)
+                                                    var mfvc= ModelDataObject(mkv, mmfvc.model)
                                                     mfvc.context=modelDataObject.context
                                                     var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                     if(tField!=null && mfvc.idFieldValue==null){
-                                                        mfvc.data.add(dynamic.model.query.mq.FieldValue(tField, mIDFV.value))
+                                                        mfvc.data.add(FieldValue(tField, mIDFV.value))
                                                         var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                         if(ret==null || ret.second!=null){
                                                             return Pair(null,ret?.second)
@@ -1907,20 +1911,20 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             Pair(null,ex.message)
         }
     }
-    protected  open fun afterEditObject(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected  open fun afterEditObject(modelDataObject: ModelDataObject,
                                         useAccessControl:Boolean,
                                         pc:PartnerCache?):Pair<Boolean,String?>{
         return Pair(true,"")
     }
 
 
-    protected open fun addEditModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject,
+    protected open fun addEditModelLog(modelDataObject: ModelDataObject,
                                        useAccessControl:Boolean,
                                        pc:PartnerCache?){
 
     }
-    protected  open fun beforeDeleteCheck(modelData: dynamic.model.query.mq.ModelDataObject,
-                                          criteria: dynamic.model.query.mq.ModelExpression?,
+    protected  open fun beforeDeleteCheck(modelData: ModelDataObject,
+                                          criteria: ModelExpression?,
                                           useAccessControl: Boolean,
                                           partnerCache:PartnerCache?):Pair<Boolean,String?>{
         val model = modelData.model
@@ -1949,8 +1953,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(true,null)
     }
 
-    open fun acDelete(modelData: dynamic.model.query.mq.ModelData,
-                      criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun acDelete(modelData: ModelData,
+                      criteria: ModelExpression?,
                       partnerCache:PartnerCache?):Pair<Long?,String?>{
 
         return this.safeDelete(modelData,
@@ -1959,17 +1963,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 partnerCache = partnerCache)
     }
 
-    open fun acDelete(criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun acDelete(criteria: ModelExpression?,
                       partnerCache:PartnerCache?):Pair<Long?,String?>{
-        val modelData = dynamic.model.query.mq.ModelDataObject(model = this)
+        val modelData = ModelDataObject(model = this)
         return this.safeDelete(modelData,
                 criteria = criteria,
                 useAccessControl = true,
                 partnerCache = partnerCache)
     }
 
-    open fun safeDelete(modelData: dynamic.model.query.mq.ModelData,
-                        criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun safeDelete(modelData: ModelData,
+                        criteria: ModelExpression?,
                         useAccessControl: Boolean=false,
                         partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
@@ -2004,13 +2008,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return Pair(0,"更新失败")
     }
 
-    open fun rawDelete(criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun rawDelete(criteria: ModelExpression?,
                        useAccessControl: Boolean=false,
                        partnerCache:PartnerCache?=null):Pair<Long?,String?>{
-        return this.rawDelete(dynamic.model.query.mq.ModelDataObject(model = this),criteria,useAccessControl,partnerCache)
+        return this.rawDelete(ModelDataObject(model = this),criteria,useAccessControl,partnerCache)
     }
-    open fun rawDelete(modelDataObject: dynamic.model.query.mq.ModelDataObject,
-                       criteria: dynamic.model.query.mq.ModelExpression?,
+    open fun rawDelete(modelDataObject: ModelDataObject,
+                       criteria: ModelExpression?,
                        useAccessControl: Boolean=false,
                        partnerCache:PartnerCache?=null):Pair<Long?,String?>{
         if(useAccessControl && partnerCache==null){
@@ -2044,7 +2048,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             if(useAccessControl)
             {
-                var acCriteria=null as dynamic.model.query.mq.ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
+                var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
                         and(tCriteria,acCriteria)!!
@@ -2058,7 +2062,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
     }
 
-    open fun rawCount(fieldValueArray: dynamic.model.query.mq.FieldValueArray, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
+    open fun rawCount(fieldValueArray: FieldValueArray, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
         var expArr = fieldValueArray.map {
             eq(it.field,it.value)!!
         }.toTypedArray()
@@ -2068,22 +2072,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return this.queryCount(statement)
     }
 
-    open fun rawCount(criteria: dynamic.model.query.mq.ModelExpression?, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
+    open fun rawCount(criteria: ModelExpression?, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
         val (c,_)=this.beforeRead(criteria = criteria,model = this,useAccessControl = useAccessControl,partnerCache = partnerCache)
         var statement = select(fromModel = this).count().where(c)
         return this.queryCount(statement)
     }
-    open fun acCount(criteria: dynamic.model.query.mq.ModelExpression?, partnerCache:PartnerCache):Int{
+    open fun acCount(criteria: ModelExpression?, partnerCache:PartnerCache):Int{
         return this.rawCount(criteria,partnerCache,true)
     }
 
-    open fun rawMax(field: dynamic.model.query.mq.FieldBase, criteria: dynamic.model.query.mq.ModelExpression?=null, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Long?{
+    open fun rawMax(field: FieldBase, criteria: ModelExpression?=null, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Long?{
         val (c,_)=this.beforeRead(field,criteria = criteria,model = this,useAccessControl = useAccessControl,partnerCache = partnerCache)
         var statement = select(fromModel = this).max(dynamic.model.query.mq.aggregation.MaxExpression(field)).where(c)
         return this.queryMax(statement)
     }
 
-    open fun acMax(field: dynamic.model.query.mq.FieldBase, partnerCache:PartnerCache, criteria: dynamic.model.query.mq.ModelExpression?=null):Long?{
+    open fun acMax(field: FieldBase, partnerCache:PartnerCache, criteria: ModelExpression?=null):Long?{
         return this.rawMax(field,criteria,partnerCache,true)
     }
 
