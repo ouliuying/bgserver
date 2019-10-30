@@ -27,12 +27,13 @@ import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelExpression
 import dynamic.model.query.mq.ModelExpressionVisitor
 
-class SumExpression(val field: dynamic.model.query.mq.FieldBase): dynamic.model.query.mq.aggregation.AggExpression(field,aggName = "sum"){
-    override fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?): Boolean {
+class SumExpression(val field: FieldBase): AggExpression(field,aggName = "sum"){
+    override fun accept(visitor: ModelExpressionVisitor,
+                        parent: ModelExpression?): Boolean {
         visitor.visit(this,parent)
         return true
     }
-    override fun render(parent: dynamic.model.query.mq.ModelExpression?): Pair<String, Map<String, Any?>>? {
+    override fun render(parent: ModelExpression?): Pair<String, Map<String, Any?>>? {
         return null
     }
 }

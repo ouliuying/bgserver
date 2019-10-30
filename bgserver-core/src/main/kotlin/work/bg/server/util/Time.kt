@@ -21,15 +21,23 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.util
 
+import org.apache.commons.logging.LogFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
 object  Time{
+    private val logger = LogFactory.getLog(javaClass)
     fun now():Date{
         return Date()
     }
-    fun getDate(value:String):Date{
+    fun getDate(value:String?):Date?{
         var df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-       return  df.parse(value)
+        try {
+            return  df.parse(value)
+        }
+        catch (ex:Exception){
+            logger.error(ex.message)
+        }
+        return null
     }
 }

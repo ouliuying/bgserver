@@ -27,9 +27,11 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.mq.model.ModelBase
 
-class ModelTableColumnAliasNameGenerator : dynamic.model.query.mq.ModelTableColumnNameGenerator {
-    override fun generateColumnName(field: dynamic.model.query.mq.FieldBase?, onlyFieldName:Boolean): String {
+class ModelTableColumnAliasNameGenerator : ModelTableColumnNameGenerator {
+    private var namedParameterIndex = 0
+    override fun generateColumnName(field: FieldBase?, onlyFieldName:Boolean): String {
         //val name=
+
         return if(!onlyFieldName){
 
                 "${field?.model?.schemaName}.${field?.model?.tableName}.${field?.name}"
@@ -45,7 +47,8 @@ class ModelTableColumnAliasNameGenerator : dynamic.model.query.mq.ModelTableColu
         return "${model?.schemaName}.${model?.tableName}"
     }
 
-    override fun generateNamedParameter(columnName: String): String {
-        return ":$columnName"
+    override fun generateNamedParameter(columnName: String): Pair<String,String> {
+        namedParameterIndex++
+        return Pair(":$columnName$namedParameterIndex","$columnName$namedParameterIndex")
     }
 }

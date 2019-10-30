@@ -29,11 +29,11 @@ package dynamic.model.query.mq
 import dynamic.model.query.mq.model.ModelBase
 
 
-class SelectStatement constructor(vararg val selectFields: dynamic.model.query.mq.FieldBase, val fromModel: ModelBase): dynamic.model.query.mq.ModelExpression(){
-        var expression: dynamic.model.query.mq.ModelExpression?=null
+class SelectStatement constructor(vararg val selectFields: FieldBase, val fromModel: ModelBase): ModelExpression(){
+        var expression: ModelExpression?=null
         var joinModels:MutableList<dynamic.model.query.mq.join.JoinModel>?=null
-        var groupBy: dynamic.model.query.mq.GroupBy?=null
-        var orderBy: dynamic.model.query.mq.OrderBy?=null
+        var groupBy: GroupBy?=null
+        var orderBy: OrderBy?=null
         var offset:Int?=null
         var limit:Int?=null
         var countExpression: dynamic.model.query.mq.aggregation.CountExpression?=null
@@ -41,7 +41,7 @@ class SelectStatement constructor(vararg val selectFields: dynamic.model.query.m
         var maxExpressions:Array<out dynamic.model.query.mq.aggregation.MaxExpression>?=null
         var minExpressions:Array<out dynamic.model.query.mq.aggregation.MinExpression>?=null
         var sumExpressions:Array<out dynamic.model.query.mq.aggregation.SumExpression>?=null
-        fun count(countExpression: dynamic.model.query.mq.aggregation.CountExpression?=null): dynamic.model.query.mq.SelectStatement {
+        fun count(countExpression: dynamic.model.query.mq.aggregation.CountExpression?=null): SelectStatement {
             if(countExpression!=null){
                 this.countExpression=countExpression
             }
@@ -50,28 +50,28 @@ class SelectStatement constructor(vararg val selectFields: dynamic.model.query.m
             }
             return this
         }
-        fun avg(vararg avgExpression: dynamic.model.query.mq.aggregation.AvgExpression): dynamic.model.query.mq.SelectStatement {
+        fun avg(vararg avgExpression: dynamic.model.query.mq.aggregation.AvgExpression): SelectStatement {
             this.avgExpressions=avgExpression
             return this
         }
-        fun max(vararg maxExpression: dynamic.model.query.mq.aggregation.MaxExpression): dynamic.model.query.mq.SelectStatement {
+        fun max(vararg maxExpression: dynamic.model.query.mq.aggregation.MaxExpression): SelectStatement {
             this.maxExpressions=maxExpression
             return this
         }
-        fun min(vararg minExpression: dynamic.model.query.mq.aggregation.MinExpression): dynamic.model.query.mq.SelectStatement {
+        fun min(vararg minExpression: dynamic.model.query.mq.aggregation.MinExpression): SelectStatement {
             this.minExpressions=minExpression
             return this
         }
-        fun sum(vararg sumExpression: dynamic.model.query.mq.aggregation.SumExpression): dynamic.model.query.mq.SelectStatement {
+        fun sum(vararg sumExpression: dynamic.model.query.mq.aggregation.SumExpression): SelectStatement {
             this.sumExpressions=sumExpression
             return this
         }
-        fun where(expression: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.SelectStatement {
+        fun where(expression: ModelExpression?): SelectStatement {
             this.expression=expression
             return this
         }
 
-        fun join(joinModel: dynamic.model.query.mq.join.JoinModel?): dynamic.model.query.mq.SelectStatement {
+        fun join(joinModel: dynamic.model.query.mq.join.JoinModel?): SelectStatement {
             if (this.joinModels==null){
               this.joinModels= mutableListOf<dynamic.model.query.mq.join.JoinModel>()
             }
@@ -81,30 +81,30 @@ class SelectStatement constructor(vararg val selectFields: dynamic.model.query.m
             return this
         }
 
-        fun orderBy(orderBy: dynamic.model.query.mq.OrderBy?): dynamic.model.query.mq.SelectStatement {
+        fun orderBy(orderBy: OrderBy?): SelectStatement {
             this.orderBy= orderBy
             return this
         }
 
-        fun groupBy(groupBy: dynamic.model.query.mq.GroupBy?): dynamic.model.query.mq.SelectStatement {
+        fun groupBy(groupBy: GroupBy?): SelectStatement {
             this.groupBy=groupBy;
             return this
         }
-        fun offset(offset:Int?): dynamic.model.query.mq.SelectStatement {
+        fun offset(offset:Int?): SelectStatement {
             this.offset=offset
             return this
         }
-        fun limit(limit:Int?): dynamic.model.query.mq.SelectStatement {
+        fun limit(limit:Int?): SelectStatement {
             this.limit=limit
             return this
         }
-        override fun render(parent: dynamic.model.query.mq.ModelExpression?):Pair<String,Map<String, dynamic.model.query.mq.FieldValue>>?{
-            var render= dynamic.model.query.mq.ModelCriteriaRender()
+        override fun render(parent: ModelExpression?):Pair<String,Map<String, FieldValue>>?{
+            var render= ModelCriteriaRender()
             this.accept(render,parent)
             return Pair(render.namedSql.toString(),render.namedParameters)
         }
 
-        override fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?): Boolean {
+        override fun accept(visitor: ModelExpressionVisitor, parent: ModelExpression?): Boolean {
             // TODO("not implemented")
             // To change body of created functions use File | Settings | File Templates.
             visitor.visit(this,parent)

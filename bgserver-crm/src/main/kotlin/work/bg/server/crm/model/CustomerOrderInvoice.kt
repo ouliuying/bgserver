@@ -64,7 +64,8 @@ open class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","publi
     val amount= ModelField(null,
             "amount",
             FieldType.NUMBER,
-            "金额")
+            "金额",
+            defaultValue = 0)
 
     val accountPartner = ModelMany2OneField(null,
             "partner_id",

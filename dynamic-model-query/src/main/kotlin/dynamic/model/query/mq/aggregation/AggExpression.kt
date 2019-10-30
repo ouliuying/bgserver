@@ -28,6 +28,6 @@ package dynamic.model.query.mq.aggregation
 import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelExpression
 
-abstract  class AggExpression(vararg val fields: dynamic.model.query.mq.FieldBase?, val aggName:String): dynamic.model.query.mq.ModelExpression(){
+abstract  class AggExpression(vararg val fields: FieldBase?, val aggName:String): ModelExpression(){
 
 }

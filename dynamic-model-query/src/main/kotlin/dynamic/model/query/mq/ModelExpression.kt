@@ -23,8 +23,8 @@
 
 package dynamic.model.query.mq
 
-abstract class ModelExpression constructor(vararg val subExpressions: dynamic.model.query.mq.ModelExpression){
-    abstract  fun render(parent: dynamic.model.query.mq.ModelExpression?):Pair<String,Map<String,Any?>>?
-    abstract  fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?):Boolean;
+abstract class ModelExpression constructor(vararg val subExpressions: ModelExpression){
+    abstract  fun render(parent: ModelExpression?):Pair<String,Map<String,Any?>>?
+    abstract  fun accept(visitor: ModelExpressionVisitor, parent: ModelExpression?):Boolean;
     //abstract  fun hasClosure(parent:ModelExpression?):Boolean;
 }

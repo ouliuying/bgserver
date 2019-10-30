@@ -1,5 +1,3 @@
-
-
 /*
  *
  *  *
@@ -23,19 +21,27 @@
  *
  */
 
-package dynamic.model.query.mq.aggregation
+package work.bg.server.account.model
 
-import dynamic.model.query.mq.FieldBase
-import dynamic.model.query.mq.ModelExpression
-import dynamic.model.query.mq.ModelExpressionVisitor
+import com.google.gson.JsonObject
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.web.spring.boot.annotation.Action
+import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
+import org.springframework.web.bind.annotation.RequestBody
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.ContextModel
 
-class MinExpression (val field: FieldBase):AggExpression(field,aggName = "min"){
-    override fun accept(visitor: ModelExpressionVisitor, parent: ModelExpression?): Boolean {
-        visitor.visit(this,parent)
-        return true
+@Model("accountApi")
+class AccountApi:ContextModel("account_api","public") {
+    companion object: RefSingleton<AccountApi> {
+        override lateinit var ref: AccountApi
     }
+    @Action("loadTopListData")
+    fun loadTopListData(@RequestBody data: JsonObject?,
+                        partnerCache: PartnerCache):Any?{
+        var ar=ActionResult()
 
-    override fun render(parent: ModelExpression?): Pair<String, Map<String, Any?>>? {
-        return null
+        return ar
     }
 }

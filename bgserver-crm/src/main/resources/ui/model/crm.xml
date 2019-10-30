@@ -742,9 +742,9 @@
         <view type="list">
             <ref>
                 <actions>
-                    <action>
-                        <group name="main" refType="main|sub"/>
-                    </action>
+<!--                    <action>-->
+<!--                        <group name="main" refType="main|sub"/>-->
+<!--                    </action>-->
                     <action>
                         <group name="opAction" refType="main|sub"/>
                     </action>

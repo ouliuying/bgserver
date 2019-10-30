@@ -39,6 +39,7 @@ import work.bg.server.kafka.SmsClient
 import work.bg.server.sms.bean.DefaultSmsSender
 import java.io.StringReader
 import java.lang.Exception
+import java.util.*
 
 @Model("sms")
 class Sms:ContextModel("sms","public") {
@@ -79,7 +80,7 @@ class Sms:ContextModel("sms","public") {
             var timeingDate=work.bg.server.util.Time.getDate(timerValue)
             smsSender.timingSendOnce(arrayListOf(*mobileList),message = message,
                     repeatFilter = rmRepeat,
-                    timingDate = timeingDate,useAccessControl = true,partnerCache = partnerCache)
+                    timingDate = timeingDate?: Date(),useAccessControl = true,partnerCache = partnerCache)
         }
         return ar
     }
@@ -114,7 +115,7 @@ class Sms:ContextModel("sms","public") {
             var timeingDate=work.bg.server.util.Time.getDate(timerValue)
             smsSender.timingSendFileOnce(fileEntity.getFieldValue(StorageEntity.ref.serverPath) as String,message = message,
                     repeatFilter = rmRepeat,
-                    timingDate = timeingDate,useAccessControl = true,partnerCache = partnerCache)
+                    timingDate = timeingDate?:Date(),useAccessControl = true,partnerCache = partnerCache)
         }
         return ar
     }

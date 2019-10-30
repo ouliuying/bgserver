@@ -33,6 +33,7 @@ class Worktable:ContextModel("worktable","public") {
     companion object : RefSingleton<Worktable> {
         override lateinit var ref: Worktable
     }
+
     @Action("loadModelLog")
     fun loadModelLog(session: HttpSession):Any?{
         var ar= ActionResult()

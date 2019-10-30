@@ -25,13 +25,14 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.mq.aggregation.AggExpression
 import dynamic.model.query.mq.aggregation.CountExpression
+import dynamic.model.query.mq.condition.IsExpression
 import dynamic.model.query.mq.condition.constant.BooleanExpression
 import dynamic.model.query.mq.condition.constant.StringExpression
 import dynamic.model.query.mq.join.JoinModel
 import dynamic.model.query.mq.logical.AndExpression
 import dynamic.model.query.mq.logical.OrExpression
 
-class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
+class ModelCriteriaRender: ModelExpressionVisitor {
 
      internal object  GRAMMARKEYS
      {
@@ -76,40 +77,40 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
          const val ASTERISK = " * "
          const val CREATE_RETURN_ID=" RETURNING id"
     }
-    var tableColumnNameGenerator: dynamic.model.query.mq.ModelTableColumnNameGenerator = dynamic.model.query.mq.ModelTableColumnAliasNameGenerator()
+    var tableColumnNameGenerator: ModelTableColumnNameGenerator = ModelTableColumnAliasNameGenerator()
     var namedSql:StringBuilder = StringBuilder()
-    var namedParameters:MutableMap<String, dynamic.model.query.mq.FieldValue> = mutableMapOf()
+    var namedParameters:MutableMap<String, FieldValue> = mutableMapOf()
     init {
 
     }
-    override fun visit(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?) =//TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun visit(expression: ModelExpression?, parent: ModelExpression?) =//TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             when (expression) {
-                is dynamic.model.query.mq.SelectStatement -> {
-                    this.buildSelect(expression as dynamic.model.query.mq.SelectStatement,parent)
+                is SelectStatement -> {
+                    this.buildSelect(expression as SelectStatement,parent)
                 }
-                is dynamic.model.query.mq.UpdateStatement ->{
+                is UpdateStatement ->{
                     this.buildUpdate(expression,parent)
                 }
-                is dynamic.model.query.mq.CreateStatement ->{
+                is CreateStatement ->{
                     this.buildCreate(expression,parent)
                 }
-                is dynamic.model.query.mq.DeleteStatement ->{
+                is DeleteStatement ->{
                     this.buildDelete(expression,parent)
                 }
-                is dynamic.model.query.mq.join.JoinModel -> {
-                    var jm=expression as dynamic.model.query.mq.join.JoinModel
+                is JoinModel -> {
+                    var jm=expression as JoinModel
                     this.buildJoinModel(jm,parent)
                 }
-                is dynamic.model.query.mq.FieldBase -> {
+                is FieldBase -> {
                     this.buildField(expression,parent)
                 }
-                is dynamic.model.query.mq.GroupBy ->{
+                is GroupBy ->{
                     this.buildGroupBy(expression,parent)
                 }
-                is dynamic.model.query.mq.OrderBy ->{
+                is OrderBy ->{
                     this.buildOrderBy(expression,parent)
                 }
-                is dynamic.model.query.mq.OrderBy.OrderField ->{
+                is OrderBy.OrderField ->{
                     this.buildOrderByField(expression,parent)
                 }
                 is dynamic.model.query.mq.condition.CheckValueExpression ->{
@@ -130,24 +131,24 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
                 is AndExpression ->{
                     this.buildAndExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.constant.BooleanExpression ->{
+                is BooleanExpression ->{
                     this.buildBooleanExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.constant.StringExpression ->{
+                is StringExpression ->{
                     this.buildStringExpression(expression,parent)
                 }
                 is OrExpression ->{
                     this.buildOrExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.aggregation.AggExpression ->{
+                is AggExpression ->{
                     this.buildAggExpression(expression,parent)
                 }
                 else -> {
 
                 }
             }
-    private fun buildBooleanExpression(expression: dynamic.model.query.mq.condition.constant.BooleanExpression?,
-                                       parent: dynamic.model.query.mq.ModelExpression?){
+    private fun buildBooleanExpression(expression: BooleanExpression?,
+                                       parent: ModelExpression?){
      if(expression!=null && expression.value) {
         this.namedSql.append(" true ")
      }
@@ -156,11 +157,11 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
      }
     }
     private fun  escapeSqlInject(value:String):String{
-        return dynamic.model.query.mq.SqlUtil.Companion.escapeSqlString(value)
+        return SqlUtil.escapeSqlString(value)
     }
 
-    private fun buildStringExpression(expression: dynamic.model.query.mq.condition.constant.StringExpression?,
-                                      parent: dynamic.model.query.mq.ModelExpression?){
+    private fun buildStringExpression(expression: StringExpression?,
+                                      parent: ModelExpression?){
         if(expression!=null && expression.value!=""){
             this.namedSql.append("\'")
             this.namedSql.append(this.escapeSqlInject(expression.value))
@@ -169,116 +170,116 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
     }
 
     // expression?.accept(this)
-    private fun buildAggExpression(expression: dynamic.model.query.mq.aggregation.AggExpression?, parent: dynamic.model.query.mq.ModelExpression?){
-        if(expression !is dynamic.model.query.mq.aggregation.CountExpression){
+    private fun buildAggExpression(expression: AggExpression?, parent: ModelExpression?){
+        if(expression !is CountExpression){
             if (expression?.fields?.size==1){
                 var columnName=this.tableColumnNameGenerator.generateColumnName(expression?.fields?.first())
                 this.namedSql.append(expression?.aggName);
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                 this.namedSql.append(columnName)
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
+                this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
             }
         }
         else{
             this.namedSql.append(expression?.aggName);
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
             if (expression?.fields?.size<1){
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ALL)
+                this.namedSql.append(GRAMMARKEYS.ALL)
             }else{
                 expression?.fields?.forEach {
                     var columnName=this.tableColumnNameGenerator.generateColumnName(it)
                     this.namedSql.append(columnName)
-                    this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                    this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                 }
             }
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
         }
     }
-    private  fun buildAndExpression(andExpression:AndExpression,parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildAndExpression(andExpression:AndExpression,parent: ModelExpression?){
         var hasClosure=false
         if(parent is AndExpression || parent is OrExpression){
             hasClosure=true
         }
         if(hasClosure){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX);
         }
 
         andExpression.subExpressions?.forEach{
             this.accept(it,andExpression)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.AND)
+            this.namedSql.append(GRAMMARKEYS.AND)
         }
-        this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.AND))
+        this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.AND))
 
         if(hasClosure){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX);
         }
     }
-    private  fun buildOrExpression(orExpression:OrExpression,parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildOrExpression(orExpression:OrExpression,parent: ModelExpression?){
         var hasClosure=false
         if(parent is AndExpression || parent is OrExpression){
             hasClosure=true
         }
         if(hasClosure){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX);
         }
 
         orExpression.subExpressions?.forEach{
             this.accept(it,orExpression)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.OR)
+            this.namedSql.append(GRAMMARKEYS.OR)
         }
-        this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.OR))
+        this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.OR))
 
         if(hasClosure){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
         }
     }
-    private fun buildIsExpression(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?){
-        if (expression is dynamic.model.query.mq.condition.IsExpression){
+    private fun buildIsExpression(expression: ModelExpression?, parent: ModelExpression?){
+        if (expression is IsExpression){
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.IsExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.IS)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            this.namedSql.append(GRAMMARKEYS.IS)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue(expression.field, expression.value)
+            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.IsNotExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.IS_NOT)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            this.namedSql.append(GRAMMARKEYS.IS_NOT)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue(expression.field, expression.value)
+            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
         }
     }
-    private  fun buildLikeExpression(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildLikeExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is dynamic.model.query.mq.condition.LikeExpression){
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.LikeExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.LIKE)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            this.namedSql.append(GRAMMARKEYS.LIKE)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.LikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.LikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.LikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.LikeExpression).value + "%")
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotLikeExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.NOT_LIKE)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            this.namedSql.append(GRAMMARKEYS.NOT_LIKE)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.NotLikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.NotLikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.NotLikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.NotLikeExpression).value + "%")
         }
     }
-    private  fun buildInExpression(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildInExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is dynamic.model.query.mq.condition.InExpression){
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.InExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.IN)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
-            if((expression as dynamic.model.query.mq.condition.InExpression).valueSet!=null)
+            this.namedSql.append(GRAMMARKEYS.IN)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
+            if(expression.valueSet!=null)
             {
-                var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+                var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedColumnName)
-                this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.InExpression).field, (expression as dynamic.model.query.mq.condition.InExpression).valueSet)
+                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
             }
             else{
                 this.accept((expression as dynamic.model.query.mq.condition.InExpression).criteria,expression)
@@ -287,98 +288,98 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotInExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.NOT_IN)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+            this.namedSql.append(GRAMMARKEYS.NOT_IN)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
             if((expression as dynamic.model.query.mq.condition.NotInExpression).valueSet!=null)
             {
-                var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+                var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedColumnName)
-                this.namedParameters[columnName]= dynamic.model.query.mq.FieldValue((expression as dynamic.model.query.mq.condition.NotInExpression).field, (expression as dynamic.model.query.mq.condition.NotInExpression).valueSet)
+                this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.NotInExpression).field, (expression as dynamic.model.query.mq.condition.NotInExpression).valueSet)
             }
             else{
                 this.accept((expression as dynamic.model.query.mq.condition.NotInExpression).criteria,expression)
             }
         }
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
+        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
     }
-    private  fun buildExistsExpression(expression: dynamic.model.query.mq.ModelExpression, parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildExistsExpression(expression: ModelExpression, parent: ModelExpression?){
 
         if (expression is dynamic.model.query.mq.condition.ExistsExpression){
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.ExistsExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.EXISTS)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+            this.namedSql.append(GRAMMARKEYS.EXISTS)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
             this.accept((expression as dynamic.model.query.mq.condition.ExistsExpression).criteria,expression)
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotExistsExpression).field)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.NOT_EXISTS)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+            this.namedSql.append(GRAMMARKEYS.NOT_EXISTS)
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
             this.accept((expression as dynamic.model.query.mq.condition.NotExistsExpression).criteria,expression)
         }
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
+        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
     }
-    private fun buildCheckValueExpression(checkValueExpression: dynamic.model.query.mq.condition.CheckValueExpression, parent: dynamic.model.query.mq.ModelExpression?){
+    private fun buildCheckValueExpression(checkValueExpression: dynamic.model.query.mq.condition.CheckValueExpression, parent: ModelExpression?){
         var columnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.field)
         this.namedSql.append(columnName)
         this.namedSql.append(checkValueExpression.operator)
         when(checkValueExpression.value){
-            is dynamic.model.query.mq.FieldBase ->{
-                val vColumnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.value as dynamic.model.query.mq.FieldBase)
+            is FieldBase ->{
+                val vColumnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.value as FieldBase)
                 this.namedSql.append(vColumnName)
             }
             else->{
-                var namedParameter=this.tableColumnNameGenerator.generateNamedParameter(columnName)
-                this.namedSql.append(namedParameter)
-                this.namedParameters[columnName] = dynamic.model.query.mq.FieldValue(checkValueExpression.field, checkValueExpression.value)
+                var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+                this.namedSql.append(namedColumnName)
+                this.namedParameters[ColumnKeyName] = FieldValue(checkValueExpression.field, checkValueExpression.value)
             }
         }
     }
-    private  fun buildOrderByField(orderByField: dynamic.model.query.mq.OrderBy.OrderField, parent: dynamic.model.query.mq.ModelExpression?){
+    private  fun buildOrderByField(orderByField: OrderBy.OrderField, parent: ModelExpression?){
         var columnName=this.tableColumnNameGenerator.generateColumnName(orderByField.field)
         this.namedSql.append(columnName)
         when(orderByField.orderType){
-            dynamic.model.query.mq.OrderBy.Companion.OrderType.ASC ->{
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ORDER_BY_ASC)
+            OrderBy.Companion.OrderType.ASC ->{
+                this.namedSql.append(GRAMMARKEYS.ORDER_BY_ASC)
             }
-            dynamic.model.query.mq.OrderBy.Companion.OrderType.DESC ->{
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ORDER_BY_DESC)
+            OrderBy.Companion.OrderType.DESC ->{
+                this.namedSql.append(GRAMMARKEYS.ORDER_BY_DESC)
             }
         }
     }
-    private  fun buildOrderBy(orderBy: dynamic.model.query.mq.OrderBy, parent: dynamic.model.query.mq.ModelExpression?) {
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ORDER_BY)
+    private  fun buildOrderBy(orderBy: OrderBy, parent: ModelExpression?) {
+        this.namedSql.append(GRAMMARKEYS.ORDER_BY)
         orderBy.fields?.forEach {
             this.accept(it,orderBy)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+            this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
         }
         if (orderBy.fields?.size>0){
-            this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA))
+            this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         }
     }
-    private fun buildGroupBy(groupBy: dynamic.model.query.mq.GroupBy, parent: dynamic.model.query.mq.ModelExpression?) {
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.GROUP_BY)
+    private fun buildGroupBy(groupBy: GroupBy, parent: ModelExpression?) {
+        this.namedSql.append(GRAMMARKEYS.GROUP_BY)
         groupBy.fields?.forEach {
             accept(it,groupBy)
         }
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.HAVING)
+        this.namedSql.append(GRAMMARKEYS.HAVING)
         this.accept(groupBy.havingCriteria,groupBy)
     }
-    private fun buildField(field: dynamic.model.query.mq.FieldBase, parent: dynamic.model.query.mq.ModelExpression?){
+    private fun buildField(field: FieldBase, parent: ModelExpression?){
         var columnName=this.tableColumnNameGenerator.generateColumnName(field)
         this.namedSql.append(columnName)
     }
-    private fun buildJoinModel(joinModel: dynamic.model.query.mq.join.JoinModel, parent: dynamic.model.query.mq.ModelExpression?) {
+    private fun buildJoinModel(joinModel: JoinModel, parent: ModelExpression?) {
         this.namedSql.append(joinModel.operator);
         var tableName=this.tableColumnNameGenerator.generateTableName(joinModel.model)
         this.namedSql.append(tableName)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ON)
+        this.namedSql.append(GRAMMARKEYS.ON)
         joinModel.subExpressions?.forEach {
             this.accept(it,joinModel)
         }
     }
-    private fun accept(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?)
+    private fun accept(expression: ModelExpression?, parent: ModelExpression?)
     {
         if(expression!=null && !expression.accept(this,parent)){
             TODO("invoke render method!")
@@ -397,144 +398,144 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
 //            }
         }
     }
-    private  fun buildDelete(delete: dynamic.model.query.mq.DeleteStatement, parent: dynamic.model.query.mq.ModelExpression?){
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.DELETE)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FROM)
+    private  fun buildDelete(delete: DeleteStatement, parent: ModelExpression?){
+        this.namedSql.append(GRAMMARKEYS.DELETE)
+        this.namedSql.append(GRAMMARKEYS.FROM)
         var tableName=this.tableColumnNameGenerator.generateTableName(delete.fromModel)
         this.namedSql.append(tableName)
         if (delete.whereExpression!=null){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.WHERE)
+            this.namedSql.append(GRAMMARKEYS.WHERE)
         }
         this.accept(delete.whereExpression,delete)
     }
-    private fun buildCreate(create: dynamic.model.query.mq.CreateStatement, parent: dynamic.model.query.mq.ModelExpression?){
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.INSERT)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.INTO)
+    private fun buildCreate(create: CreateStatement, parent: ModelExpression?){
+        this.namedSql.append(GRAMMARKEYS.INSERT)
+        this.namedSql.append(GRAMMARKEYS.INTO)
         var tableName=this.tableColumnNameGenerator.generateTableName(create.model)
         this.namedSql.append(tableName)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX.trim())
+        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX.trim())
         var values= mutableListOf<String>()
         create.fieldValues.forEach {
             var columnName=this.tableColumnNameGenerator.generateColumnName(it.field,true)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
-            this.namedParameters[columnName]=it
+            this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
+            this.namedParameters[ColumnKeyName]=it
             values.add(namedColumnName)
         }
         this.namedSql = StringBuilder(this.namedSql.removeSuffix(","))
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-        this.namedSql=java.lang.StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA))
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.VALUES)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX.trim())
-        this.namedSql.append(values.joinToString(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA.trim()))
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX.trim())
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.CREATE_RETURN_ID)
+        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+        this.namedSql=java.lang.StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
+        this.namedSql.append(GRAMMARKEYS.VALUES)
+        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX.trim())
+        this.namedSql.append(values.joinToString(GRAMMARKEYS.FIELD_COMMA.trim()))
+        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX.trim())
+        this.namedSql.append(GRAMMARKEYS.CREATE_RETURN_ID)
     }
-    private  fun buildUpdate(update: dynamic.model.query.mq.UpdateStatement, parent: dynamic.model.query.mq.ModelExpression?){
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.UPDATE)
+    private  fun buildUpdate(update: UpdateStatement, parent: ModelExpression?){
+        this.namedSql.append(GRAMMARKEYS.UPDATE)
         var tableName=this.tableColumnNameGenerator.generateTableName(update.setModel)
         this.namedSql.append(tableName)
-        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.SET)
+        this.namedSql.append(GRAMMARKEYS.SET)
         update.fieldValues.forEach {
             var columnName=this.tableColumnNameGenerator.generateColumnName(it.field,true)
-            var namedColumnName=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(columnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ASSIGN)
+            this.namedSql.append(GRAMMARKEYS.ASSIGN)
             this.namedSql.append(namedColumnName)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
-            this.namedParameters[columnName]=it
+            this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
+            this.namedParameters[ColumnKeyName]=it
         }
-        this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA))
+        this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         if(update.whereExpression!=null){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.WHERE)
+            this.namedSql.append(GRAMMARKEYS.WHERE)
         }
         this.accept(update.whereExpression,update)
 
     }
-    private fun buildSelect(select: dynamic.model.query.mq.SelectStatement, parent: dynamic.model.query.mq.ModelExpression?){
+    private fun buildSelect(select: SelectStatement, parent: ModelExpression?){
 
 //        var hasClosure=select.hasClosure(parent)
 //        if (hasClosure){
 //            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
 //        }
         if(select.selectFields!=null && select.selectFields.count()>0){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.SELECT)
+            this.namedSql.append(GRAMMARKEYS.SELECT)
         }
         else if(select.countExpression!=null||select.maxExpressions!=null
                 ||select.minExpressions!=null||select.avgExpressions!=null
                 ||select.sumExpressions!=null){
-                this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.SELECT)
+                this.namedSql.append(GRAMMARKEYS.SELECT)
                 if (select.countExpression!=null){
-                    this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.COUNT)
-                    this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                    this.namedSql.append(GRAMMARKEYS.COUNT)
+                    this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                     if(select.countExpression!!.field!=null){
                         this.namedSql.append(select.countExpression!!.field!!.name)
                     }
                     else{
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.ASTERISK)
+                        this.namedSql.append(GRAMMARKEYS.ASTERISK)
                     }
-                    this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-                    this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                    this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+                    this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                 }
 
                 select.maxExpressions?.forEach {
                     if(it.field!=null){
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.MAX)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                        this.namedSql.append(GRAMMARKEYS.MAX)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                         this.namedSql.append(it.field!!.name)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+                        this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
                 }
                 select.minExpressions?.forEach {
                     if(it.field!=null){
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.MIN)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                        this.namedSql.append(GRAMMARKEYS.MIN)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                         this.namedSql.append(it.field!!.name)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+                        this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
                 }
                 select.avgExpressions?.forEach {
                     if(it.field!=null){
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.AVG)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                        this.namedSql.append(GRAMMARKEYS.AVG)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                         this.namedSql.append(it.field!!.name)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+                        this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
                 }
                 select.sumExpressions?.forEach {
                     if(it.field!=null){
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.SUM)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_PREFIX)
+                        this.namedSql.append(GRAMMARKEYS.SUM)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                         this.namedSql.append(it.field!!.name)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.BRACKET_SUFFIX)
-                        this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+                        this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
+                        this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
                 }
-            this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA))
+            this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         }
         else
         {
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.SELECT_ALL)
+            this.namedSql.append(GRAMMARKEYS.SELECT_ALL)
         }
 
 
 
         select.selectFields?.forEach {
             this.accept(it,select)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA)
+            this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
         }
 
         if (select.selectFields?.size>0){
-            this.namedSql=StringBuilder(this.namedSql.removeSuffix(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FIELD_COMMA))
+            this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         }
 
         if(select.fromModel!=null){
             var tableName=this.tableColumnNameGenerator.generateTableName(select.fromModel)
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.FROM)
+            this.namedSql.append(GRAMMARKEYS.FROM)
             this.namedSql.append(tableName)
         }
 
@@ -543,7 +544,7 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
             this.accept(it,select)
         }
         if(select.expression!=null){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.WHERE)
+            this.namedSql.append(GRAMMARKEYS.WHERE)
         }
         this.accept(select.expression,select)
 
@@ -552,11 +553,11 @@ class ModelCriteriaRender: dynamic.model.query.mq.ModelExpressionVisitor {
         this.accept(select.orderBy,select)
 
         if(select.offset!=null){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.OFFSET)
+            this.namedSql.append(GRAMMARKEYS.OFFSET)
             this.namedSql.append(select.offset!!)
         }
         if(select.limit!=null){
-            this.namedSql.append(dynamic.model.query.mq.ModelCriteriaRender.GRAMMARKEYS.LIMIT)
+            this.namedSql.append(GRAMMARKEYS.LIMIT)
             this.namedSql.append(select.limit!!)
         }
 //        if(hasClosure){
