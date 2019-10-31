@@ -25,10 +25,12 @@ package dynamic.model.query.mq.model
 
 import dynamic.model.query.constant.ModelReservedKey
 import dynamic.model.query.mq.*
+import dynamic.model.query.mq.aggregation.SumExpression
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.ResultSetExtractor
+import org.springframework.jdbc.core.RowCallbackHandler
 import org.springframework.jdbc.core.SqlParameterValue
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.sql.JDBCType
@@ -366,6 +368,17 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 it.next()
                 it.getInt(1)
             })
+    }
+
+
+    open fun query(select: SelectStatement,handler:RowCallbackHandler){
+        var render = select.render(null)
+        var kParameters=this.fieldValueToParameters(render!!.second)
+        var sql=render!!.first
+        return if(kParameters!=null)
+            return this.namedParameterJdbcTemplate?.query(sql, kParameters, handler)
+        else
+            return this.namedParameterJdbcTemplate?.query(sql, handler)
     }
 
    open fun queryMax(select: SelectStatement):Long?{

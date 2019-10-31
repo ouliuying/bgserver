@@ -23,6 +23,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -41,6 +42,7 @@ import dynamic.model.web.spring.boot.model.ReadActionParam
 import work.bg.server.core.ui.*
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
+import work.bg.server.util.Time
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
@@ -59,7 +61,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
      *  actions begin
      */
     @Action(name="edit")
-    open fun editAction(@RequestBody modelData: dynamic.model.query.mq.ModelData?, pc:PartnerCache): ActionResult?{
+    open fun editAction(@RequestBody modelData: ModelData?, pc:PartnerCache): ActionResult?{
         var ar= ActionResult()
         if(modelData!=null){
             var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
@@ -77,7 +79,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     open fun listAction(@RequestBody param: ReadActionParam, pc:PartnerCache):ActionResult?{
         var ar=ActionResult()
         var fields= param.fields?:arrayListOf()
-        var attachFields:Array<dynamic.model.query.mq.AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
+        var attachFields:Array<AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
         var modelData=this.acRead(*fields.toTypedArray(),
                 model=this,
                 criteria = param.criteria,
@@ -90,7 +92,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
 
     @Action(name="create")
-    open fun createAction(@RequestBody modelData: dynamic.model.query.mq.ModelData?, pc:PartnerCache):ActionResult?{
+    open fun createAction(@RequestBody modelData: ModelData?, pc:PartnerCache):ActionResult?{
         var ar=ActionResult()
         if(modelData!=null){
             var ret=this.acCreate(modelData,pc)
@@ -109,7 +111,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     open fun readAction(@RequestBody param: ReadActionParam, pc:PartnerCache):ActionResult?{
         var ar=ActionResult()
         var fields= param.fields?:arrayListOf()
-        var attachFields:Array<dynamic.model.query.mq.AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
+        var attachFields:Array<AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
         var modelData=this.acRead(*fields.toTypedArray(),
                 model=this,
                 criteria = param.criteria,
@@ -127,10 +129,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar = ActionResult()
         val id = data["id"]?.asLong
         id?.let {
-            var fdarr = dynamic.model.query.mq.FieldValueArray()
+            var fdarr = FieldValueArray()
             val idField = this.fields!!.getIdField()!!
             fdarr.setValue(idField,id)
-            var  mo = dynamic.model.query.mq.ModelDataObject(model = this, data = fdarr)
+            var  mo = ModelDataObject(model = this, data = fdarr)
             val criteria = eq(idField,id)
             var ret= this.acDelete(mo,criteria=criteria,partnerCache = pc)
             ret?.first?.let {
@@ -158,10 +160,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         ar.bag = this.loadMainViewType(app,model,viewType,ownerFieldValue,toField,ownerModelID,pc,reqData,viewRefType)
         return ar
     }
-    private  fun getMany2ManyFieldByRelationModel(model: ModelBase, relationModel:ModelBase, ownerField: dynamic.model.query.mq.FieldBase): dynamic.model.query.mq.ModelMany2ManyField?{
+    private  fun getMany2ManyFieldByRelationModel(model: ModelBase, relationModel:ModelBase, ownerField: FieldBase): ModelMany2ManyField?{
             val ownerModel = ownerField.model!!
             model.fields?.forEach {
-                if(it is dynamic.model.query.mq.ModelMany2ManyField){
+                if(it is ModelMany2ManyField){
                     if(it.relationModelTable==relationModel.fullTableName && it.targetModelFieldName=="id" &&
                             it.targetModelTable==ownerModel.fullTableName){
                         return it
@@ -171,10 +173,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return null
     }
 
-    private  fun getRelationModelMany2OneFieldToOwnerFieldModel(relationModel:ModelBase,ownerField: dynamic.model.query.mq.FieldBase): dynamic.model.query.mq.FieldBase?{
+    private  fun getRelationModelMany2OneFieldToOwnerFieldModel(relationModel:ModelBase,ownerField: FieldBase): FieldBase?{
         val ownerModel = ownerField.model!!
         relationModel.fields?.forEach {
-            if(it is dynamic.model.query.mq.ModelMany2OneField && it.targetModelTable==ownerModel.fullTableName && it.targetModelFieldName=="id"){
+            if(it is ModelMany2OneField && it.targetModelTable==ownerModel.fullTableName && it.targetModelFieldName=="id"){
                 return it
             }
         }
@@ -192,7 +194,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 val ownerFieldObject = this.appModel.getModel(ownerApp,ownerModel)?.fields?.getFieldByPropertyName(ownerFieldName)
                 if(ownerFieldObject!=null){
                     var refField = when(ownerFieldObject){
-                        is dynamic.model.query.mq.ModelMany2ManyField ->{
+                        is ModelMany2ManyField ->{
                             var relationModel = this.appModel.getModel(ownerFieldObject.relationModelTable!!)
                             var targetModel = this.appModel.getModel(ownerFieldObject.targetModelTable!!)
                             if(relationModel!=null && relationModel.meta.appName == app && relationModel.meta.name == model){
@@ -206,8 +208,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                 null
                             }
                         }
-                        is dynamic.model.query.mq.ModelOne2ManyField,is dynamic.model.query.mq.ModelMany2OneField,is dynamic.model.query.mq.ModelOne2OneField ->{
-                            var targetModel = this.appModel.getModel((ownerFieldObject as dynamic.model.query.mq.RefTargetField).targetModelTable!!)
+                        is ModelOne2ManyField,is ModelMany2OneField,is ModelOne2OneField ->{
+                            var targetModel = this.appModel.getModel((ownerFieldObject as RefTargetField).targetModelTable!!)
                             if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name==model){
                                 targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
                             }
@@ -219,9 +221,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     }
                     if(refField!=null) return if(it.has("value")){
                         val ownerValue =  it["value"]?.asLong
-                        Pair(dynamic.model.query.mq.FieldValue(ownerFieldObject, ownerValue),refField)
+                        Pair(FieldValue(ownerFieldObject, ownerValue),refField)
                     } else{
-                        Pair(dynamic.model.query.mq.FieldValue(ownerFieldObject, dynamic.model.query.mq.Undefined),refField)
+                        Pair(FieldValue(ownerFieldObject, Undefined),refField)
                     }
                 }
             }
@@ -229,7 +231,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return Pair(null,null)
     }
 
-    protected open fun controlModelViewStatusWithOwnerField(mv:ModelView?, toField: dynamic.model.query.mq.FieldBase?, ownerFieldValue: dynamic.model.query.mq.FieldValue?, ownerModelID:Long?, pc:PartnerCache){
+    protected open fun controlModelViewStatusWithOwnerField(mv:ModelView?, toField: FieldBase?, ownerFieldValue: FieldValue?, ownerModelID:Long?, pc:PartnerCache){
         if(mv!=null && toField!=null){
             mv.fields.map {
                 if(it.name == toField.propertyName){
@@ -240,8 +242,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
     private fun loadMainViewType(app:String, model:String,
                                  viewType:String,
-                                 ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                 toField: dynamic.model.query.mq.FieldBase?,
+                                 ownerFieldValue: FieldValue?,
+                                 toField: FieldBase?,
                                  ownerModelID:Long?,
                                  pc:PartnerCache,
                                  reqData:JsonObject?, viewRefType:String?=null):MutableMap<String,Any>{
@@ -287,8 +289,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
 
     private fun loadRefViewType(refView:ModelView.RefView,
                                 pc:PartnerCache,
-                                ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                toField: dynamic.model.query.mq.FieldBase?,
+                                ownerFieldValue: FieldValue?,
+                                toField: FieldBase?,
                                 ownerModelID: Long?,
                                 reqData:JsonObject?,
                                 reqRefTypeArray:List<String>,
@@ -348,10 +350,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return triggerGroups.toTypedArray()
     }
 
-    protected  open fun fillModelViewMeta(mv:ModelView, modelData: dynamic.model.query.mq.ModelData?, viewData:MutableMap<String,Any>,
+    protected  open fun fillModelViewMeta(mv:ModelView, modelData: ModelData?, viewData:MutableMap<String,Any>,
                                           pc:PartnerCache,
-                                          ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                          toField: dynamic.model.query.mq.FieldBase?,
+                                          ownerFieldValue: FieldValue?,
+                                          toField: FieldBase?,
                                           ownerModelID: Long?,
                                           reqData: JsonObject?):ModelView{
 
@@ -373,13 +375,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return mv
     }
     protected  open fun fillDetailModelViewMeta(mv:ModelView,
-                                                modelData: dynamic.model.query.mq.ModelData?,
+                                                modelData: ModelData?,
                                                 viewData:MutableMap<String,Any>,
                                                 pc:PartnerCache,
-                                                ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                                toField: dynamic.model.query.mq.FieldBase?,
+                                                ownerFieldValue: FieldValue?,
+                                                toField: FieldBase?,
                                                 reqData: JsonObject?):ModelView{
-        var modelDataObject  = modelData as dynamic.model.query.mq.ModelDataObject?
+        var modelDataObject  = modelData as ModelDataObject?
         mv.fields.forEach {mvi->
             when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
@@ -391,7 +393,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             modelData != null) {
                         if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many){
                             var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
-                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as dynamic.model.query.mq.ModelMany2ManyField?
+                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as ModelMany2ManyField?
                             var relationModel = this.appModel.getModel(rField?.relationModelTable)
                             var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
                                     (mvi.relationData as ModelView.RelationData).targetModel)
@@ -399,10 +401,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                     relationModel!=null &&
                                     targetModel!=null) {
                                 var jArr = JsonArray()
-                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(relationModel) as dynamic.model.query.mq.ModelDataArray?
+                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
                                 dataArray?.data?.forEach {fvs->
                                     fvs.forEach { fv->
-                                        if(fv.value is dynamic.model.query.mq.ModelDataObject){
+                                        if(fv.value is ModelDataObject){
                                             if(targetModel.isSame((fv.value as ModelDataObject).model)){
                                                 jArr.add(this.gson.toJsonTree(fv.value))
                                             }
@@ -421,7 +423,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             var tField = modelObject?.getFieldByPropertyName(mvi.name)
                             tField?.let {
                                 var tValue = modelDataObject?.getFieldValue(tField)
-                                if(targetModel!=null && tValue is dynamic.model.query.mq.ModelDataObject){
+                                if(targetModel!=null && tValue is ModelDataObject){
                                     var jArr = JsonArray()
                                     if(targetModel.isSame(tValue.model)){
                                         jArr.add(this.gson.toJsonTree(tValue))
@@ -448,13 +450,13 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
 
     protected  open fun fillEditModelViewMeta(mv:ModelView,
-                                              modelData: dynamic.model.query.mq.ModelData?,
+                                              modelData: ModelData?,
                                               viewData:MutableMap<String,Any>,
                                               pc:PartnerCache,
-                                              ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                              toField: dynamic.model.query.mq.FieldBase?,
+                                              ownerFieldValue: FieldValue?,
+                                              toField: FieldBase?,
                                               reqData: JsonObject?):ModelView{
-        var modelDataObject  = modelData as dynamic.model.query.mq.ModelDataObject?
+        var modelDataObject  = modelData as ModelDataObject?
         mv.fields.forEach {mvi->
             when (mvi.type) {
                 ModelView.Field.ViewFieldType.many2ManyDataSetSelect,
@@ -466,7 +468,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             modelData != null) {
                         if((mvi.relationData as ModelView.RelationData).type==ModelView.RelationType.Many2Many){
                             var modelObject = this.appModel.getModel(mv.app!!,mv.model!!)
-                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as dynamic.model.query.mq.RefRelationField?
+                            var rField = modelObject?.getFieldByPropertyName(mvi.name) as RefRelationField?
                             var relationModel = this.appModel.getModel(rField?.relationModelTable)
                             var targetModel=this.appModel.getModel((mvi.relationData as ModelView.RelationData).targetApp,
                                     (mvi.relationData as ModelView.RelationData).targetModel)
@@ -474,10 +476,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                     relationModel!=null &&
                                     targetModel!=null) {
                                 var jArr = JsonArray()
-                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(relationModel) as dynamic.model.query.mq.ModelDataArray?
+                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
                                 dataArray?.data?.forEach {fvs->
                                     fvs.forEach { fv->
-                                        if(fv.value is dynamic.model.query.mq.ModelDataObject){
+                                        if(fv.value is ModelDataObject){
                                             if(targetModel.isSame((fv.value as ModelDataObject).model)){
                                                 jArr.add(this.gson.toJsonTree(fv.value))
                                             }
@@ -496,7 +498,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             var tField = modelObject?.getFieldByPropertyName(mvi.name)
                             tField?.let {
                                 var tValue = modelDataObject?.getFieldValue(tField)
-                                if(targetModel!=null && tValue is dynamic.model.query.mq.ModelDataObject){
+                                if(targetModel!=null && tValue is ModelDataObject){
                                     var jArr = JsonArray()
                                     if(targetModel.isSame(tValue.model)){
                                         jArr.add(this.gson.toJsonTree(tValue))
@@ -521,11 +523,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return mv
     }
     protected  open fun fillListModelViewMeta(mv:ModelView,
-                                              modelData: dynamic.model.query.mq.ModelData?,
+                                              modelData: ModelData?,
                                               viewData:MutableMap<String,Any>,
                                               pc:PartnerCache,
-                                              ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                              toField: dynamic.model.query.mq.FieldBase?,
+                                              ownerFieldValue: FieldValue?,
+                                              toField: FieldBase?,
                                               reqData: JsonObject?):ModelView{
 
         mv.fields.forEach {
@@ -541,11 +543,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
 
     protected  open fun fillCreateModelViewMeta(mv:ModelView,
-                                                modelData: dynamic.model.query.mq.ModelData?,
+                                                modelData: ModelData?,
                                                 viewData:MutableMap<String,Any>,
                                                 pc:PartnerCache,
-                                                ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                                toField: dynamic.model.query.mq.FieldBase?,
+                                                ownerFieldValue: FieldValue?,
+                                                toField: FieldBase?,
                                                 reqData: JsonObject?):ModelView{
         mv.fields.forEach {
             when(it.type){
@@ -592,10 +594,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadModelViewData(mv:ModelView,
                                          viewData:MutableMap<String,Any>,
                                          pc:PartnerCache,
-                                         ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                         toField: dynamic.model.query.mq.FieldBase?,
+                                         ownerFieldValue: FieldValue?,
+                                         toField: FieldBase?,
                                          ownerModelID: Long?,
-                                         reqData:JsonObject?): dynamic.model.query.mq.ModelData?{
+                                         reqData:JsonObject?): ModelData?{
         when(mv.viewType){
             ModelView.ViewType.CREATE->{
                return this.loadCreateModelViewData(mv,viewData,pc,ownerFieldValue,toField,ownerModelID,reqData)
@@ -616,9 +618,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return null
     }
 
-    protected fun getModelViewFields(mv:ModelView):ArrayList<dynamic.model.query.mq.FieldBase>{
-        var fields = arrayListOf<dynamic.model.query.mq.FieldBase>()
-        var fFields = arrayListOf<dynamic.model.query.mq.FunctionField<*,*>>()
+    protected fun getModelViewFields(mv:ModelView):ArrayList<FieldBase>{
+        var fields = arrayListOf<FieldBase>()
+        var fFields = arrayListOf<FunctionField<*,*>>()
         if(mv.app.isNullOrEmpty() || mv.model.isNullOrEmpty()){
             return fields
         }
@@ -627,7 +629,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             if(it.relationData==null){
                 var field = modelObj?.getFieldByPropertyName(it.name)
                 field?.let {fd->
-                    if(fd !is dynamic.model.query.mq.FunctionField<*,*>){
+                    if(fd !is FunctionField<*,*>){
                         if(fd !in fields){
                             fields.add(fd)
                         }
@@ -640,7 +642,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             fFields.add(fd)
                         }
                         fd.depFields?.forEach {dFD->
-                            if(dFD !is dynamic.model.query.mq.FunctionField<*,*>){
+                            if(dFD !is FunctionField<*,*>){
                                 if(dFD !in fields){
                                     fields.add(dFD!!)
                                 }
@@ -677,12 +679,12 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadCreateModelViewData(mv:ModelView,
                                                viewData:MutableMap<String,Any>,
                                                pc:PartnerCache,
-                                               ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                               toField: dynamic.model.query.mq.FieldBase?,
+                                               ownerFieldValue: FieldValue?,
+                                               toField: FieldBase?,
                                                ownerModelID: Long?,
-                                               reqData:JsonObject?): dynamic.model.query.mq.ModelDataObject? {
-        var mo = dynamic.model.query.mq.ModelDataObject(model = this)
-        if(ownerFieldValue!=null && ownerFieldValue.value!= dynamic.model.query.mq.Undefined && toField!=null){
+                                               reqData:JsonObject?): ModelDataObject? {
+        var mo = ModelDataObject(model = this)
+        if(ownerFieldValue!=null && ownerFieldValue.value!= Undefined && toField!=null){
             var ownerModel = ownerFieldValue.field.model as ContextModel?
             ownerModel?.let {
                 if(it.isPersistField(ownerFieldValue.field)){
@@ -703,9 +705,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                val ma= ownerModel.acRead(model=ownerModel,partnerCache = pc,criteria = eq(ownerModel.fields?.getIdField()!!,ownerModelID))
                ma?.firstOrNull()?.let {mit->
                    this.fields.map {
-                       if (it is dynamic.model.query.mq.RefTargetField) {
+                       if (it is RefTargetField) {
                             if(ownerModel.fullTableName == it.targetModelTable &&
-                                    dynamic.model.query.mq.FieldConstant.id==it.targetModelFieldName) {
+                                    FieldConstant.id==it.targetModelFieldName) {
                                 mo.setFieldValue(it, mit)
                                 return@map
                             }
@@ -721,10 +723,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadDetailModelViewData(mv:ModelView,
                                                viewData:MutableMap<String,Any>,
                                                pc:PartnerCache,
-                                               ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                               toField: dynamic.model.query.mq.FieldBase?,
+                                               ownerFieldValue: FieldValue?,
+                                               toField: FieldBase?,
                                                ownerModelID: Long?,
-                                               reqData:JsonObject?): dynamic.model.query.mq.ModelDataObject?{
+                                               reqData:JsonObject?): ModelDataObject?{
         val id = reqData?.get("id")?.asLong
         val fields= this.getModelViewFields(mv)
         id?.let {
@@ -734,8 +736,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
-                            _f is dynamic.model.query.mq.ModelMany2ManyField
-                        }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
+                            _f is ModelMany2ManyField
+                        }.toTypedArray())) as ModelDataObject?
                     }
                 }
             }
@@ -748,8 +750,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
-                        _f is dynamic.model.query.mq.ModelMany2ManyField
-                    }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
+                        _f is ModelMany2ManyField
+                    }.toTypedArray())) as ModelDataObject?
                 }
             }
         }
@@ -761,7 +763,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
 
         if(ownerFieldValue!=null && toField!=null){
             if(this.isPersistField(toField)){
-                if(ownerFieldValue.value!= dynamic.model.query.mq.Undefined){
+                if(ownerFieldValue.value!= Undefined){
                     return Pair(true,eq(toField,ownerFieldValue.value))
                 }
                 else if(ownerModelID!=null){
@@ -769,8 +771,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 }
             }
             else{
-                if(toField is dynamic.model.query.mq.ModelMany2ManyField){
-                    if(ownerFieldValue.field is dynamic.model.query.mq.ModelMany2ManyField){
+                if(toField is ModelMany2ManyField){
+                    if(ownerFieldValue.field is ModelMany2ManyField){
                         if(ownerModelID!=null){
                            val mf= this.getRelationModelField(ownerFieldValue.field)
                             if(mf?.first!=null){
@@ -782,19 +784,19 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             }
                         }
                     }
-                    else if(ownerFieldValue.field is dynamic.model.query.mq.ModelMany2OneField){
-                        if(ownerFieldValue.value!= dynamic.model.query.mq.Undefined){
+                    else if(ownerFieldValue.field is ModelMany2OneField){
+                        if(ownerFieldValue.value!= Undefined){
                             return Pair(true,eq(toField?.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
                         }
                     }
                 }
-                else if(toField is dynamic.model.query.mq.ModelOne2ManyField){
-                        if(ownerFieldValue.value!= dynamic.model.query.mq.Undefined){
+                else if(toField is ModelOne2ManyField){
+                        if(ownerFieldValue.value!= Undefined){
                             return Pair(true,eq(toField.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
                         }
                 }
-                else if(toField is dynamic.model.query.mq.One2OneField && toField.isVirtualField){
-                    if(ownerFieldValue.value!= dynamic.model.query.mq.Undefined){
+                else if(toField is One2OneField && toField.isVirtualField){
+                    if(ownerFieldValue.value!= Undefined){
                         return Pair(true,eq(toField.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
                     }
                 }
@@ -802,12 +804,12 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return Pair(false,null)
     }
-    fun isPersistField(field: dynamic.model.query.mq.FieldBase?):Boolean{
+    fun isPersistField(field: FieldBase?):Boolean{
         field?.let {
-            if((it !is dynamic.model.query.mq.FunctionField<*,*>) &&
-                    (it !is dynamic.model.query.mq.RefRelationField) &&
-                    it !is dynamic.model.query.mq.One2ManyField){
-                if(it !is dynamic.model.query.mq.ModelOne2OneField || !it.isVirtualField){
+            if((it !is FunctionField<*,*>) &&
+                    (it !is RefRelationField) &&
+                    it !is One2ManyField){
+                if(it !is ModelOne2OneField || !it.isVirtualField){
                     return true
                 }
             }
@@ -817,10 +819,10 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     protected open fun loadEditModelViewData(mv:ModelView,
                                              viewData:MutableMap<String,Any>,
                                              pc:PartnerCache,
-                                             ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                             toField: dynamic.model.query.mq.FieldBase?,
+                                             ownerFieldValue: FieldValue?,
+                                             toField: FieldBase?,
                                              ownerModelID: Long?,
-                                             reqData:JsonObject?): dynamic.model.query.mq.ModelDataObject?{
+                                             reqData:JsonObject?): ModelDataObject?{
         val id = reqData?.get("id")?.asInt
         val fields = this.getModelViewFields(mv)
         id?.let {
@@ -830,8 +832,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
-                            it is dynamic.model.query.mq.ModelMany2ManyField
-                        }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
+                            it is ModelMany2ManyField
+                        }.toTypedArray())) as ModelDataObject?
                     }
                 }
             }
@@ -842,8 +844,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
-                        _f is dynamic.model.query.mq.ModelMany2ManyField
-                    }.toTypedArray())) as dynamic.model.query.mq.ModelDataObject?
+                        _f is ModelMany2ManyField
+                    }.toTypedArray())) as ModelDataObject?
                 }
             }
         }
@@ -851,16 +853,16 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
 
     private  fun setM2MFieldValue(model:ModelBase,
-                                  fvs: dynamic.model.query.mq.FieldValueArray,
-                                  fd: dynamic.model.query.mq.FieldBase,
+                                  fvs: FieldValueArray,
+                                  fd: FieldBase,
                                   relModel:ModelBase,
-                                  relFvs: dynamic.model.query.mq.FieldValueArray){
-        val fRelModel = this.appModel.getModel((fd as dynamic.model.query.mq.ModelMany2ManyField).relationModelTable)
+                                  relFvs: FieldValueArray){
+        val fRelModel = this.appModel.getModel((fd as ModelMany2ManyField).relationModelTable)
         if(relModel.isSame(fRelModel)){
             relFvs.forEach {
                 when(it.field){
-                    is dynamic.model.query.mq.ModelMany2OneField ->{
-                        if(it.value is dynamic.model.query.mq.ModelDataObject){
+                    is ModelMany2OneField ->{
+                        if(it.value is ModelDataObject){
                             var tTargetModel = this.appModel.getModel((it.field as ModelMany2OneField).targetModelTable)
                             tTargetModel?.let {_->
                                 if(tTargetModel.isSame(model)){
@@ -882,18 +884,18 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
     }
 
-    protected fun toClientModelData(modelData: dynamic.model.query.mq.ModelData?, m2mFields:ArrayList<dynamic.model.query.mq.FieldBase>): dynamic.model.query.mq.ModelData?{
+    protected fun toClientModelData(modelData: ModelData?, m2mFields:ArrayList<FieldBase>): ModelData?{
         modelData?.let {
             when(it){
-                is dynamic.model.query.mq.ModelDataObject ->{
-                    var mso = it.getFieldValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?
+                is ModelDataObject ->{
+                    var mso = it.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?
                     mso?.let {msoIt->
                         m2mFields.forEach {fd->
-                            if(fd is dynamic.model.query.mq.ModelMany2ManyField){
+                            if(fd is ModelMany2ManyField){
                                 var relModel = this.appModel.getModel(fd.relationModelTable)
                                 relModel?.let {mRelIt->
                                     msoIt.data[mRelIt]?.let {mdaIt->
-                                        (mdaIt as dynamic.model.query.mq.ModelDataArray).data.firstOrNull()?.let { sit->
+                                        (mdaIt as ModelDataArray).data.firstOrNull()?.let { sit->
                                             this.setM2MFieldValue(fd.model!!,it.data,fd,relModel,sit)
                                         }
                                     }
@@ -902,16 +904,16 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                         }
                     }
                 }
-                is dynamic.model.query.mq.ModelDataArray ->{
+                is ModelDataArray ->{
                     it.data?.forEach {fvs->
-                        var mso = fvs.getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?
+                        var mso = fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?
                         mso?.let {msoIt->
                             m2mFields.forEach {fd->
-                               if(fd is dynamic.model.query.mq.ModelMany2ManyField){
+                               if(fd is ModelMany2ManyField){
                                    var relModel = this.appModel.getModel(fd.relationModelTable)
                                    relModel?.let {mRelIt->
                                        msoIt.data[mRelIt]?.let {mdaIt->
-                                           (mdaIt as dynamic.model.query.mq.ModelDataArray).data.firstOrNull()?.let { nfvs->
+                                           (mdaIt as ModelDataArray).data.firstOrNull()?.let { nfvs->
                                                this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,nfvs)
                                            }
 
@@ -927,18 +929,18 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         return modelData
     }
-    protected open fun processFunctionFieldAfterRead(modelArray: dynamic.model.query.mq.ModelDataArray?, funFields:ArrayList<dynamic.model.query.mq.FunctionField<*,*>>){
+    protected open fun processFunctionFieldAfterRead(modelArray: ModelDataArray?, funFields:ArrayList<FunctionField<*,*>>){
 
     }
     protected  open fun loadListModelViewData(mv:ModelView,
                                               viewData:MutableMap<String,Any>,
                                               pc:PartnerCache,
-                                              ownerFieldValue: dynamic.model.query.mq.FieldValue?,
-                                              toField: dynamic.model.query.mq.FieldBase?,
+                                              ownerFieldValue: FieldValue?,
+                                              toField: FieldBase?,
                                               ownerModelID: Long?,
-                                              reqData:JsonObject?): dynamic.model.query.mq.ModelDataArray?{
+                                              reqData:JsonObject?): ModelDataArray?{
         if(ownerFieldValue!=null){
-            if(ownerFieldValue.value== dynamic.model.query.mq.Undefined && ownerModelID==null){
+            if(ownerFieldValue.value== Undefined && ownerModelID==null){
                 return null
             }
         }
@@ -948,7 +950,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val jCriteria = reqData?.get("criteria")?.asJsonObject
         //TODO parse javascript criteria
 
-        var criteria = null as dynamic.model.query.mq.ModelExpression?
+        var criteria = null as ModelExpression?
         jCriteria?.let {
             criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
         }
@@ -960,52 +962,73 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
         return this.toClientModelData(data,arrayListOf(*fields.filter {_f->
-            _f is dynamic.model.query.mq.ModelMany2ManyField
-        }.toTypedArray())) as dynamic.model.query.mq.ModelDataArray?
+            _f is ModelMany2ManyField
+        }.toTypedArray())) as ModelDataArray?
     }
 
-    override fun addCreateModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
-        modelDataObject.idFieldValue?.value?.let {
-            var modelID = TypeConvert.getLong(it as Number)
-            val modelTitle = this.meta.title
-            val embeddedCtlType=JsonObject()
-            val ctlData=JsonObject()
-            ctlData.addProperty("modelID",modelID)
-            ctlData.addProperty("app",this.meta.appName)
-            ctlData.addProperty("model",this.meta.name)
-            ctlData.addProperty("viewType","detail")
-            ctlData.addProperty("title",this.meta.title)
-            embeddedCtlType.addProperty("viewType","logView")
-            embeddedCtlType.add("data",ctlData)
-            this.addModelLogImp("创建$modelTitle",embeddedCtlType,"时间：${Date()}",modelID=modelID,pc=pc)
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+        pc?.let {
+            modelDataObject.idFieldValue?.value?.let {
+                var modelID = TypeConvert.getLong(it as Number)
+                val modelLog = ModelDataObject(model = BaseModelLog.ref)
+                modelLog.setFieldValue(BaseModelLog.ref.app,this.meta.appName)
+                modelLog.setFieldValue(BaseModelLog.ref.model,this.meta.name)
+                modelLog.setFieldValue(BaseModelLog.ref.modelID,modelID)
+                modelLog.setFieldValue(BaseModelLog.ref.partner,pc.partnerID)
+                val controlData = JsonObject()
+                controlData.addProperty("controlType","modelLogControl")
+                val controlDataProps =  JsonObject()
+                controlDataProps.addProperty("text",this.meta.title)
+                controlDataProps.addProperty("viewType","detail")
+                controlDataProps.addProperty("app",this.meta.appName)
+                controlDataProps.addProperty("model",this.meta.name)
+                controlDataProps.addProperty("modelID",modelID)
+                controlData.add("props",controlDataProps)
+                val jData = JsonArray()
+                jData.add("创建了")
+                jData.add(controlData)
+                modelLog.setFieldValue(BaseModelLog.ref.data,jData.toString())
+                BaseModelLog.ref.rawCreate(modelLog,useAccessControl = useAccessControl,partnerCache = pc)
+            }
         }
     }
 
-    override fun addEditModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
-        modelDataObject.idFieldValue?.value?.let {
-            val modelID = TypeConvert.getLong(it as Number)
-            val modelTitle = this.meta.title
-            val embeddedCtlType=JsonObject()
-            val ctlData=JsonObject()
-            ctlData.addProperty("modelID",modelID)
-            ctlData.addProperty("app",this.meta.appName)
-            ctlData.addProperty("model",this.meta.name)
-            ctlData.addProperty("viewType","detail")
-            ctlData.addProperty("title",this.meta.title)
-            embeddedCtlType.addProperty("viewType","logView")
-            embeddedCtlType.add("data",ctlData)
-            this.addModelLogImp("更新$modelTitle",embeddedCtlType,"时间：${Date()}",modelID=modelID,pc=pc)
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+        pc?.let {
+            modelDataObject.idFieldValue?.value?.let {
+                var modelID = TypeConvert.getLong(it as Number)
+                val modelLog = ModelDataObject(model = BaseModelLog.ref)
+                modelLog.setFieldValue(BaseModelLog.ref.app,this.meta.appName)
+                modelLog.setFieldValue(BaseModelLog.ref.model,this.meta.name)
+                modelLog.setFieldValue(BaseModelLog.ref.modelID,modelID)
+                modelLog.setFieldValue(BaseModelLog.ref.partner,pc.partnerID)
+
+                val controlData = JsonObject()
+                controlData.addProperty("controlType","modelLogControl")
+                val controlDataProps =  JsonObject()
+                controlDataProps.addProperty("text",this.meta.title)
+                controlDataProps.addProperty("viewType","detail")
+                controlDataProps.addProperty("app",this.meta.appName)
+                controlDataProps.addProperty("model",this.meta.name)
+                controlDataProps.addProperty("modelID",modelID)
+                controlData.add("props",controlDataProps)
+                val jData = JsonArray()
+                jData.add("更新了")
+                jData.add(controlData)
+                modelLog.setFieldValue(BaseModelLog.ref.data,jData.toString())
+                BaseModelLog.ref.rawCreate(modelLog,useAccessControl = useAccessControl,partnerCache = pc)
+            }
         }
     }
 
     private  fun addModelLogImp(vararg args:Any,modelID:Long?,pc:PartnerCache?){
         var modelLog= BaseModelLog.ref
-        var mo= dynamic.model.query.mq.ModelDataObject(model = modelLog)
+        var mo= ModelDataObject(model = modelLog)
         mo.setFieldValue(modelLog.app,this.meta.appName)
         mo.setFieldValue(modelLog.model,this.meta.name)
         mo.setFieldValue(modelLog.modelID,modelID)
         pc?.let {
-            val partnerObj= dynamic.model.query.mq.ModelDataObject(model = BasePartner.ref)
+            val partnerObj= ModelDataObject(model = BasePartner.ref)
             partnerObj.setFieldValue(BasePartner.ref.id,pc?.partnerID)
             mo.setFieldValue(modelLog.partner,partnerObj)
         }

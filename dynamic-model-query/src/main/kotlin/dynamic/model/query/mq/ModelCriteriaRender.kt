@@ -25,7 +25,7 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.mq.aggregation.AggExpression
 import dynamic.model.query.mq.aggregation.CountExpression
-import dynamic.model.query.mq.condition.IsExpression
+import dynamic.model.query.mq.condition.*
 import dynamic.model.query.mq.condition.constant.BooleanExpression
 import dynamic.model.query.mq.condition.constant.StringExpression
 import dynamic.model.query.mq.join.JoinModel
@@ -113,19 +113,19 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                 is OrderBy.OrderField ->{
                     this.buildOrderByField(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.CheckValueExpression ->{
+                is CheckValueExpression ->{
                     this.buildCheckValueExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.ExistsExpression,is dynamic.model.query.mq.condition.NotExistsExpression ->{
+                is ExistsExpression,is NotExistsExpression ->{
                     this.buildExistsExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.NotInExpression,is dynamic.model.query.mq.condition.InExpression ->{
+                is NotInExpression,is InExpression ->{
                     this.buildInExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.NotLikeExpression,is dynamic.model.query.mq.condition.LikeExpression ->{
+                is NotLikeExpression,is LikeExpression ->{
                     this.buildLikeExpression(expression,parent)
                 }
-                is dynamic.model.query.mq.condition.IsExpression,is dynamic.model.query.mq.condition.IsNotExpression ->{
+                is IsExpression,is IsNotExpression ->{
                     this.buildIsExpression(expression,parent)
                 }
                 is AndExpression ->{
@@ -183,10 +183,10 @@ class ModelCriteriaRender: ModelExpressionVisitor {
         else{
             this.namedSql.append(expression?.aggName);
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            if (expression?.fields?.size<1){
+            if (expression.fields.isEmpty()){
                 this.namedSql.append(GRAMMARKEYS.ALL)
             }else{
-                expression?.fields?.forEach {
+                expression.fields.forEach {
                     var columnName=this.tableColumnNameGenerator.generateColumnName(it)
                     this.namedSql.append(columnName)
                     this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
@@ -235,7 +235,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     }
     private fun buildIsExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is IsExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.IsExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as IsExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IS)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
@@ -243,7 +243,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
         }
         else{
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.IsNotExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as IsNotExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IS_NOT)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
@@ -252,26 +252,26 @@ class ModelCriteriaRender: ModelExpressionVisitor {
         }
     }
     private  fun buildLikeExpression(expression: ModelExpression?, parent: ModelExpression?){
-        if (expression is dynamic.model.query.mq.condition.LikeExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.LikeExpression).field)
+        if (expression is LikeExpression){
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as LikeExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.LIKE)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.LikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.LikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue((expression as LikeExpression).field, "%" + (expression as LikeExpression).value + "%")
         }
         else{
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotLikeExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as NotLikeExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.NOT_LIKE)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.NotLikeExpression).field, "%" + (expression as dynamic.model.query.mq.condition.NotLikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue((expression as NotLikeExpression).field, "%" + (expression as NotLikeExpression).value + "%")
         }
     }
     private  fun buildInExpression(expression: ModelExpression?, parent: ModelExpression?){
-        if (expression is dynamic.model.query.mq.condition.InExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.InExpression).field)
+        if (expression is InExpression){
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as InExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IN)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
@@ -282,45 +282,45 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                 this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
             }
             else{
-                this.accept((expression as dynamic.model.query.mq.condition.InExpression).criteria,expression)
+                this.accept((expression as InExpression).criteria,expression)
             }
         }
         else{
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotInExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as NotInExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.NOT_IN)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            if((expression as dynamic.model.query.mq.condition.NotInExpression).valueSet!=null)
+            if((expression as NotInExpression).valueSet!=null)
             {
                 var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedColumnName)
-                this.namedParameters[ColumnKeyName]= FieldValue((expression as dynamic.model.query.mq.condition.NotInExpression).field, (expression as dynamic.model.query.mq.condition.NotInExpression).valueSet)
+                this.namedParameters[ColumnKeyName]= FieldValue((expression as NotInExpression).field, (expression as NotInExpression).valueSet)
             }
             else{
-                this.accept((expression as dynamic.model.query.mq.condition.NotInExpression).criteria,expression)
+                this.accept((expression as NotInExpression).criteria,expression)
             }
         }
         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
     }
     private  fun buildExistsExpression(expression: ModelExpression, parent: ModelExpression?){
 
-        if (expression is dynamic.model.query.mq.condition.ExistsExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.ExistsExpression).field)
+        if (expression is ExistsExpression){
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as ExistsExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.EXISTS)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            this.accept((expression as dynamic.model.query.mq.condition.ExistsExpression).criteria,expression)
+            this.accept((expression as ExistsExpression).criteria,expression)
         }
         else{
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as dynamic.model.query.mq.condition.NotExistsExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as NotExistsExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.NOT_EXISTS)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            this.accept((expression as dynamic.model.query.mq.condition.NotExistsExpression).criteria,expression)
+            this.accept((expression as NotExistsExpression).criteria,expression)
         }
         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
     }
-    private fun buildCheckValueExpression(checkValueExpression: dynamic.model.query.mq.condition.CheckValueExpression, parent: ModelExpression?){
+    private fun buildCheckValueExpression(checkValueExpression: CheckValueExpression, parent: ModelExpression?){
         var columnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.field)
         this.namedSql.append(columnName)
         this.namedSql.append(checkValueExpression.operator)
@@ -363,8 +363,11 @@ class ModelCriteriaRender: ModelExpressionVisitor {
         groupBy.fields?.forEach {
             accept(it,groupBy)
         }
-        this.namedSql.append(GRAMMARKEYS.HAVING)
-        this.accept(groupBy.havingCriteria,groupBy)
+        groupBy.havingCriteria?.let {
+            this.namedSql.append(GRAMMARKEYS.HAVING)
+            this.accept(groupBy.havingCriteria,groupBy)
+        }
+
     }
     private fun buildField(field: FieldBase, parent: ModelExpression?){
         var columnName=this.tableColumnNameGenerator.generateColumnName(field)
@@ -459,10 +462,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
 //        if (hasClosure){
 //            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
 //        }
-        if(select.selectFields!=null && select.selectFields.count()>0){
-            this.namedSql.append(GRAMMARKEYS.SELECT)
-        }
-        else if(select.countExpression!=null||select.maxExpressions!=null
+          if(select.countExpression!=null||select.maxExpressions!=null
                 ||select.minExpressions!=null||select.avgExpressions!=null
                 ||select.sumExpressions!=null){
                 this.namedSql.append(GRAMMARKEYS.SELECT)
@@ -515,7 +515,12 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                         this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
                 }
-            this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
+            if(select.selectFields.isEmpty()){
+                this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
+            }
+        }
+        else if(select.selectFields.count()>0){
+            this.namedSql.append(GRAMMARKEYS.SELECT)
         }
         else
         {
@@ -524,12 +529,12 @@ class ModelCriteriaRender: ModelExpressionVisitor {
 
 
 
-        select.selectFields?.forEach {
+        select.selectFields.forEach {
             this.accept(it,select)
             this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
         }
 
-        if (select.selectFields?.size>0){
+        if (select.selectFields.isNotEmpty()){
             this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         }
 

@@ -39,7 +39,7 @@ import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
 import work.bg.server.util.TypeConvert
 
-@Model("chatChannel")
+@Model("chatChannel","频道")
 class ChatChannel:ContextModel("chat_channel","public") {
     companion object: RefSingleton<ChatChannel> {
         override lateinit var ref: ChatChannel

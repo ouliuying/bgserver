@@ -23,14 +23,14 @@
 
 package dynamic.model.query.mq
 
-class  GroupBy constructor(vararg val fields: dynamic.model.query.mq.FieldBase, val havingCriteria: dynamic.model.query.mq.ModelExpression): dynamic.model.query.mq.ModelExpression(){
-    override fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?): Boolean {
+class  GroupBy constructor(vararg val fields: FieldBase, val havingCriteria: ModelExpression?=null): ModelExpression(){
+    override fun accept(visitor: ModelExpressionVisitor, parent: ModelExpression?): Boolean {
        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         visitor.visit(this,parent)
         return true
     }
 
-    override fun render(parent: dynamic.model.query.mq.ModelExpression?): Pair<String, Map<String, Any?>>? {
+    override fun render(parent: ModelExpression?): Pair<String, Map<String, Any?>>? {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         return null
     }

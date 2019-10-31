@@ -30,6 +30,10 @@ object  Time{
     fun now():Date{
         return Date()
     }
+    fun formatDate(date:Date):String{
+        var df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        return df.format(date)
+    }
     fun getDate(value:String?):Date?{
         var df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         try {
