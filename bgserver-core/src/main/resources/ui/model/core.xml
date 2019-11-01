@@ -248,15 +248,6 @@
             <field name="userIcon" style="subHead" type="selectImage"/>
             <field name="birthday" type="date"/>
             <field name="mobile" type="mobile"/>
-<!--            <field name="setCurrentCorpAsDefault" type="singleCheckbox">-->
-<!--                <meta>-->
-<!--                    <![CDATA[-->
-<!--                    {-->
-<!--                     "label":"设定当前公司为默认"-->
-<!--                    }-->
-<!--                  ]]>-->
-<!--                </meta>-->
-<!--            </field>-->
             <field name="telephone" type="telephone"/>
             <field name="email" type="email"/>
             <field name="userTitle" colSpan="2" type="multiLineText"/>
@@ -272,6 +263,7 @@
                 </actions>
                 <views>
                     <view type="detail" refType="none" ownerField="partnerRoles" model="corpPartnerRel"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
                 <menus>
 
@@ -297,6 +289,7 @@
             <field name="userTitle" colSpan="2" type="static"/>
             <field name="userComment" colSpan="2" type="static"/>
             <field name="partnerRoles" style="relation"/>
+            <field name="eventLogs" style="relation"/>
         </view>
     </model>
 
@@ -520,6 +513,8 @@
             <field name="modelID" type="static"/>
             <field name="data" type="static"/>
             <field name="partner" type="static"/>
+        </view>
+        <view type="eventLogList">
         </view>
     </model>
 </ui>

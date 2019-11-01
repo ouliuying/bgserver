@@ -42,9 +42,7 @@ class ShouldLoginInterceptor constructor(private val unauthRedirectUrl:String?):
                     ShouldLogin::class.java)
             val partnerID=request.session
                     .getAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY)
-           // request.setAttribute(ServletRequestAttributeTag.PARTNER_CONTEXT_TAG,partner_ctx)
             if(rm!=null) if(partnerID== null){
-                //  ErrorCode::
                 response.contentType="application/json"
                 response.characterEncoding="utf-8"
                 response.status=200

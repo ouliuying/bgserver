@@ -350,7 +350,9 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         return triggerGroups.toTypedArray()
     }
 
-    protected  open fun fillModelViewMeta(mv:ModelView, modelData: ModelData?, viewData:MutableMap<String,Any>,
+    protected  open fun fillModelViewMeta(mv:ModelView,
+                                          modelData: ModelData?,
+                                          viewData:MutableMap<String,Any>,
                                           pc:PartnerCache,
                                           ownerFieldValue: FieldValue?,
                                           toField: FieldBase?,

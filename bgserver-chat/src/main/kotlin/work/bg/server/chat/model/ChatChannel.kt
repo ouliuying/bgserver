@@ -37,6 +37,7 @@ import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
+import work.bg.server.core.model.field.EventLogField
 import work.bg.server.util.TypeConvert
 
 @Model("chatChannel","频道")
@@ -99,6 +100,8 @@ class ChatChannel:ContextModel("chat_channel","public") {
             "join_status",
             "关系",
             this.owner)
+
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     @Action("getChannelJoinModels")
     fun getChannelJoinModels(@RequestBody data:JsonObject,partnerCache:PartnerCache?):ActionResult?{

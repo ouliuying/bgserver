@@ -145,6 +145,7 @@
                 </actions>
                 <views>
                     <view type="list" ownerField="joinPartners" model="chatModelJoinChannelRel" refType="none"/>
+                    <view type="eventLogList" ownerField="eventLogs" model="modelLog" refType="none" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -171,6 +172,8 @@
             </field>
             <field name="owner.userName" type="static"/>
             <field name="joinPartners" style="relation"/>
+            <field name="eventLogs" style="relation"/>
+
         </view>
     </model>
     <model name="chatModelJoinChannelRel" app="chat">

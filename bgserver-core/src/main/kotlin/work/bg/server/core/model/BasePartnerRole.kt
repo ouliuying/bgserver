@@ -21,8 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import dynamic.model.query.mq.RefSingleton
-import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.*
 import dynamic.model.query.mq.model.AppModel
 import work.bg.server.core.acrule.inspector.*
 import work.bg.server.core.model.billboard.CurrCorpBillboard
@@ -35,51 +34,51 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
         override lateinit var ref: BasePartnerRole
     }
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val name= dynamic.model.query.mq.ModelField(null,
+    val name= ModelField(null,
             "name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "名称")
 
 
 
-    val corp= dynamic.model.query.mq.ModelMany2OneField(null,
+    val corp= ModelMany2OneField(null,
             "corp_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "公司",
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
             defaultValue = CurrCorpBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val partners= dynamic.model.query.mq.ModelMany2ManyField(null,
+    val partners= ModelMany2ManyField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "用户",
             "public.base_corp_partner_rel",
             "partner_id",
             "public.base_partner",
             "id")
 
-    val accessControlRule = dynamic.model.query.mq.ModelField(null,
+    val accessControlRule = ModelField(null,
             "ac_rule",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "权限配置",
             defaultValue = "")
 
-    val isSuper= dynamic.model.query.mq.ModelField(null,
+    val isSuper= ModelField(null,
             "is_super",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "管理员",
             defaultValue = 0)
 
-    val apps= dynamic.model.query.mq.ModelOne2ManyField(null, "m_partner_role_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+    val apps= ModelOne2ManyField(null, "m_partner_role_id",
+            FieldType.BIGINT,
             title = "应用",
             targetModelTable = "public.base_app",
             targetModelFieldName = "partner_role_id")
@@ -88,18 +87,18 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
 
     fun getInstallApps(id:Long):List<String>{
         val apps = mutableListOf<String>()
-        var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.apps)))?.firstOrNull()
+        var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(AttachedField(this.apps)))?.firstOrNull()
         d?.let {
             (it.getFieldValue(this.isSuper) as Int?)?.let {isSuper->
                 if(isSuper>0){
                     return AppModel.ref.appPackageManifests.keys.toList()
                 }
             }
-            val pApps = it.getFieldValue(this.apps) as dynamic.model.query.mq.ModelDataArray?
+            val pApps = it.getFieldValue(this.apps) as ModelDataArray?
             pApps?.let {mda->
                 mda.toModelDataObjectArray().forEach {
                     mdo->
-                    val name = mdo.getFieldValue(BasePartnerRole.ref.name) as String?
+                    val name = mdo.getFieldValue(ref.name) as String?
                     name?.let {
                        val pm= AppModel.ref.appPackageManifests[name]
                         pm?.let {appm->

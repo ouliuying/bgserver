@@ -45,18 +45,18 @@ open class BaseCorp(table:String, schema:String):ContextModel(table,schema){
     return null
   }
 
-  val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-  val name= dynamic.model.query.mq.ModelField(null, "name", dynamic.model.query.mq.FieldType.STRING, "名称")
-  val website= dynamic.model.query.mq.ModelField(null, "website", dynamic.model.query.mq.FieldType.STRING, "网站")
-  val address= dynamic.model.query.mq.ModelField(null, "address", dynamic.model.query.mq.FieldType.STRING, "地址")
-  val telephone= dynamic.model.query.mq.ModelField(null, "telephone", dynamic.model.query.mq.FieldType.STRING, "电话")
-  val fax= dynamic.model.query.mq.ModelField(null, "fax", dynamic.model.query.mq.FieldType.STRING, "传真")
-  val comment= dynamic.model.query.mq.ModelField(null, "comment", dynamic.model.query.mq.FieldType.TEXT, "注释")
-  val partners= dynamic.model.query.mq.ModelMany2ManyField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "用户", "public.base_corp_partner_rel", "partner_id",
+  val id= ModelField(null, "id", FieldType.BIGINT, "标识", primaryKey = FieldPrimaryKey())
+  val name= ModelField(null, "name", FieldType.STRING, "名称")
+  val website= ModelField(null, "website", FieldType.STRING, "网站")
+  val address= ModelField(null, "address", FieldType.STRING, "地址")
+  val telephone= ModelField(null, "telephone", FieldType.STRING, "电话")
+  val fax= ModelField(null, "fax", FieldType.STRING, "传真")
+  val comment= ModelField(null, "comment", FieldType.TEXT, "注释")
+  val partners= ModelMany2ManyField(null, "partner_id", FieldType.BIGINT, "用户", "public.base_corp_partner_rel", "partner_id",
           "base_partner", "id")
-  val partnerRoles= dynamic.model.query.mq.ModelOne2ManyField(null,
+  val partnerRoles= ModelOne2ManyField(null,
           "m_corp_id",
-          dynamic.model.query.mq.FieldType.BIGINT, "角色",
+          FieldType.BIGINT, "角色",
           "public.base_partner_role",
           "corp_id")
 }

@@ -24,13 +24,12 @@ package work.bg.server.core.model
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.springframework.web.bind.annotation.RequestBody
-import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.cache.PartnerCache
 import dynamic.model.query.config.ActionType
+import dynamic.model.query.mq.*
 import dynamic.model.query.mq.billboard.FieldValueDependentingRecordBillboard
-import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.model.AppModel
 import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
@@ -44,22 +43,22 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
     }
     constructor():this("base_app","public")
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val name= dynamic.model.query.mq.ModelField(null,
+    val name= ModelField(null,
             "name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "名称")
-    val title= dynamic.model.query.mq.ModelField(null,
+    val title= ModelField(null,
             "title",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "说明",
             defaultValue = object : FieldValueDependentingRecordBillboard {
-                override fun computeValue(fvs: dynamic.model.query.mq.FieldValueArray?, actionType: ActionType): Pair<Boolean, Any?> {
+                override fun computeValue(fvs: FieldValueArray?, actionType: ActionType): Pair<Boolean, Any?> {
                     val nameField = this@BaseApp.name
                     fvs?.let {
                         val name = it.getValue(nameField) as String?
@@ -74,19 +73,19 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
                 }
             })
 
-    val defaultFlag= dynamic.model.query.mq.ModelField(null,
+    val defaultFlag= ModelField(null,
             "default_flag",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "默认",
             defaultValue = 0)
 
-    val partnerRole= dynamic.model.query.mq.ModelMany2OneField(null,
+    val partnerRole= ModelMany2OneField(null,
             "partner_role_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             targetModelTable = "public.base_partner_role",
             targetModelFieldName = "id",
             title = "角色",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE)
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE)
     )
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
@@ -124,12 +123,12 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
                                partnerCache:PartnerCache):ActionResult?{
         var ret= ActionResult()
         BasePartnerAppShortcut.ref.acDelete(criteria = eq(BasePartnerAppShortcut.ref.partner,partnerCache.partnerID),partnerCache = partnerCache)
-        var modelDataArray= dynamic.model.query.mq.ModelDataArray(model = BasePartnerAppShortcut.ref)
+        var modelDataArray= ModelDataArray(model = BasePartnerAppShortcut.ref)
         var shortRef= BasePartnerAppShortcut.ref
         var index=0
         shortcutApps.forEach {
             var jo = it as JsonObject
-            var fvs = dynamic.model.query.mq.FieldValueArray()
+            var fvs = FieldValueArray()
             fvs.setValue(shortRef.partner,partnerCache.partnerID)
             var name = jo["name"]?.asString
             name?.let {

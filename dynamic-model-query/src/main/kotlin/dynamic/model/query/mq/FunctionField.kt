@@ -28,16 +28,16 @@ import dynamic.model.query.mq.model.ModelBase
 
 open class FunctionField<T,ContextType>(model: ModelBase?,
                                         name:String,
-                                        fieldType: dynamic.model.query.mq.FieldType,
+                                        fieldType: FieldType,
                                         title:String?,
-                                        val comp:((dynamic.model.query.mq.FieldValueArray, ContextType?, Any?)->T?)?=null,
-                                        val inv:((dynamic.model.query.mq.FieldValueArray, ContextType?, T?, Any?)->Unit)?=null,
-                                        open val depFields: Array<dynamic.model.query.mq.FieldBase?>?=null): dynamic.model.query.mq.FieldBase(name,title,fieldType,model) {
-    open  fun  compute(fieldValueArray: dynamic.model.query.mq.FieldValueArray, context: ContextType?, data:Any?):T?{
+                                        val comp:((FieldValueArray, ContextType?, Any?)->T?)?=null,
+                                        val inv:((FieldValueArray, ContextType?, T?, Any?)->Unit)?=null,
+                                        open val depFields: Array<FieldBase?>?=null): FieldBase(name,title,fieldType,model) {
+    open  fun  compute(fieldValueArray: FieldValueArray, context: ContextType?, data:Any?):T?{
             return this.comp?.invoke(fieldValueArray,context,data)
     }
 
-    open fun  inverse(fieldValueArray: dynamic.model.query.mq.FieldValueArray, partnerCache: ContextType?, value:T?, data:Any?){
+    open fun  inverse(fieldValueArray: FieldValueArray, partnerCache: ContextType?, value:T?, data:Any?){
        this.inv?.invoke(fieldValueArray,partnerCache,value,data)
     }
 }

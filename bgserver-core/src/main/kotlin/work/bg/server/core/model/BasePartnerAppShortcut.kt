@@ -21,6 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
+import dynamic.model.query.mq.FieldType
+import dynamic.model.query.mq.ModelField
 import dynamic.model.query.mq.RefSingleton
 import dynamic.model.query.mq.eq
 import work.bg.server.core.cache.PartnerCache
@@ -31,22 +33,22 @@ class BasePartnerAppShortcut(tableName:String,schemaName:String):ContextModel(ta
     companion object: RefSingleton<BasePartnerAppShortcut> {
         override lateinit var ref: BasePartnerAppShortcut
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
             primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val index = dynamic.model.query.mq.ModelField(null, "shortcut_index", dynamic.model.query.mq.FieldType.INT, "次序", defaultValue = 0)
+    val index = ModelField(null, "shortcut_index", FieldType.INT, "次序", defaultValue = 0)
 
     val partner= dynamic.model.query.mq.ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "公司人员",
             "public.base_partner",
             "id",
             dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE)
     )
-    var app = dynamic.model.query.mq.ModelOne2OneField(null, "app_id", dynamic.model.query.mq.FieldType.BIGINT,
+    var app = dynamic.model.query.mq.ModelOne2OneField(null, "app_id", FieldType.BIGINT,
             "app", targetModelTable = "public.base_app", targetModelFieldName = "id", foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
 
@@ -58,7 +60,7 @@ class BasePartnerAppShortcut(tableName:String,schemaName:String):ContextModel(ta
                 criteria = eq(this.partner,partnerID),
                 orderBy = dynamic.model.query.mq.OrderBy(dynamic.model.query.mq.OrderBy.OrderField(this.index)))
         dataObjectArray?.data?.forEach {
-            var mobj=it.getValue(BasePartnerAppShortcut.ref.app) as dynamic.model.query.mq.ModelDataObject?
+            var mobj=it.getValue(ref.app) as dynamic.model.query.mq.ModelDataObject?
             if(mobj!=null){
                 var name=mobj.data.getValue(BaseApp.ref.name) as String?
                 name?.let {

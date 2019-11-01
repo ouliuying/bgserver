@@ -23,9 +23,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.model
 
-import dynamic.model.query.mq.FieldCollection
-import dynamic.model.query.mq.ModelField
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import dynamic.model.query.mq.model.ModelBase
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldMustCoexist
@@ -41,36 +39,36 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
     companion object : RefSingleton<BaseCorpPartnerRel> {
         override lateinit var ref: BaseCorpPartnerRel
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val corp= dynamic.model.query.mq.ModelMany2OneField(null,
+            primaryKey = FieldPrimaryKey())
+    val corp= ModelMany2OneField(null,
             "corp_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "公司",
             "public.base_corp",
             "id",
             defaultValue = CurrCorpBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
-    val partner= dynamic.model.query.mq.ModelMany2OneField(null,
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+    val partner= ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "用户",
             "public.base_partner",
             "id",
             defaultValue = CurrPartnerBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
-    val partnerRole= dynamic.model.query.mq.ModelMany2OneField(null,
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+    val partnerRole= ModelMany2OneField(null,
             "partner_role_id",
-            dynamic.model.query.mq.FieldType.BIGINT, "角色",
+            FieldType.BIGINT, "角色",
             "public.base_partner_role",
             "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
-    val isDefaultCorp= dynamic.model.query.mq.ModelField(null,
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+    val isDefaultCorp= ModelField(null,
             "is_default_corp",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             " 默认公司",
             null,
             0)
