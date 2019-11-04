@@ -21,6 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule
 
-interface ModelEditRecordFieldsValueCheckRule<T>:ModelEditAccessControlRule<T> {
-
-}
+interface ModelEditRecordFieldsValueCheckRule<T,T2>:ModelEditAccessControlRule<T,T2>

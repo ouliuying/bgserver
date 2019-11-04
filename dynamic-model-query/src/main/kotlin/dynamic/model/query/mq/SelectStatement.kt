@@ -87,7 +87,7 @@ class SelectStatement constructor(vararg val selectFields: FieldBase, val fromMo
         }
 
         fun groupBy(groupBy: GroupBy?): SelectStatement {
-            this.groupBy=groupBy;
+            this.groupBy=groupBy
             return this
         }
         fun offset(offset:Int?): SelectStatement {

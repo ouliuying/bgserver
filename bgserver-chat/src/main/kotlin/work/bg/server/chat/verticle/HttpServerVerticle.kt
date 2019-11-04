@@ -88,7 +88,7 @@ class HttpServerVerticle:AbstractVerticle() {
                         }
                     }
                     else{
-                        handler.handle(Future.failedFuture("redis通讯失败：${it.cause().toString()}"))
+                        handler.handle(Future.failedFuture("redis通讯失败：${it.cause()}"))
                     }
                 }?.exceptionHandler {
                     handler.handle(Future.failedFuture(it))
@@ -164,13 +164,13 @@ class HttpServerVerticle:AbstractVerticle() {
                         val fromUUID = this.sessionIDToFromUUID[sessionID]
                         if(fromUUID!=null){
                             msgObj.put(ChatEventBusConstant.CHAT_FROM_UUID,fromUUID)
-                            this.logger.trace("redirect receive client message to ${ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS} ${msgObj?.toString()}")
+                            this.logger.trace("redirect receive client message to ${ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS} ${msgObj.toString()}")
                             val resp = createUpdateUUIDResponseMessage(msgObj)
                             resp?.let {
                                 eb.publish("${ChatEventBusConstant.SERVER_TO_CLIENT_ADDRESS_HEADER}$sessionID",
                                         resp)
                             }
-                            this.logger.trace("server receive msg ${msgObj?.toString()}")
+                            this.logger.trace("server receive msg ${msgObj.toString()}")
                             eb.publish(ChatEventBusConstant.INNER_SERVER_REDIS_IN_QUEUE_ADDRESS,msgObj)
                         }
                     }

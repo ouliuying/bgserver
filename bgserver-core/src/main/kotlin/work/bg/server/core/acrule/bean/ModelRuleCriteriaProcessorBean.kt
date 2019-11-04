@@ -33,7 +33,7 @@ import dynamic.model.query.mq.model.ModelBase
 
 @Scope(value = "prototype")
 class ModelRuleCriteriaProcessorBean:ModelRuleCriteriaProcessor {
-    override fun parse(criteriaStatement: String, model: ModelBase?, context: ModelExpressionContext): dynamic.model.query.mq.ModelExpression? {
+    override fun parse(criteriaStatement: String, model: ModelBase?, context: ModelExpressionContext): ModelExpression? {
         return CriteriaStatementUtil.parse(criteriaStatement,model,context)
     }
 }

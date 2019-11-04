@@ -33,7 +33,7 @@ import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.model.ModelBase
 
 @Component
-class ModelReadPartnerIsolationBean:ModelReadIsolationRule<dynamic.model.query.mq.ModelExpression> {
+class ModelReadPartnerIsolationBean:ModelReadIsolationRule<ModelExpression> {
     private lateinit var _config:String
     override var config: String
         get() = _config //To change initializer of created properties use File | Settings | File Templates.
@@ -41,15 +41,15 @@ class ModelReadPartnerIsolationBean:ModelReadIsolationRule<dynamic.model.query.m
             _config=value
         }
 
-    override fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression? {
+    override fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: ModelExpression?): ModelExpression? {
         if(!partnerCache.checkReadBelongToPartner(model)){
             return null
         }
         if((model as AccessControlModel).corpIsolationFields()!=null)
         {
-            var acModel = model as AccessControlModel
+            var acModel = model
             return if(criteria!=null){
-                and(eq(acModel.createPartnerID,partnerCache.partnerID)!!,criteria)
+                and(eq(acModel.createPartnerID, partnerCache.partnerID),criteria)
             } else{
                 eq(acModel.createPartnerID,partnerCache.partnerID)
             }

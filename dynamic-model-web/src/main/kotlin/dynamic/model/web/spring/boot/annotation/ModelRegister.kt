@@ -40,7 +40,7 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.RootBeanDefinition
 import org.springframework.context.ApplicationContext
 import java.util.function.Supplier
-class ModelRegister constructor(): ImportBeanDefinitionRegistrar,
+class ModelRegister : ImportBeanDefinitionRegistrar,
         ResourceLoaderAware{
     private var resourceLoader: ResourceLoader? = null
     private  var applicationContext: ApplicationContext?= null

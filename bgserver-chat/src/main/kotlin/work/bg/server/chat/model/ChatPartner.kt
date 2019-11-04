@@ -93,7 +93,7 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                        @RequestParam devType:Int,
                        session: HttpSession): ActionResult?{
         var md5Password= work.bg.server.util.MD5.hash(password)
-        var partner=this.rawRead(criteria = and(eq(this.userName,userName)!!, eq(this.password,md5Password)!!),
+        var partner=this.rawRead(criteria = and(eq(this.userName, userName), eq(this.password, md5Password)),
                 attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.corps), dynamic.model.query.mq.AttachedField(this.partnerRoles)))
         return when{
             partner!=null->{
@@ -104,19 +104,18 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                             getFieldValue(this.chatUUID) as String?
                     val icon = firstPartner?.getFieldValue(this.userIcon) as String?
                     var ar = ActionResult()
-                    var corpPartnerRels = (partner?.data?.
-                            firstOrNull()?.
-                            getValue(ConstRelRegistriesField.ref!!) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
+                    var corpPartnerRels = (partner.data.firstOrNull()?.
+                            getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
                             as dynamic.model.query.mq.ModelDataArray?
                     corpPartnerRels?.data?.sortByDescending {
-                        (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
+                        (it.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
                     }
                     var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject?
                     var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.partnerRole) as dynamic.model.query.mq.ModelDataObject?
-                    var corpID=corpObject?.data?.getValue(BaseCorp.ref!!.id) as Long?
+                    var corpID=corpObject?.data?.getValue(BaseCorp.ref.id) as Long?
                     var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                     var corps=corpPartnerRels?.data?.map {
-                        it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject
+                        it.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject
                     }
                     if(corpID!=null && corpID>0){
                         session.setAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY, PartnerCacheKey(id, corpID, devType))
@@ -140,9 +139,9 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                             ar.bag["sys"]=sys
                             sys["corps"] = corps?.toList()?.stream()?.map {
                                 mapOf(
-                                        "id" to it.data.getValue(BaseCorp.ref!!.id),
-                                        "name" to it.data.getValue(BaseCorp.ref!!.name),
-                                        "comment" to it.data.getValue(BaseCorp.ref!!.comment)
+                                        "id" to it.data.getValue(BaseCorp.ref.id),
+                                        "name" to it.data.getValue(BaseCorp.ref.name),
+                                        "comment" to it.data.getValue(BaseCorp.ref.comment)
                                 )
                             }?.toArray()
                             sys["currCorp"] = pc.activeCorp
@@ -220,7 +219,7 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                 selfObj = dynamic.model.query.mq.ModelDataObject(model = this)
                 selfObj.setFieldValue(this.chatUUID,UUID.randomUUID().toString())
                 val pd = this.update(selfObj,criteria = eq(this.id,pid))
-                if(pd!=null && pd!!>0){
+                if(pd!=null && pd >0){
                     return ret
                 }
                 return Pair(false,"创建企信UUID失败！")

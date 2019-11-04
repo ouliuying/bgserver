@@ -29,7 +29,6 @@ import io.vertx.core.json.Json
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.core.net.SocketAddress
-import io.vertx.kotlin.redis.client.RedisOptions
 import io.vertx.kotlin.redis.client.redisOptionsOf
 import io.vertx.redis.client.Redis
 import io.vertx.redis.client.RedisAPI
@@ -127,7 +126,7 @@ object ModelClientHub {
                 }
                 else{
                     var channelConsumer = ChannelConsumer(id,uuid,name,defaultFlag,broadcastType,icon)
-                    channelConsumer.chatUUIDSet?.add(mccs.chatUUID)
+                    channelConsumer.chatUUIDSet.add(mccs.chatUUID)
                     channelConsumer.Consumer=this.vertx.eventBus()
                             .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${uuid}")
                             .handler{

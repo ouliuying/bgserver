@@ -21,7 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
@@ -32,29 +32,29 @@ class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public
     }
 
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
 
-    val joinPartner= dynamic.model.query.mq.ModelMany2OneField(null,
+    val joinPartner= ModelMany2OneField(null,
             "join_partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "加入的员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
 
-    val joinChannel= dynamic.model.query.mq.ModelMany2OneField(null,
+    val joinChannel= ModelMany2OneField(null,
             "join_channel_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "加入的频道",
             targetModelTable = "public.chat_channel",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
 
 }

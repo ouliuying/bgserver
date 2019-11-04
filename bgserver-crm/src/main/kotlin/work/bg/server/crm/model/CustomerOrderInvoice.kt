@@ -33,7 +33,7 @@ import java.math.BigInteger
 //订单发票
 
 @Model("customerOrderInvoice")
-open class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
+class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
     companion object : RefSingleton<CustomerOrderInvoice> {
         override lateinit var ref: CustomerOrderInvoice
     }

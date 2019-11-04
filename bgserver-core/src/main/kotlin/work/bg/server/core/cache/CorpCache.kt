@@ -21,6 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.cache
 
-class CorpCache(val id:Long,val name:String,val roles:Map<Long,CorpPartnerRoleCache>) {
-
-}
+class CorpCache(val id:Long,val name:String,val roles:Map<Long,CorpPartnerRoleCache>)

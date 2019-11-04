@@ -48,18 +48,18 @@ class  ModelPathScan constructor(private val annotation: KClass<out Annotation>,
     fun registerFilters() {
         this.addIncludeFilter(AnnotationTypeFilter(this.annotation.java))
         this.addExcludeFilter { metadataReader, _ ->
-            val className = metadataReader.getClassMetadata().getClassName()
+            val className = metadataReader.classMetadata.className
 
             className.endsWith("package-info") ||
                     className.endsWith("AppName")
         }
     }
 
-    protected override fun isCandidateComponent(beanDefinition: AnnotatedBeanDefinition): Boolean {
+    override fun isCandidateComponent(beanDefinition: AnnotatedBeanDefinition): Boolean {
         return beanDefinition.metadata.isConcrete && beanDefinition.metadata.isIndependent
     }
 
-    protected override fun checkCandidate(beanName: String, beanDefinition: BeanDefinition): Boolean {
+    override fun checkCandidate(beanName: String, beanDefinition: BeanDefinition): Boolean {
         return when (super.checkCandidate(beanName, beanDefinition) && beanName.isNotEmpty()) {
             true -> true
             false -> {

@@ -63,11 +63,11 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
             if(name.indexOf(".")>-1){
                 var (propertyName,toPropertyName) = name.split(".")
                 val fd = AppModel.ref.getModel(app!!,model!!)?.fields?.getFieldByPropertyName(propertyName)
-                f.title =if(fd?.title != null) fd!!.title!! else ""
+                f.title =if(fd?.title != null) fd.title!! else ""
             }
             else{
                 val fd = AppModel.ref.getModel(app!!,model!!)?.fields?.getFieldByPropertyName(name)
-                f.title =if(fd?.title != null) fd!!.title!! else ""
+                f.title =if(fd?.title != null) fd.title!! else ""
             }
         }
         f.icon=icon

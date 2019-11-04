@@ -23,5 +23,4 @@
 
 package dynamic.model.query.mq
 
-class FieldForeignKey(val name:String?=null,val action: dynamic.model.query.mq.ForeignKeyAction?=null) {
-}
+class FieldForeignKey(val name:String?=null,val action: dynamic.model.query.mq.ForeignKeyAction?=null)

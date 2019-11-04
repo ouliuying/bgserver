@@ -23,6 +23,9 @@
 
 package work.bg.server.account.model
 
+import dynamic.model.query.mq.FieldType
+import dynamic.model.query.mq.ModelField
+import dynamic.model.query.mq.ModelOne2OneField
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import dynamic.model.web.spring.boot.annotation.Model
@@ -33,31 +36,31 @@ class AccountCustomerOrderInvoice:CustomerOrderInvoice() {
     companion object: RefSingleton<AccountCustomerOrderInvoice> {
         override lateinit var ref: AccountCustomerOrderInvoice
     }
-    val payTyp = dynamic.model.query.mq.ModelField(null,
+    val payTyp = ModelField(null,
             "pay_type",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "应付/应收",
             defaultValue = 0)
 
 
     //-1 正在处理，0 取消 1 成功
-    val status = dynamic.model.query.mq.ModelField(null,
+    val status = ModelField(null,
             "status",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "状态",
             defaultValue = -1)
 
-    val payable = dynamic.model.query.mq.ModelOne2OneField(null,
+    val payable = ModelOne2OneField(null,
             "payable",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_payable",
             targetModelFieldName = "order_invoice_id",
             isVirtualField = true)
 
-    val receivable = dynamic.model.query.mq.ModelOne2OneField(null,
+    val receivable = ModelOne2OneField(null,
             "receivable",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "应付款",
             targetModelTable = "public.account_receivable",
             targetModelFieldName = "order_invoice_id",

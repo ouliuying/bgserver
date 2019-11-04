@@ -30,16 +30,16 @@ import work.bg.server.core.ui.ModelView
 import kotlin.reflect.KClass
 
 @Model(name = "corp", title="公司")
-open class BaseCorp(table:String, schema:String):ContextModel(table,schema){
+class BaseCorp(table:String, schema:String):ContextModel(table,schema){
   companion object: RefSingleton<BaseCorp> {
     override lateinit var ref: BaseCorp
   }
 
   constructor():this("base_corp","public")
 
-  override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
-    return super.getModelFields(AccessControlModel::class)
-  }
+//  override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
+//    return super.getModelFields(AccessControlModel::class)
+//  }
 
   override fun corpIsolationFields(): Array<ModelField>? {
     return null

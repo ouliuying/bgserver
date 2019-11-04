@@ -33,7 +33,7 @@ import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.model.ModelBase
 
 @Component
-class ModelReadCorpIsolationBean:ModelReadIsolationRule<dynamic.model.query.mq.ModelExpression> {
+class ModelReadCorpIsolationBean:ModelReadIsolationRule<ModelExpression> {
     private lateinit var _config:String
     override var config: String
         get() = _config
@@ -43,16 +43,16 @@ class ModelReadCorpIsolationBean:ModelReadIsolationRule<dynamic.model.query.mq.M
 
     override fun invoke(model: ModelBase,
                         partnerCache: PartnerCache,
-                        criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression? {
+                        criteria: ModelExpression?): ModelExpression? {
         if((model as AccessControlModel).corpIsolationFields()!=null)
         {
-            var acModel = model as AccessControlModel
+            var acModel = model
             return if(criteria!=null){
-                and(eq(acModel.createCorpID,partnerCache.corpID)!!,criteria)
+                and(eq(acModel.createCorpID, partnerCache.corpID),criteria)
             } else{
                 eq(acModel.createCorpID,partnerCache.corpID)
             }
         }
-        return null
+        return criteria
     }
 }

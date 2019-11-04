@@ -36,7 +36,7 @@ class ModelReadPartnerInnerFilterBean:ModelReadFieldFilterRule {
             _config=value
         }
 
-    override fun invoke(field: dynamic.model.query.mq.FieldBase, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
+    override fun invoke(field: FieldBase, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
         if(field.isSame(BasePartner.ref.password)){
            return Pair(true,"")
         }

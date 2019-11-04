@@ -25,6 +25,6 @@ import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.ModelField
 
 interface ModelFieldInspector {
-     val targetFields: Array<out dynamic.model.query.mq.ModelField>
+     val targetFields: Array<out ModelField>
      val advice:String
 }

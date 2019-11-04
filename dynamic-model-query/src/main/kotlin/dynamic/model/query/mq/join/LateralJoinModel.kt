@@ -25,5 +25,4 @@ package dynamic.model.query.mq.join
 
 import dynamic.model.query.mq.model.ModelBase
 
-class LateralJoinModel(model: ModelBase?, operator:String, onCondition: dynamic.model.query.mq.ModelExpression, criteria: dynamic.model.query.mq.ModelExpression?=null, val fetchCount:Int?=null, val orderBy: dynamic.model.query.mq.OrderBy?=null): dynamic.model.query.mq.join.JoinModel(model,onCondition,operator,criteria) {
-}
+class LateralJoinModel(model: ModelBase?, operator:String, onCondition: dynamic.model.query.mq.ModelExpression, criteria: dynamic.model.query.mq.ModelExpression?=null, val fetchCount:Int?=null, val orderBy: dynamic.model.query.mq.OrderBy?=null): dynamic.model.query.mq.join.JoinModel(model,onCondition,operator,criteria)

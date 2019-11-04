@@ -58,10 +58,10 @@ class RedisReceiveServerVerticle:AbstractVerticle() {
                                     .arg(it.body().toString())
                             ){
                                 if(it.succeeded()){
-                                    this.logger.trace("publish to ${ChatEventBusConstant.INNER_SERVER_MESSAGE_REDIS_QUEUE} data = ${msgBody?.toString()} ret = ${it.result().toString()}")
+                                    this.logger.trace("publish to ${ChatEventBusConstant.INNER_SERVER_MESSAGE_REDIS_QUEUE} data = ${msgBody?.toString()} ret = ${it.result()}")
                                 }
                                 else{
-                                    this.logger.trace("publish to ${ChatEventBusConstant.INNER_SERVER_MESSAGE_REDIS_QUEUE} data = ${msgBody?.toString()} ret = ${it.cause().toString()}")
+                                    this.logger.trace("publish to ${ChatEventBusConstant.INNER_SERVER_MESSAGE_REDIS_QUEUE} data = ${msgBody?.toString()} ret = ${it.cause()}")
                                 }
                             }
                         }

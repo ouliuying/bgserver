@@ -63,8 +63,8 @@ class C8686SenderBean {
     class SmsSender {
         private val digits = "0123456789abcdef"
         private val _content_type = "application/x-www-form-urlencoded"
-        public var apikey = ""
-        public var apisecret = ""
+        var apikey = ""
+        var apisecret = ""
 
         private fun getUnixTimeStamp(): String {
             val unixTimestamp = Instant.now().epochSecond
@@ -133,17 +133,17 @@ class C8686SenderBean {
                 val url = URL(_url)
                 val con = url.openConnection()
                 val http = con as HttpURLConnection
-                http.setRequestMethod("POST")
-                http.setDoOutput(true)
+                http.requestMethod = "POST"
+                http.doOutput = true
                 val out = data.toByteArray(charset("UTF-8"))
                 val length = out.size
                 http.setFixedLengthStreamingMode(length)
                 http.setRequestProperty("Content-Type", this._content_type)
-                http.setConnectTimeout(1000 * 120)
+                http.connectTimeout = 1000 * 120
                 http.connect()
-                val outstream = http.getOutputStream()
+                val outstream = http.outputStream
                 outstream.write(out)
-                val instream = http.getInputStream()
+                val instream = http.inputStream
                 val bts = ByteArrayOutputStream()
                 val buffer = ByteArray(1024)
                 var rlen = instream.read(buffer)

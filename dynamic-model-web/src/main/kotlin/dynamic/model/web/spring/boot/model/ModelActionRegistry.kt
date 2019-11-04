@@ -41,7 +41,7 @@ class  ModelActionRegistry(val name: String,val buildModelStrategy: BuildModelSt
                          modName: String,
                          action: String,
                          context:ContextType?): Any?{
-        val actions: ModelAction? =modelActions?.get(modName)
+        val actions: ModelAction? = modelActions.get(modName)
         return actions?.invoke(request,respone,session,appModel,appName,modName, action,context)
     }
 

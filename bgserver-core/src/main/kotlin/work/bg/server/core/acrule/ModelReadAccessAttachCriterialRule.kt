@@ -27,6 +27,6 @@ import dynamic.model.query.mq.model.ModelBase
 
 
 interface ModelReadAccessAttachCriterialRule<T>:ModelReadAccessControlRule<T> {
-     operator fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: dynamic.model.query.mq.ModelExpression?): dynamic.model.query.mq.ModelExpression?
+     operator fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: ModelExpression?): ModelExpression?
      var config:String
 }

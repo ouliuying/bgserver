@@ -23,7 +23,4 @@
 
 package dynamic.model.query.mq
 
-interface Many2ManyField: dynamic.model.query.mq.RefRelationField {
-
-
-}
+interface Many2ManyField: dynamic.model.query.mq.RefRelationField

@@ -25,6 +25,4 @@ package dynamic.model.query.mq
 
 class AttachedField(val field: dynamic.model.query.mq.RefTargetField,
                     val criteria: dynamic.model.query.mq.ModelExpression?=null,
-                    var canBeEmpty:Boolean=true){
-
-}
+                    var canBeEmpty:Boolean=true)

@@ -40,7 +40,7 @@ class ModelCreateFieldsInStoreInspectorCheckBean:
             set(value) {
                 this._config=value
             }
-        override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
+        override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
             data?.forEach {
                 when(it){
                     is ModelFieldUnique->{

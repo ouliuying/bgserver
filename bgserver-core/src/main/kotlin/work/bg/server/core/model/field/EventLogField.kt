@@ -34,7 +34,7 @@ class EventLogField (model: ModelBase?, name:String,
                      title:String? ):FunctionField<Long,PartnerCache>(model,name,FieldType.BIGINT,title) {
     override fun compute(fieldValueArray: FieldValueArray, context: PartnerCache?, data: Any?): Long? {
         val idField = model?.fields?.getIdField()
-        fieldValueArray.setValue(this,if(idField!=null) fieldValueArray.getValue(idField!!) else null)
+        fieldValueArray.setValue(this,if(idField!=null) fieldValueArray.getValue(idField) else null)
         return 1
     }
 

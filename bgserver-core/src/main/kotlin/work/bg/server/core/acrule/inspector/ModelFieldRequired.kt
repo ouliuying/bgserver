@@ -24,7 +24,5 @@ package work.bg.server.core.acrule.inspector
 import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.ModelField
 
-class ModelFieldRequired(override vararg val targetFields: dynamic.model.query.mq.ModelField,
-                         override val advice: String):ModelFieldInspector {
-
-}
+class ModelFieldRequired(override vararg val targetFields: ModelField,
+                         override val advice: String):ModelFieldInspector

@@ -40,47 +40,47 @@ class Department:ContextModel("corp_department",
     companion object : RefSingleton<Department> {
         override lateinit var ref: Department
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val name= dynamic.model.query.mq.ModelField(null,
+            primaryKey = FieldPrimaryKey())
+    val name= ModelField(null,
             "name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "名称")
-    val comment = dynamic.model.query.mq.ModelField(null,
+    val comment = ModelField(null,
             "comment",
-            dynamic.model.query.mq.FieldType.TEXT,
+            FieldType.TEXT,
             "注释")
-    val corp = dynamic.model.query.mq.ModelMany2OneField(null,
+    val corp = ModelMany2OneField(null,
             "corp_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             null,
             targetModelTable = "public.base_corp",
             targetModelFieldName = "id",
             defaultValue = CurrCorpBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val partners= dynamic.model.query.mq.ModelMany2ManyField(null,
+    val partners= ModelMany2ManyField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT, "员工",
+            FieldType.BIGINT, "员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
             relationModelTable = "public.department_partner_rel",
             relationModelFieldName = "partner_id")
 
-    val parent= dynamic.model.query.mq.ModelMany2OneField(null, "parent_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+    val parent= ModelMany2OneField(null, "parent_id",
+            FieldType.BIGINT,
             "上级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",
             defaultValue = null,
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val children = dynamic.model.query.mq.ModelOne2ManyField(null,
+    val children = ModelOne2ManyField(null,
             "m_parent_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             title = "下级部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "parent_id")
@@ -114,7 +114,7 @@ class Department:ContextModel("corp_department",
 
     override fun loadListModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: FieldValue?, toField: FieldBase?, ownerModelID: Long?, reqData: JsonObject?): ModelDataArray? {
         if(ownerFieldValue!=null){
-            if(ownerFieldValue.value== dynamic.model.query.mq.Undefined && ownerModelID==null){
+            if(ownerFieldValue.value== Undefined && ownerModelID==null){
                 return null
             }
         }
@@ -124,7 +124,7 @@ class Department:ContextModel("corp_department",
         val jCriteria = reqData?.get("criteria")?.asJsonObject
         //TODO parse javascript criteria
 
-        var criteria = null as dynamic.model.query.mq.ModelExpression?
+        var criteria = null as ModelExpression?
         jCriteria?.let {
             criteria = JsonClauseResolver(it,this,pc.modelExpressionContext).criteria()
         }
@@ -136,7 +136,7 @@ class Department:ContextModel("corp_department",
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
         return this.toClientModelData(data,arrayListOf(*fields.filter {_f->
-            _f is dynamic.model.query.mq.ModelMany2ManyField
-        }.toTypedArray())) as dynamic.model.query.mq.ModelDataArray?
+            _f is ModelMany2ManyField
+        }.toTypedArray())) as ModelDataArray?
     }
 }

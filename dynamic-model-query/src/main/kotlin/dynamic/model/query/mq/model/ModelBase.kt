@@ -74,14 +74,12 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     open fun getFieldKey(fieldName:String?):String?{
         return "${this.fieldKeyHeader}.$fieldName"
     }
-    open fun isAssociative():Boolean{
-        return false
-    }
+
     open fun isDynamic():Boolean{
         return false
     }
     fun getFieldByPropertyName(propertyName:String): FieldBase?{
-        return this.fields?.getFieldByPropertyName(propertyName)
+        return this.fields.getFieldByPropertyName(propertyName)
     }
     open  fun <T>  getModelFields(overrideBaseCls:KClass<T>?=null): FieldCollection where T: ModelBase {
         var thisCls=this::class as KClass<*>?
@@ -134,7 +132,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
             rFields.addAll(fields)
         }
         else{
-            rFields.addAll(fromModel.fields?.getAllPersistFields()?.values?.toTypedArray()?.toList()!!)
+            rFields.addAll(fromModel.fields.getAllPersistFields().values.toTypedArray().toList())
         }
         var st= select(*rFields.toTypedArray(), fromModel = fromModel)
         joinModels?.forEach {
@@ -148,7 +146,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 rendData!!.first,
                 st.selectFields as Array<FieldBase>,
                 null,
-                rendData?.second
+                rendData.second
         )
     }
     protected open fun query(vararg fields: FieldBase,
@@ -171,7 +169,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 return null
             }
             is ModelDataArray->{
-                return value?.data?.map { fva->
+                return value.data.map { fva->
                     val idField = value.model?.fields?.getIdField()
                     return idField?.let {
                         fva.getValue(idField)
@@ -271,14 +269,14 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         var parameters=this.fieldValueToParameters(rData?.second)
         var ret= if(parameters!=null)
         {
-            this.namedParameterJdbcTemplate?.execute(rData?.first,parameters) {
+            this.namedParameterJdbcTemplate.execute(rData?.first,parameters) {
                 it.executeQuery()
                 it.updateCount
             }
         }
         else
         {
-            this.namedParameterJdbcTemplate?.execute(rData?.first) {
+            this.namedParameterJdbcTemplate.execute(rData?.first) {
                 it.executeQuery()
                 it.updateCount
             }
@@ -293,13 +291,13 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         var parameters=this.fieldValueToParameters(rData?.second)
         var uRet= if(parameters!=null)
         {
-            this.namedParameterJdbcTemplate?.update(rData?.first,parameters)
+            this.namedParameterJdbcTemplate.update(rData?.first,parameters)
         }
         else
         {
-            this.jdbcTemplate?.update(rData?.first)
+            this.jdbcTemplate.update(rData?.first)
         }
-        return uRet?.toLong()
+        return uRet.toLong()
     }
 
 
@@ -307,14 +305,14 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         var rData=mqCreate(*modelDataObject.data.toTypedArray(),model=modelDataObject.model!!).render(null)
         var parameters=this.fieldValueToParameters(rData?.second)
         return if (parameters!=null){
-            this.namedParameterJdbcTemplate?.execute(rData?.first,parameters){
+            this.namedParameterJdbcTemplate.execute(rData?.first,parameters){
                 it.execute()
                 it.resultSet.next()
                 it.resultSet.getLong(1)
             }
         }
         else{
-            this.namedParameterJdbcTemplate?.execute(rData?.first){
+            this.namedParameterJdbcTemplate.execute(rData?.first){
                 it.execute()
                 it.resultSet.next()
                 it.resultSet.getLong(1)
@@ -329,14 +327,14 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
             it.forEach { t, u ->
                 sb.append("  $t =")
                 u.value?.let {
-                    sb.append("${it.toString()}")
+                    sb.append("$it")
                 }
             }
         }
-        this.logger.info("sql = ${sql}, values = ${sb.toString()}")
+        this.logger.info("sql = ${sql}, values = $sb")
         var kParameters=this.fieldValueToParameters(parameters)
         if(kParameters!=null)
-            return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<ModelDataArray?> {
+            return this.namedParameterJdbcTemplate.query(sql,kParameters, ResultSetExtractor<ModelDataArray?> {
                 var mda= ModelDataArray(fields = arrayListOf(), model = model)
                 mda.fields?.addAll(selectFields!!.toList())
                 while (it.next()){
@@ -345,7 +343,7 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                 mda
             })
         else
-            return this.namedParameterJdbcTemplate?.query(sql, ResultSetExtractor<ModelDataArray?> {
+            return this.namedParameterJdbcTemplate.query(sql, ResultSetExtractor<ModelDataArray?> {
                 var mda= ModelDataArray(fields = arrayListOf(), model = model)
                 mda.fields?.addAll(selectFields!!.toList())
                 while (it.next()){
@@ -357,14 +355,14 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     open fun queryCount(select: SelectStatement):Int{
         var render = select.render(null)
         var kParameters=this.fieldValueToParameters(render!!.second)
-        var sql=render!!.first
+        var sql= render.first
         return if(kParameters!=null)
-            return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<Int> {
+            return this.namedParameterJdbcTemplate.query(sql,kParameters, ResultSetExtractor<Int> {
                 it.next()
                 it.getInt(1)
             })
         else
-            return this.namedParameterJdbcTemplate?.query(sql, ResultSetExtractor<Int> {
+            return this.namedParameterJdbcTemplate.query(sql, ResultSetExtractor<Int> {
                 it.next()
                 it.getInt(1)
             })
@@ -374,24 +372,24 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
     open fun query(select: SelectStatement,handler:RowCallbackHandler){
         var render = select.render(null)
         var kParameters=this.fieldValueToParameters(render!!.second)
-        var sql=render!!.first
+        var sql= render.first
         return if(kParameters!=null)
-            return this.namedParameterJdbcTemplate?.query(sql, kParameters, handler)
+            return this.namedParameterJdbcTemplate.query(sql, kParameters, handler)
         else
-            return this.namedParameterJdbcTemplate?.query(sql, handler)
+            return this.namedParameterJdbcTemplate.query(sql, handler)
     }
 
    open fun queryMax(select: SelectStatement):Long?{
         var render = select.render(null)
         var kParameters=this.fieldValueToParameters(render!!.second)
-        var sql=render!!.first
+        var sql= render.first
         return if(kParameters!=null)
-            return this.namedParameterJdbcTemplate?.query(sql,kParameters, ResultSetExtractor<Long?> {
+            return this.namedParameterJdbcTemplate.query(sql,kParameters, ResultSetExtractor<Long?> {
                 it.next()
                 it.getLong(1)
             })
         else
-            return this.namedParameterJdbcTemplate?.query(sql, ResultSetExtractor<Long?> {
+            return this.namedParameterJdbcTemplate.query(sql, ResultSetExtractor<Long?> {
                 it.next()
                 it.getLong(1)
             })
@@ -416,13 +414,13 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         var tParameters=this.fieldValueToParameters(parameters)
         return if (tParameters!=null)
         {
-            this.namedParameterJdbcTemplate?.execute(sql,tParameters) {
+            this.namedParameterJdbcTemplate.execute(sql,tParameters) {
                 it.execute()
             }
         }
         else
         {
-            this.namedParameterJdbcTemplate?.execute(sql) {
+            this.namedParameterJdbcTemplate.execute(sql) {
                 it.execute()
             }
         }

@@ -22,6 +22,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package dynamic.model.query.exception
 
 class ModelErrorException constructor(message: String):
-        Exception(message){
-
-}
+        Exception(message)

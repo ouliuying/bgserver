@@ -51,7 +51,7 @@ import work.bg.server.core.model.field.EventLogField
 
 
 @Model(name = "partner",title="员工")
-open class  BasePartner(table:String, schema:String): ContextModel(table,schema){
+class  BasePartner(table:String, schema:String): ContextModel(table,schema){
     @Value("\${bg.work.auth-url}")
     private  val authUrl:String?= null
     companion object : RefSingleton<BasePartner> {
@@ -217,35 +217,34 @@ open class  BasePartner(table:String, schema:String): ContextModel(table,schema)
         return this.readPartnerInnerFilterBean
     }
 
-    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*>? {
+    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*,*>? {
         return this.editPartnerInnerFilterBean
     }
     override fun getModelCreateAccessFieldFilterRule(): ModelCreateRecordFieldsValueFilterRule<*>? {
         return this.createPartnerInnerFilterBean
     }
     @Action(name="login")
-    open fun login(@RequestParam userName:String, @RequestParam password:String, @RequestParam devType:Int, session:HttpSession):ActionResult?{
+    fun login(@RequestParam userName:String, @RequestParam password:String, @RequestParam devType:Int, session:HttpSession):ActionResult?{
         var md5Password= work.bg.server.util.MD5.hash(password)
-        var partner=this.rawRead(criteria = and(eq(this.userName,userName)!!,eq(this.password,md5Password)!!),
+        var partner=this.rawRead(criteria = and(eq(this.userName, userName), eq(this.password, md5Password)),
                 attachedFields = arrayOf(AttachedField(this.corps), AttachedField(this.partnerRoles)))
         return when{
             partner!=null->{
-                    var id=partner?.data?.firstOrNull()?.getValue(this.id) as Long?
+                    var id= partner.data.firstOrNull()?.getValue(this.id) as Long?
                     if(id!=null && id>0) {
                         var ar = ActionResult()
-                        var corpPartnerRels = (partner?.data?.
-                                firstOrNull()?.
-                                getValue(ConstRelRegistriesField.ref!!) as ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
+                        var corpPartnerRels = (partner.data.firstOrNull()?.
+                                getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
                         as ModelDataArray?
                         corpPartnerRels?.data?.sortByDescending {
-                            (it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?)?.data?.getValue(BasePartnerRole.ref!!.isSuper) as Int
+                            (it.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
                         }
-                        var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject?
-                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref!!.partnerRole) as ModelDataObject?
-                        var corpID=corpObject?.data?.getValue(BaseCorp.ref!!.id) as Long?
+                        var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject?
+                        var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.partnerRole) as ModelDataObject?
+                        var corpID=corpObject?.data?.getValue(BaseCorp.ref.id) as Long?
                         var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                         var corps=corpPartnerRels?.data?.map {
-                            it.getValue(BaseCorpPartnerRel.ref!!.corp) as ModelDataObject
+                            it.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject
                         }
                         if(corpID!=null && corpID>0){
                             session.setAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY, PartnerCacheKey(id, corpID, devType))
@@ -259,9 +258,9 @@ open class  BasePartner(table:String, schema:String): ContextModel(table,schema)
                                 ar.bag["sys"]=sys
                                 sys["corps"] = corps?.toList()?.stream()?.map {
                                     mapOf(
-                                            "id" to it.data.getValue(BaseCorp.ref!!.id),
-                                            "name" to it.data.getValue(BaseCorp.ref!!.name),
-                                            "comment" to it.data.getValue(BaseCorp.ref!!.comment)
+                                            "id" to it.data.getValue(BaseCorp.ref.id),
+                                            "name" to it.data.getValue(BaseCorp.ref.name),
+                                            "comment" to it.data.getValue(BaseCorp.ref.comment)
                                     )
                                 }?.toArray()
                                 sys["currCorp"] = pc.activeCorp

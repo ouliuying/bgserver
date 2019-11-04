@@ -28,7 +28,7 @@ package dynamic.model.query.mq
 import dynamic.model.query.mq.model.ModelBase
 
 interface ModelTableColumnNameGenerator{
-    fun generateTableName(model: ModelBase?):String;
-    fun generateColumnName(field: dynamic.model.query.mq.FieldBase?, onlyFieldName:Boolean=false):String;
+    fun generateTableName(model: ModelBase?):String
+    fun generateColumnName(field: dynamic.model.query.mq.FieldBase?, onlyFieldName:Boolean=false):String
     fun generateNamedParameter(columnName:String):Pair<String,String>
 }

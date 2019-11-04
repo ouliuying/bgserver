@@ -21,6 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.ui
 
-class ModelViewFieldSource(val app:String,val model:String,val method:String) {
-
-}
+class ModelViewFieldSource(val app:String,val model:String,val method:String)

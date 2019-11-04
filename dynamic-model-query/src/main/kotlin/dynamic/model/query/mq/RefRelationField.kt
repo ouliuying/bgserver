@@ -24,6 +24,6 @@
 package dynamic.model.query.mq
 
 interface RefRelationField: dynamic.model.query.mq.RefTargetField {
-    public  open val relationModelTable: String?
-    public  open val relationModelFieldName: String?
+    open val relationModelTable: String?
+    open val relationModelFieldName: String?
 }

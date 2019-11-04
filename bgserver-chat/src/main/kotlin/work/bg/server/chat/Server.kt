@@ -61,7 +61,7 @@ class Server: ApplicationRunner{
                 logger.info("message log persist server verticle start success")
             }
             else{
-                logger.info("message log persist server verticle start failed reason ${it.cause().toString()}")
+                logger.info("message log persist server verticle start failed reason ${it.cause()}")
             }
         }
 
@@ -71,7 +71,7 @@ class Server: ApplicationRunner{
                 logger.info("model client  hub verticle start success")
             }
             else{
-                logger.info("model client  hub verticle start fail reason ${it.cause().toString()}")
+                logger.info("model client  hub verticle start fail reason ${it.cause()}")
             }
         }
 
@@ -107,7 +107,7 @@ class Server: ApplicationRunner{
                 logger.info("chat server verticle start success")
             }
             else{
-                logger.info("chat server verticle start fail reason ${it.cause().toString()}")
+                logger.info("chat server verticle start fail reason ${it.cause()}")
             }
         }
 

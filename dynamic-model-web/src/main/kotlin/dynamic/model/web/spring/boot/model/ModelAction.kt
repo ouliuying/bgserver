@@ -28,7 +28,7 @@ import dynamic.model.web.context.ContextType
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
-class  ModelAction(){
+class  ModelAction {
     private  var actions = HashMap<String, ActionMethod?>()
     fun invoke(request: HttpServletRequest,
                response:HttpServletResponse,

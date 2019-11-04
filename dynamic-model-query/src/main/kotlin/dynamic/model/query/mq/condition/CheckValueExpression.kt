@@ -28,6 +28,4 @@ package dynamic.model.query.mq.condition
 import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelExpression
 
-abstract  class CheckValueExpression(val field: dynamic.model.query.mq.FieldBase, val value:Any?, val operator:String): dynamic.model.query.mq.ModelExpression(){
-
-}
+abstract  class CheckValueExpression(val field: dynamic.model.query.mq.FieldBase, val value:Any?, val operator:String): dynamic.model.query.mq.ModelExpression()

@@ -22,6 +22,6 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package dynamic.model.query.mq
 
 interface PagingField {
-    public  open val paging:Boolean?
-    public  open val pageSize:Int?
+    open val paging:Boolean?
+    open val pageSize:Int?
 }

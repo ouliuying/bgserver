@@ -21,5 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package dynamic.model.query.mq
 
-class FieldPrimaryKey(val name:String?=null,val serial:Boolean=true) {
-}
+class FieldPrimaryKey(val name:String?=null,val serial:Boolean=true)

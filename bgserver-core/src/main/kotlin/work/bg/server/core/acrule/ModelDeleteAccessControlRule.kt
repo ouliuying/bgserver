@@ -24,7 +24,9 @@ package work.bg.server.core.acrule
 import work.bg.server.core.cache.PartnerCache
 import dynamic.model.query.mq.ModelDataObject
 
-interface ModelDeleteAccessControlRule<T>:AccessControlRule<T> {
-    open operator fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data:T?): Pair<Boolean,String>
+interface ModelDeleteAccessControlRule<T,T2>:AccessControlRule<T> {
+    open operator fun invoke(modelData: ModelDataObject,
+                             partnerCache: PartnerCache,
+                             data:T?): Pair<Boolean,T2>
     open var config:String
 }

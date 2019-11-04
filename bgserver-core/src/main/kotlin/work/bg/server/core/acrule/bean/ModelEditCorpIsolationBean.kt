@@ -21,23 +21,35 @@
  *
  */
 
-package work.bg.server.product.acrule.bean
+package work.bg.server.core.acrule.bean
 
 import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.ModelExpression
+import dynamic.model.query.mq.and
+import dynamic.model.query.mq.eq
 import org.springframework.stereotype.Component
-import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
+import work.bg.server.core.acrule.ModelEditAccessControlRule
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.AccessControlModel
 
 @Component
-class ModelEditProductInnerRecordFieldsValueFilterBean : ModelEditRecordFieldsValueFilterRule<Unit,String> {
-    private lateinit var _config:String
+class ModelEditCorpIsolationBean: ModelEditAccessControlRule<ModelExpression?,ModelExpression?> {
+    protected lateinit var _config:String
     override var config: String
         get() = _config
         set(value) {
-            _config=value
+            _config = value
         }
 
-    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Unit?): Pair<Boolean, String> {
-        return Pair(true,"")
+    override fun invoke(modelData: ModelDataObject,
+                        partnerCache: PartnerCache,
+                        criteria: ModelExpression?): Pair<Boolean, ModelExpression?> {
+
+        val model = modelData.model as AccessControlModel?
+        if(model?.corpIsolationFields() != null){
+            var isoCriteria = eq(model.createCorpID,partnerCache.corpID)
+            return Pair(true, if(criteria!=null) and(criteria,isoCriteria) else isoCriteria)
+        }
+        return Pair(true,criteria)
     }
 }

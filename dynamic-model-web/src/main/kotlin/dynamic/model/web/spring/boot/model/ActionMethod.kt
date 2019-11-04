@@ -72,18 +72,18 @@ class ActionMethod constructor(val method: KFunction<*>){
                          context:ContextType?=null): Any?{
         val webRequest = ServletWebRequest(request, response)
         val handlerMethod=HandlerMethod(this.bean,this.method.javaMethod)
-        var getDataBinderFactory=RequestMappingHandlerAdapter::class.java!!.getDeclaredMethod("getDataBinderFactory",HandlerMethod::class.java)
+        var getDataBinderFactory= RequestMappingHandlerAdapter::class.java.getDeclaredMethod("getDataBinderFactory",HandlerMethod::class.java)
         getDataBinderFactory.isAccessible = true
         var binderFactory=getDataBinderFactory.invoke(appModel.requestMappingHandlerAdapter,handlerMethod)
         val invocableMethod = ServletInvocableHandlerMethod(handlerMethod)
         invocableMethod.setDataBinderFactory(binderFactory as WebDataBinderFactory)
-        val argumentResolversField = RequestMappingHandlerAdapter::class.java!!.getDeclaredField("argumentResolvers")
+        val argumentResolversField = RequestMappingHandlerAdapter::class.java.getDeclaredField("argumentResolvers")
         argumentResolversField.isAccessible = true
         val value = argumentResolversField.get(appModel.requestMappingHandlerAdapter)
         if (value != null) {
             invocableMethod.setHandlerMethodArgumentResolvers(value as HandlerMethodArgumentResolverComposite)
         }
-        val parameterNameDiscovererField = RequestMappingHandlerAdapter::class.java!!.getDeclaredField("parameterNameDiscoverer")
+        val parameterNameDiscovererField = RequestMappingHandlerAdapter::class.java.getDeclaredField("parameterNameDiscoverer")
         parameterNameDiscovererField.isAccessible = true
         val value2 = parameterNameDiscovererField.get(appModel.requestMappingHandlerAdapter)
         if (value2!= null){

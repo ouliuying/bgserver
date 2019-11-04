@@ -8,7 +8,10 @@ import work.bg.server.core.cache.PartnerCache
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
 import org.springframework.web.bind.annotation.RequestBody
+import work.bg.server.core.ui.ModelView
+import work.bg.server.core.ui.TriggerGroup
 import work.bg.server.util.Time
+import work.bg.server.util.TypeConvert
 import java.util.*
 
 @Model("modelLog")
@@ -41,6 +44,11 @@ class BaseModelLog:ContextModel("base_model_log","public") {
             FieldType.STRING,
             "数据")
 
+    val icon = ModelField(null,
+            "icon",
+            FieldType.STRING,
+            "图标")
+
     val partner = ModelMany2OneField(null,
             "partner_id",
             FieldType.BIGINT,
@@ -56,9 +64,34 @@ class BaseModelLog:ContextModel("base_model_log","public") {
     override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
     }
+    // {"controlType":"modelCommentControl","icon":"/svg/event-log-comment.svg","data":{"comment":"343434"}}
+    @Action("addControlTypeData")
+    fun addControlTypeData(@RequestBody data:JsonObject?,
+                           partnerCache: PartnerCache):Any{
+//        controlType,
+//        icon,
+//        data,
+//        modelID:ownerModelID
+        var ar = ActionResult()
+        var modelID = TypeConvert.getLong(data?.get("modelID")?.asNumber)
+        val modelLog = ModelDataObject(model = ref)
+        modelLog.setFieldValue(ref.app,data?.get("app")?.asString)
+        modelLog.setFieldValue(ref.model,data?.get("model")?.asString)
+        modelLog.setFieldValue(ref.modelID,modelID)
+        modelLog.setFieldValue(ref.partner,partnerCache.partnerID)
+        modelLog.setFieldValue(ref.icon,data?.get("icon")?.asString)
+        val controlData = JsonObject()
+        controlData.addProperty("controlType",data?.get("controlType")?.asString)
+        controlData.add("props",data?.get("data"))
+        val jData = JsonArray()
+        jData.add(controlData)
+        modelLog.setFieldValue(ref.data,jData.toString())
+        ref.rawCreate(modelLog,partnerCache = partnerCache)
+        return ar
+    }
     @Action("loadPageData")
     fun loadPageData(@RequestBody data:JsonObject?,partnerCache: PartnerCache):Any{
-        var ar = ActionResult();
+        var ar = ActionResult()
         val app = data?.get("app")?.asString
         val model = data?.get("model")?.asString
         val page = data?.get("page")?.asInt?:1
@@ -81,13 +114,15 @@ class BaseModelLog:ContextModel("base_model_log","public") {
                 val partner =  it.getFieldValue(ref.partner) as ModelDataObject?
                 jo.addProperty("icon",partner?.getFieldValue(BasePartner.ref.userIcon) as String?)
                 jo.addProperty("text",(partner?.getFieldValue(BasePartner.ref.userName) as String).substring(0,1))
-                jo.addProperty("title",partner?.getFieldValue(BasePartner.ref.userName) as String)
+                jo.addProperty("title", partner.getFieldValue(BasePartner.ref.userName) as String)
                 jo.addProperty("id",it.idFieldValue?.value as Number?)
                 jo.addProperty("date", Time.formatDate(it.getFieldValue(ref.createTime) as Date))
+                jo.addProperty("ctrlIcon",it.getFieldValue(ref.icon) as String?)
                 jo.addProperty("data",it.getFieldValue(ref.data) as String?)
                 eventLogs.add(jo)
             }
         }
+        ar.bag["triggerGroups"]= arrayOf<TriggerGroup>()
         ar.bag["eventLogs"]=eventLogs
         return ar
     }

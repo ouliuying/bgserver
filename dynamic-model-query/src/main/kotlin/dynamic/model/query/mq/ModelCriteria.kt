@@ -23,6 +23,4 @@
 
 package dynamic.model.query.mq
 
-abstract class ModelCriteria constructor(vararg  subCriterias: dynamic.model.query.mq.ModelExpression, val operator:String): dynamic.model.query.mq.ModelExpression(*subCriterias){
-
-}
+abstract class ModelCriteria constructor(vararg  subCriterias: dynamic.model.query.mq.ModelExpression, val operator:String): dynamic.model.query.mq.ModelExpression(*subCriterias)

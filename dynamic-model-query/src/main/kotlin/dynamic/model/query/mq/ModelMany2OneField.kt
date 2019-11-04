@@ -35,6 +35,4 @@ class ModelMany2OneField(model: ModelBase?,
                          override val targetModelFieldName: String?=null,
                          override val foreignKey: dynamic.model.query.mq.FieldForeignKey?=null,
                          defaultValue:Any?=null
-                         ): dynamic.model.query.mq.ModelField(model,name,fieldType,title,defaultValue=defaultValue), dynamic.model.query.mq.Many2OneField {
-
-}
+                         ): dynamic.model.query.mq.ModelField(model,name,fieldType,title,defaultValue=defaultValue), dynamic.model.query.mq.Many2OneField

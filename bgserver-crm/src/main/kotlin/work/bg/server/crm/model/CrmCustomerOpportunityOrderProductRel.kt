@@ -94,8 +94,8 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
         }
         val order = modelDataObject.getFieldValue(this.customerOrder)
         val opportunity = modelDataObject.getFieldValue((this.customerOpportunity))
-        val orderID = (if(order is dynamic.model.query.mq.ModelDataObject) order?.idFieldValue?.value as BigInteger? else order as BigInteger?)?.toLong()
-        val opportunityID = TypeConvert.getLong(if(opportunity is dynamic.model.query.mq.ModelDataObject) opportunity?.idFieldValue?.value as Number? else opportunity as Number?)
+        val orderID = (if(order is dynamic.model.query.mq.ModelDataObject) order.idFieldValue?.value as BigInteger? else order as BigInteger?)?.toLong()
+        val opportunityID = TypeConvert.getLong(if(opportunity is dynamic.model.query.mq.ModelDataObject) opportunity.idFieldValue?.value as Number? else opportunity as Number?)
         var id = modelDataObject.idFieldValue?.value
         id?.let {
             var mo = dynamic.model.query.mq.ModelDataObject(model = this)

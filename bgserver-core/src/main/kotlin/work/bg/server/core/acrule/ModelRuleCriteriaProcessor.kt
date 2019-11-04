@@ -28,5 +28,5 @@ import dynamic.model.query.mq.model.ModelBase
 
 interface ModelRuleCriteriaProcessor {
     open fun parse(criteriaStatement:String, model: ModelBase?,
-                   context: ModelExpressionContext): dynamic.model.query.mq.ModelExpression?
+                   context: ModelExpressionContext): ModelExpression?
 }

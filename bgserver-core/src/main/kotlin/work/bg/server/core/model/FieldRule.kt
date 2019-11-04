@@ -24,5 +24,4 @@ package work.bg.server.core.model
 import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelExpression
 
-class FieldRule(val field: dynamic.model.query.mq.FieldBase, ruleExpression: dynamic.model.query.mq.ModelExpression) {
-}
+class FieldRule(val field: dynamic.model.query.mq.FieldBase, ruleExpression: dynamic.model.query.mq.ModelExpression)

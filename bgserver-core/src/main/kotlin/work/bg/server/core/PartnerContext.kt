@@ -21,7 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core
 
-class PartnerContext constructor(){
+class PartnerContext {
     var isSysPartner: Boolean=false
     fun isSys():Boolean{
         return this.isSysPartner

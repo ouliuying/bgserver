@@ -32,9 +32,8 @@ import dynamic.model.query.mq.ModelExpression
 import dynamic.model.query.mq.ModelExpressionVisitor
 
 class NotInExpression(val field: dynamic.model.query.mq.FieldBase, val valueSet:Array<Any>?, val criteria: dynamic.model.query.mq.ModelExpression?=null): dynamic.model.query.mq.ModelExpression(){
-    constructor(field: dynamic.model.query.mq.FieldBase, criteria: dynamic.model.query.mq.ModelExpression?):this(field,null,criteria){
+    constructor(field: dynamic.model.query.mq.FieldBase, criteria: dynamic.model.query.mq.ModelExpression?):this(field,null,criteria)
 
-    }
     override fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

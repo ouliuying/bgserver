@@ -23,5 +23,4 @@
 
 package dynamic.model.query.mq
 
-interface One2ManyField: dynamic.model.query.mq.RefTargetField {
-}
+interface One2ManyField: dynamic.model.query.mq.RefTargetField

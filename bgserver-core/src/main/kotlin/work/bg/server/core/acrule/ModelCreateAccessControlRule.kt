@@ -25,6 +25,6 @@ import work.bg.server.core.cache.PartnerCache
 import dynamic.model.query.mq.ModelDataObject
 
 interface ModelCreateAccessControlRule<T>:AccessControlRule<T> {
-    open operator fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data:T?): Pair<Boolean,String>
+    open operator fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data:T?): Pair<Boolean,String>
     open var config:String
 }

@@ -38,8 +38,7 @@ class CriteriaStatementUtil {
         }
 
     }
-    open class CriteriaTreeNode(val statement:String,var subNodes:ArrayList<CriteriaTreeNode>?=null){
-    }
+    open class CriteriaTreeNode(val statement:String,var subNodes:ArrayList<CriteriaTreeNode>?=null)
     class AndCriteriaTreeNode(statement:String):CriteriaTreeNode(statement){
         val operator="and"
     }
@@ -64,9 +63,7 @@ class CriteriaStatementUtil {
     class ExistsExpressionTreeNode(statement:String):CriteriaTreeNode(statement){
         var isNotExists:Boolean=false
     }
-    class SubExpressionTreeNode(statement: String):CriteriaTreeNode(statement){
-
-    }
+    class SubExpressionTreeNode(statement: String):CriteriaTreeNode(statement)
     class SelectExpressionTreeNode(statement:String):CriteriaTreeNode(statement){
         var table:String?=null
         var fields:ArrayList<String>?=null
@@ -177,7 +174,7 @@ class CriteriaStatementUtil {
                     }
                     else{
                         iStartIndex+=1
-                        break;
+                        break
                     }
                 }
                 else{
@@ -207,9 +204,9 @@ class CriteriaStatementUtil {
                 var res=fieldExpressionHeader.find(statement,startIndex)
                 if(res!=null){
                     stateTreeNode=FieldExpressionTreeNode(getExpression(FieldExpressionTreeNode::class,statement,startIndex,res.value))
-                    (stateTreeNode as FieldExpressionTreeNode).fieldName=res.value.trim(' ','!','=','>','<')
-                    (stateTreeNode as FieldExpressionTreeNode).fieldValue=stateTreeNode.statement.substring(res.value.length)
-                    (stateTreeNode as FieldExpressionTreeNode).operator=Regex("[=,!,>,<]+").find(res.value)?.value!!
+                    stateTreeNode.fieldName=res.value.trim(' ','!','=','>','<')
+                    stateTreeNode.fieldValue=stateTreeNode.statement.substring(res.value.length)
+                    stateTreeNode.operator=Regex("[=,!,>,<]+").find(res.value)?.value!!
                 }
                 else{
                     res=fieldInExpressionHeader.find(statement,startIndex)
@@ -307,7 +304,7 @@ class CriteriaStatementUtil {
                             inValue= StringBuffer()
                             iStartIndex+=1
                             if(iStartIndex==inSubStr.length-1){
-                                break;
+                                break
                             }
                             else{
                                 inValue.append('\'')
@@ -368,7 +365,7 @@ class CriteriaStatementUtil {
                     }
                     else{
                         var iStartIndex=1
-                        var iFromIndex=0;
+                        var iFromIndex=0
                         while (iStartIndex<matchs.count()){
                             var iToIndex=matchs[iStartIndex].range.start
                             joinModels.add(joinTable.substring(iFromIndex,iToIndex))

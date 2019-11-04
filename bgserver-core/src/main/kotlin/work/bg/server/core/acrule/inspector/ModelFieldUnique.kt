@@ -23,7 +23,7 @@ package work.bg.server.core.acrule.inspector
 
 import dynamic.model.query.mq.ModelField
 
-class ModelFieldUnique(override vararg val targetFields: dynamic.model.query.mq.ModelField,
+class ModelFieldUnique(override vararg val targetFields: ModelField,
                        override val advice: String, val isolationType:IsolationType):ModelFieldInspector {
 
 

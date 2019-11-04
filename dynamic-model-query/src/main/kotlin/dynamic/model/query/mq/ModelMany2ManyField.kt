@@ -37,6 +37,4 @@ class ModelMany2ManyField constructor(model: ModelBase?,
                                       override val paging:Boolean?=true,
                                       override val pageSize: Int?=10
                                       ):
-        dynamic.model.query.mq.ModelField(model,name,fieldType,title), dynamic.model.query.mq.Many2ManyField, dynamic.model.query.mq.PagingField {
-
-}
+        dynamic.model.query.mq.ModelField(model,name,fieldType,title), dynamic.model.query.mq.Many2ManyField, dynamic.model.query.mq.PagingField

@@ -24,7 +24,7 @@
 package dynamic.model.query.mq
 
 interface RefTargetField {
-    public  open val targetModelTable:String?
-    public  open val targetModelFieldName:String?
-    public  open val foreignKey: dynamic.model.query.mq.FieldForeignKey?
+    open val targetModelTable:String?
+    open val targetModelFieldName:String?
+    open val foreignKey: dynamic.model.query.mq.FieldForeignKey?
 }

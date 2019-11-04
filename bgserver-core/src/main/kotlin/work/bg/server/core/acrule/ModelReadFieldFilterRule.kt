@@ -26,6 +26,6 @@ import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelDataObject
 
 interface ModelReadFieldFilterRule :ModelReadAccessControlRule<Unit>{
-    open operator fun invoke(field: dynamic.model.query.mq.FieldBase, partnerCache: PartnerCache, data:Any?): Pair<Boolean,String>
+    open operator fun invoke(field: FieldBase, partnerCache: PartnerCache, data:Any?): Pair<Boolean,String>
     open var config:String
 }

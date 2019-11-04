@@ -21,18 +21,20 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
+import dynamic.model.query.mq.FieldType
+import dynamic.model.query.mq.ModelMany2ManyField
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.BasePartner
 import dynamic.model.web.spring.boot.annotation.Model
 
 @Model("partner", "员工")
-open class DepartmentPartner:BasePartner() {
+class DepartmentPartner:BasePartner() {
     companion object : RefSingleton<DepartmentPartner> {
         override lateinit var ref: DepartmentPartner
     }
-    val departments = dynamic.model.query.mq.ModelMany2ManyField(null,
+    val departments = ModelMany2ManyField(null,
             "department_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "部门",
             targetModelTable = "public.corp_department",
             targetModelFieldName = "id",

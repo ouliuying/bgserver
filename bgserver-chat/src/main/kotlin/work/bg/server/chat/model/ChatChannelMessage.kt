@@ -21,6 +21,9 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
+import dynamic.model.query.mq.FieldPrimaryKey
+import dynamic.model.query.mq.FieldType
+import dynamic.model.query.mq.ModelField
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
@@ -31,34 +34,34 @@ class ChatChannelMessage:ContextModel("chat_channel_message","public") {
         override lateinit var ref: ChatChannelMessage
     }
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val channelUUID = dynamic.model.query.mq.ModelField(null,
+    val channelUUID = ModelField(null,
             "channel_uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "频道UUID")
 
-    val fromChatUUID = dynamic.model.query.mq.ModelField(null,
+    val fromChatUUID = ModelField(null,
             "from_chat_uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "发起ChatUUID")
 
-    val toChatUUID = dynamic.model.query.mq.ModelField(null,
+    val toChatUUID = ModelField(null,
             "to_chat_uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "接收ChatUUID")
 
-    val uuid = dynamic.model.query.mq.ModelField(null,
+    val uuid = ModelField(null,
             "uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "信息UUID")
 
-    val message = dynamic.model.query.mq.ModelField(null,
+    val message = ModelField(null,
             "message",
-            dynamic.model.query.mq.FieldType.TEXT,
+            FieldType.TEXT,
             "信息")
 }

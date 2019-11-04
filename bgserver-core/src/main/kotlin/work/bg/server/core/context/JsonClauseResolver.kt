@@ -146,7 +146,7 @@ class JsonClauseResolver(val obj:JsonObject,
                                          value:String): dynamic.model.query.mq.ModelExpression?{
         try {
             var kv = this.context?.valueFromContextKey(value)?:return null
-            if(kv!!.first){
+            if(kv.first){
                 return when{
                     operator.compareTo("=",true)==0 ->  eq(field,kv.second)
                     operator.compareTo(">",true)==0->  gt(field,kv.second)
@@ -241,6 +241,6 @@ class JsonClauseResolver(val obj:JsonObject,
                 exps.add(c)
             }
         }
-        return if(exps.count()>0) exps.toTypedArray() as Array<dynamic.model.query.mq.ModelExpression> else null
+        return if(exps.count()>0) exps.toTypedArray() else null
     }
 }

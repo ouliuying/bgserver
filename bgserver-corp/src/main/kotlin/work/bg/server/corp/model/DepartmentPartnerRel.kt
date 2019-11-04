@@ -21,7 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.corp.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
@@ -36,35 +36,35 @@ class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schem
         override lateinit var ref: DepartmentPartnerRel
     }
 
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val department= dynamic.model.query.mq.ModelMany2OneField(null,
+    val department= ModelMany2OneField(null,
             "department_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "公司",
             "public.corp_department",
             "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val partner= dynamic.model.query.mq.ModelMany2OneField(null,
+    val partner= ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "用户",
             "public.base_partner",
             "id",
             defaultValue = CurrPartnerBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
-        return arrayOf(ModelFieldUnique(partner,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
+        return arrayOf(ModelFieldUnique(partner,department,advice = "用戶已经加入这个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
     }
 
     override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
-        return arrayOf(ModelFieldUnique(partner,advice = "用戶只能加入一个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
+        return arrayOf(ModelFieldUnique(partner,department,advice = "用戶已经加入这个部门",isolationType = ModelFieldUnique.IsolationType.IN_CORP))
     }
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(ModelFieldNotNullOrEmpty(department,advice = "部门必须选择"))

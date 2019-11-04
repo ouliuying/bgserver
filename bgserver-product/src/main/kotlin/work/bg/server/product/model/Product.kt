@@ -37,7 +37,7 @@ import work.bg.server.product.acrule.bean.ModelEditProductInnerRecordFieldsValue
 
 
 @Model(name="product")
-open class Product:ContextModel("product_product","public") {
+class Product:ContextModel("product_product","public") {
     @Autowired
     private lateinit var createInnerRecordFieldsValueFilterBean:ModelCreateProductInnerRecordFieldsValueFilterBean
     @Autowired
@@ -100,7 +100,7 @@ open class Product:ContextModel("product_product","public") {
         return this.createInnerRecordFieldsValueFilterBean
     }
 
-    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*>? {
+    override fun getModelEditAccessFieldFilterRule(): ModelEditRecordFieldsValueFilterRule<*,*>? {
         return this.editInnerRecordInnerFieldsValueFilterBean
     }
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {

@@ -36,7 +36,7 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
         set(value) {
             _config=value
         }
-    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject,
+    override fun invoke(modelData: ModelDataObject,
                         partnerCache: PartnerCache,
                         data: Any?): Pair<Boolean, String> {
         this.invokeFieldArray(modelData.data,partnerCache,data)
@@ -50,14 +50,14 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
         cloneArr.forEach {
             when {
                 it.field is dynamic.model.query.mq.FunctionField<*,*> -> (it.field as dynamic.model.query.mq.FunctionField<*,PartnerCache>).inverse(fieldValueArray,partnerCache,null,data)
-                it.value is dynamic.model.query.mq.ModelDataObject -> this.invoke(it.value as ModelDataObject,partnerCache,null)
-                it.value is dynamic.model.query.mq.ModelDataArray -> this.invokeArray(it.value as ModelDataArray,partnerCache,null)
-                it.value is dynamic.model.query.mq.ModelDataSharedObject -> (it.value as ModelDataSharedObject).data.forEach { _, u ->
+                it.value is ModelDataObject -> this.invoke(it.value as ModelDataObject,partnerCache,null)
+                it.value is ModelDataArray -> this.invokeArray(it.value as ModelDataArray,partnerCache,null)
+                it.value is ModelDataSharedObject -> (it.value as ModelDataSharedObject).data.forEach { _, u ->
                     when(u){
-                        is dynamic.model.query.mq.ModelDataObject ->{
+                        is ModelDataObject ->{
                             this.invoke(u,partnerCache,null)
                         }
-                        is dynamic.model.query.mq.ModelDataArray ->{
+                        is ModelDataArray ->{
                             this.invokeArray(u,partnerCache,null)
                         }
                     }
@@ -66,7 +66,7 @@ class ModelCUFieldsProcessProxyModelFieldBeanValue: ModelCreateRecordFieldsValue
         }
     }
 
-    private fun invokeArray(modelData: dynamic.model.query.mq.ModelDataArray, partnerCache: PartnerCache, data: Any?){
+    private fun invokeArray(modelData: ModelDataArray, partnerCache: PartnerCache, data: Any?){
         modelData.data.forEach {
             invokeFieldArray(it,partnerCache,data)
         }

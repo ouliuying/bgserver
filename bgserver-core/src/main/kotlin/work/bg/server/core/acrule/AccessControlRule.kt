@@ -26,6 +26,4 @@ import work.bg.server.core.context.ModelExpressionContext
 import dynamic.model.query.mq.ModelData
 import dynamic.model.query.mq.ModelDataObject
 
-interface AccessControlRule<T> {
-
-}
+interface AccessControlRule<T>

@@ -41,8 +41,8 @@ class SelectTest : StringSpec({
     // tests here
     var model = UserModel()
     var totalFields=model.getModelFields(null as KClass<ModelBase>)
-    var fields = totalFields?.toArray()
-    var sel = select(*fields!!, fromModel = model).where(eq(fields!!.first(), 1)!!)
+    var fields = totalFields.toArray()
+    var sel = select(*fields!!, fromModel = model).where(eq(fields!!.first(), 1))
     var ret = sel.render(null)
     ret?.first shouldBe "SELECT public.user_table.id,public.user_table.user_name,public.user_table.password,public.user_table.create_time,public.user_table.last_modify_time,public.user_table.create_partner_id,public.user_table.last_modify_partner_id,public.user_table.create_corp_id,public.user_table.last_modify_corp_id FROM public.user_table WHERE public.user_table.id=:public.user_table.id"
 })
@@ -50,15 +50,13 @@ class SelectTest : StringSpec({
 class UpdateTest : StringSpec({
     var model = UserModel()
     var totalFields=model.getModelFields(null as KClass<ModelBase>)
-    var fields = totalFields?.toArray()
+    var fields = totalFields.toArray()
     var uField= dynamic.model.query.mq.FieldValue(fields!!.first(), 1)
     var upd= update(uField,setModel = model).where(eq(fields!!.get(2),"password123"))
     var ret=upd.render(null)
     ret?.first shouldBe "UPDATE public.user_table SET public.user_table.id = :public.user_table.id WHERE public.user_table.password=:public.user_table.password"
 })
 
-open class K1(open val m1:Any?){}
-class K2(override var m1:ArrayList<Long>):K1(m1){
-
-}
+open class K1(open val m1:Any?)
+class K2(override var m1:ArrayList<Long>):K1(m1)
 

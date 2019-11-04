@@ -61,8 +61,8 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         if(partnerData==null){
             return
         }
-        var corpObject=partnerData?.get("corpObject") as dynamic.model.query.mq.ModelDataObject?
-        var partnerRoleObject=partnerData?.get("partnerRoleObject") as dynamic.model.query.mq.ModelDataObject?
+        var corpObject= partnerData.get("corpObject") as dynamic.model.query.mq.ModelDataObject?
+        var partnerRoleObject= partnerData.get("partnerRoleObject") as dynamic.model.query.mq.ModelDataObject?
        // var roleModelsArray=partnerData?.get("roleModelArray") as ModelDataArray
         if(corpObject!=null && partnerRoleObject!=null){
             var corpCache=buildCorpCache(corpID?:0,corpObject,partnerRoleObject)
@@ -97,7 +97,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         val role=this.currRole
         roleData["id"]=role?.id
         roleData["isSuper"]=if(role!!.isSuper) 1 else 0
-        roleData["name"]=role?.name
+        roleData["name"]= role.name
         return map
     }
     inline  fun <reified T>  getModelCreateAccessControlRules(model: ModelBase):List<T>?{
@@ -114,12 +114,12 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     }
     fun  checkEditBelongToPartner(model:ModelBase):Boolean{
          val editRule = this.getEditModelRule(model.meta.appName,model.meta.name)
-         return  if(editRule?.checkBelongToPartner!=null) editRule?.checkBelongToPartner > 0 else false
+         return  if(editRule?.checkBelongToPartner!=null) editRule.checkBelongToPartner > 0 else false
     }
 
     fun  checkReadBelongToPartner(model:ModelBase):Boolean{
         val readRule = this.getReadModelRule(model.meta.appName,model.meta.name)
-        return  if(readRule?.checkBelongToPartner!=null) readRule?.checkBelongToPartner > 0 else false
+        return  if(readRule?.checkBelongToPartner!=null) readRule.checkBelongToPartner > 0 else false
     }
 
     private  fun buildCorpCache(corpID:Long,
@@ -128,7 +128,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         var roleID=partnerRoleObject.data.getValue(BasePartnerRole.ref.id) as Long
         var roleName=partnerRoleObject.data.getValue(BasePartnerRole.ref.name) as String
         var isSuper=(partnerRoleObject.data.getValue(BasePartnerRole.ref.isSuper) as Int)>0
-        var name=corpObject.data.getValue(BaseCorp.ref?.name!!) as String
+        var name=corpObject.data.getValue(BaseCorp.ref.name) as String
         var acRuleMeta = partnerRoleObject.data.getValue(BasePartnerRole.ref.accessControlRule) as String?
         var  role=CorpPartnerRoleCache(roleID,roleName,isSuper,acRuleMeta)
         return CorpCache(corpID,name, mutableMapOf(role.id to role))
@@ -253,10 +253,10 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     else{
                         var index=findMenuChildIndex(menu,it.app,it.name)
                         if(index!=null && index>-1){
-                            var subMenuNode=menu?.children?.get(index)
+                            var subMenuNode= menu.children?.get(index)
                             var newChild=applyMenuRule(subMenuNode,it)
                             if(newChild!=null){
-                                menu?.children?.set(index,newChild)
+                                menu.children?.set(index,newChild)
                             }
                             else{
                                 removeMenuChild(menu,index)
@@ -271,7 +271,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     else{
                         var index = findMenuItemChildIndex(menu,it.app,it.model,it.viewType)
                         if(index!=null && index>-1){
-                            var subMenuNode=menu?.children?.get(index)
+                            var subMenuNode= menu.children?.get(index)
                             var newChild=applyMenuRule(subMenuNode,it)
                             if(newChild!=null){
                                 menu.children?.set(index,newChild)

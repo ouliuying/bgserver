@@ -66,7 +66,7 @@ class ModelLineGraph(val modelMetaDatas: List<ModelMetaData>): ModelGraph {
         var ams= mutableMapOf<String, ActionMethod>()
         var mmd=modelMetaData
         if(mmd!=null){
-            val mTyp=(mmd?.beanDefinitionHolder.beanDefinition as GenericBeanDefinition).beanClass.kotlin
+            val mTyp=(mmd.beanDefinitionHolder.beanDefinition as GenericBeanDefinition).beanClass.kotlin
             mTyp.memberFunctions.forEach{
                 if (it.isOpen){
                     var ann= AnnotationUtils.findAnnotation(it.javaMethod, Action::class.java)

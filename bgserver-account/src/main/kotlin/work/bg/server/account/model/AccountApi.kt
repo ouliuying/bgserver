@@ -70,7 +70,7 @@ class AccountApi:ContextModel("account_api","public") {
         }
 
         criteria = when{
-                criteria!=null -> and(criteria!!,eq(AccountCustomerOrderInvoice.ref.status,1))
+                criteria!=null -> and(criteria,eq(AccountCustomerOrderInvoice.ref.status,1))
                 else -> eq(AccountCustomerOrderInvoice.ref.status,1)
         }
 

@@ -24,5 +24,5 @@
 package dynamic.model.query.mq
 
 interface ModelExpressionVisitor{
-    fun visit(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?);
+    fun visit(expression: dynamic.model.query.mq.ModelExpression?, parent: dynamic.model.query.mq.ModelExpression?)
 }

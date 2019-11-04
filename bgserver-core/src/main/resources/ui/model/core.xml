@@ -289,7 +289,15 @@
             <field name="userTitle" colSpan="2" type="static"/>
             <field name="userComment" colSpan="2" type="static"/>
             <field name="partnerRoles" style="relation"/>
-            <field name="eventLogs" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
 

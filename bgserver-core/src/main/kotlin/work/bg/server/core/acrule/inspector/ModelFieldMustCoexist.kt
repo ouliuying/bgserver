@@ -23,7 +23,5 @@ package work.bg.server.core.acrule.inspector
 
 import dynamic.model.query.mq.ModelField
 
-class ModelFieldMustCoexist(override vararg val targetFields: dynamic.model.query.mq.ModelField,
-                            override val advice: String):ModelFieldInspector {
-
-}
+class ModelFieldMustCoexist(override vararg val targetFields: ModelField,
+                            override val advice: String):ModelFieldInspector

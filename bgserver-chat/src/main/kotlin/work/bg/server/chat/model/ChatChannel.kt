@@ -23,12 +23,10 @@ package work.bg.server.chat.model
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dynamic.model.query.mq.*
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.chat.billboard.ChatChannelGuidBillboard
 import work.bg.server.chat.field.PartnerJoinStatusField
-import dynamic.model.query.mq.RefSingleton
-import dynamic.model.query.mq.and
-import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.specialized.ConstRelRegistriesField
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -45,51 +43,51 @@ class ChatChannel:ContextModel("chat_channel","public") {
     companion object: RefSingleton<ChatChannel> {
         override lateinit var ref: ChatChannel
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标识",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
-    val name = dynamic.model.query.mq.ModelField(null,
+            primaryKey = FieldPrimaryKey())
+    val name = ModelField(null,
             "name",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "名称")
 
-    val icon = dynamic.model.query.mq.ModelField(null,
+    val icon = ModelField(null,
             "icon",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "图标")
 
-    val uuid = dynamic.model.query.mq.ModelField(null,
+    val uuid = ModelField(null,
             "uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "内部标识",
             defaultValue = ChatChannelGuidBillboard())
 
-    val defaultFlag = dynamic.model.query.mq.ModelField(null,
+    val defaultFlag = ModelField(null,
             "default_flag",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "默认频道",
             defaultValue = 0)
 
-    val broadcastType = dynamic.model.query.mq.ModelField(null,
+    val broadcastType = ModelField(null,
             "broadcast_type",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "投递方式",
             defaultValue = 0,comment = "1 表示广播，0 p2p")
 
-    val owner = dynamic.model.query.mq.ModelMany2OneField(null,
+    val owner = ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "员工",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
             defaultValue = CurrPartnerBillboard(),
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val joinPartners = dynamic.model.query.mq.ModelMany2ManyField(null,
+    val joinPartners = ModelMany2ManyField(null,
             "join_partners",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "加入的员工",
             relationModelTable = "public.chat_model_join_channel_rel",
             relationModelFieldName = "join_partner_id",
@@ -110,7 +108,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
               val uuid = data.get("uuid")?.asString
               val mo= this.acRead(criteria = eq(this.uuid,uuid),
                       partnerCache = partnerCache,
-                      attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.joinPartners)))?.firstOrNull()
+                      attachedFields = arrayOf(AttachedField(this.joinPartners)))?.firstOrNull()
               ar.errorCode = ErrorCode.SUCCESS
               val joinModels = getJoinPartners(mo)
               joinModels?.let {
@@ -138,7 +136,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
                     return ar
                 }
 
-                val mo = dynamic.model.query.mq.ModelDataObject(model = ChatModelJoinChannelRel.ref)
+                val mo = ModelDataObject(model = ChatModelJoinChannelRel.ref)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinChannel,modelID)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinPartner,partnerCache.partnerID)
                 var ret = ChatModelJoinChannelRel.ref.acCreate(mo,partnerCache)
@@ -155,16 +153,16 @@ class ChatChannel:ContextModel("chat_channel","public") {
         ar.errorCode = ErrorCode.RELOGIN
         return ar
     }
-    private fun getJoinPartners(mo: dynamic.model.query.mq.ModelDataObject?):JsonArray?{
+    private fun getJoinPartners(mo: ModelDataObject?):JsonArray?{
         var joinModels = JsonArray()
-        var ownerPartner = this.getJoinModelFromPartner(mo?.getFieldValue(this.owner) as dynamic.model.query.mq.ModelDataObject?)
+        var ownerPartner = this.getJoinModelFromPartner(mo?.getFieldValue(this.owner) as ModelDataObject?)
         ownerPartner?.let {
             ownerPartner.addProperty("isOwner","1")
             joinModels.add(ownerPartner)
         }
-        ((mo?.getFieldValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(ChatModelJoinChannelRel.ref) as dynamic.model.query.mq.ModelDataArray?)?.let {
+        ((mo?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(ChatModelJoinChannelRel.ref) as ModelDataArray?)?.let {
             it.toModelDataObjectArray().forEach {
-                var partnerModelDataObject = it.getFieldValue(ChatModelJoinChannelRel.ref.joinPartner) as dynamic.model.query.mq.ModelDataObject?
+                var partnerModelDataObject = it.getFieldValue(ChatModelJoinChannelRel.ref.joinPartner) as ModelDataObject?
                 partnerModelDataObject?.let {
                     val joinPartner = this.getJoinModelFromPartner(partnerModelDataObject)
                     joinPartner?.let {
@@ -176,7 +174,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
         //continue add other models have chat function
         return joinModels
     }
-    private fun getJoinModelFromPartner(partner: dynamic.model.query.mq.ModelDataObject?):JsonObject?{
+    private fun getJoinModelFromPartner(partner: ModelDataObject?):JsonObject?{
         return partner?.let {
             val jo = JsonObject()
             jo.addProperty("model","partner")

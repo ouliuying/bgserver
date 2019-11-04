@@ -65,11 +65,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar= ActionResult()
         if(modelData!=null){
             var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
-            if(ret?.first!=null && ret?.first!! > 0){
+            if(ret.first !=null && ret.first!! > 0){
                 ar.bag["result"]=ret.first!!
                 return ar
             }
-            ar.description=ret?.second
+            ar.description= ret.second
         }
         ar.errorCode=ErrorCode.UPDATEMODELFAIL
         return ar
@@ -130,12 +130,12 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         val id = data["id"]?.asLong
         id?.let {
             var fdarr = FieldValueArray()
-            val idField = this.fields!!.getIdField()!!
+            val idField = this.fields.getIdField()!!
             fdarr.setValue(idField,id)
             var  mo = ModelDataObject(model = this, data = fdarr)
             val criteria = eq(idField,id)
             var ret= this.acDelete(mo,criteria=criteria,partnerCache = pc)
-            ret?.first?.let {
+            ret.first?.let {
                 if(it>0){
                   return ar
                 }
@@ -162,20 +162,20 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     }
     private  fun getMany2ManyFieldByRelationModel(model: ModelBase, relationModel:ModelBase, ownerField: FieldBase): ModelMany2ManyField?{
             val ownerModel = ownerField.model!!
-            model.fields?.forEach {
-                if(it is ModelMany2ManyField){
-                    if(it.relationModelTable==relationModel.fullTableName && it.targetModelFieldName=="id" &&
-                            it.targetModelTable==ownerModel.fullTableName){
-                        return it
-                    }
+        model.fields.forEach {
+            if(it is ModelMany2ManyField){
+                if(it.relationModelTable==relationModel.fullTableName && it.targetModelFieldName=="id" &&
+                        it.targetModelTable==ownerModel.fullTableName){
+                    return it
                 }
             }
+        }
         return null
     }
 
     private  fun getRelationModelMany2OneFieldToOwnerFieldModel(relationModel:ModelBase,ownerField: FieldBase): FieldBase?{
         val ownerModel = ownerField.model!!
-        relationModel.fields?.forEach {
+        relationModel.fields.forEach {
             if(it is ModelMany2OneField && it.targetModelTable==ownerModel.fullTableName && it.targetModelFieldName=="id"){
                 return it
             }
@@ -211,7 +211,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                         is ModelOne2ManyField,is ModelMany2OneField,is ModelOne2OneField ->{
                             var targetModel = this.appModel.getModel((ownerFieldObject as RefTargetField).targetModelTable!!)
                             if(targetModel!=null && targetModel.meta.appName == app && targetModel.meta.name==model){
-                                targetModel.fields?.getField(ownerFieldObject.targetModelFieldName)
+                                targetModel.fields.getField(ownerFieldObject.targetModelFieldName)
                             }
                             else{
                                 null
@@ -403,7 +403,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                     relationModel!=null &&
                                     targetModel!=null) {
                                 var jArr = JsonArray()
-                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                                var dataArray = (modelDataObject.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
                                 dataArray?.data?.forEach {fvs->
                                     fvs.forEach { fv->
                                         if(fv.value is ModelDataObject){
@@ -478,7 +478,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                                     relationModel!=null &&
                                     targetModel!=null) {
                                 var jArr = JsonArray()
-                                var dataArray = (modelDataObject?.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
+                                var dataArray = (modelDataObject.getFieldValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(relationModel) as ModelDataArray?
                                 dataArray?.data?.forEach {fvs->
                                     fvs.forEach { fv->
                                         if(fv.value is ModelDataObject){
@@ -695,7 +695,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     if(ownerData!=null){
                         val d =  ownerData.firstOrNull()
                         d?.let {
-                            mo.setFieldValue(toField!!,d)
+                            mo.setFieldValue(toField,d)
                         }
                     }
                 }
@@ -704,7 +704,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         if(ownerModelID!=null && ownerModelID>0){
             var ownerModel = ownerFieldValue?.field?.model as ContextModel?
             ownerModel?.let {
-               val ma= ownerModel.acRead(model=ownerModel,partnerCache = pc,criteria = eq(ownerModel.fields?.getIdField()!!,ownerModelID))
+               val ma= ownerModel.acRead(model=ownerModel,partnerCache = pc,criteria = eq(ownerModel.fields.getIdField()!!,ownerModelID))
                ma?.firstOrNull()?.let {mit->
                    this.fields.map {
                        if (it is RefTargetField) {
@@ -780,15 +780,15 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             if(mf?.first!=null){
                                 val tmf = this.getRelationModelField(toField)
                                 if(tmf?.first!=null){
-                                    val subSelect = select(mf.second!!,fromModel = mf.first!!).where(eq(tmf.second!!,ownerModelID))
-                                    return Pair(true,`in`(toField.model!!.fields.getIdField()!!,subSelect)!!)
+                                    val subSelect = select(mf.second,fromModel = mf.first).where(eq(tmf.second,ownerModelID))
+                                    return Pair(true, `in`(toField.model!!.fields.getIdField()!!, subSelect))
                                 }
                             }
                         }
                     }
                     else if(ownerFieldValue.field is ModelMany2OneField){
                         if(ownerFieldValue.value!= Undefined){
-                            return Pair(true,eq(toField?.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
+                            return Pair(true,eq(toField.model?.fields?.getIdField()!!,(ownerFieldValue.value as String?)?.toLong()))
                         }
                     }
                 }
@@ -907,21 +907,21 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                     }
                 }
                 is ModelDataArray ->{
-                    it.data?.forEach {fvs->
+                    it.data.forEach { fvs->
                         var mso = fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?
                         mso?.let {msoIt->
                             m2mFields.forEach {fd->
-                               if(fd is ModelMany2ManyField){
-                                   var relModel = this.appModel.getModel(fd.relationModelTable)
-                                   relModel?.let {mRelIt->
-                                       msoIt.data[mRelIt]?.let {mdaIt->
-                                           (mdaIt as ModelDataArray).data.firstOrNull()?.let { nfvs->
-                                               this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,nfvs)
-                                           }
+                                if(fd is ModelMany2ManyField){
+                                    var relModel = this.appModel.getModel(fd.relationModelTable)
+                                    relModel?.let {mRelIt->
+                                        msoIt.data[mRelIt]?.let {mdaIt->
+                                            (mdaIt as ModelDataArray).data.firstOrNull()?.let { nfvs->
+                                                this.setM2MFieldValue(fd.model!!,fvs,fd,relModel,nfvs)
+                                            }
 
-                                       }
-                                   }
-                               }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -977,6 +977,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 modelLog.setFieldValue(BaseModelLog.ref.model,this.meta.name)
                 modelLog.setFieldValue(BaseModelLog.ref.modelID,modelID)
                 modelLog.setFieldValue(BaseModelLog.ref.partner,pc.partnerID)
+                modelLog.setFieldValue(BaseModelLog.ref.icon,"/svg/event-log-create.svg")
                 val controlData = JsonObject()
                 controlData.addProperty("controlType","modelLogControl")
                 val controlDataProps =  JsonObject()
@@ -1004,7 +1005,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 modelLog.setFieldValue(BaseModelLog.ref.model,this.meta.name)
                 modelLog.setFieldValue(BaseModelLog.ref.modelID,modelID)
                 modelLog.setFieldValue(BaseModelLog.ref.partner,pc.partnerID)
-
+                modelLog.setFieldValue(BaseModelLog.ref.icon,"/svg/event-log-edit.svg")
                 val controlData = JsonObject()
                 controlData.addProperty("controlType","modelLogControl")
                 val controlDataProps =  JsonObject()
@@ -1031,7 +1032,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         mo.setFieldValue(modelLog.modelID,modelID)
         pc?.let {
             val partnerObj= ModelDataObject(model = BasePartner.ref)
-            partnerObj.setFieldValue(BasePartner.ref.id,pc?.partnerID)
+            partnerObj.setFieldValue(BasePartner.ref.id, pc.partnerID)
             mo.setFieldValue(modelLog.partner,partnerObj)
         }
         if(args.isNotEmpty()){

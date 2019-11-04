@@ -28,7 +28,7 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.corp.model.DepartmentPartner
 
 @Model("partner")
-open class CrmPartner:DepartmentPartner() {
+class CrmPartner:DepartmentPartner() {
     companion object : RefSingleton<CrmPartner> {
         override lateinit var ref: CrmPartner
     }

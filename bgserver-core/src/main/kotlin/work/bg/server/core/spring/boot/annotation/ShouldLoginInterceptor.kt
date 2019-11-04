@@ -38,7 +38,7 @@ class ShouldLoginInterceptor constructor(private val unauthRedirectUrl:String?):
                   response: HttpServletResponse,
                   handler: Any): Boolean {
         if(handler is HandlerMethod){
-            val rm = (handler as HandlerMethod).getMethodAnnotation(
+            val rm = handler.getMethodAnnotation(
                     ShouldLogin::class.java)
             val partnerID=request.session
                     .getAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY)

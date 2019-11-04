@@ -21,6 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat
 
-class ChatChannel(val isPattern:Boolean,val name:String,val pattern:String,val isP2P:Boolean) {
-
-}
+class ChatChannel(val isPattern:Boolean,val name:String,val pattern:String,val isP2P:Boolean)

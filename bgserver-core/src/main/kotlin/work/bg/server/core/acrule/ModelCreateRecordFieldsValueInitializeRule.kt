@@ -21,6 +21,4 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule
 
-interface ModelCreateRecordFieldsValueInitializeRule<T>:ModelCreateAccessControlRule<T> {
-
-}
+interface ModelCreateRecordFieldsValueInitializeRule<T>:ModelCreateAccessControlRule<T>

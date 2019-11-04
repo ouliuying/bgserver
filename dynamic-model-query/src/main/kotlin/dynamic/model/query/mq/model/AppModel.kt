@@ -177,7 +177,7 @@ open class  AppModel(
         }
         this.appModelMapCache= mutableMapOf()
         this.tableModelMap?.forEach { t, u ->
-            this.appModelMapCache?.put("${u.meta?.appName}.${u.meta?.name}",u)
+            this.appModelMapCache?.put("${u.meta.appName}.${u.meta.name}",u)
         }
         //todo create database tables
         this.tableModelMap?.forEach {
@@ -230,7 +230,7 @@ open class  AppModel(
             }
         }
         var (indexFields,indexUnique) =this.getModelIndexFields(model)
-        indexFields?.forEach { k, u ->
+        indexFields.forEach { k, u ->
             var (indexName,columns,unique)=this.getColumnIndexName(k, u,indexUnique)
             if(unique){
                 runSql("CREATE UNIQUE INDEX $indexName\n" +
@@ -271,7 +271,7 @@ open class  AppModel(
         this.createSchema(model?.schemaName)
         //var sql=StringBuilder()
         runSql("CREATE TABLE IF NOT EXISTS ${bakeSqlKeyword(model?.fullTableName!!)}();")
-        model?.fields?.forEach {
+        model.fields.forEach {
             if((it !is FunctionField<*,*>) && (it !is ModelOne2ManyField) && (it !is ModelMany2ManyField) && (it !is ModelOne2OneField)) {
                 if(!isTableColumnExist(model,it)){
                     runSql("ALTER TABLE ${bakeSqlKeyword(model.fullTableName)} ADD  COLUMN   IF NOT EXISTS  ${bakeSqlKeyword(it.name)} ${this.getColumnTypeExpression(it)};")
@@ -279,7 +279,7 @@ open class  AppModel(
                 if ((it as ModelField).defaultValue != null) {
                     runSql("ALTER TABLE  ${bakeSqlKeyword(model.fullTableName)} ALTER  COLUMN  ${bakeSqlKeyword(it.name)} SET DEFAULT ${this.getFieldDefaultValueExpression(it)};")
                 }
-                if((it as ModelField).primaryKey!=null){
+                if(it.primaryKey!=null){
                     runSql("ALTER TABLE  ${bakeSqlKeyword(model.fullTableName)} ADD  CONSTRAINT ${this.getColumnPrimaryName(it)} PRIMARY KEY (${bakeSqlKeyword(it.name)});")
                 }
             }
@@ -301,7 +301,7 @@ open class  AppModel(
         var table=model.tableName
         var schema=model.schemaName
         var column=field.name
-        var count=0 as Int
+        var count= 0
         var sql="select count(*) from information_schema.columns where table_schema='$schema' and table_name='$table' and column_name='$column'"
         this.jdbcTemplate?.query(sql){rs->
                count= rs.getInt(1)
@@ -328,7 +328,7 @@ open class  AppModel(
                 return "text"
             }
             FieldType.STRING->{
-                return if(field?.length!=null){
+                return if(field.length !=null){
                     "character varying(${field.length})"
                 } else{
                     "character varying"
@@ -397,7 +397,7 @@ open class  AppModel(
                 }
             }
         }
-        return if (fks?.count()>0) {
+        return if (fks.count() >0) {
             fks.toList()
         } else null
     }
@@ -470,12 +470,12 @@ open class  AppModel(
     }
     private fun getFieldDefaultValueExpression(field:ModelField?):String?{
         if(field?.defaultValue!=null && field.defaultValue !is FieldDefaultValueBillboard){
-            when(field?.fieldType){
+            when(field.fieldType){
                 FieldType.NUMBER,FieldType.BIGINT,FieldType.INT->{
-                    return field?.defaultValue.toString()
+                    return field.defaultValue.toString()
                 }
                 FieldType.STRING,FieldType.TEXT->{
-                    return "'"+SqlUtil.escapeSqlString(field?.defaultValue.toString())+"'"
+                    return "'"+SqlUtil.escapeSqlString(field.defaultValue.toString())+"'"
                 }
                 FieldType.TIME->{
                     return "now()::time without time zone"

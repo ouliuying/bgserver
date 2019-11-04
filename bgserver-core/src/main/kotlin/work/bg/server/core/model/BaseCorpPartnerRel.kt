@@ -76,17 +76,10 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
 
 
 
-    override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
-        return super.getModelFields(AccessControlModel::class)
-    }
+//    override fun <T : ModelBase> getModelFields(overrideBaseCls: KClass<T>?): FieldCollection {
+//        return super.getModelFields(AccessControlModel::class)
+//    }
 
-    override fun corpIsolationFields(): Array<ModelField>? {
-        return null
-    }
-
-    override fun isAssociative(): Boolean {
-        return true
-    }
 
 
     override fun maybeCheckACRule(): Boolean {

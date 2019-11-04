@@ -24,6 +24,4 @@ package work.bg.server.core.acrule
 import work.bg.server.core.cache.PartnerCache
 import dynamic.model.query.mq.ModelDataObject
 
-interface ModelCreateRecordFieldsValueCheckRule<T>:ModelCreateAccessControlRule<T> {
-
-}
+interface ModelCreateRecordFieldsValueCheckRule<T>:ModelCreateAccessControlRule<T>

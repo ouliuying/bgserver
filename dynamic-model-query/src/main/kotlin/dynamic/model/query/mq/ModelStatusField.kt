@@ -25,6 +25,4 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.mq.model.ModelBase
 
-class ModelStatusField constructor(model: ModelBase, name:String, fieldType: dynamic.model.query.mq.FieldType, title:String?, override val statusMetas: Array<dynamic.model.query.mq.StatusFieldMeta>): dynamic.model.query.mq.ModelField(model,name,fieldType,title), dynamic.model.query.mq.StatusField {
-
-}
+class ModelStatusField constructor(model: ModelBase, name:String, fieldType: dynamic.model.query.mq.FieldType, title:String?, override val statusMetas: Array<dynamic.model.query.mq.StatusFieldMeta>): dynamic.model.query.mq.ModelField(model,name,fieldType,title), dynamic.model.query.mq.StatusField

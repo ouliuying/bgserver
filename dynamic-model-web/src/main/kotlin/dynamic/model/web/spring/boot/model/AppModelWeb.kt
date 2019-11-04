@@ -87,11 +87,11 @@ class AppModelWeb(modelMetaDatas: List<ModelMetaData>,
             var cls=(fmmd?.beanDefinitionHolder?.beanDefinition as GenericBeanDefinition?)?.beanClass
             var fmmds=modelMetaDatas.filter { it->
                 var tCls=(it?.beanDefinitionHolder?.beanDefinition as GenericBeanDefinition?)?.beanClass
-                tCls?.kotlin?.isSubclassOf(cls?.kotlin!!)!! || cls?.kotlin?.isSubclassOf(tCls?.kotlin!!)!!
+                tCls?.kotlin?.isSubclassOf(cls?.kotlin!!)!! || cls?.kotlin?.isSubclassOf(tCls.kotlin)!!
             }
             modelMetaDatas.removeAll(fmmds)
             var (minFmmd,maxFmmd)=this.getMaxMinLevelModelMeta(fmmds)
-            var mmd= ModelMetaData(minFmmd!!.appName, minFmmd.modelName, minFmmd!!.title, maxFmmd!!.beanDefinitionHolder, minFmmd.index)
+            var mmd= ModelMetaData(minFmmd!!.appName, minFmmd.modelName, minFmmd.title, maxFmmd!!.beanDefinitionHolder, minFmmd.index)
             fmmds.forEach {
                 it?.let {
                     sortAppModelMetaDatas.add(ModelMetaData(minFmmd.appName, minFmmd.modelName, minFmmd.title, it.beanDefinitionHolder, it.index))

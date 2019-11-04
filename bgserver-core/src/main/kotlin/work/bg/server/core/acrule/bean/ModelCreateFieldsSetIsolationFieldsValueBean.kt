@@ -38,7 +38,7 @@ class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueI
         set(value) {
             this._config=value
         }
-    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject,
+    override fun invoke(modelData: ModelDataObject,
                         partnerCache: PartnerCache,
                         data: Any?): Pair<Boolean, String> {
         if(modelData.model!=null && (modelData.model as AccessControlModel).corpIsolationFields()!=null){
@@ -57,13 +57,13 @@ class ModelCreateFieldsSetIsolationFieldsValueBean:ModelCreateRecordFieldsValueI
         }
         return Pair(true,"")
     }
-    private  fun setFieldValue(modelData: dynamic.model.query.mq.ModelDataObject, field: dynamic.model.query.mq.ModelField, value:Any?){
-        var index=modelData.data?.setValue(field,value)
+    private  fun setFieldValue(modelData: ModelDataObject, field: ModelField, value:Any?){
+        var index= modelData.data.setValue(field,value)
        if(index<0){
             modelData.fields?.add(field)
         }
     }
-    operator fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache): Pair<Boolean, String> {
+    operator fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache): Pair<Boolean, String> {
        return this.invoke(modelData,partnerCache,null)
     }
 

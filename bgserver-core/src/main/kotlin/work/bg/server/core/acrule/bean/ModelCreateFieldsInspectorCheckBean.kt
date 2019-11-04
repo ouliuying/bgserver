@@ -41,7 +41,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         set(value) {
             this._config=value
         }
-    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
+    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
         data?.forEach {
             when(it){
                 is ModelFieldRequired->{
@@ -63,7 +63,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         }
         return Pair(true,"")
     }
-    private fun fieldsExist(fields:Array<out dynamic.model.query.mq.ModelField>, modelData: dynamic.model.query.mq.ModelDataObject):Boolean{
+    private fun fieldsExist(fields:Array<out ModelField>, modelData: ModelDataObject):Boolean{
         fields.forEach {
             var fv=modelData.data.filter {mFV->
                 mFV.field.isSame(it)
@@ -75,7 +75,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         return true
     }
 
-    private fun fieldsCoexist(fields:Array<out dynamic.model.query.mq.ModelField>, modelData: dynamic.model.query.mq.ModelDataObject):Boolean{
+    private fun fieldsCoexist(fields:Array<out ModelField>, modelData: ModelDataObject):Boolean{
         val existCount = modelData.data.count m@{
            return fields.firstOrNull {
                m@it.isSame(it)
@@ -84,7 +84,7 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
         return (existCount==0||existCount==fields.count())
     }
 
-    private  fun fieldsNotNullOrEmpty(fields:Array<out dynamic.model.query.mq.ModelField>, modelData: dynamic.model.query.mq.ModelDataObject, canBeBlank:Boolean):Boolean{
+    private  fun fieldsNotNullOrEmpty(fields:Array<out ModelField>, modelData: ModelDataObject, canBeBlank:Boolean):Boolean{
         fields.forEach {
             var fv=modelData.data.filter {mFV->
                 mFV.field.isSame(it)
@@ -92,10 +92,10 @@ class ModelCreateFieldsInspectorCheckBean :ModelCreateRecordFieldsValueCheckRule
             if(fv.count()<1){
                 return@forEach
             }
-            if(fv[0].field.fieldType!= dynamic.model.query.mq.FieldType.STRING && fv[0].value==null){
+            if(fv[0].field.fieldType!= FieldType.STRING && fv[0].value==null){
                 return false
             }
-            else if(fv[0].field.fieldType== dynamic.model.query.mq.FieldType.STRING){
+            else if(fv[0].field.fieldType== FieldType.STRING){
                 if(fv[0].value==null || (fv[0].value as String).isNullOrEmpty()){
                     return false
                 }

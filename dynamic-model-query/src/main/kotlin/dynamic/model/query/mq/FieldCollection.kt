@@ -36,7 +36,7 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
     init {
 
         fields.forEach {
-            fieldSet[it.getFullName()!!]=it
+            fieldSet[it.getFullName()]=it
         }
     }
     fun getAllFields():Map<String, dynamic.model.query.mq.FieldBase>{
@@ -45,7 +45,7 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
     fun getDefaultOrderBy(): dynamic.model.query.mq.OrderBy?{
         var idf= getField(dynamic.model.query.mq.FieldConstant.Companion.id)
         return if(idf!=null){
-            dynamic.model.query.mq.OrderBy(dynamic.model.query.mq.OrderBy.OrderField(idf!!, dynamic.model.query.mq.OrderBy.Companion.OrderType.DESC))
+            dynamic.model.query.mq.OrderBy(dynamic.model.query.mq.OrderBy.OrderField(idf, dynamic.model.query.mq.OrderBy.Companion.OrderType.DESC))
         }
         else{
             null
@@ -66,7 +66,7 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
         try {
             if(this::cachedPropertyFields.isInitialized){
 
-                return this.cachedPropertyFields?.get(propertyName)
+                return this.cachedPropertyFields.get(propertyName)
             }
         }
 
@@ -78,9 +78,9 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
         try {
             this.cachedPropertyFields= mutableMapOf()
             this.fieldSet.forEach{
-               this.cachedPropertyFields?.set(it.value.propertyName,it.value)
+                this.cachedPropertyFields.set(it.value.propertyName,it.value)
             }
-            return this.cachedPropertyFields?.get(propertyName)
+            return this.cachedPropertyFields.get(propertyName)
         }
         finally {
             cachedPropertyFieldsLock.unlockWrite(tamp)
@@ -134,7 +134,7 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
     fun add(field: dynamic.model.query.mq.FieldBase?): dynamic.model.query.mq.FieldBase?{
         if(!this.fieldSet.containsKey(field?.getFullName()))
         {
-            this.fieldSet.put(field?.getFullName()!!,field!!);
+            this.fieldSet.put(field?.getFullName()!!, field)
         }
         return null
     }
@@ -180,9 +180,9 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
             this.cachedPersistFieldsExcludeVirtualOne2OneField= mutableMapOf()
             this.fieldSet.forEach{
                 if((it.value !is dynamic.model.query.mq.FunctionField<*,*>) && (it.value !is dynamic.model.query.mq.RefRelationField) && it.value !is dynamic.model.query.mq.One2ManyField){
-                        this.cachedPersistFields?.set(it.key,it.value)
+                    this.cachedPersistFields.set(it.key,it.value)
                     if(it.value !is dynamic.model.query.mq.ModelOne2OneField || !(it.value as dynamic.model.query.mq.ModelOne2OneField).isVirtualField){
-                        cachedPersistFieldsExcludeVirtualOne2OneField?.set(it.key,it.value)
+                        cachedPersistFieldsExcludeVirtualOne2OneField.set(it.key,it.value)
                     }
                 }
             }
@@ -211,7 +211,7 @@ class FieldCollection(vararg fields: dynamic.model.query.mq.FieldBase): Iterable
         var funFields= mutableMapOf<String, dynamic.model.query.mq.FieldBase>()
         var relatioinFields=mutableMapOf<String, dynamic.model.query.mq.FieldBase>()
         this.fieldSet.forEach{
-            if(fullFieldNames!=null && fullFieldNames!!.toList().contains(it.key)){
+            if(fullFieldNames!=null && fullFieldNames.toList().contains(it.key)){
                 when(it){
                     is dynamic.model.query.mq.FunctionField<*,*> ->{
                         funFields[it.key] = it.value

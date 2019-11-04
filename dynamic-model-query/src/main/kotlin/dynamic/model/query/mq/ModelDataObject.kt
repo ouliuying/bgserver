@@ -97,7 +97,7 @@ class ModelDataObject(override var data: dynamic.model.query.mq.FieldValueArray 
         }
         val tValue = when(value) {
             is com.google.gson.internal.LazilyParsedNumber -> {
-                dynamic.model.query.mq.ModelFieldConvert.Companion.toTypeValue(field, value?.toString())
+                dynamic.model.query.mq.ModelFieldConvert.Companion.toTypeValue(field, value.toString())
             }
             else -> value
         }
@@ -112,12 +112,12 @@ class ModelDataObject(override var data: dynamic.model.query.mq.FieldValueArray 
     }
 
     fun hasFieldValue(propertyName:String):Boolean{
-        return this.data.firstOrNull() {
+        return this.data.firstOrNull {
                     it.field.propertyName == propertyName
                 }!=null
     }
     fun hasFieldValue(field: dynamic.model.query.mq.FieldBase):Boolean{
-        return this.data.firstOrNull() {
+        return this.data.firstOrNull {
             it.field.isSame(field)
         }!=null
     }

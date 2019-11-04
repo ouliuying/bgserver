@@ -66,18 +66,17 @@ class PartnerCacheRegistry{
 
         try {
             var partnerData=basePartner?.rawRead(*basePartner?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
-                    criteria = eq(this.basePartner?.id!!,partnerKey.partnerID)!!,
+                    criteria = eq(this.basePartner?.id!!, partnerKey.partnerID),
                     attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.basePartner?.corps!!), dynamic.model.query.mq.AttachedField(this.basePartner?.partnerRoles!!)))
 
-            var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject).
-                    data?.get(BaseCorpPartnerRel.ref) as dynamic.model.query.mq.ModelDataArray?)?.data?.firstOrNull {
-                (it.getValue(BaseCorpPartnerRel.ref!!.corp) as dynamic.model.query.mq.ModelDataObject).data.getValue(BaseCorp.ref!!.id) as Long?==partnerKey.corpID
+            var corpPartnerRelFieldValueArry=((partnerData?.data?.firstOrNull()?.getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject).data.get(BaseCorpPartnerRel.ref) as dynamic.model.query.mq.ModelDataArray?)?.data?.firstOrNull {
+                (it.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject).data.getValue(BaseCorp.ref.id) as Long?==partnerKey.corpID
             }
 
-            var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.corp!!) as dynamic.model.query.mq.ModelDataObject
-            var partnerRoleModelDataObject = corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref?.partnerRole!!) as dynamic.model.query.mq.ModelDataObject
+            var corpModelDataObject=corpPartnerRelFieldValueArry?.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject
+            var partnerRoleModelDataObject = corpPartnerRelFieldValueArry.getValue(BaseCorpPartnerRel.ref.partnerRole) as dynamic.model.query.mq.ModelDataObject
 
-            var roleID=partnerRoleModelDataObject.data.getValue(BasePartnerRole.ref?.id!!) as Long?
+            var roleID=partnerRoleModelDataObject.data.getValue(BasePartnerRole.ref.id) as Long?
 
             return PartnerCache(mapOf(
                     "corpObject" to corpModelDataObject,

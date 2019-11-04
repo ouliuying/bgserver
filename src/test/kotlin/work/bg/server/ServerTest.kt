@@ -86,7 +86,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-           var ret =  BasePartner.ref?.safeCreate(obj)
+           var ret = BasePartner.ref.safeCreate(obj)
             print(ret.second)
         }
         print(obj)
@@ -100,7 +100,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeCreate(obj)
+            BasePartner.ref.safeCreate(obj)
         }
         print(obj)
     }
@@ -114,7 +114,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeCreate(obj)
+            BasePartner.ref.safeCreate(obj)
         }
         print(obj)
     }
@@ -128,7 +128,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeCreate(obj)
+            BasePartner.ref.safeCreate(obj)
         }
         print(obj)
     }
@@ -141,7 +141,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeEdit(obj)
+            BasePartner.ref.safeEdit(obj)
         }
 
     }
@@ -152,8 +152,8 @@ class HttpRequestTest {
     }
     @Test
     fun queryAdmin(){
-        var rset= BasePartner.ref?.rawRead(*BasePartner.ref?.fields?.getAllPersistFields()?.values?.toTypedArray()!!,
-                model=BasePartner.ref,criteria = null,attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(BasePartner.ref?.corps!!)))
+        var rset= BasePartner.ref.rawRead(*BasePartner.ref.fields.getAllPersistFields().values.toTypedArray(),
+                model=BasePartner.ref,criteria = null,attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(BasePartner.ref.corps)))
         print(rset?.fromIdValue)
     }
     @Test
@@ -178,7 +178,7 @@ class HttpRequestTest {
         var json=String(bts)
         var obj=this.gson?.fromJson(json, dynamic.model.query.mq.ModelData::class.java)
         if(obj!=null){
-            BasePartner.ref?.safeCreate(obj)
+            BasePartner.ref.safeCreate(obj)
         }
         print(obj)
     }

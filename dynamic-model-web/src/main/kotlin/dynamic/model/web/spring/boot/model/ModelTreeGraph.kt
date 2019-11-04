@@ -67,7 +67,7 @@ class ModelTreeGraph constructor(val modelMetaDatas: List<ModelMetaData>): Model
         }
         var mmd=node.getModelMetaData()
         if(mmd!=null){
-            val mtyp=(mmd?.beanDefinitionHolder.beanDefinition as GenericBeanDefinition).beanClass.kotlin
+            val mtyp=(mmd.beanDefinitionHolder.beanDefinition as GenericBeanDefinition).beanClass.kotlin
             mtyp.memberFunctions.forEach{
                 if (it.isOpen){
                     var ann= AnnotationUtils.findAnnotation(it.javaMethod, Action::class.java)
@@ -133,7 +133,7 @@ class ModelTreeGraph constructor(val modelMetaDatas: List<ModelMetaData>): Model
         var subNodes= mutableListOf<ModelTreeGraphNode>()
         nodes.forEach{
             if (it.isDependentedNode(parent!!)){
-                parent?.addSubNode(it)
+                parent.addSubNode(it)
                 subNodes.add(it)
             }
         }

@@ -110,7 +110,7 @@ class DefaultSmsSender: SmsSender {
             mo.setFieldValue(tm.sendPartner,it.partnerID)
         }
         val ret=tm.rawCreate(mo,useAccessControl,partnerCache)
-        if(ret?.first != null && ret.first!!>0){
+        if(ret.first != null && ret.first!!>0){
             return true
         }
         return false

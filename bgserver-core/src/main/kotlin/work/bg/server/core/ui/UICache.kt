@@ -86,7 +86,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         var viewActionSortFiles=UISortFiles()
         appModel.appPackageManifests.forEach { _, u ->
             try {
-                var menuRes=this.resLoader.getResource("classpath:ui/menu/${u.name}.xml")?.inputStream
+                var menuRes= this.resLoader.getResource("classpath:ui/menu/${u.name}.xml").inputStream
                 if(menuRes!=null){
                     try {
                         var doc=SAXReader().read(menuRes)
@@ -96,7 +96,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                         logger.error(ex.toString())
                     }
                 }
-                var modelRes=this.resLoader.getResource("classpath:ui/model/${u.name}.xml")?.inputStream
+                var modelRes= this.resLoader.getResource("classpath:ui/model/${u.name}.xml").inputStream
                 if(modelRes!=null){
                     try {
                         var doc=SAXReader().read(modelRes)
@@ -107,7 +107,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     }
                 }
 
-                var actionRes=this.resLoader.getResource("classpath:ui/action/${u.name}.xml")?.inputStream
+                var actionRes= this.resLoader.getResource("classpath:ui/action/${u.name}.xml").inputStream
                 if(actionRes!=null){
                     try {
                         var doc=SAXReader().read(actionRes)
@@ -210,7 +210,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             }
         }
 
-        files?.forEach {
+        files.forEach {
             var actions=it.doc.selectNodes("/ui/action") as List<Element?>?
             actions?.forEach {ait->
                 if(ait!=null){
@@ -223,15 +223,15 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     private fun addViewAction(va:ViewAction){
 
         if(this.viewActions.containsKey(va.app)){
-            if(this.viewActions[va.app]!!.modelActions?.containsKey(va.model)){
-                if(this.viewActions[va.app]!!.modelActions?.get(va.model)?.containsKey(va.viewType)!!){
-                    var vaList = this.viewActions[va.app]!!.modelActions?.get(va.model)?.get(va.viewType) as MutableList<ViewAction>?
+            if(this.viewActions[va.app]!!.modelActions.containsKey(va.model)){
+                if(this.viewActions[va.app]!!.modelActions.get(va.model)?.containsKey(va.viewType)!!){
+                    var vaList = this.viewActions[va.app]!!.modelActions.get(va.model)?.get(va.viewType) as MutableList<ViewAction>?
                     vaList?.add(va)
                 }
                 else{
                     var vaList = mutableListOf<ViewAction>()
                     vaList.add(va)
-                    var mmap = this.viewActions[va.app]!!.modelActions?.get(va.model) as MutableMap?
+                    var mmap = this.viewActions[va.app]!!.modelActions.get(va.model) as MutableMap?
                     mmap?.put(va.viewType,vaList)
                 }
             }
@@ -273,7 +273,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 if(name!=null){
                     var ag=TriggerGroup(name)
                     va.groups[ag.name]=ag
-                    var triggers=it?.selectNodes("trigger") as List<Element?>?
+                    var triggers= it.selectNodes("trigger") as List<Element?>?
                     triggers?.forEach {
                         tit->
                         var tApp=app
@@ -388,13 +388,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     private  fun buildMenuTree(hostApp:String,menu:Element?,parentApp:String?=null):MenuTree?{
         if(menu!=null){
             try {
-                var appName=menu?.attributeValue("app")
+                var appName= menu.attributeValue("app")
                 if(appName==null || appName.isNullOrEmpty()){
                     appName=parentApp
                 }
-                var name=menu?.attributeValue("name")
-                var title=menu?.attributeValue("title")
-                var icon=menu?.attributeValue("icon")
+                var name= menu.attributeValue("name")
+                var title= menu.attributeValue("title")
+                var icon= menu.attributeValue("icon")
                 var mT= MenuTree(appName,name,title,icon)
                 var elements=menu.elements() as List<Element?>?
                 mT.children= arrayListOf()
@@ -424,14 +424,14 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     private fun buildMenuNode(hostApp: String,menuItem:Element?,parentApp:String?=null):MenuNode?{
         if(menuItem!=null){
             try {
-                var app=menuItem?.attributeValue("app")
+                var app= menuItem.attributeValue("app")
                 if(app==null || app.isNullOrEmpty()){
                     app=parentApp
                 }
-                var title=menuItem?.attributeValue("title")
-                var model=menuItem?.attributeValue("model")
-                var viewType=menuItem?.attributeValue("viewType")
-                var icon=menuItem?.attributeValue("icon")
+                var title= menuItem.attributeValue("title")
+                var model= menuItem.attributeValue("model")
+                var viewType= menuItem.attributeValue("viewType")
+                var icon= menuItem.attributeValue("icon")
                 return MenuNode(app,title,model,viewType,icon)
             }
             catch (ex:Exception){
@@ -446,7 +446,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             anchorNodes.forEach {
                 var index=it?.parent?.elements()?.indexOf(it)
                 if(index!=null && index>-1){
-                    opNodes?.asReversed()?.forEach {opNode->
+                    opNodes.asReversed().forEach { opNode->
                         var tcpyNode=opNode?.createCopy()
                         if(tcpyNode!=null){
                             it?.parent?.elements()?.add(index,tcpyNode)
@@ -463,7 +463,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             anchorNodes.forEach {
                 var index=it?.parent?.elements()?.indexOf(it)
                 if(index!=null && index>-1){
-                    opNodes?.asReversed()?.forEach {opNode->
+                    opNodes.asReversed().forEach { opNode->
                         var cpyNode=opNode?.createCopy()
                         if(cpyNode!=null){
                             it?.parent?.elements()?.add(index+1,cpyNode)
@@ -478,7 +478,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                              opNodes:List<Element?>?){
         if(opNodes!=null && !opNodes.isEmpty()){
             anchorNodes.forEach {anchorNode->
-                opNodes?.forEach {opNode->
+                opNodes.forEach { opNode->
                     var cpyNode=opNode?.createCopy()
                     if(cpyNode!=null){
                         anchorNode?.elements()?.add(cpyNode)
@@ -492,7 +492,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                         opNodes:List<Element?>?){
         if(opNodes!=null && !opNodes.isEmpty()){
             anchorNodes.forEach {anchorNode->
-                opNodes?.asReversed()?.forEach {opNode->
+                opNodes.asReversed().forEach { opNode->
                     var cpyNode=opNode?.createCopy()
                     if(cpyNode!=null){
                         anchorNode?.elements()?.add(0,cpyNode)
@@ -547,7 +547,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
             appModelConfigMap[it.appName]=it
         }
 
-        files?.forEach {
+        files.forEach {
             var models=it.doc.selectNodes("/ui/model") as List<Element?>?
             models?.forEach {mit->
                 if(mit!=null){
@@ -600,7 +600,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
         try {
             var viewType=viewNode?.attributeValue("type")
             var mv=ModelView(app,model,viewType)
-            (viewNode?.elements("field") as List<Element?>)?.forEach {it ->
+            (viewNode?.elements("field") as List<Element?>).forEach { it ->
                 if(it!=null){
                     var name=it.attributeValue("name")
                     var style=it.attributeValue("style")
@@ -624,15 +624,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     var rowSpan=1
                     try {
                         rowSpan = it.attributeValue("rowSpan").toInt(10)
-                    }
-                    catch (ex:Exception){
+                    } catch (ex:Exception){
 
                     }
                     var colSpan=1
                     try {
                         colSpan=it.attributeValue("colSpan").toInt(10)
-                    }
-                    catch (ex:Exception){
+                    } catch (ex:Exception){
 
                     }
                     var subNodes=it.elements("view")
@@ -641,8 +639,8 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     f.visible=visible
                     f.enable=enable
                     if(subNode!=null){
-                        var subModel=viewNode?.attributeValue("name")
-                        var subApp=viewNode?.attributeValue("app")?:app
+                        var subModel= viewNode.attributeValue("name")
+                        var subApp= viewNode.attributeValue("app") ?:app
                         f.fieldView=buildSingleModelView(subApp,subModel,subNode)
                     }
 
@@ -650,13 +648,13 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     var subMetaNode=if(subMetaNodes.size>0) subMetaNodes[0] as Element? else null
                     if(subMetaNode!=null){
                         f.meta=  gson.fromJson(subMetaNode.textTrim,JsonObject::class.java)
-                       // print(f.meta)
+                        // print(f.meta)
                     }
-                    var sourceNode = it.element("source") as Element?
+                    var sourceNode = it.element("source")
                     sourceNode?.let {
-                        val sApp = (it.attributeValue("app") as String?)?:app
-                        val sModel = (it.attributeValue("model") as String?)?:model
-                        val sMethod = (it.attributeValue("method") as String?)
+                        val sApp = it.attributeValue("app") ?:app
+                        val sModel = it.attributeValue("model") ?:model
+                        val sMethod = it.attributeValue("method")
                         if(!sApp.isNullOrEmpty() && !sModel.isNullOrEmpty() && !sMethod.isNullOrEmpty()){
                             f.source = ModelViewFieldSource(sApp,sModel,sMethod)
                         }
@@ -665,15 +663,14 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                     if(subCtrlProps.size>0){
                         try {
                             f.ctrlProps = gson.fromJson((subCtrlProps[0] as Element).textTrim,JsonObject::class.java)
-                        }
-                        catch (ex:java.lang.Exception){
+                        } catch (ex:java.lang.Exception){
                             logger.error(ex.toString())
                         }
                     }
                 }
             }
 
-            (viewNode?.selectNodes("ref/actions/action") as List<Element>?)?.forEach {
+            (viewNode.selectNodes("ref/actions/action") as List<Element>?)?.forEach {
                 val aApp = it.attributeValue("app")?:app
                 val aModel = it.attributeValue("model")?:model
                 val aViewType = it.attributeValue("viewType")?:viewType
@@ -697,7 +694,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                             val tIcon = tit.attributeValue("icon")
                             try{
                                 var rt = ModelView.RefActionGroup.RefTrigger(tApp,tModel,tViewType,tName!!,tTitle,tOwnerField,tActionName,tVisible,tIcon,tEnable)
-                                logger.debug("load rt ${rt.toString()}")
+                                logger.debug("load rt $rt")
                                 triggers.add(rt)
                                 try {
                                     val metaElem = tit.selectSingleNode("meta") as Element?
@@ -720,7 +717,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 }
             }
 
-            (viewNode?.selectNodes("ref/actions/menu") as List<Element>?)?.forEach {
+            (viewNode.selectNodes("ref/actions/menu") as List<Element>?)?.forEach {
                 val aApp = it.attributeValue("app")?:app
                 val name = it.attributeValue("name")
                 val refType = it.attributeValue("refType")
@@ -730,7 +727,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 )
             }
 
-            (viewNode?.selectNodes("ref/views/view") as List<Element>?)?.forEach {
+            (viewNode.selectNodes("ref/views/view") as List<Element>?)?.forEach {
                 var vApp = it.attributeValue("app")
                 var vModel = it.attributeValue("model")
                 val viewType = it.attributeValue("type")
@@ -801,7 +798,7 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
                 else{
                     var vLst = mutableListOf<String>()
                     u.forEach {
-                        vLst?.add(it.key)
+                        vLst.add(it.key)
                     }
                     keys[t]=vLst
                 }

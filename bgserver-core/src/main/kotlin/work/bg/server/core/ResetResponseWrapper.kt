@@ -38,12 +38,6 @@ class ResetResponseWrapper(response: HttpServletResponse):HttpServletResponseWra
     private val bodyShadow= ByteArrayOutputStream()
     private val feedServletOutputStream=FeedServletOutputStream(response.outputStream,bodyShadow)
     private val feedWriter = PrintWriter(OutputStreamWriter(feedServletOutputStream, this.characterEncoding))
-    override fun flushBuffer() {
-        super.flushBuffer()
-    }
-    override fun getBufferSize(): Int {
-        return super.getBufferSize()
-    }
 
     override fun getOutputStream(): ServletOutputStream {
         return feedServletOutputStream
@@ -53,21 +47,6 @@ class ResetResponseWrapper(response: HttpServletResponse):HttpServletResponseWra
         return feedWriter
     }
 
-    override fun resetBuffer() {
-        super.resetBuffer()
-    }
-
-    override fun reset() {
-        super.reset()
-    }
-
-    override fun setBufferSize(size: Int) {
-        super.setBufferSize(size)
-    }
-
-    override fun setResponse(response: ServletResponse?) {
-        super.setResponse(response)
-    }
     val bodyText: String
         get() = String(bodyShadow.toByteArray(), Charset.defaultCharset())
 

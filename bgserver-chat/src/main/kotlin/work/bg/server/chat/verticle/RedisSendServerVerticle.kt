@@ -49,7 +49,7 @@ class RedisSendServerVerticle:AbstractVerticle() {
                 it.result()?.let {
                     it.handler {msg->
                         try{
-                            this.logger.trace("redis receive msg = ${msg.toString()}")
+                            this.logger.trace("redis receive msg = $msg")
                             val msgBody = msg[2].toString()
                             this.logger.trace("real message = ${msgBody}")
                             val msgObj = JsonObject(msgBody)

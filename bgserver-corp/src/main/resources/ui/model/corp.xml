@@ -23,20 +23,20 @@
 
 
 
-        <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">
-            <field name="department"/>
-        </xpath>
+<!--        <xpath expression="/ui/model[@app='core'][@name='corp']/view/create" op="append" app="core">-->
+<!--            <field name="department"/>-->
+<!--        </xpath>-->
 
-        <xpath expression="/ui/model[@app='core'][@name='partnerRole']/view/edit" op="append" app="core">
-            <field name="department"/>
-        </xpath>
+<!--        <xpath expression="/ui/model[@app='core'][@name='partnerRole']/view/edit" op="append" app="core">-->
+<!--            <field name="department"/>-->
+<!--        </xpath>-->
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']" op="append" app="core">
             <field name="departments" style="relation"/>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='create']/ref/views" op="append" app="core">
-            <view type="create" ownerField="departments" refType="none" model="departmentPartnerRel" app="corp"></view>
+            <view type="list" ownerField="departments" refType="sub" model="departmentPartnerRel" app="corp"></view>
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']" op="append" app="core">
@@ -44,19 +44,24 @@
         </xpath>
 
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='edit']/ref/views" op="append" app="core">
-            <view type="edit" ownerField="departments" refType="none" model="departmentPartnerRel" app="corp"></view>
+            <view type="list" ownerField="departments" refType="sub" model="departmentPartnerRel" app="corp"></view>
         </xpath>
 
-        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='setCurrentCorpAsDefault']" op="insertAfter" app="core">
-            <field name="departments.name" type="selectModelFromListView"/>
-        </xpath>
 
-        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='partnerRoles']" op="insertAfter" app="core">
+
+<!--        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/field[@name='partnerRoles']" op="insertAfter" app="core">-->
+<!--            <field name="departments" style="relation"/>-->
+<!--        </xpath>-->
+
+
+        <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']" op="append" app="core">
             <field name="departments" style="relation"/>
         </xpath>
+
         <xpath expression="/ui/model[@app='core'][@name='partner']/view[@type='detail']/ref/views" op="append" app="core">
-            <view type="detail" refType="none" ownerField="departments" model="department" app="corp"/>
+            <view type="list" refType="none" ownerField="departments" model="departmentPartnerRel" app="corp"/>
         </xpath>
+
     </inherit>
 
     <model name="department" app="corp">
@@ -157,9 +162,10 @@
             </ref>
             <field name="partner.id" title="标识"/>
             <field name="partner.userName" title="用户名"/>
-            <field name="partner.name" title="姓名"/>
-            <field name="partner.nickName" title="昵称"/>
-            <field name="partner.userComment" title="注释"/>
+            <field name="department.name" title="部门"/>
+<!--            <field name="partner.name" title="姓名"/>-->
+<!--            <field name="partner.nickName" title="昵称"/>-->
+<!--            <field name="partner.userComment" title="注释"/>-->
         </view>
         <view type="edit">
             <ref>

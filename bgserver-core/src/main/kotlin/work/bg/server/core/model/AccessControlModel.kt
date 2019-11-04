@@ -94,10 +94,18 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     @Autowired
     protected  lateinit var  modelDeleteFieldsBelongToPartnerCheck:ModelDeleteFieldsBelongToPartnerCheckBean
+
     @Autowired
     protected lateinit var readCorpIsolation:ModelReadCorpIsolationBean
+
     @Autowired
     protected lateinit var readPartnerIsolation:ModelReadPartnerIsolationBean
+
+    @Autowired
+    protected  lateinit var deleteCorpIsolationBean: ModelDeleteCorpIsolationBean
+
+    @Autowired
+    protected lateinit var editCorpIsolationBean:ModelEditCorpIsolationBean
     @Autowired
     lateinit var gson: Gson
     /*Corp Isolation Fields Begin*/
@@ -125,9 +133,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         )
     }
 
-    override fun isAssociative():Boolean{
-        return false
-    }
+
 
     open fun maybeCheckACRule():Boolean{
 
@@ -200,8 +206,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
             models.forEach {
+                ruleCriteria = this.readCorpIsolation(model,partnerCache,ruleCriteria)
                 if(partnerCache.checkReadBelongToPartner(model)){
-                    ruleCriteria = this.readCorpIsolation(model,partnerCache,ruleCriteria)
                     ruleCriteria = this.readPartnerIsolation(model,partnerCache,ruleCriteria)
                     val isolationRules = partnerCache.getModelReadAccessControlRules<ModelReadIsolationRule<*>>(this)
                     isolationRules?.forEach {
@@ -246,7 +252,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun getModelReadAccessFieldFilterRule():ModelReadFieldFilterRule?{
         return null
     }
-    protected  open fun getModelEditAccessFieldFilterRule():ModelEditRecordFieldsValueFilterRule<*>?{
+    protected  open fun getModelEditAccessFieldFilterRule():ModelEditRecordFieldsValueFilterRule<*,*>?{
         return null
     }
     protected  open fun getModelCreateAccessFieldFilterRule():ModelCreateRecordFieldsValueFilterRule<*>?{
@@ -352,11 +358,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         var m2mfs=ArrayList<AttachedField>()
         var ownerMany2OneFields = ArrayList<ModelMany2OneField>()
         if(fields.isEmpty()){
-            var pFields= model?.fields?.getAllPersistFields()?.values?.toTypedArray()
+            var pFields= model.fields.getAllPersistFields().values.toTypedArray()
             if(partnerCache!=null){
                 pFields=this.filterAcModelFields(pFields,model=this,partnerCache=partnerCache)
             }
-            pFields?.let {
+            pFields.let {
                 sortFields(model, arrayListOf(*pFields),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
             }
         }
@@ -395,7 +401,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var mf=this.getTargetModelField(it)
             if(mf!=null){
                 if(useAccessControl){
-                    var o2oFields=mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    var o2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(o2oFields!=null){
                         fs.addAll(o2oFields)
                     }
@@ -404,17 +410,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
                 else{
-                    fs.addAll(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    fs.addAll(mf.first.fields.getAllPersistFields(true).values.toTypedArray())
                 }
                 var o2oFd= it as ModelOne2OneField
                 if(o2oFd.isVirtualField){
                     var idf=o2oFd.model?.fields?.getIdField()
-                    modelRelationMatcher.addMatchData(model,o2oFd,mf?.first,mf?.second,idf)
-                    joinModels.add(leftJoin(mf?.first,eq(mf?.second!!,idf)!!))
+                    modelRelationMatcher.addMatchData(model,o2oFd, mf.first, mf.second,idf)
+                    joinModels.add(leftJoin(mf.first, eq(mf.second, idf)))
                 }
                 else{
-                    modelRelationMatcher.addMatchData(model,o2oFd,mf?.first,mf?.second)
-                    joinModels.add(leftJoin(mf?.first,eq(mf?.second!!,it)!!))
+                    modelRelationMatcher.addMatchData(model,o2oFd, mf.first, mf.second)
+                    joinModels.add(leftJoin(mf.first, eq(mf.second, it)))
                 }
             }
         }
@@ -423,7 +429,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var mf=this.getTargetModelField(it)
             if(mf!=null){
                 if(useAccessControl){
-                    var m2oFields=mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    var m2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(m2oFields!=null){
                         fs.addAll(m2oFields)
                     }
@@ -432,10 +438,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
                 else{
-                    fs.addAll(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    fs.addAll(mf.first.fields.getAllPersistFields(true).values.toTypedArray())
                 }
-                modelRelationMatcher.addMatchData(model,it,mf?.first,mf?.second)
-                joinModels.add(leftJoin(mf?.first,eq(mf?.second!!,it)!!))
+                modelRelationMatcher.addMatchData(model,it, mf.first, mf.second)
+                joinModels.add(leftJoin(mf.first, eq(mf.second, it)))
             }
         }
         var offset=null as Int?
@@ -448,7 +454,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 offset=0
             }
             if(newOrderBy==null){
-                newOrderBy=model?.fields?.getDefaultOrderBy()
+                newOrderBy= model.fields.getDefaultOrderBy()
             }
         }
         var (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
@@ -459,7 +465,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 joinModels = joinModels.toTypedArray())
 
         var mDataArray=this.query(*postFS,
-                fromModel = model!!,
+                fromModel = model,
                 joinModels = joinModels.toTypedArray(),
                 criteria = readCriteria,
                 orderBy = newOrderBy,
@@ -527,7 +533,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
             else if(it.field is One2ManyField){
-                var rtf=it.field as RefTargetField
+                var rtf= it.field
                 if(o2mfs.filter { rt-> (rt.field as FieldBase).getFullName()==(it.field as FieldBase).getFullName() }.count()<1)
                 {
                     o2mfs.add(it)
@@ -545,22 +551,20 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         rmfs.forEach {
             modelRelationMatcher = ModelRelationMatcher()
             var rmf=model.getRelationModelField(it.value.first().field as FieldBase)
-            var idField=model?.fields?.getIdField()
+            var idField= model.fields.getIdField()
             var rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
-            var subSelect=select(idField!!,fromModel = model!!).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
+            var subSelect=select(idField!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
             var rtFields=ArrayList<FieldBase>()
             rtFields.addAll(rmf?.first?.fields?.getAllPersistFields(true)?.values!!)
-            modelRelationMatcher.addMatchData(model,idField,rmf?.first,rIDField)
+            modelRelationMatcher.addMatchData(model,idField, rmf.first,rIDField)
             var joinModels=ArrayList<dynamic.model.query.mq.join.JoinModel>()
             it.value.forEach allField@{rrf->
                 val relationMF = model.getRelationModelField(rrf.field as FieldBase)?:return@allField
                 val targetMF= model.getTargetModelField(rrf.field as FieldBase)?:return@allField
-                var jField= relationMF.first?.fields?.getFieldByTargetField(targetMF.second)?:return@allField
+                var jField= relationMF.first.fields.getFieldByTargetField(targetMF.second) ?:return@allField
                 if(useAccessControl){
                     //var rmfFields=partnerCache?.acFilterReadFields(sRmf?.first?.fields?.getAllPersistFields()?.values?.toTypedArray()!!)
-                    var targetMFFields=targetMF?.first?.fields?.
-                            getAllPersistFields(true)?.
-                            values?.toTypedArray()!!
+                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
                     if(targetMFFields!=null){
                         //rtFields.addAll(rmfFields)
                         rtFields.addAll(targetMFFields)
@@ -569,17 +573,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         return@allField
                     }
                 }else{
-                    rtFields.addAll(targetMF?.first?.fields?.getAllPersistFields(true)?.values!!)
+                    rtFields.addAll(targetMF.first.fields.getAllPersistFields(true).values)
                 }
-                modelRelationMatcher.addMatchData(rmf?.first,
+                modelRelationMatcher.addMatchData(rmf.first,
                         relationMF.second,
-                        targetMF?.first,
-                        targetMF?.second)
+                        targetMF.first,
+                        targetMF.second)
                 if(rrf.canBeEmpty){
-                    joinModels.add(leftJoin(targetMF?.first, eq(jField!!,targetMF?.second!!)!!))
+                    joinModels.add(leftJoin(targetMF.first, eq(jField, targetMF.second)))
                 }
                 else{
-                    joinModels.add(innerJoin(targetMF?.first, eq(jField!!,targetMF?.second!!)!!))
+                    joinModels.add(innerJoin(targetMF.first, eq(jField, targetMF.second)))
                 }
             }
 
@@ -608,15 +612,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
 
-            var (readCriteria,postFS) = (rmf?.first!! as AccessControlModel).beforeRead(*rtFields.toTypedArray(),
+            var (readCriteria,postFS) = (rmf.first as AccessControlModel).beforeRead(*rtFields.toTypedArray(),
                     criteria=subCriteria,
-                    model=rmf?.first!!,
+                    model= rmf.first,
                     useAccessControl = useAccessControl,
                     partnerCache = partnerCache,
                     joinModels = joinModels.toTypedArray())
 
-            var mrDataArray=(rmf?.first!! as AccessControlModel).query(*postFS,
-                    fromModel= rmf?.first!!,
+            var mrDataArray=(rmf.first as AccessControlModel).query(*postFS,
+                    fromModel= rmf.first,
                     joinModels=joinModels.toTypedArray(),
                     criteria=readCriteria,
                     orderBy = rOrderBy,
@@ -636,7 +640,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             modelRelationMatcher = ModelRelationMatcher()
             var targetMF=this.getTargetModelField(it.field as FieldBase)
             if(targetMF!=null){
-                var subSelect=select(model?.fields?.getIdField()!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
+                var subSelect=select(model.fields.getIdField()!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
 
                 var rOrderBy=null as OrderBy?
                 var rOffset=null as Int?
@@ -648,23 +652,23 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //                    rLimit=it.pageSize
 //                }
                 if(useAccessControl){
-                    var targetMFFields=targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!//partnerCache?.acFilterReadFields(targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(targetMFFields!=null){
 
-                        modelRelationMatcher.addMatchData(model,it.field as FieldBase,targetMF?.first,targetMF?.second,model.fields?.getIdField())
-                        var subCriteria=selectIn(targetMF?.second!!,subSelect)
+                        modelRelationMatcher.addMatchData(model,it.field as FieldBase, targetMF.first, targetMF.second, model.fields.getIdField())
+                        var subCriteria=selectIn(targetMF.second,subSelect)
                         if(it.criteria!=null){
-                            subCriteria=and(subCriteria!!, it.criteria!!)
+                            subCriteria=and(subCriteria, it.criteria!!)
                         }
 
-                        var (readCriteria,postFS) = (targetMF?.first!! as AccessControlModel).beforeRead(*targetMFFields,
+                        var (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
                                 criteria=subCriteria,
-                                model=targetMF?.first!!,
+                                model= targetMF.first,
                                 useAccessControl = useAccessControl,
                                 partnerCache = partnerCache)
 
-                        var mrDataArray=(targetMF?.first!! as AccessControlModel).query(*postFS,
-                                fromModel= targetMF?.first!!,
+                        var mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,
+                                fromModel= targetMF.first,
                                 criteria=readCriteria,
                                 orderBy = rOrderBy,
                                 offset = rOffset,
@@ -683,19 +687,19 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
                 else{
-                    modelRelationMatcher.addMatchData(model,it.field as FieldBase,targetMF?.first,targetMF?.second,model.fields?.getIdField())
-                    var subCriteria=selectIn(targetMF?.second!!,subSelect)
+                    modelRelationMatcher.addMatchData(model,it.field as FieldBase, targetMF.first, targetMF.second, model.fields.getIdField())
+                    var subCriteria=selectIn(targetMF.second,subSelect)
                     if(it.criteria!=null){
-                        subCriteria=and(subCriteria!!, it.criteria!!)
+                        subCriteria=and(subCriteria, it.criteria!!)
                     }
-                    var targetMFFields=targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!
-                    var (readCriteria,postFS) = (targetMF?.first!! as AccessControlModel).beforeRead(*targetMFFields,
+                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
+                    var (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
                             criteria=subCriteria,
-                            model=targetMF?.first!!,
+                            model= targetMF.first,
                             useAccessControl = useAccessControl,
                             partnerCache = partnerCache)
 
-                    var mrDataArray=(targetMF?.first!! as AccessControlModel).query(*postFS,fromModel= targetMF?.first!!,criteria=readCriteria,
+                    var mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,fromModel= targetMF.first,criteria=readCriteria,
                             orderBy = rOrderBy,offset = rOffset,limit = rLimit)
 
                     mDataArray= reconstructMultipleRelationModelRecordSet(model,
@@ -715,7 +719,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     ownerMany2OneFields.forEach {m2o->
                         var v = fvs.getValue(m2o)
                         if(v!=null && m2o.targetModelFieldName== ModelReservedKey.idFieldName){
-                            var criteria=eq(model!!.fields.getIdField()!!,v)
+                            var criteria=eq(model.fields.getIdField()!!,v)
                             var (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
                                     criteria=criteria,
                                     model=this,
@@ -724,7 +728,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     joinModels = joinModels.toTypedArray())
 
                             v=this.query(*postFS,
-                                    fromModel = model!!,
+                                    fromModel = model,
                                     joinModels = joinModels.toTypedArray(),criteria =readCriteria )?.firstOrNull()
                             if(v!=null){
                                 v.model=model
@@ -801,7 +805,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var fvs = FieldValueArray()
             fvs.addAll(it)
             if(relModel!=null){ //m2m
-                val field = relModel.fields?.getFieldByTargetField(idField)
+                val field = relModel.fields.getFieldByTargetField(idField)
                 val relArray = this.readM2MModelDataArrayFromMultiModelDataArray(relModel,field!!,mId,fields,relDataArray)
                 var mds = (fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?: ModelDataSharedObject()
                 relArray?.let {
@@ -830,7 +834,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         var relReadFields = this.getModelFieldsFromMultiDataArray(relModel,dataArray)
         var relDataArray = ModelDataArray(model = relModel, fields = relReadFields)
-        field?.let {
+        field.let {
             dataArray?.data?.filter {
                 (it.getValue(field) as Long)==fieldValue
             }?.forEach {fv->
@@ -842,7 +846,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     var tFV = this.readOneModelFieldValueFromMultiModelFieldValue(tReadFields,fv)
                     var rf = this.getRelationModelField(it)
                     rf?.let {
-                        relFieldValue.setValue(rf.second!!, ModelDataObject(fields = tReadFields, data = tFV, model = tf?.first))
+                        relFieldValue.setValue(rf.second, ModelDataObject(fields = tReadFields, data = tFV, model = tf?.first))
                     }
                 }
             }
@@ -962,16 +966,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     protected open fun getRelationModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
         if((field is Many2ManyField)){
-            var model=this.appModel?.getModel((field as RefRelationField).relationModelTable)?:return null
-            var mField=model?.fields?.getField((field as RefRelationField).relationModelFieldName)?:return null
+            var model= this.appModel.getModel((field as RefRelationField).relationModelTable) ?:return null
+            var mField= model.fields.getField((field as RefRelationField).relationModelFieldName) ?:return null
             return Pair(model,mField)
         }
         return null
     }
     protected  open fun getTargetModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
         if(field is RefTargetField){
-            var model=this.appModel?.getModel(field.targetModelTable)?:return null
-            var mField=model?.fields?.getField(field.targetModelFieldName)?:return null
+            var model= this.appModel.getModel(field.targetModelTable) ?:return null
+            var mField= model.fields.getField(field.targetModelFieldName) ?:return null
             return Pair(model,mField)
         }
         return null
@@ -994,7 +998,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         var errorMessage="添加失败" as String?
         val def = DefaultTransactionDefinition()
         def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
-        val status = txManager?.getTransaction(def)
+        val status = txManager.getTransaction(def)
         try {
            // var dependingModelFieldValueCollection
             if(modelData.context==null){
@@ -1003,7 +1007,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             var (id,errMsg)=(modelData.model as AccessControlModel)
                     .rawCreate(modelData,useAccessControl,partnerCache)
             if(id!=null && id>0){
-                txManager?.commit(status)
+                txManager.commit(status)
                 return Pair(id,null)
             }
             errorMessage=errMsg
@@ -1015,7 +1019,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         try
         {
             //Hikaricp discard database connection when some error occur
-            txManager?.rollback(status)
+            txManager.rollback(status)
         }
         catch(ex:Exception)
         {
@@ -1078,7 +1082,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                    null
                 }
                 is FieldValueDependentingRecordBillboard ->{
-                    var ret = value?.looked(fvs, ActionType.EDIT)
+                    var ret = value.looked(fvs, ActionType.EDIT)
                     return if(ret.first){
                         FieldValue(field, ret.second)
                     }
@@ -1227,7 +1231,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         fitler?.let {
             it(modelDataObject,partnerCache,null)
         }
-        var filterRules = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueFilterRule<*>>(model)
+        var filterRules = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueFilterRule<*,*>>(model)
 
         filterRules?.forEach {
             it(modelDataObject,partnerCache,null)
@@ -1317,7 +1321,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelEditFieldsChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckRule<*>>(model)
+        var modelEditFieldsChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckRule<*,String>>(model)
 
         modelEditFieldsChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
@@ -1337,7 +1341,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelEditFieldsInStoreChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckInStoreRule<*>>(model)
+        var modelEditFieldsInStoreChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckInStoreRule<*,String>>(model)
         modelEditFieldsInStoreChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
             if(!ret.first){
@@ -1369,7 +1373,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(constGetRefField!=null){
             return if(modelDataObject.context?.refRecordMap?.containsKey(constGetRefField.value as String)!!){
                 var fvc=modelDataObject.context?.refRecordMap?.get(constGetRefField.value as String) as ModelDataObject
-                var idValue=fvc?.idFieldValue?.value as Long?
+                var idValue= fvc.idFieldValue?.value as Long?
                 if(idValue!=null) {
                     modelDataObject.data.add(FieldValue(modelDataObject.model?.fields?.getIdField()!!, idValue))
                     Pair(idValue,null)
@@ -1405,8 +1409,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             if(id==null ||id.second!=null){
                                 return id?:Pair(null,"创建失败")
                             }
-                            var idField= (it.value as ModelDataObject)?.model?.fields?.getIdField()
-                            (it.value as ModelDataObject).data.add(FieldValue(idField!!, id?.first))
+                            var idField= (it.value as ModelDataObject).model?.fields?.getIdField()
+                            (it.value as ModelDataObject).data.add(FieldValue(idField!!, id.first))
                         }
                         else if((it.value as ModelDataObject).hasNormalField()){
                             (it.value as ModelDataObject).context=modelDataObject.context
@@ -1477,7 +1481,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             var tmf=this.getTargetModelField(fv.field)
                             (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                             (fv.value as ModelDataObject).context=modelDataObject.context
-                            var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
+                            var o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                             if (o2m==null || o2m.second!=null){
                                 return  Pair(null,o2m?.second?:"创建失败")
                             }
@@ -1500,7 +1504,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 var tmf=this.getTargetModelField(fv.field)
                                 (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                                 (fv.value as ModelDataObject).context=modelDataObject.context
-                                var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
+                                var o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                                 if (o2o==null || o2o.second!=null){
                                     return  Pair(null,"创建失败")
                                 }
@@ -1621,7 +1625,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         val def = DefaultTransactionDefinition()
         def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
-        val status = txManager?.getTransaction(def)
+        val status = txManager.getTransaction(def)
         try {
             // var dependingModelFieldValueCollection
             if(modelData.isObject()){
@@ -1631,11 +1635,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         partnerCache = partnerCache)
                 val tRet:Long=0
                 if(ret.first!=null && ret.first!!>tRet){
-                    txManager?.commit(status)
+                    txManager.commit(status)
                     return ret
                 }
                 else{
-                    txManager?.rollback(status)
+                    txManager.rollback(status)
                 }
                 return  Pair(0,ret.second)
             }
@@ -1648,7 +1652,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             logger.error(ex.message)
         }
         try {
-            txManager?.rollback(status)
+            txManager.rollback(status)
         }
         catch (ex:Exception)
         {
@@ -1677,7 +1681,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(idFV!=null){
                 var idCriteria=eq(idFV.field,idFV.value)
                 tCriteria= if(tCriteria!=null) {
-                    and(tCriteria,idCriteria!!)!!
+                    and(tCriteria, idCriteria)
                 } else idCriteria
             }
 
@@ -1689,6 +1693,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         and(tCriteria, acCriteria)
                     } else acCriteria
                 }
+                tCriteria= this.editCorpIsolationBean(modelDataObject,partnerCache!!,tCriteria)?.second
             }
 
             modelDataObject.data.forEach {
@@ -1706,7 +1711,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 if(id==null ||id.second!=null){
                                     return id?:Pair(null,"创建失败")
                                 }
-                                (it.value as ModelDataObject).data.add(FieldValue((it.value as ModelDataObject)?.model?.fields?.getIdField()!!, id?.first))
+                                (it.value as ModelDataObject).data.add(FieldValue((it.value as ModelDataObject).model?.fields?.getIdField()!!, id.first))
                             }
                             else if((it.value as ModelDataObject).hasNormalField()){
                                 (it.value as ModelDataObject).context=modelDataObject.context
@@ -1769,7 +1774,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 {
                                     (fv.value as ModelDataObject).context=modelDataObject.context
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
-                                    var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
+                                    var o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
                                             partnerCache)
                                     if (o2m==null || o2m.second!=null){
@@ -1794,7 +1799,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     if(tfvc.idFieldValue==null){
                                         tfvc.context=modelDataObject.context
                                         tfvc.data.add(FieldValue(tmf?.second!!, mIDFV.value))
-                                        var o2m=(tmf?.first as AccessControlModel?)?.rawCreate(tfvc,
+                                        var o2m=(tmf.first as AccessControlModel?)?.rawCreate(tfvc,
                                                 useAccessControl,
                                                 partnerCache)
                                         if (o2m==null || o2m.second!=null){
@@ -1821,7 +1826,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     var tmf=this.getTargetModelField(fv.field)
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    var o2o=(tmf?.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
+                                    var o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
                                             partnerCache)
                                     if (o2o==null || o2o.second!=null){
@@ -1832,7 +1837,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     var tmf=this.getTargetModelField(fv.field)
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    var o2o=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
+                                    var o2o=(tmf.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
                                             criteria=null,
                                             useAccessControl = useAccessControl,
                                             partnerCache = partnerCache)
@@ -1938,11 +1943,11 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
 
         if(partnerCache!=null){
-            var ret= modelDeleteFieldsBelongToPartnerCheck(modelData,partnerCache,null)
+            var ret= modelDeleteFieldsBelongToPartnerCheck(modelData,partnerCache,criteria)
             if(!ret.first){
                 return ret
             }
-            var ruleTypes = partnerCache.getModelDeleteAccessControlRules<ModelDeleteAccessControlRule<*>>(model!!)
+            var ruleTypes = partnerCache.getModelDeleteAccessControlRules<ModelDeleteAccessControlRule<*,String>>(model!!)
             ruleTypes?.forEach {
                 ret=it(modelData,partnerCache,null)
                 if(!ret.first){
@@ -1982,7 +1987,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         val def = DefaultTransactionDefinition()
         def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
-        val status = txManager?.getTransaction(def)
+        val status = txManager.getTransaction(def)
         try {
             // var dependingModelFieldValueCollection
             if(modelData.isObject()){
@@ -1990,7 +1995,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         criteria=criteria,
                         useAccessControl=useAccessControl,
                         partnerCache = partnerCache)
-                txManager?.commit(status)
+                txManager.commit(status)
                 return  ret
             }
 
@@ -1999,7 +2004,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             logger.error(ex.message)
         }
         try {
-            txManager?.rollback(status)
+            txManager.rollback(status)
         }
         catch (ex:Exception)
         {
@@ -2025,24 +2030,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return Pair(null,errorMsg)
         }
 
-//        if(useAccessControl){
-//            var rules=partnerCache?.acGetDeleteRules(modelDataObject.model)
-//            rules?.forEach {
-//                var (ok,errorMsg)=it.check(modelDataObject,context = partnerCache?.modelExpressionContext!!)
-//                if(!ok){
-//                    return Pair(null,errorMsg)
-//                }
-//            }
-//        }
-
-
         return try {
             var tCriteria=criteria
             var idFV=modelDataObject.idFieldValue
             if(idFV!=null){
                 var idCriteria=eq(idFV.field,idFV.value)
                 tCriteria= if(tCriteria!=null) {
-                    and(tCriteria,idCriteria!!)!!
+                    and(tCriteria, idCriteria)
                 } else idCriteria
             }
 
@@ -2051,11 +2045,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
-                        and(tCriteria,acCriteria)!!
+                        and(tCriteria, acCriteria)
                     } else acCriteria
                 }
-            }
 
+                var corpIsolationCriteria = deleteCorpIsolationBean(modelDataObject,
+                        partnerCache = partnerCache!!,
+                        criteria=tCriteria)
+                if(corpIsolationCriteria.first && corpIsolationCriteria.second!=null){
+                    tCriteria = corpIsolationCriteria.second
+                }
+            }
             Pair(this.delete(modelDataObject,criteria = tCriteria),null)
         } catch (ex:Exception){
             Pair(null,ex.message)
@@ -2064,7 +2064,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     open fun rawCount(fieldValueArray: FieldValueArray, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
         var expArr = fieldValueArray.map {
-            eq(it.field,it.value)!!
+            eq(it.field, it.value)
         }.toTypedArray()
         var expressions = and(*expArr)
         var (expressions2,_) = this.beforeRead(criteria = expressions,model=this,useAccessControl = useAccessControl,partnerCache = partnerCache)

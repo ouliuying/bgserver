@@ -164,7 +164,7 @@ class Lead:ContextModel("crm_lead","public") {
 
                 val def = DefaultTransactionDefinition()
                 def.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRED
-                val status = txManager?.getTransaction(def)
+                val status = txManager.getTransaction(def)
                 try {
                     var mo = ModelDataObject(model = Customer.ref)
                     mo.setFieldValue(Customer.ref.name,modelData.getFieldValue(this.name))
@@ -211,12 +211,12 @@ class Lead:ContextModel("crm_lead","public") {
                         this.rawEdit(uModelData,useAccessControl = true,partnerCache = partnerCache)
                     }
                     ar.errorCode = ErrorCode.SUCCESS
-                    txManager?.commit(status)
+                    txManager.commit(status)
                     return ar
                 }
                 catch (ex:Exception){
                     ex.printStackTrace()
-                    txManager?.rollback(status)
+                    txManager.rollback(status)
                 }
                 finally {
 

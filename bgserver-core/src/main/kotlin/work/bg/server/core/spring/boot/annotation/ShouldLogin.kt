@@ -29,6 +29,4 @@ import java.lang.annotation.Inherited
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 @Inherited
-annotation class ShouldLogin{
-
-}
+annotation class ShouldLogin

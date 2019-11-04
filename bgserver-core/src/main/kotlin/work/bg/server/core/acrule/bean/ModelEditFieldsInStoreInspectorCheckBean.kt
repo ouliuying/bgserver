@@ -32,7 +32,7 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
 
 @Component
-class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>> {
+class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheckInStoreRule<Array<ModelFieldInspector>,String> {
     private lateinit var _config:String
     override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Array<ModelFieldInspector>?): Pair<Boolean, String> {
         var idFV: dynamic.model.query.mq.FieldValue = modelData.idFieldValue ?: return Pair(true,"")
@@ -46,7 +46,7 @@ class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheck
                         }
                     }
                     var expArr = targetFieldValues.map {ifv->
-                        eq(ifv.field,ifv.value)!!
+                        eq(ifv.field, ifv.value)
                     }.toTypedArray()
                     if(it.isolationType==ModelFieldUnique.IsolationType.IN_PARTNER){
                         val m = modelData.model as AccessControlModel
@@ -59,7 +59,7 @@ class ModelEditFieldsInStoreInspectorCheckBean : ModelEditRecordFieldsValueCheck
                         val m = modelData.model as AccessControlModel
                         targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
                     }
-                    var expressions = and(*expArr, notEq(idFV.field,idFV.value)!!)
+                    var expressions = and(*expArr, notEq(idFV.field, idFV.value))
                     if((modelData.model as AccessControlModel).rawCount(expressions)>0){
                         return Pair(false,it.advice)
                     }

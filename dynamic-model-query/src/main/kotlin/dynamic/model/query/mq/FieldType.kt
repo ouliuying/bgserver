@@ -34,4 +34,4 @@ enum class FieldType(val value:JDBCType) {
     DATETIME(JDBCType.TIMESTAMP),
     DATE(JDBCType.DATE),
     TIME(JDBCType.TIME),
-};
+}

@@ -56,19 +56,19 @@ class SmsSetting:ContextModel("sms_setting","public") {
             if(modelData is dynamic.model.query.mq.ModelDataObject){
                 if(modelData.idFieldValue?.value!=null){
                     var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
-                    if(ret?.first!=null && ret?.first!! > 0){
+                    if(ret.first !=null && ret.first!! > 0){
                         ar.bag["result"]=ret.first!!
                         return ar
                     }
-                    ar.description=ret?.second
+                    ar.description= ret.second
                 }
                 else{
                     var ret=this.acCreate(modelData,partnerCache = pc)
-                    if(ret?.first!=null && ret?.first!! > 0){
+                    if(ret.first !=null && ret.first!! > 0){
                         ar.bag["result"]=ret.first!!
                         return ar
                     }
-                    ar.description=ret?.second
+                    ar.description= ret.second
                 }
             }
         }
@@ -77,7 +77,7 @@ class SmsSetting:ContextModel("sms_setting","public") {
     }
 
 
-    protected override fun loadEditModelViewData(mv: ModelView,
+    override fun loadEditModelViewData(mv: ModelView,
                                                  viewData:MutableMap<String,Any>,
                                                  pc:PartnerCache,
                                                  ownerFieldValue: dynamic.model.query.mq.FieldValue?,

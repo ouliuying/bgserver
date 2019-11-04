@@ -23,5 +23,4 @@
 
 package dynamic.model.web.context
 
-interface ContextType {
-}
+interface ContextType

@@ -25,6 +25,4 @@ package dynamic.model.query.mq
 
 import dynamic.model.query.mq.model.ModelBase
 
-class ModelEnumField constructor(model: ModelBase, name:String, fieldTyp: dynamic.model.query.mq.FieldType, title:String?, override val enumMetas: Array<dynamic.model.query.mq.EnumFieldMeta>, val defautlValue: dynamic.model.query.mq.EnumFieldMeta?=null, val ignoreValue: dynamic.model.query.mq.EnumFieldMeta?=null): dynamic.model.query.mq.ModelField(model,name,fieldTyp,title), dynamic.model.query.mq.EnumField {
-
-}
+class ModelEnumField constructor(model: ModelBase, name:String, fieldTyp: dynamic.model.query.mq.FieldType, title:String?, override val enumMetas: Array<dynamic.model.query.mq.EnumFieldMeta>, val defautlValue: dynamic.model.query.mq.EnumFieldMeta?=null, val ignoreValue: dynamic.model.query.mq.EnumFieldMeta?=null): dynamic.model.query.mq.ModelField(model,name,fieldTyp,title), dynamic.model.query.mq.EnumField

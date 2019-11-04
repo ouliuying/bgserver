@@ -86,7 +86,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     override fun visit(expression: ModelExpression?, parent: ModelExpression?) =//TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             when (expression) {
                 is SelectStatement -> {
-                    this.buildSelect(expression as SelectStatement,parent)
+                    this.buildSelect(expression,parent)
                 }
                 is UpdateStatement ->{
                     this.buildUpdate(expression,parent)
@@ -98,7 +98,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                     this.buildDelete(expression,parent)
                 }
                 is JoinModel -> {
-                    var jm=expression as JoinModel
+                    var jm= expression
                     this.buildJoinModel(jm,parent)
                 }
                 is FieldBase -> {
@@ -173,15 +173,15 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     private fun buildAggExpression(expression: AggExpression?, parent: ModelExpression?){
         if(expression !is CountExpression){
             if (expression?.fields?.size==1){
-                var columnName=this.tableColumnNameGenerator.generateColumnName(expression?.fields?.first())
-                this.namedSql.append(expression?.aggName);
+                var columnName=this.tableColumnNameGenerator.generateColumnName(expression.fields.first())
+                this.namedSql.append(expression.aggName)
                 this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
                 this.namedSql.append(columnName)
                 this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
             }
         }
         else{
-            this.namedSql.append(expression?.aggName);
+            this.namedSql.append(expression.aggName)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
             if (expression.fields.isEmpty()){
                 this.namedSql.append(GRAMMARKEYS.ALL)
@@ -201,17 +201,17 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             hasClosure=true
         }
         if(hasClosure){
-            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
         }
 
-        andExpression.subExpressions?.forEach{
+        andExpression.subExpressions.forEach{
             this.accept(it,andExpression)
             this.namedSql.append(GRAMMARKEYS.AND)
         }
         this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.AND))
 
         if(hasClosure){
-            this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
         }
     }
     private  fun buildOrExpression(orExpression:OrExpression,parent: ModelExpression?){
@@ -220,10 +220,10 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             hasClosure=true
         }
         if(hasClosure){
-            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX);
+            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
         }
 
-        orExpression.subExpressions?.forEach{
+        orExpression.subExpressions.forEach{
             this.accept(it,orExpression)
             this.namedSql.append(GRAMMARKEYS.OR)
         }
@@ -235,7 +235,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     }
     private fun buildIsExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is IsExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as IsExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName(expression.field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IS)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
@@ -253,12 +253,12 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     }
     private  fun buildLikeExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is LikeExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as LikeExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName(expression.field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.LIKE)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue((expression as LikeExpression).field, "%" + (expression as LikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, "%" + expression.value + "%")
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as NotLikeExpression).field)
@@ -266,12 +266,12 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             this.namedSql.append(GRAMMARKEYS.NOT_LIKE)
             var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
             this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue((expression as NotLikeExpression).field, "%" + (expression as NotLikeExpression).value + "%")
+            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, "%" + expression.value + "%")
         }
     }
     private  fun buildInExpression(expression: ModelExpression?, parent: ModelExpression?){
         if (expression is InExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as InExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName(expression.field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IN)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
@@ -282,7 +282,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                 this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
             }
             else{
-                this.accept((expression as InExpression).criteria,expression)
+                this.accept(expression.criteria,expression)
             }
         }
         else{
@@ -290,14 +290,14 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.NOT_IN)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            if((expression as NotInExpression).valueSet!=null)
+            if(expression.valueSet!=null)
             {
                 var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedColumnName)
-                this.namedParameters[ColumnKeyName]= FieldValue((expression as NotInExpression).field, (expression as NotInExpression).valueSet)
+                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
             }
             else{
-                this.accept((expression as NotInExpression).criteria,expression)
+                this.accept(expression.criteria,expression)
             }
         }
         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
@@ -305,18 +305,18 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     private  fun buildExistsExpression(expression: ModelExpression, parent: ModelExpression?){
 
         if (expression is ExistsExpression){
-            var columnName=this.tableColumnNameGenerator.generateColumnName((expression as ExistsExpression).field)
+            var columnName=this.tableColumnNameGenerator.generateColumnName(expression.field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.EXISTS)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            this.accept((expression as ExistsExpression).criteria,expression)
+            this.accept(expression.criteria,expression)
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as NotExistsExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.NOT_EXISTS)
             this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-            this.accept((expression as NotExistsExpression).criteria,expression)
+            this.accept(expression.criteria,expression)
         }
         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
     }
@@ -326,7 +326,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
         this.namedSql.append(checkValueExpression.operator)
         when(checkValueExpression.value){
             is FieldBase ->{
-                val vColumnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.value as FieldBase)
+                val vColumnName=this.tableColumnNameGenerator.generateColumnName(checkValueExpression.value)
                 this.namedSql.append(vColumnName)
             }
             else->{
@@ -350,17 +350,17 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     }
     private  fun buildOrderBy(orderBy: OrderBy, parent: ModelExpression?) {
         this.namedSql.append(GRAMMARKEYS.ORDER_BY)
-        orderBy.fields?.forEach {
+        orderBy.fields.forEach {
             this.accept(it,orderBy)
             this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
         }
-        if (orderBy.fields?.size>0){
+        if (orderBy.fields.size >0){
             this.namedSql=StringBuilder(this.namedSql.removeSuffix(GRAMMARKEYS.FIELD_COMMA))
         }
     }
     private fun buildGroupBy(groupBy: GroupBy, parent: ModelExpression?) {
         this.namedSql.append(GRAMMARKEYS.GROUP_BY)
-        groupBy.fields?.forEach {
+        groupBy.fields.forEach {
             accept(it,groupBy)
         }
         groupBy.havingCriteria?.let {
@@ -374,11 +374,11 @@ class ModelCriteriaRender: ModelExpressionVisitor {
         this.namedSql.append(columnName)
     }
     private fun buildJoinModel(joinModel: JoinModel, parent: ModelExpression?) {
-        this.namedSql.append(joinModel.operator);
+        this.namedSql.append(joinModel.operator)
         var tableName=this.tableColumnNameGenerator.generateTableName(joinModel.model)
         this.namedSql.append(tableName)
         this.namedSql.append(GRAMMARKEYS.ON)
-        joinModel.subExpressions?.forEach {
+        joinModel.subExpressions.forEach {
             this.accept(it,joinModel)
         }
     }
@@ -483,7 +483,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                     if(it.field!=null){
                         this.namedSql.append(GRAMMARKEYS.MAX)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-                        this.namedSql.append(it.field!!.name)
+                        this.namedSql.append(it.field.name)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
                         this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
@@ -492,7 +492,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                     if(it.field!=null){
                         this.namedSql.append(GRAMMARKEYS.MIN)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-                        this.namedSql.append(it.field!!.name)
+                        this.namedSql.append(it.field.name)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
                         this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
@@ -501,7 +501,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                     if(it.field!=null){
                         this.namedSql.append(GRAMMARKEYS.AVG)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-                        this.namedSql.append(it.field!!.name)
+                        this.namedSql.append(it.field.name)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
                         this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }
@@ -510,7 +510,7 @@ class ModelCriteriaRender: ModelExpressionVisitor {
                     if(it.field!=null){
                         this.namedSql.append(GRAMMARKEYS.SUM)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-                        this.namedSql.append(it.field!!.name)
+                        this.namedSql.append(it.field.name)
                         this.namedSql.append(GRAMMARKEYS.BRACKET_SUFFIX)
                         this.namedSql.append(GRAMMARKEYS.FIELD_COMMA)
                     }

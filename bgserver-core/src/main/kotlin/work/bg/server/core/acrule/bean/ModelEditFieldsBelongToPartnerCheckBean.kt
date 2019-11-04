@@ -21,39 +21,37 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
-import dynamic.model.query.mq.and
-import dynamic.model.query.mq.eq
-import dynamic.model.query.mq.select
+import dynamic.model.query.mq.*
 import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueCheckRule
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.AccessControlModel
 
 @Component
-class ModelEditFieldsBelongToPartnerCheckBean: ModelEditRecordFieldsValueCheckRule<Any> {
+class ModelEditFieldsBelongToPartnerCheckBean: ModelEditRecordFieldsValueCheckRule<ModelExpression?,String> {
     private lateinit var _config:String
-    override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject, partnerCache: PartnerCache, data: Any?): Pair<Boolean, String> {
+    override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, criteria: ModelExpression?): Pair<Boolean, String> {
         if(!partnerCache.checkEditBelongToPartner(modelData.model!!)){
             return Pair(true,"")
         }
+        var targetFieldValues = dynamic.model.query.mq.FieldValueArray()
+        val m = modelData.model as AccessControlModel
+        targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)
+        targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
         val idFV = modelData.idFieldValue
-        idFV?.let {
-            var targetFieldValues = dynamic.model.query.mq.FieldValueArray()
-            targetFieldValues.setValue(it.field,it.value)
-            val m = modelData.model as AccessControlModel
-            targetFieldValues.setValue(m.createPartnerID,partnerCache.partnerID)
-            targetFieldValues.setValue(m.createCorpID,partnerCache.corpID)
-
-            var expArr = targetFieldValues.map {
-                eq(it.field,it.value)!!
-            }.toTypedArray()
-            var expressions = and(*expArr)
-            var statement = select(fromModel = modelData.model!!).count().where(expressions)
-            val count= modelData.model?.queryCount(statement)
-            count?.let {
-                if(count<1){
-                    return Pair(false,"无更新权限")
-                }
+        if(idFV!=null){
+            targetFieldValues.setValue(idFV.field,idFV.value)
+        }
+        var expArr = targetFieldValues.map {
+            eq(it.field, it.value)
+        }.toTypedArray()
+        var expressions = and(*expArr)
+        expressions = if(criteria!=null) and(expressions,criteria) else expressions
+        var statement = select(fromModel = modelData.model!!).count().where(expressions)
+        val count= modelData.model?.queryCount(statement)
+        count?.let {
+            if(count<1){
+                return Pair(false,"无更新权限")
             }
         }
         return Pair(true,"")
