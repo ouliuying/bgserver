@@ -53,11 +53,11 @@ class CrmApi:ContextModel("crm_api","public") {
         val toDate = Time.getDate(endDate)
         ar.errorCode = ErrorCode.SUCCESS
         ar.bag["data"] = mapOf(
-                "eventCount" to this.getEventCount(fromDate, toDate),
-                "leadCount" to this.getLeadCount(fromDate, toDate),
-                "opportunityCount" to this.getOpportunityCount(fromDate, toDate),
-                "customerCount" to this.getCustomerCount(fromDate, toDate),
-                "orderCount" to this.getOrderCount(fromDate, toDate)
+                "eventCount" to this.getEventCount(fromDate, toDate,partnerCache),
+                "leadCount" to this.getLeadCount(fromDate, toDate,partnerCache),
+                "opportunityCount" to this.getOpportunityCount(fromDate, toDate,partnerCache),
+                "customerCount" to this.getCustomerCount(fromDate, toDate,partnerCache),
+                "orderCount" to this.getOrderCount(fromDate, toDate,partnerCache)
         )
         return ar
     }
@@ -80,26 +80,26 @@ class CrmApi:ContextModel("crm_api","public") {
         ar.bag["funnelData"]= arrayOf(
                 mapOf(
                         "step" to "线索",
-                        "count" to this.getLeadCount(fromDate, toDate)
+                        "count" to this.getLeadCount(fromDate, toDate,partnerCache)
                 ),
                 mapOf(
                         "step" to "销售机会",
-                        "count" to this.getOpportunityCount(fromDate, toDate)
+                        "count" to this.getOpportunityCount(fromDate, toDate,partnerCache)
                 )
                 ,
                 mapOf(
                         "step" to "形成订单/合同/发票",
-                        "count" to this.getOrderCount(fromDate, toDate)
+                        "count" to this.getOrderCount(fromDate, toDate,partnerCache)
                 )
                 ,
                 mapOf(
                         "step" to "回款成功",
-                        "count" to this.getOrderInvoiceCount(fromDate, toDate,1)
+                        "count" to this.getOrderInvoiceCount(fromDate, toDate,1,partnerCache)
                 )
         )
         return ar
     }
-    private fun getOrderInvoiceCount(fromDate: Date?, toDate:Date?,status:Int):Int{
+    private fun getOrderInvoiceCount(fromDate: Date?, toDate:Date?,status:Int,partnerCache: PartnerCache):Int{
         val model = CustomerOrderInvoice.ref
         val statusField = model.fields.getField("status")
         var criteria = when{
@@ -119,22 +119,22 @@ class CrmApi:ContextModel("crm_api","public") {
         val ret=  model.rawCount(criteria = criteria)
         return if(ret>0) ret else 1
     }
-    private fun getEventCount(fromDate: Date?, toDate:Date?):Int{
-        return this.getModelDataCount(Event.ref,fromDate, toDate)
+    private fun getEventCount(fromDate: Date?, toDate:Date?,partnerCache: PartnerCache):Int{
+        return this.getModelDataCount(Event.ref,fromDate, toDate,partnerCache)
     }
-    private  fun getLeadCount(fromDate: Date?,toDate: Date?):Int{
-        return this.getModelDataCount(Lead.ref,fromDate, toDate)
+    private  fun getLeadCount(fromDate: Date?,toDate: Date?,partnerCache: PartnerCache):Int{
+        return this.getModelDataCount(Lead.ref,fromDate, toDate,partnerCache)
     }
-    private  fun getOpportunityCount(fromDate: Date?,toDate: Date?):Int{
-        return this.getModelDataCount(CustomerOpportunity.ref,fromDate, toDate)
+    private  fun getOpportunityCount(fromDate: Date?,toDate: Date?,partnerCache: PartnerCache):Int{
+        return this.getModelDataCount(CustomerOpportunity.ref,fromDate, toDate,partnerCache)
     }
-    private  fun getCustomerCount(fromDate: Date?,toDate: Date?):Int{
-        return this.getModelDataCount(Customer.ref,fromDate, toDate)
+    private  fun getCustomerCount(fromDate: Date?,toDate: Date?,partnerCache: PartnerCache):Int{
+        return this.getModelDataCount(Customer.ref,fromDate, toDate,partnerCache)
     }
-    private  fun getOrderCount(fromDate: Date?,toDate: Date?):Int{
-        return this.getModelDataCount(CustomerOrder.ref,fromDate, toDate)
+    private  fun getOrderCount(fromDate: Date?,toDate: Date?,partnerCache: PartnerCache):Int{
+        return this.getModelDataCount(CustomerOrder.ref,fromDate, toDate,partnerCache)
     }
-    private  fun getModelDataCount(model:ContextModel,fromDate: Date?,toDate: Date?):Int{
+    private  fun getModelDataCount(model:ContextModel,fromDate: Date?,toDate: Date?,partnerCache: PartnerCache):Int{
          var criteria = when{
              fromDate!=null &&  toDate!=null ->{
                   and(gtEq(model.createTime,fromDate), ltEq(model.createTime,toDate))
@@ -143,7 +143,7 @@ class CrmApi:ContextModel("crm_api","public") {
              toDate!=null -> gtEq(model.createTime,fromDate)
              else-> null
          }
-         val ret =   model.rawCount(criteria = criteria)
-        return if(ret>0) ret else 4
+         val ret =   model.rawCount(criteria = criteria,partnerCache = partnerCache,useAccessControl = true)
+        return if(ret>0) ret else 1
     }
 }

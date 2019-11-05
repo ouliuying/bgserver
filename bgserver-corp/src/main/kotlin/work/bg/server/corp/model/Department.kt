@@ -132,7 +132,7 @@ class Department:ContextModel("corp_department",
         if(ret){
             criteria = if(criteria!=null && ownerCriteria!=null) and(ownerCriteria,criteria!!) else if(criteria!=null) criteria  else ownerCriteria
         }
-        var data = this.acRead(*fields,partnerCache = pc,pageIndex = 0,pageSize =null,criteria = criteria)
+        var data = this.rawRead(*fields,partnerCache = pc,useAccessControl = true,pageIndex = 0,pageSize =null,criteria = criteria)
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
         return this.toClientModelData(data,arrayListOf(*fields.filter {_f->

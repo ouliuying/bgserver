@@ -141,7 +141,7 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             index++
             modelDataArray.add(fvs)
         }
-        shortRef.acCreate(modelDataArray,partnerCache=partnerCache)
+        shortRef.safeCreate(modelDataArray,partnerCache=partnerCache,useAccessControl = true)
         return ret
     }
 

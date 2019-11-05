@@ -204,9 +204,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
             }
-
+            ruleCriteria = this.readCorpIsolation(model,partnerCache,ruleCriteria)
             models.forEach {
-                ruleCriteria = this.readCorpIsolation(model,partnerCache,ruleCriteria)
                 if(partnerCache.checkReadBelongToPartner(model)){
                     ruleCriteria = this.readPartnerIsolation(model,partnerCache,ruleCriteria)
                     val isolationRules = partnerCache.getModelReadAccessControlRules<ModelReadIsolationRule<*>>(this)

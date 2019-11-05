@@ -64,7 +64,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     open fun editAction(@RequestBody modelData: ModelData?, pc:PartnerCache): ActionResult?{
         var ar= ActionResult()
         if(modelData!=null){
-            var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
+            var ret=this.safeEdit(modelData,criteria = null,partnerCache = pc,useAccessControl = true)
             if(ret.first !=null && ret.first!! > 0){
                 ar.bag["result"]=ret.first!!
                 return ar
@@ -80,10 +80,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar=ActionResult()
         var fields= param.fields?:arrayListOf()
         var attachFields:Array<AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
-        var modelData=this.acRead(*fields.toTypedArray(),
+        var modelData=this.rawRead(*fields.toTypedArray(),
                 model=this,
                 criteria = param.criteria,
                 partnerCache = pc,
+                useAccessControl = true,
                 orderBy = param.orderBy,
                 attachedFields = attachFields,
                 pageIndex = param.pageIndex,
@@ -95,7 +96,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
     open fun createAction(@RequestBody modelData: ModelData?, pc:PartnerCache):ActionResult?{
         var ar=ActionResult()
         if(modelData!=null){
-            var ret=this.acCreate(modelData,pc)
+            var ret=this.safeCreate(modelData,partnerCache = pc,useAccessControl = true)
             if(ret.first!=null && ret.first!!>0){
                 ar.bag["id"]=ret.first!!
                 return ar
@@ -112,10 +113,11 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         var ar=ActionResult()
         var fields= param.fields?:arrayListOf()
         var attachFields:Array<AttachedField>? = if(param.attachedFields!=null) arrayOf(*param.attachedFields!!.toTypedArray()) else null
-        var modelData=this.acRead(*fields.toTypedArray(),
+        var modelData=this.rawRead(*fields.toTypedArray(),
                 model=this,
                 criteria = param.criteria,
                 partnerCache = pc,
+                useAccessControl = true,
                 orderBy = param.orderBy,
                 attachedFields = attachFields,
                 pageIndex = param.pageIndex,
@@ -564,7 +566,8 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                             var idField = tModel.fields.getIdField()
                             var toField = tModel.getFieldByPropertyName(it.relationData!!.toName!!)
                             if(idField!=null && toField!=null){
-                                var dataArray=(tModel as ContextModel).acRead(partnerCache = pc,
+                                var dataArray=(tModel as ContextModel).rawRead(partnerCache = pc,
+                                        useAccessControl = true,
                                         criteria = null,
                                         pageIndex = 1,
                                         pageSize = 10)
@@ -690,7 +693,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             var ownerModel = ownerFieldValue.field.model as ContextModel?
             ownerModel?.let {
                 if(it.isPersistField(ownerFieldValue.field)){
-                    val ownerData = it.acRead(criteria =eq(ownerFieldValue.field,ownerFieldValue.value),partnerCache = pc)
+                    val ownerData = it.rawRead(criteria =eq(ownerFieldValue.field,ownerFieldValue.value),partnerCache = pc,useAccessControl = true)
 
                     if(ownerData!=null){
                         val d =  ownerData.firstOrNull()
@@ -704,7 +707,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         if(ownerModelID!=null && ownerModelID>0){
             var ownerModel = ownerFieldValue?.field?.model as ContextModel?
             ownerModel?.let {
-               val ma= ownerModel.acRead(model=ownerModel,partnerCache = pc,criteria = eq(ownerModel.fields.getIdField()!!,ownerModelID))
+               val ma= ownerModel.rawRead(model=ownerModel,partnerCache = pc,useAccessControl = true,criteria = eq(ownerModel.fields.getIdField()!!,ownerModelID))
                ma?.firstOrNull()?.let {mit->
                    this.fields.map {
                        if (it is RefTargetField) {
@@ -734,7 +737,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(*fields.toTypedArray(),criteria = eq(idf,it), partnerCache = pc)
+                var data = this.rawRead(*fields.toTypedArray(),criteria = eq(idf,it), partnerCache = pc,useAccessControl = true)
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -748,7 +751,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
                 toField,
                 ownerModelID)
         if(ret) {
-            var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
+            var data = this.rawRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc,useAccessControl = true)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -830,7 +833,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         id?.let {
             val idField = this.fields.getIdField()
             idField?.let { idf->
-                var data = this.acRead(*fields.toTypedArray(), criteria = eq(idf,it), partnerCache = pc)
+                var data = this.rawRead(*fields.toTypedArray(), criteria = eq(idf,it), partnerCache = pc,useAccessControl = true)
                 data?.let {
                     if(it.data.count()>0){
                         return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
@@ -842,7 +845,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         }
         val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
         if(ret) {
-            var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
+            var data = this.rawRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc,useAccessControl = true)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
@@ -960,7 +963,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
         if(ret){
             criteria = if(criteria!=null && ownerCriteria!=null) and(ownerCriteria,criteria!!) else if(criteria!=null) criteria  else ownerCriteria
         }
-        var data = this.acRead(*fields,partnerCache = pc,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
+        var data = this.rawRead(*fields,partnerCache = pc,useAccessControl = true,pageIndex = pageIndex,pageSize = pageSize,criteria = criteria)
         var totalCount = this.acCount(criteria = criteria,partnerCache = pc)
         viewData["totalCount"]=totalCount
         return this.toClientModelData(data,arrayListOf(*fields.filter {_f->

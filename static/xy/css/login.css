@@ -1,0 +1,52 @@
+html,
+body{
+height:100%;
+}
+body{
+background:url("../images/bk.jpg");
+background-size：cover;
+    font: 12px/20px "SimSun","宋体","Arial Narrow",HELVETICA;
+}
+.bg-reg-form{
+    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 4em;
+    width:516px;
+    height:548px;
+    background-color: #fff;
+    margin-left:-258px;
+    margin-top:-274px;
+}
+.bg-reg-form > h2{
+    display: inline-block;
+    font-size: 26px;
+    margin-bottom: 10px;
+    color: #01cd74;
+    letter-spacing: 2px;
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+
+
+.bg-reg-form .tips{
+    margin: 0;
+    color: #777;
+    letter-spacing: 1px;
+    line-height: 1.8em;
+    font-size: 14px;
+    font-weight: 400;
+}
+.ui.dividing.header{
+ border:none;
+}
+.bg-reg-form input[type='text'],
+.bg-reg-form input[type='password']
+{
+    border-radius:0 !important;
+    width:30rem !important;
+}
+
+

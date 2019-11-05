@@ -105,8 +105,8 @@ class BaseModelLog:ContextModel("base_model_log","public") {
         val datas = this.rawRead(criteria=criteria,
                 pageIndex = page,
                 pageSize = pageSize,
-                partnerCache = partnerCache)?.toModelDataObjectArray()
-        ar.bag["totalCount"] = this.rawCount(criteria=criteria, partnerCache = partnerCache)
+                partnerCache = partnerCache,useAccessControl = true)?.toModelDataObjectArray()
+        ar.bag["totalCount"] = this.rawCount(criteria=criteria, partnerCache = partnerCache,useAccessControl = true)
         var eventLogs = JsonArray()
         datas?.let { aIT ->
             aIT.forEach {

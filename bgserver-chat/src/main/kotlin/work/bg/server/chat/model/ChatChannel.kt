@@ -106,8 +106,9 @@ class ChatChannel:ContextModel("chat_channel","public") {
           val ar = ActionResult(ErrorCode.RELOGIN)
           if(partnerCache!=null){
               val uuid = data.get("uuid")?.asString
-              val mo= this.acRead(criteria = eq(this.uuid,uuid),
+              val mo= this.rawRead(criteria = eq(this.uuid,uuid),
                       partnerCache = partnerCache,
+                      useAccessControl = true,
                       attachedFields = arrayOf(AttachedField(this.joinPartners)))?.firstOrNull()
               ar.errorCode = ErrorCode.SUCCESS
               val joinModels = getJoinPartners(mo)
@@ -139,7 +140,7 @@ class ChatChannel:ContextModel("chat_channel","public") {
                 val mo = ModelDataObject(model = ChatModelJoinChannelRel.ref)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinChannel,modelID)
                 mo.setFieldValue(ChatModelJoinChannelRel.ref.joinPartner,partnerCache.partnerID)
-                var ret = ChatModelJoinChannelRel.ref.acCreate(mo,partnerCache)
+                var ret = ChatModelJoinChannelRel.ref.safeCreate(mo,partnerCache = partnerCache,useAccessControl = true)
                 if(ret.first!=null && ret.first!!>0){
                     ar.errorCode = ErrorCode.SUCCESS
                 }

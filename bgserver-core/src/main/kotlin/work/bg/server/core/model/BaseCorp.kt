@@ -25,6 +25,8 @@ import com.google.gson.JsonObject
 import dynamic.model.query.mq.*
 import dynamic.model.query.mq.model.ModelBase
 import dynamic.model.web.spring.boot.annotation.Model
+import dynamic.model.web.spring.boot.model.ActionResult
+import dynamic.model.web.spring.boot.model.ReadActionParam
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.ui.ModelView
 import kotlin.reflect.KClass
@@ -59,4 +61,43 @@ class BaseCorp(table:String, schema:String):ContextModel(table,schema){
           FieldType.BIGINT, "角色",
           "public.base_partner_role",
           "corp_id")
+
+  override fun listAction(param: ReadActionParam, pc: PartnerCache): ActionResult? {
+    return null
+  }
+
+  override fun createAction(modelData: ModelData?, pc: PartnerCache): ActionResult? {
+    return null
+  }
+
+  override fun editAction(modelData: ModelData?, pc: PartnerCache): ActionResult? {
+    return null
+  }
+
+  override fun deleteAction(data: JsonObject, pc: PartnerCache): ActionResult? {
+    return null
+  }
+  override fun acCount(criteria: ModelExpression?, partnerCache: PartnerCache): Int {
+    return 0
+  }
+
+  override fun acDelete(criteria: ModelExpression?, partnerCache: PartnerCache?): Pair<Long?, String?> {
+    return Pair(0,null)
+  }
+
+  override fun acEdit(modelData: ModelData, criteria: ModelExpression?, partnerCache: PartnerCache): Pair<Long?, String?> {
+    return Pair(0,null)
+  }
+
+  override fun acDelete(modelData: ModelData, criteria: ModelExpression?, partnerCache: PartnerCache?): Pair<Long?, String?> {
+    return  return Pair(0,null)
+  }
+
+  override fun acMax(field: FieldBase, partnerCache: PartnerCache, criteria: ModelExpression?): Long? {
+    return null
+  }
+
+  override fun loadModelViewType(data: JsonObject, pc: PartnerCache): ActionResult {
+    return ActionResult()
+  }
 }

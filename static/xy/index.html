@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="keywords" content="" />
+    <link href="/xy/css/semantic.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/xy/css/login.css" rel="stylesheet" type="text/css" media="all"/>
+    <script src="/xy/script/jquery-3.1.1.min.js"></script>
+    <script>
+        function showMessage(msg,type){
+            if(type ==1){
+                $("#showMessage").show();
+                $("#errorMessage").hide();
+                $("#showMessage").text(msg)
+            }
+            else{
+                 $("#showMessage").hide();
+                $("#errorMessage").show();
+                 $("#errorMessage").text(msg)
+            }
+
+        }
+        function tickWaiting(times){
+            if(times<1){
+                  location.href="/";
+                  return;
+            }
+            showMessage("注册成功，"+ times +"秒后转向登录界面",1)
+            setTimeout(function(){
+                tickWaiting(times-1);
+            },1000);
+        }
+        $(function(){
+            $("#submitBtn").click(function(){
+                var userName = $("input[name='username']").val();
+                var password = $("input[name='password']").val();
+                var confirmPassword = $("input[name='password']").val();
+                var name =  $("input[name='name']").val();
+                var corpName =  $("input[name='corpName']").val();
+                if(userName == "" || password == "" || confirmPassword==""){
+                    showMessage("用户名密码不能为空！",0);
+                    return false;
+                }
+                if(password!=confirmPassword){
+                    return false;
+                }
+                $.ajax("/xyApi/doReg", {
+                    data : JSON.stringify({
+                        userName:userName,
+                        password:password,
+                        confirmPassword:confirmPassword,
+                        name:name,
+                        corpName:corpName
+                    }),
+                    contentType : 'application/json',
+                    method  : 'POST'
+                    }).done(function(data){
+                        if(data.errorCode == 0){
+                          tickWaiting(5);
+                        }
+                        else{
+                            showMessage(data.message,0)
+                        }
+                    })
+                    .fail(function(data){
+
+                    })
+
+                    return false;
+            })
+        })
+    </script>
+</head>
+<body>
+    <div class="bg-reg-form">
+        <h2>注册 -- 金云办公</h2>
+        <form class="ui form">
+            <h4 class="ui dividing header tips">必填信息</h4>
+
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="text" name="username" placeholder="用户名">
+                    <i class="users icon"></i>
+                </div>
+            </div>
+
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="password" name="password" placeholder="密码">
+                    <i class="lock icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="password" name="confirmPassword" placeholder="确认密码">
+                    <i class="lock icon"></i>
+                </div>
+            </div>
+
+            <h4 class="ui dividing header tips">可选内容</h4>
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="text" name="name" placeholder="姓名">
+                    <i class="user icon"></i>
+                </div>
+            </div>
+
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="text" name="corpName" placeholder="公司名称">
+                    <i class="building icon"></i>
+                </div>
+            </div>
+
+
+
+            <div style="text-align:center;">
+                <p id="showMessage" style="display:none;color:#01cd74;"></p>
+                <p id="errorMessage" style="display:none;color:red;"></p>
+            </div>
+
+
+
+            <div style="text-align:center;">
+             <button class="large positive ui button" style="width: 80%;border-radius: 0;margin-top: 2rem;letter-spacing: 5px;" id="submitBtn">确定注册</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

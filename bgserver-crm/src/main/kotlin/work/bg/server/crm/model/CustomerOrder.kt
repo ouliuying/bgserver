@@ -109,7 +109,7 @@ class CustomerOrder:
     @Action("confirmCustomerOrder")
     fun confirmCustomerOrder(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache): ActionResult?{
         var r = ActionResult(ErrorCode.UNKNOW)
-        var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
+        var d = this.rawRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc,useAccessControl = true)?.firstOrNull()
        d?.getFieldValue(this.step)?.let {
            if(it!=CustomerOrderStep.NEW_STEP.step){
                 r.description="只能确认信订单"
@@ -118,7 +118,7 @@ class CustomerOrder:
                var mo= dynamic.model.query.mq.ModelDataObject(model = this)
                mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
                mo.setFieldValue(this.step,CustomerOrderStep.CONFIRM_STEP.step)
-               this.acEdit(mo,criteria = null,partnerCache = pc)
+               this.rawEdit(mo,criteria = null,partnerCache = pc,useAccessControl = true)
                r.errorCode=ErrorCode.SUCCESS
            }
        }
@@ -134,7 +134,7 @@ class CustomerOrder:
     @Action("confirmOrderPayment")
     fun confirmOrderPayment(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache):ActionResult?{
         var r = ActionResult(ErrorCode.UNKNOW)
-        var d = this.acRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc)?.firstOrNull()
+        var d = this.rawRead(criteria = eq(this.id,modelData?.idFieldValue?.value),partnerCache = pc,useAccessControl = true)?.firstOrNull()
         d?.getFieldValue(this.step)?.let {
             if(it!=CustomerOrderStep.INVOICE_STEP.step){
                 r.description="未开票订单"
@@ -143,7 +143,7 @@ class CustomerOrder:
                 var mo= dynamic.model.query.mq.ModelDataObject(model = this)
                 mo.setFieldValue(this.id,modelData?.idFieldValue?.value)
                 mo.setFieldValue(this.step,CustomerOrderStep.PAYMENT_STEP.step)
-                this.acEdit(mo,criteria = null,partnerCache = pc)
+                this.rawEdit(mo,criteria = null,partnerCache = pc,useAccessControl = true)
                 r.errorCode=ErrorCode.SUCCESS
             }
         }
@@ -154,7 +154,7 @@ class CustomerOrder:
     override fun loadCreateModelViewData(mv: ModelView, viewData: MutableMap<String, Any>, pc: PartnerCache, ownerFieldValue: dynamic.model.query.mq.FieldValue?, toField: dynamic.model.query.mq.FieldBase?, ownerModelID: Long?, reqData: JsonObject?): dynamic.model.query.mq.ModelDataObject? {
 
         if(ownerModelID!=null && ownerModelID>0){
-           var co = CustomerOpportunity.ref.acRead(criteria = eq(CustomerOpportunity.ref.id,ownerModelID),partnerCache = pc)?.firstOrNull()
+           var co = CustomerOpportunity.ref.rawRead(criteria = eq(CustomerOpportunity.ref.id,ownerModelID),partnerCache = pc,useAccessControl = true)?.firstOrNull()
             co?.let {
                 var retCO = dynamic.model.query.mq.ModelDataObject(model = this)
                 retCO.setFieldValue(CustomerOrder.ref.opportunity,co)

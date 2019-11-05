@@ -62,17 +62,17 @@ class AccountApi:ContextModel("account_api","public") {
 
         var criteria = when{
             fromDate!=null &&  toDate!=null ->{
-                and(gtEq(model.createTime,fromDate), ltEq(model.createTime,toDate))
+                and(gtEq(model.createTime,fromDate), ltEq(model.createTime,toDate),eq(model.createCorpID,partnerCache.corpID))
             }
-            fromDate!=null-> ltEq(model.createTime,toDate)
-            toDate!=null -> gtEq(model.createTime,fromDate)
-            else-> null
+            fromDate!=null-> and(ltEq(model.createTime,toDate),eq(model.createCorpID,partnerCache.corpID))
+            toDate!=null -> and(gtEq(model.createTime,fromDate),eq(model.createCorpID,partnerCache.corpID))
+            else-> eq(model.createCorpID,partnerCache.corpID)
         }
 
-        criteria = when{
-                criteria!=null -> and(criteria,eq(AccountCustomerOrderInvoice.ref.status,1))
-                else -> eq(AccountCustomerOrderInvoice.ref.status,1)
-        }
+
+        criteria =  and(criteria,eq(AccountCustomerOrderInvoice.ref.status,1))
+
+
 
         //TODO ADD sum field and as keyword
         val select  = select(model.createPartnerID,fromModel = model).where(criteria).sum(SumExpression(model.amount)).groupBy(GroupBy(model.createPartnerID))

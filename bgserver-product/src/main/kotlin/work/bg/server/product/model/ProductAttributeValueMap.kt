@@ -81,7 +81,8 @@ class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
                         var idField = tModel.fields.getIdField()
                         var toField = tModel.getFieldByPropertyName(it.relationData!!.toName!!)
                         if (idField != null && toField != null) {
-                            var dataArray = (tModel as ContextModel).acRead(partnerCache = pc,
+                            var dataArray = (tModel as ContextModel).rawRead(partnerCache = pc,
+                                    useAccessControl = true,
                                     criteria = null,
                                     pageIndex = 1,
                                     pageSize = 10,

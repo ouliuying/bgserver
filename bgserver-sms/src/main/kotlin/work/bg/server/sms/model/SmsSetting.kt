@@ -55,7 +55,7 @@ class SmsSetting:ContextModel("sms_setting","public") {
         if(modelData!=null){
             if(modelData is dynamic.model.query.mq.ModelDataObject){
                 if(modelData.idFieldValue?.value!=null){
-                    var ret=this.acEdit(modelData,criteria = null,partnerCache = pc)
+                    var ret=this.safeEdit(modelData,criteria = null,partnerCache = pc,useAccessControl = true)
                     if(ret.first !=null && ret.first!! > 0){
                         ar.bag["result"]=ret.first!!
                         return ar
@@ -63,7 +63,7 @@ class SmsSetting:ContextModel("sms_setting","public") {
                     ar.description= ret.second
                 }
                 else{
-                    var ret=this.acCreate(modelData,partnerCache = pc)
+                    var ret=this.safeCreate(modelData,partnerCache = pc,useAccessControl = true)
                     if(ret.first !=null && ret.first!! > 0){
                         ar.bag["result"]=ret.first!!
                         return ar
@@ -85,7 +85,7 @@ class SmsSetting:ContextModel("sms_setting","public") {
                                                  ownerModelID: Long?,
                                                  reqData: JsonObject?): dynamic.model.query.mq.ModelDataObject?{
         val fields = this.getModelViewFields(mv)
-        var data = this.acRead(*fields.toTypedArray(), criteria = null, partnerCache = pc)
+        var data = this.rawRead(*fields.toTypedArray(), criteria = null, partnerCache = pc,useAccessControl = true)
         data?.let {
             if(it.data.count()>0){
                 return this.toClientModelData(it.firstOrNull(), arrayListOf(*fields.filter {
@@ -95,7 +95,7 @@ class SmsSetting:ContextModel("sms_setting","public") {
         }
         val (ret,criteria) = this.getCriteriaByOwnerModelParam(ownerFieldValue,toField,ownerModelID)
         if(ret) {
-            var data = this.acRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc)
+            var data = this.rawRead(*fields.toTypedArray(), criteria = criteria, partnerCache = pc,useAccessControl = true)
             data?.let {
                 if (it.data.count() > 0) {
                     return this.toClientModelData(it.firstOrNull(),arrayListOf(*fields.filter {_f->
