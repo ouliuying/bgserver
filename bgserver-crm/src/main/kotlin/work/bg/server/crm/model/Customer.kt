@@ -27,6 +27,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldNotNullOrEmpty
 import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.field.EventLogField
 import work.bg.server.crm.field.ModelFullAddressField
 
 @Model(name="customer",title = "客户")
@@ -179,6 +180,7 @@ class Customer: ContextModel("crm_customer","public") {
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "customer_id")
 
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(

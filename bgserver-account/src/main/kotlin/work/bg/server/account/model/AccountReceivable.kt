@@ -32,10 +32,11 @@ import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.field.EventLogField
 import work.bg.server.crm.model.CustomerOrderInvoice
 
 //应收款
-@Model("accountReceivable")
+@Model("accountReceivable","应收")
 class AccountReceivable:ContextModel("account_receivable","public") {
     companion object: RefSingleton<AccountReceivable> {
         override lateinit var ref: AccountReceivable
@@ -58,6 +59,7 @@ class AccountReceivable:ContextModel("account_receivable","public") {
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     @Action("confirmReceivable")
     fun confirmReceivable(@RequestBody data:JsonObject?,

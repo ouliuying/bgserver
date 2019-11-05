@@ -137,6 +137,9 @@
                     </action>
 
                 </actions>
+                <views>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                </views>
             </ref>
             <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
             <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
@@ -165,6 +168,15 @@
             </field>
 
             <field name="comment" type="static"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
 
@@ -182,6 +194,7 @@
                         <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                 </actions>
+
             </ref>
             <field name="id" type="static"/>
             <field name="orderInvoice.status" type="enumStatic" title="状态">
@@ -255,6 +268,9 @@
                         </group>
                     </action>
                 </actions>
+                <views>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                </views>
             </ref>
             <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
             <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
@@ -282,6 +298,15 @@
                 </meta>
             </field>
             <field name="comment" type="static"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
 

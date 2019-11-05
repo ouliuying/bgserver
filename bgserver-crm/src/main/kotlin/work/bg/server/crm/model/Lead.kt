@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.field.EventLogField
 import work.bg.server.crm.field.ModelFullAddressField
 import work.bg.server.util.TypeConvert
 import java.lang.Exception
@@ -154,6 +155,7 @@ class Lead:ContextModel("crm_lead","public") {
                     this.streetAddress,
                     this.gson)
     }
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
     @Action("createCustomer")
     fun createCustomer(@RequestBody data:JsonObject?, partnerCache: PartnerCache):ActionResult{
         var ar = ActionResult()

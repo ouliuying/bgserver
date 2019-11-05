@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import work.bg.server.core.acrule.ModelCreateRecordFieldsValueFilterRule
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueFilterRule
 import work.bg.server.core.model.ContextModel
+import work.bg.server.core.model.field.EventLogField
 import work.bg.server.product.acrule.bean.ModelCreateProductInnerRecordFieldsValueFilterBean
 import work.bg.server.product.acrule.bean.ModelEditProductInnerRecordFieldsValueFilterBean
 
@@ -95,6 +96,7 @@ class Product:ContextModel("product_product","public") {
             targetModelTable = "public.product_sku_pattern",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     override fun getModelCreateAccessFieldFilterRule(): ModelCreateRecordFieldsValueFilterRule<*>? {
         return this.createInnerRecordFieldsValueFilterBean

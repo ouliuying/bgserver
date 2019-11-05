@@ -28,11 +28,12 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.field.EventLogField
 import java.math.BigInteger
 
 //订单发票
 
-@Model("customerOrderInvoice")
+@Model("customerOrderInvoice","发票/收据")
 class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
     companion object : RefSingleton<CustomerOrderInvoice> {
         override lateinit var ref: CustomerOrderInvoice
@@ -93,7 +94,7 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
 
     val comment = ModelField(null, "comment", FieldType.TEXT, "附加说明")
 
-
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
 
     override fun afterCreateObject(modelDataObject: ModelDataObject,

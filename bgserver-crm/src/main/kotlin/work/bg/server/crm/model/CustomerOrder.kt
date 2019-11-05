@@ -32,9 +32,10 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.ui.ModelView
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
+import work.bg.server.core.model.field.EventLogField
 import java.math.BigInteger
 
-@Model("customerOrder")
+@Model("customerOrder","客户订单")
 class CustomerOrder:
         ContextModel("crm_customer_order","public") {
     companion object : RefSingleton<CustomerOrder> {
@@ -104,7 +105,7 @@ class CustomerOrder:
 
     val sms = dynamic.model.query.mq.FunctionField<String,PartnerCache>(null, "sms", dynamic.model.query.mq.FieldType.TEXT, "短信")
     val mail = dynamic.model.query.mq.FunctionField<String,PartnerCache>(null, "mail", dynamic.model.query.mq.FieldType.TEXT, "邮件")
-
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     @Action("confirmCustomerOrder")
     fun confirmCustomerOrder(@RequestBody modelData: dynamic.model.query.mq.ModelDataObject?, pc:PartnerCache): ActionResult?{

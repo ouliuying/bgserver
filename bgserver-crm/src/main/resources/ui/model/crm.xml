@@ -226,6 +226,10 @@
                           model="partner"
                           app="core"
                           refType="none"/>
+                    <view type="eventLogList"
+                          refType="none"
+                          ownerField="eventLogs"
+                          model="modelLog"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -264,6 +268,15 @@
             <field name="opportunities" style="relation"/>
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
 
@@ -342,6 +355,7 @@
                     <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="none"/>
                     <view type="list" model="lead" ownerField="leads" refType="none"/>
                     <view type="list" model="customer" ownerField="customers" refType="none"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -353,6 +367,15 @@
             <field name="magPartners" style="relation"/>
             <field name="leads" style="relation"/>
             <field name="customers" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="lead" app="crm">
@@ -458,6 +481,7 @@
                     <view type="list" model="leadCustomerCommunicationHistory"
                           ownerField="communications"
                           refType="none"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -472,6 +496,15 @@
             <field name="partners" style="relation"/>
             <field name="commPartner" style="relation"/>
             <field name="communications" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="leadInteractionStatus" app="crm">
@@ -633,6 +666,9 @@
                         <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                </views>
             </ref>
             <field name="name" type="static" style="head"/>
             <field name="mobile" type="static"/>
@@ -650,6 +686,15 @@
             </field>
             <field name="birthday" type="date"/>
             <field name="comment" type="singleLineText"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </div>
     </model>
     <model name="customerOpportunity" app="crm">
@@ -728,6 +773,7 @@
                 <views>
                     <view type="list" ownerField="products" model="crmCustomerOpportunityOrderProductRel" refType="none"/>
                     <view type="detail" ownerField="customer" model="customer" refType="none"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
             </ref>
             <field name="title" type="static" style="head"/>
@@ -736,6 +782,15 @@
             <field name="order" style="relation" visible="false"/>
             <field name="customer" style="relation"/>
             <field name="products" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="customerOpportunityOrderQuotation" app="crm">
@@ -907,6 +962,7 @@
                     <view type="list" model="crmCustomerOpportunityOrderProductRel"  ownerField="products" refType="none"/>
                     <view type="detail" model="customer"  ownerField="customer" refType="none"/>
                     <view type="detail" model="customerOpportunity"  ownerField="opportunity" refType="none"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
             </ref>
             <field name="title" type="static" style="head"/>
@@ -916,7 +972,15 @@
             <field name="opportunity" style="relation"/>
             <field name="products" style="relation"/>
             <field name="customer" style="relation"/>
-
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
         <view type="modelAction">
             <ref>
@@ -981,10 +1045,22 @@
                         <group name="main" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                </views>
             </ref>
             <field name="fromCorpName" type="static"/>
             <field name="toCorpName" type="static"/>
             <field name="amount" type="static"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="crmCustomerOpportunityOrderProductRel" app="crm">

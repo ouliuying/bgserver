@@ -98,6 +98,7 @@
                     </view>
                     <view type="detail" ownerField="uom" model="productUOM" refType="none">
                     </view>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -107,6 +108,15 @@
             <field name="uom" style="relation"/>
             <field name="attributeMap" style="relation"/>
             <field name="skuPattern" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
         </view>
     </model>
     <model name="productAttribute" app="product">

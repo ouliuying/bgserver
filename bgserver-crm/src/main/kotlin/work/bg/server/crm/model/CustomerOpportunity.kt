@@ -24,6 +24,8 @@ package work.bg.server.crm.model
 import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.field.EventLogField
+
 //商机
 @Model(name="customerOpportunity",title = "商机")
 class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
@@ -80,7 +82,7 @@ class CustomerOpportunity:ContextModel("crm_customer_opportunity","public") {
             targetModelTable = "public.crm_customer_order",
             targetModelFieldName = "opportunity_id"
     )
-
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 }
 
 

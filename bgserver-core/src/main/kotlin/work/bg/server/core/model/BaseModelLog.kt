@@ -7,6 +7,7 @@ import dynamic.model.web.spring.boot.annotation.Action
 import work.bg.server.core.cache.PartnerCache
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
+import dynamic.model.web.spring.boot.model.AppModelWeb
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.ui.ModelView
 import work.bg.server.core.ui.TriggerGroup
@@ -68,24 +69,34 @@ class BaseModelLog:ContextModel("base_model_log","public") {
     @Action("addControlTypeData")
     fun addControlTypeData(@RequestBody data:JsonObject?,
                            partnerCache: PartnerCache):Any{
-//        controlType,
-//        icon,
-//        data,
-//        modelID:ownerModelID
         var ar = ActionResult()
         var modelID = TypeConvert.getLong(data?.get("modelID")?.asNumber)
         val modelLog = ModelDataObject(model = ref)
-        modelLog.setFieldValue(ref.app,data?.get("app")?.asString)
-        modelLog.setFieldValue(ref.model,data?.get("model")?.asString)
+        val app = data?.get("app")?.asString
+        val model = data?.get("model")?.asString
+        modelLog.setFieldValue(ref.app,app)
+        modelLog.setFieldValue(ref.model,model)
         modelLog.setFieldValue(ref.modelID,modelID)
         modelLog.setFieldValue(ref.partner,partnerCache.partnerID)
         modelLog.setFieldValue(ref.icon,data?.get("icon")?.asString)
         val controlData = JsonObject()
         controlData.addProperty("controlType",data?.get("controlType")?.asString)
         controlData.add("props",data?.get("data"))
-        val jData = JsonArray()
-        jData.add(controlData)
-        modelLog.setFieldValue(ref.data,jData.toString())
+        val modelType = AppModelWeb.ref.getModel(app,model)
+        val jArray = JsonArray()
+        jArray.add("备注")
+        val controlData2 = JsonObject()
+        controlData2.addProperty("controlType","modelLogControl")
+        val controlDataProps =  JsonObject()
+        controlDataProps.addProperty("text",modelType?.meta?.title)
+        controlDataProps.addProperty("viewType","detail")
+        controlDataProps.addProperty("app",app)
+        controlDataProps.addProperty("model",model)
+        controlDataProps.addProperty("modelID",modelID)
+        controlData2.add("props",controlDataProps)
+        jArray.add(controlData2)
+        jArray.add(controlData)
+        modelLog.setFieldValue(ref.data,jArray.toString())
         ref.rawCreate(modelLog,partnerCache = partnerCache)
         return ar
     }

@@ -30,6 +30,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldRequired
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.field.EventLogField
 
 @Model(name="event",title = "活动")
 class Event:ContextModel("crm_event","public") {
@@ -69,6 +70,8 @@ class Event:ContextModel("crm_event","public") {
             "客户",
             targetModelTable = "public.crm_customer",
             targetModelFieldName = "event_id")
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
+
 
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(

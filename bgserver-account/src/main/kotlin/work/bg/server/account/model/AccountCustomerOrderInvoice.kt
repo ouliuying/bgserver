@@ -31,7 +31,7 @@ import work.bg.server.core.cache.PartnerCache
 import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.crm.model.CustomerOrderInvoice
 
-@Model("customerOrderInvoice")
+@Model("customerOrderInvoice","发票/收据")
 class AccountCustomerOrderInvoice:CustomerOrderInvoice() {
     companion object: RefSingleton<AccountCustomerOrderInvoice> {
         override lateinit var ref: AccountCustomerOrderInvoice

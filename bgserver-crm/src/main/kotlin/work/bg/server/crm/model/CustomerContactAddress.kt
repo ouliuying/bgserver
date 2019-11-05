@@ -24,6 +24,7 @@ package work.bg.server.crm.model
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.field.EventLogField
 
 @Model(name="customerContactAddress",title = "客户联系人")
 class CustomerContactAddress:ContextModel("customer_contact_address","public"){
@@ -52,5 +53,5 @@ class CustomerContactAddress:ContextModel("customer_contact_address","public"){
     val sex = dynamic.model.query.mq.ModelField(null, "sex", dynamic.model.query.mq.FieldType.INT, title = "性别", defaultValue = "")
     val birthday = dynamic.model.query.mq.ModelField(null, "birthday", dynamic.model.query.mq.FieldType.DATE, title = "生日", defaultValue = "")
     val comment = dynamic.model.query.mq.ModelField(null, "c_comment", dynamic.model.query.mq.FieldType.DATE, title = "注释", defaultValue = "")
-
+    val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 }

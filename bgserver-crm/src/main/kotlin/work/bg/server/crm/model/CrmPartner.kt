@@ -27,7 +27,7 @@ import dynamic.model.query.mq.RefSingleton
 import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.corp.model.DepartmentPartner
 
-@Model("partner")
+@Model("partner","员工")
 class CrmPartner:DepartmentPartner() {
     companion object : RefSingleton<CrmPartner> {
         override lateinit var ref: CrmPartner
