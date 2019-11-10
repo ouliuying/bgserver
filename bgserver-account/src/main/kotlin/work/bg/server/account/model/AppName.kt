@@ -29,6 +29,7 @@ class AppName : AppNamePackage {
         return AppPackageManifest("account",
                 "财务", "/svg/account-app.svg",
                 "财务",
+                "",
                 1)
     }
 }

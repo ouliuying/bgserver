@@ -85,24 +85,34 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
 
     constructor():this("base_partner_role","public")
 
-    fun getInstallApps(id:Long):List<String>{
-        val apps = mutableListOf<String>()
+    fun getInstallApps(id:Long):List<BaseApp.BaseAppData>{
+        val apps = mutableListOf<BaseApp.BaseAppData>()
         var d = this.rawRead(model=this,criteria = eq(this.id,id),attachedFields = arrayOf(AttachedField(this.apps)))?.firstOrNull()
         d?.let {
             (it.getFieldValue(this.isSuper) as Int?)?.let {isSuper->
                 if(isSuper>0){
-                    return AppModel.ref.appPackageManifests.keys.toList()
+                     AppModel.ref.appPackageManifests.forEach { (t, u) ->
+                        apps.add(BaseApp.BaseAppData(
+                                u.name,
+                                u.modelUrl
+                        ))
+                    }
+                    return apps
                 }
             }
             val pApps = it.getFieldValue(this.apps) as ModelDataArray?
             pApps?.let {mda->
                 mda.toModelDataObjectArray().forEach {
                     mdo->
-                    val name = mdo.getFieldValue(ref.name) as String?
+                    val name = mdo.getFieldValue(BaseApp.ref.name) as String?
+                    val modelUrl = mdo.getFieldValue(BaseApp.ref.modelUrl) as String?
                     name?.let {
                        val pm= AppModel.ref.appPackageManifests[name]
                         pm?.let {appm->
-                            apps.add(pm.name)
+                            apps.add(BaseApp.BaseAppData(
+                                    appm.name,
+                                    modelUrl?:""
+                            ))
                         }
                     }
                 }
@@ -135,4 +145,5 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
                 ModelFieldUnique(this.name,advice = "名称必须唯一",isolationType=ModelFieldUnique.IsolationType.IN_CORP)
         )
     }
+
 }

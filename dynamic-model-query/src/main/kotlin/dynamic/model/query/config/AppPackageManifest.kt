@@ -25,4 +25,6 @@ class AppPackageManifest(val name:String,
                          val title:String,
                          val icon:String,
                          val description:String,
-                         val uiInServer:Int)
+                         val modelUrl:String,
+                         val uiInServer:Int,
+                         val isWorker:Int=0)

@@ -30,6 +30,7 @@ class AppName : AppNamePackage {
                 "企信",
                 "/svg/chat-channel-logo.svg",
                 "企业通讯",
+                "",
                 1)
     }
 }

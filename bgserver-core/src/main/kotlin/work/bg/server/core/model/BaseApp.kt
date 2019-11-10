@@ -53,6 +53,9 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
             "name",
             FieldType.STRING,
             "名称")
+
+    var modelUrl = ModelField(null,"model_url",FieldType.STRING,"快捷连接")
+
     val title= ModelField(null,
             "title",
             FieldType.STRING,
@@ -165,4 +168,6 @@ class BaseApp(tableName:String, schemaName:String):ContextModel(tableName,schema
         }
         return metaObj
     }
+
+    class BaseAppData(val name:String,val modelUrl:String)
 }

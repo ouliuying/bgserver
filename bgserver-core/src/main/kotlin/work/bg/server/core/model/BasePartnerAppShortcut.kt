@@ -52,6 +52,7 @@ class BasePartnerAppShortcut(tableName:String,schemaName:String):ContextModel(ta
             "app", targetModelTable = "public.base_app", targetModelFieldName = "id", foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
 
 
+
     constructor():this("base_partner_app_shortcut","public")
 
     fun getPartnerApps(partnerID:Long):ArrayList<String>{

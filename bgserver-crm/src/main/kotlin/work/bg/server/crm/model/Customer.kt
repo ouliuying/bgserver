@@ -180,6 +180,15 @@ class Customer: ContextModel("crm_customer","public") {
             targetModelTable = "public.crm_customer_opportunity",
             targetModelFieldName = "customer_id")
 
+    val followStep = ModelMany2ManyField(null,
+            "follow_step_id",
+            FieldType.BIGINT,
+            "跟进阶段",
+            targetModelTable = "public.crm_customer_follow_step",
+            targetModelFieldName ="id",
+            relationModelTable = "public.crm_customer_follow_step_customer_rel",
+            relationModelFieldName = "customer_follow_step_id")
+
     val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {

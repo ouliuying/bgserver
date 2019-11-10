@@ -34,7 +34,7 @@ import dynamic.model.web.spring.boot.model.ActionResult
 import java.lang.Exception
 import java.net.URI
 
-@Model("chat")
+@Model("chat","企信")
 class Chat:ContextModel("chat","public") {
     private val logger = LogFactory.getLog(javaClass)
     @Value("\${bg.chat.redis.url}")

@@ -24,41 +24,41 @@
 package work.bg.server.crm.model
 
 import dynamic.model.query.mq.*
-import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.model.ContextModel
 
-@Model("crmPartnerCustomerRel")
-class CrmPartnerCustomerRel:ContextModel("crm_partner_customer_rel","public") {
-    companion object : RefSingleton<CrmPartnerCustomerRel> {
-        override lateinit var ref: CrmPartnerCustomerRel
+@Model("customerFollowStepCustomerRel")
+class CustomerFollowStepCustomerRel:ContextModel("crm_customer_follow_step_customer_rel",
+        "public") {
+    companion object : RefSingleton<CustomerFollowStepCustomerRel> {
+        override lateinit var ref: CustomerFollowStepCustomerRel
     }
-
     val id= ModelField(null,
             "id",
             FieldType.BIGINT,
             "标示",
             primaryKey = FieldPrimaryKey())
 
-    val partner= ModelMany2OneField(null,
-            "partner_id",
-            FieldType.BIGINT,
-            "员工",
-            targetModelTable = "public.base_partner",
-            targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
-
-    val customer= ModelMany2OneField(null,
+    val customer = ModelMany2OneField(null,
             "customer_id",
             FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
-            targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+            targetModelFieldName = "id")
 
-    val ownFlag = ModelField(null,
-            "ownFlag",
+    val customerFollowStep = ModelMany2OneField(null,
+            "customer_follow_step_id",
+            FieldType.BIGINT,
+            "客户跟进阶段",
+            targetModelTable = "public.crm_customer_follow_step",
+            targetModelFieldName = "id")
+
+    val seqIndex = ModelField(null,
+            "seq_index",
             FieldType.INT,
-            "占有",
-            defaultValue = 0,
-            comment = "0,默认不占有，1占有")
+            "顺序",
+            defaultValue = 0)
+
+    val rate = ModelField(null,"rate",FieldType.DECIMAL,"满意度",defaultValue = 2.5)
+
 }

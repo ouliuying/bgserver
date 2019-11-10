@@ -29,6 +29,7 @@ class AppName : AppNamePackage {
         return AppPackageManifest("corp",
                 "公司部门", "/svg/department-app.svg",
                 "在公司和员工直接添加部门的支持",
-                1)
+                "",
+                1,1)
     }
 }

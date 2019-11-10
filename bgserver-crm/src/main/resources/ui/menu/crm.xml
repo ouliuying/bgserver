@@ -43,6 +43,8 @@
             </menuItem>
         </menu>
         <menu name="customer" app="crm" title="客户管理" icon="/svg/crm-app-customer.svg">
+            <menuItem title="客户跟进" model="customer" viewType="crmCustomerFollowView">
+            </menuItem>
             <menuItem title="客户列表" model="customer" viewType="list">
             </menuItem>
             <menuItem title="添加客户" model="customer" viewType="create">

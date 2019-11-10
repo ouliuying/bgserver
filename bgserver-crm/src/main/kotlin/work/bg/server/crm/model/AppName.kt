@@ -30,6 +30,7 @@ class AppName : AppNamePackage {
                 "客户",
                 "/svg/crm-app.svg",
                 "客户管理",
+                "customer/crmCustomerFollowView",
                 1)
     }
 }

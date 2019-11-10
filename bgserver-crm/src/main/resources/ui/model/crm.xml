@@ -44,6 +44,21 @@
     </inherit>
 
     <model name="customer" app="crm">
+        <view type="crmCustomerFollowView">
+
+        </view>
+        <view type="searchBox">
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -59,6 +74,9 @@
                         <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="searchBox" refType="embedded"/>
+                </views>
             </ref>
             <field name="id" type="static"/>
             <field name="name" type="static" style="head"/>
@@ -281,6 +299,19 @@
     </model>
 
     <model name="event" app="crm">
+
+        <view type="searchBox">
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -291,6 +322,9 @@
                         <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="searchBox" refType="embedded"/>
+                </views>
             </ref>
             <field name="id" type="static"/>
             <field name="name" type="static" style="head"/>
@@ -355,7 +389,7 @@
                     <view type="list" model="crmPartnerEventRel" ownerField="magPartners" refType="none"/>
                     <view type="list" model="lead" ownerField="leads" refType="none"/>
                     <view type="list" model="customer" ownerField="customers" refType="none"/>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -379,6 +413,48 @@
         </view>
     </model>
     <model name="lead" app="crm">
+
+        <view type="searchBox">
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="corpName" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="mobile" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+
+            <field name="telephone" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -389,6 +465,9 @@
                         <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="searchBox" refType="embedded"/>
+                </views>
             </ref>
             <field name="id" type="static" style="head"/>
             <field name="name" type="static" style="head"/>
@@ -481,7 +560,7 @@
                     <view type="list" model="leadCustomerCommunicationHistory"
                           ownerField="communications"
                           refType="none"/>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -667,7 +746,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>
@@ -698,6 +777,22 @@
         </div>
     </model>
     <model name="customerOpportunity" app="crm">
+
+
+        <view type="searchBox">
+            <field name="title" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+
+
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -708,6 +803,9 @@
                         <group name="opAction" refType="main|sub"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="searchBox" refType="embedded"/>
+                </views>
             </ref>
             <field name="id" type="static"/>
             <field name="title" type="static"/>
@@ -773,7 +871,7 @@
                 <views>
                     <view type="list" ownerField="products" model="crmCustomerOpportunityOrderProductRel" refType="none"/>
                     <view type="detail" ownerField="customer" model="customer" refType="none"/>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="title" type="static" style="head"/>
@@ -962,7 +1060,7 @@
                     <view type="list" model="crmCustomerOpportunityOrderProductRel"  ownerField="products" refType="none"/>
                     <view type="detail" model="customer"  ownerField="customer" refType="none"/>
                     <view type="detail" model="customerOpportunity"  ownerField="opportunity" refType="none"/>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="title" type="static" style="head"/>
@@ -1046,7 +1144,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="fromCorpName" type="static"/>

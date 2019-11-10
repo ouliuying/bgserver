@@ -38,7 +38,9 @@ import dynamic.model.query.mq.specialized.ConstSetRecordRefField
 import dynamic.model.web.spring.boot.model.ActionResult
 import work.bg.server.core.context.JsonClauseResolver
 import dynamic.model.query.exception.ModelErrorException
+import dynamic.model.query.mq.FieldBase
 import dynamic.model.query.mq.ModelData
+import dynamic.model.query.mq.ModelField
 import dynamic.model.web.spring.boot.model.ReadActionParam
 import work.bg.server.core.ui.MenuNode
 import work.bg.server.core.ui.MenuTree
@@ -61,11 +63,14 @@ class GsonActionResultSerializerConfiguration {
         override fun customize(gsonBuilder: GsonBuilder?) {
             gsonBuilder?.registerTypeHierarchyAdapter(ActionResult::class.java,
                     ActionResultAdapter())
-            gsonBuilder?.registerTypeHierarchyAdapter(dynamic.model.query.mq.ModelData::class.java,
+            gsonBuilder?.registerTypeHierarchyAdapter(ModelData::class.java,
                     ModelDataDeserializerAdapter())
-            gsonBuilder?.registerTypeHierarchyAdapter(dynamic.model.query.mq.ModelData::class.java,
+
+            gsonBuilder?.registerTypeHierarchyAdapter(ModelData::class.java,
                     ModelDataSerializerAdapter())
 
+            gsonBuilder?.registerTypeHierarchyAdapter(FieldBase::class.java,
+                    ModelFieldSerializerAdapter())
 
             gsonBuilder?.registerTypeAdapter(MenuTree::class.java,
                     MenuTreeAdapter())
@@ -78,18 +83,19 @@ class GsonActionResultSerializerConfiguration {
             gsonBuilder?.registerTypeAdapter(ModelView::class.java,
                     ModelViewAdapter())
 
-            gsonBuilder?.registerTypeAdapter(ReadActionParam::class.java,ReadActionParamAdapter())
+            gsonBuilder?.registerTypeAdapter(ReadActionParam::class.java,
+                    ReadActionParamAdapter())
         }
     }
-    class ModelDataDeserializerAdapter: JsonDeserializer<dynamic.model.query.mq.ModelData>{
+    class ModelDataDeserializerAdapter: JsonDeserializer<ModelData>{
         override fun deserialize(json: JsonElement?,
                                  typeOfT: Type?,
-                                 context: JsonDeserializationContext?): dynamic.model.query.mq.ModelData? {
+                                 context: JsonDeserializationContext?): ModelData? {
             var jsonObj=json?.asJsonObject
             return fillModelDataObject(jsonObj)
         }
 
-        private fun fillModelDataObject(jsonObj:JsonObject?): dynamic.model.query.mq.ModelData?{
+        private fun fillModelDataObject(jsonObj:JsonObject?): ModelData?{
             if(jsonObj!= null){
                 var app= jsonObj.get("app")?.asString
                 var model= jsonObj.get("model")?.asString
@@ -113,7 +119,7 @@ class GsonActionResultSerializerConfiguration {
                                                      fromField:JsonObject?,
                                                      toField:JsonObject?,
                                                      fromIdValue:Long?,
-                                                     record:JsonObject?): dynamic.model.query.mq.ModelData?{
+                                                     record:JsonObject?): ModelData?{
             var model= AppModel.ref.getModel(appName!!,modelName!!)
             var fieldValues=fillModelFieldValueArrayFromOneRecord(appName,modelName,record)
             if(!fieldValues.isEmpty()){
@@ -303,8 +309,31 @@ class GsonActionResultSerializerConfiguration {
             return mmfkv
         }
     }
-    class ModelDataSerializerAdapter:JsonSerializer<dynamic.model.query.mq.ModelData>{
-        override fun serialize(src: dynamic.model.query.mq.ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+    class ModelFieldSerializerAdapter:JsonSerializer<FieldBase>{
+        override fun serialize(src: FieldBase?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement? {
+            return this.build(src)
+        }
+        private  fun build(field:FieldBase?):JsonObject?{
+            if(field!=null){
+                var model=field.model
+                var jo=JsonObject()
+                jo.addProperty("app",model?.meta?.appName)
+                jo.addProperty("model",model?.meta?.name)
+                jo.addProperty("name",field.propertyName)
+                jo.addProperty("type",field.fieldType.toString())
+                when(field){
+                    is ModelField ->{
+                        jo.addProperty("title",field.title)
+                        jo.addProperty("comment",field.comment)
+                    }
+                }
+                return jo
+            }
+            return null
+        }
+    }
+    class ModelDataSerializerAdapter:JsonSerializer<ModelData>{
+        override fun serialize(src: ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             var ret= buildModelData(src,typeOfSrc,context)
             return ret?:JsonObject()
         }
@@ -322,7 +351,9 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private fun buildField(field: dynamic.model.query.mq.FieldBase?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
+        private fun buildField(field: FieldBase?,
+                               typeOfSrc: Type?,
+                               context: JsonSerializationContext?):JsonObject?{
             if(field!=null){
                 var model=field.model
                 var jo=JsonObject()
@@ -345,7 +376,7 @@ class GsonActionResultSerializerConfiguration {
                 var jo=JsonObject()
                 fvArr.forEach {
                     when(it.value){
-                        is dynamic.model.query.mq.ModelData ->{
+                        is ModelData ->{
                             jo.add(it.field.propertyName,this.buildModelData(it.value as ModelData,typeOfSrc,context))
                         }
                         else->{
@@ -375,7 +406,7 @@ class GsonActionResultSerializerConfiguration {
             }
             return null
         }
-        private  fun buildModelData(modelData: dynamic.model.query.mq.ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
+        private  fun buildModelData(modelData: ModelData?, typeOfSrc: Type?, context: JsonSerializationContext?):JsonObject?{
             val obj = JsonObject()
             if(modelData!=null){
                 when(modelData){
@@ -389,12 +420,12 @@ class GsonActionResultSerializerConfiguration {
                         if(modelName!=null){
                             obj.addProperty("model",modelName)
                         }
-                        if(modelData.fields!=null){
-                            var fieldsJsonObject=this.buildFields(modelData.fields, typeOfSrc, context)
-                            if(fieldsJsonObject!=null){
-                                obj.add("fields",fieldsJsonObject)
-                            }
-                        }
+//                        if(modelData.fields!=null){
+//                            var fieldsJsonObject=this.buildFields(modelData.fields, typeOfSrc, context)
+//                            if(fieldsJsonObject!=null){
+//                                obj.add("fields",fieldsJsonObject)
+//                            }
+//                        }
                         if(modelData.fromField!=null){
                             var fieldJsonObject=this.buildField(modelData.fromField, typeOfSrc, context)
                             if(fieldJsonObject!=null){

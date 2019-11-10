@@ -20,6 +20,28 @@
 
 <ui>
     <model app="product" name="product">
+
+        <view type="searchBox">
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+            <field name="sku" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -33,6 +55,9 @@
                         <group name="selSingleItemAction" refType="singleSelection"/>
                     </action>
                 </actions>
+                <views>
+                    <view type="searchBox" refType="embedded"/>
+                </views>
             </ref>
             <field name="id"/>
             <field name="name" type="static"/>
@@ -98,7 +123,7 @@
                     </view>
                     <view type="detail" ownerField="uom" model="productUOM" refType="none">
                     </view>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>

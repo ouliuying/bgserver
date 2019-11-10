@@ -27,7 +27,7 @@ import dynamic.model.query.mq.RefSingleton
 import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.product.model.Product
 
-@Model("product")
+@Model("product","产品")
 class CrmProduct:Product(){
     companion object : RefSingleton<CrmProduct> {
         override lateinit var ref: CrmProduct

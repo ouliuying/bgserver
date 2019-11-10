@@ -19,6 +19,19 @@
   -->
 <ui>
     <model name="chatChannel" app="chat">
+
+        <view type="searchBox">
+            <field name="name" type="criteriaStringEqual">
+                <meta>
+                    <![CDATA[
+                    {
+                      "skipValue":["",null,undefined]
+                    }
+                  ]]>
+                </meta>
+            </field>
+        </view>
+
         <view type="list">
             <ref>
                 <actions>
@@ -37,6 +50,9 @@
                         </group>
                     </action>
                 </actions>
+                <views>
+                    <view refType="embedded" type="searchBox"/>
+                </views>
             </ref>
             <field name="name" type="static"/>
             <field name="uuid" type="static"/>
@@ -172,7 +188,15 @@
             </field>
             <field name="owner.userName" type="static"/>
             <field name="joinPartners" style="relation"/>
-            <field name="eventLogs" style="relation"/>
+            <field name="eventLogs" style="relation">
+                <meta>
+                    <![CDATA[
+                        {
+                         "controlActions":[{"editor":"modelCommentControlEditor","title":"跟踪"}]
+                        }
+                      ]]>
+                </meta>
+            </field>
 
         </view>
     </model>

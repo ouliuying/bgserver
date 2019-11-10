@@ -30,7 +30,7 @@ import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model(name="customerOpportunityOrderQuotation")
+@Model(name="customerOpportunityOrderQuotation",title = "报价单")
 class CustomerOpportunityOrderQuotation:
         ContextModel("crm_customer_opportunity_order_quotation","public") {
     companion object : RefSingleton<CustomerOpportunityOrderQuotation> {

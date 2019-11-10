@@ -96,6 +96,7 @@ class Product:ContextModel("product_product","public") {
             targetModelTable = "public.product_sku_pattern",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action=ForeignKeyAction.SET_NULL))
+
     val eventLogs = EventLogField(null,"event_logs","跟踪日志")
 
     override fun getModelCreateAccessFieldFilterRule(): ModelCreateRecordFieldsValueFilterRule<*>? {

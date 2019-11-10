@@ -29,6 +29,7 @@ class AppName : AppNamePackage {
         return AppPackageManifest("worktable",
                 "工作台", "/svg/my-worktable.svg",
                 "我的工作台",
+                "",
                 1)
     }
 }

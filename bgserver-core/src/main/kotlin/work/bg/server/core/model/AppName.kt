@@ -29,6 +29,6 @@ class AppName : AppNamePackage {
         return AppPackageManifest("core",
                 "公司",
                 "/svg/core-app.svg",
-                "我的公司", 1)
+                "我的公司", "partner/list",1)
     }
 }

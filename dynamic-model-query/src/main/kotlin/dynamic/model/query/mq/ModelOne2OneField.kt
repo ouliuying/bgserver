@@ -35,5 +35,5 @@ open class ModelOne2OneField constructor(model: ModelBase?,
                                          override val isVirtualField:Boolean=false,
                                          override val targetModelTable: String?=null,
                                          override val targetModelFieldName: String?=null,
-                                         override val foreignKey: dynamic.model.query.mq.FieldForeignKey?=null
-): dynamic.model.query.mq.ModelField(model,name,fieldType,title,length), dynamic.model.query.mq.One2OneField
+                                         override val foreignKey: FieldForeignKey?=null
+): ModelField(model,name,fieldType,title,length), One2OneField

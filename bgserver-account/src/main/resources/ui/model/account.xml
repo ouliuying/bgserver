@@ -44,9 +44,6 @@
         <view type="list">
             <ref>
                 <actions>
-<!--                    <action>-->
-<!--                        <group name="main" refType="main|sub"/>-->
-<!--                    </action>-->
                     <action>
                         <group name="opAction" refType="main|sub"></group>
                     </action>
@@ -83,15 +80,6 @@
             <field name="orderInvoice.toCorpName" type="static" title="受票方"/>
         </view>
         <view type="create">
-<!--            <ref>-->
-<!--                <actions>-->
-<!--                    <action>-->
-<!--                        <group name="main" refType="main|sub"/>-->
-<!--                    </action>-->
-<!--                </actions>-->
-<!--            </ref>-->
-<!--            <field name="partner.name" type="static"/>-->
-<!--            <field name="partnerRole.name" type="static"/>-->
         </view>
         <view type="edit">
             <ref>
@@ -138,7 +126,7 @@
 
                 </actions>
                 <views>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
@@ -184,9 +172,6 @@
         <view type="list">
             <ref>
                 <actions>
-<!--                    <action>-->
-<!--                        <group name="main" refType="main|sub"/>-->
-<!--                    </action>-->
                     <action>
                         <group name="opAction" refType="main|sub"></group>
                     </action>
@@ -269,7 +254,7 @@
                     </action>
                 </actions>
                 <views>
-                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog"/>
+                    <view type="eventLogList" refType="none" ownerField="eventLogs" model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="orderInvoice.fromCorpName" type="static" title="开票方"/>
@@ -309,5 +294,4 @@
             </field>
         </view>
     </model>
-
 </ui>
