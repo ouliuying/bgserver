@@ -43,5 +43,5 @@ object SystemInfo{
          """)
     }
     @JvmStatic
-    val Version = "0.0.1 BETA Release"
+    val Version = "1.0.0 Release"
 }

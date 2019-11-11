@@ -25,7 +25,7 @@
 
 package dynamic.model.query.mq
 
-class  OrderBy constructor(vararg val fields: dynamic.model.query.mq.OrderBy.OrderField): dynamic.model.query.mq.ModelExpression(*fields){
+class  OrderBy constructor(vararg val fields: OrderField): dynamic.model.query.mq.ModelExpression(*fields){
     companion object {
         enum class OrderType(val typ:Int){
              ASC(0),

@@ -44,14 +44,16 @@ class CustomerFollowStepCustomerRel:ContextModel("crm_customer_follow_step_custo
             FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_customer",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     val customerFollowStep = ModelMany2OneField(null,
             "customer_follow_step_id",
             FieldType.BIGINT,
             "客户跟进阶段",
             targetModelTable = "public.crm_customer_follow_step",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     val seqIndex = ModelField(null,
             "seq_index",

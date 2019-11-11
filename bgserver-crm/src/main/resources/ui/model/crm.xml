@@ -247,7 +247,7 @@
                     <view type="eventLogList"
                           refType="none"
                           ownerField="eventLogs"
-                          model="modelLog"/>
+                          model="modelLog" app="core"/>
                 </views>
             </ref>
             <field name="name" type="static" style="head"/>

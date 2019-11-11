@@ -270,14 +270,14 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
         var ret= if(parameters!=null)
         {
             this.namedParameterJdbcTemplate.execute(rData?.first,parameters) {
-                it.executeQuery()
+                it.execute()
                 it.updateCount
             }
         }
         else
         {
             this.namedParameterJdbcTemplate.execute(rData?.first) {
-                it.executeQuery()
+                it.execute()
                 it.updateCount
             }
         }

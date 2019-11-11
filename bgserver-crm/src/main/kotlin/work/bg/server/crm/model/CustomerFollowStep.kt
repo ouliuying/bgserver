@@ -30,6 +30,7 @@ import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
+import org.apache.commons.logging.LogFactory
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -37,6 +38,7 @@ import work.bg.server.util.TypeConvert
 
 @Model("customerFollowStep","客户跟进阶段")
 class CustomerFollowStep:ContextModel("crm_customer_follow_step","public") {
+    private  val logger = LogFactory.getLog(javaClass)
     companion object : RefSingleton<CustomerFollowStep> {
         override lateinit var ref: CustomerFollowStep
     }
@@ -228,6 +230,100 @@ class CustomerFollowStep:ContextModel("crm_customer_follow_step","public") {
             ar.description = ret.second
         }
 
+        return ar
+    }
+    @Action("deleteCustomerFollowStepCustomer")
+    fun deleteCustomerFollowStepCustomer(@RequestBody data:JsonObject?,partnerCache: PartnerCache):ActionResult{
+        var ar =ActionResult()
+        var id = data?.get("id")?.asLong
+        id?.let {
+           var ret =  CustomerFollowStepCustomerRel.ref.rawDelete(criteria = eq(CustomerFollowStepCustomerRel.ref.id,id),
+                   useAccessControl = true,
+                   partnerCache = partnerCache)
+            if(ret.first!=null && ret.first!!>0){
+                ar.errorCode = ErrorCode.SUCCESS
+                return ar
+            }
+            ar.description = ret.second?:"删除失败"
+            ar.errorCode = ErrorCode.UNKNOW
+        }
+        return ar
+    }
+    @Action("switchFollowStepCustomerSeq")
+    fun switchFollowStepCustomerSeq(@RequestBody data:JsonObject?,partnerCache: PartnerCache):ActionResult{
+        var ar = ActionResult()
+        //this.logger.info(data?.toString())
+        val stepCustomerID = data?.get("stepCustomerID")?.asLong
+        val fromStepObj = data?.get("fromStep")?.asJsonObject
+        val toStepObj = data?.get("toStep")?.asJsonObject
+
+        val fromStepIndex= fromStepObj?.get("index")?.asInt
+        val toStepIndex = toStepObj?.get("index")?.asInt
+
+        val fromStepID = fromStepObj?.get("stepID")?.asLong
+        val toStepID = toStepObj?.get("stepID")?.asLong
+        if(fromStepID!=null && toStepID!=null && fromStepIndex!=null && toStepIndex!=null && stepCustomerID!=null){
+            if(fromStepID==toStepID){
+               if(fromStepIndex!=toStepIndex){
+                   var datas =  CustomerFollowStepCustomerRel.ref.rawRead(CustomerFollowStepCustomerRel.ref.id,
+                           criteria = and(eq(CustomerFollowStepCustomerRel.ref.customerFollowStep,fromStepID),
+                            eq(CustomerFollowStepCustomerRel.ref.createPartnerID,partnerCache.partnerID)),
+                            orderBy = OrderBy(OrderBy.OrderField(CustomerFollowStepCustomerRel.ref.seqIndex,OrderBy.Companion.OrderType.DESC)))?.toModelDataObjectArray()
+                    var ids = arrayListOf<Long>()
+                   datas?.forEach {
+                       var id = TypeConvert.getLong(it.idFieldValue?.value as Number?)
+                       id?.let {
+                           ids.add(id!!)
+                       }
+                   }
+                   ids.remove(stepCustomerID)
+                   ids.add(toStepIndex,stepCustomerID)
+                   ids.reversed().forEachIndexed { index, l ->
+                       var mo = ModelDataObject(model = CustomerFollowStepCustomerRel.ref)
+                       mo.setFieldValue(CustomerFollowStepCustomerRel.ref.id,l)
+                       mo.setFieldValue(CustomerFollowStepCustomerRel.ref.seqIndex,index+1)
+                       CustomerFollowStepCustomerRel.ref.rawEdit(mo,partnerCache = partnerCache,useAccessControl = true)
+                   }
+               }
+            }
+            else{
+//                var stepCustomerObj = CustomerFollowStepCustomerRel.ref.rawRead(criteria = and(eq(CustomerFollowStepCustomerRel.ref.id,stepCustomerID),
+//                        eq(CustomerFollowStepCustomerRel.ref.createPartnerID,partnerCache.partnerID)))?.firstOrNull()
+//                if(stepCustomerObj!=null){
+//                    return ar
+//                }
+//                CustomerFollowStepCustomerRel.ref.rawDelete(criteria = and(eq(CustomerFollowStepCustomerRel.ref.id,stepCustomerID),
+//                        eq(CustomerFollowStepCustomerRel.ref.createPartnerID,partnerCache.partnerID)))
+                var datas =  CustomerFollowStepCustomerRel.ref.rawRead(CustomerFollowStepCustomerRel.ref.id,
+                        criteria = and(eq(CustomerFollowStepCustomerRel.ref.customerFollowStep,toStepID),
+                                eq(CustomerFollowStepCustomerRel.ref.createPartnerID,partnerCache.partnerID)),
+                        orderBy = OrderBy(OrderBy.OrderField(CustomerFollowStepCustomerRel.ref.seqIndex,OrderBy.Companion.OrderType.DESC)))?.toModelDataObjectArray()
+                var ids = arrayListOf<Long>()
+                datas?.forEach {
+                    var id = TypeConvert.getLong(it.idFieldValue?.value as Number?)
+                    id?.let {
+                        ids.add(id!!)
+                    }
+                }
+                ids.add(toStepIndex,stepCustomerID)
+                ids.reversed().forEachIndexed { index, l ->
+                    var mo = ModelDataObject(model = CustomerFollowStepCustomerRel.ref)
+                    if(l!=stepCustomerID){
+                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.id,l)
+                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.seqIndex,index+1)
+                        CustomerFollowStepCustomerRel.ref.rawEdit(mo,partnerCache = partnerCache,useAccessControl = true)
+                    }
+                    else{
+                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.id,l)
+                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.seqIndex,index+1)
+                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.customerFollowStep,toStepID)
+//                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.rate,stepCustomerObj?.getFieldValue(CustomerFollowStepCustomerRel.ref.rate))
+//                        mo.setFieldValue(CustomerFollowStepCustomerRel.ref.rate,stepCustomerObj?.getFieldValue(CustomerFollowStepCustomerRel.ref.rate))
+                        CustomerFollowStepCustomerRel.ref.rawEdit(mo,partnerCache = partnerCache,useAccessControl = true)
+                    }
+                }
+            }
+        }
         return ar
     }
 }
