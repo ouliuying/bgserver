@@ -23,6 +23,8 @@
 
 package work.bg.server.product.model
 
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
@@ -43,7 +45,8 @@ class ProductAttributeValue:ContextModel("product_attribute_value","public") {
             dynamic.model.query.mq.FieldType.BIGINT,
             "属性",
             targetModelTable = "public.product_attribute",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     val attrValue= dynamic.model.query.mq.ModelField(null,
             "attr_value",

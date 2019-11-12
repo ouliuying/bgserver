@@ -74,7 +74,7 @@ class CustomerOrderInvoice:ContextModel("crm_customer_order_invoice","public") {
             "开票人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            defaultValue = CurrPartnerBillboard())
+            defaultValue = CurrPartnerBillboard(),foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
 
     //0 普通发票，1 增值税发票 2 收据

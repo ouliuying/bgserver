@@ -321,6 +321,9 @@
                     <action>
                         <group name="opAction" refType="main|sub"/>
                     </action>
+                    <action>
+                        <group name="selSingleItemAction" refType="singleSelection"/>
+                    </action>
                 </actions>
                 <views>
                     <view type="searchBox" refType="embedded"/>

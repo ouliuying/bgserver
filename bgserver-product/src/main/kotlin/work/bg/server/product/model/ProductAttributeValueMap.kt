@@ -25,6 +25,8 @@ package work.bg.server.product.model
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -49,21 +51,23 @@ class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
             dynamic.model.query.mq.FieldType.BIGINT,
             "产品",
             targetModelTable = "public.product_product",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     val productAttribute= dynamic.model.query.mq.ModelMany2OneField(null,
             "product_attribute_id",
             dynamic.model.query.mq.FieldType.BIGINT,
             "属性",
             targetModelTable = "public.product_attribute",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
     val productAttributeValue = dynamic.model.query.mq.ModelMany2OneField(null,
             "product_attribute_value_id",
             dynamic.model.query.mq.FieldType.BIGINT,
             "属性值",
             targetModelTable = "public.product_attribute_value",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+
     override fun fillCreateModelViewMeta(mv: ModelView,
                                          modelData: dynamic.model.query.mq.ModelData?,
                                          viewData: MutableMap<String, Any>,

@@ -21,6 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -39,7 +41,7 @@ class SmsSendJobLog:ContextModel("sms_send_job_log","public") {
     val triggerGroup = dynamic.model.query.mq.ModelField(null, "trigger_group", dynamic.model.query.mq.FieldType.STRING, "trigger组名")
     val sendPartner = dynamic.model.query.mq.ModelMany2OneField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "发送人",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "id", defaultValue = CurrPartnerBillboard())
+            targetModelFieldName = "id", defaultValue = CurrPartnerBillboard(),foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     override fun addCreateModelLog(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 

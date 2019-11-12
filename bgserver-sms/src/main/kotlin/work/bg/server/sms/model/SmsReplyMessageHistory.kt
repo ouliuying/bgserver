@@ -23,6 +23,8 @@
 
 package work.bg.server.sms.model
 
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.model.ContextModel
@@ -39,7 +41,7 @@ class SmsReplyMessageHistory:ContextModel("sms_reply_message_history",
             dynamic.model.query.mq.FieldType.BIGINT,
             "发送人",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
     val mobile = dynamic.model.query.mq.ModelField(null, "mobile", dynamic.model.query.mq.FieldType.STRING, "号码")
     val message = dynamic.model.query.mq.ModelField(null, "message", dynamic.model.query.mq.FieldType.STRING, "信息")
 }

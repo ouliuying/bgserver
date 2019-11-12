@@ -21,6 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.sms.model
 
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -34,7 +36,7 @@ class SmsSendHistory:ContextModel("sms_send_history","public") {
     val id= dynamic.model.query.mq.ModelField(null, "id", dynamic.model.query.mq.FieldType.BIGINT, "标识", primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
     val sendPartner = dynamic.model.query.mq.ModelMany2OneField(null, "partner_id", dynamic.model.query.mq.FieldType.BIGINT, "发送人",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
     val mobile = dynamic.model.query.mq.ModelField(null, "mobile", dynamic.model.query.mq.FieldType.STRING, "号码")
     val message = dynamic.model.query.mq.ModelField(null, "message", dynamic.model.query.mq.FieldType.STRING, "信息")
     val smsCount = dynamic.model.query.mq.ModelField(null, "sms_count", dynamic.model.query.mq.FieldType.INT, "短信条数")

@@ -130,7 +130,8 @@ class Lead:ContextModel("crm_lead","public") {
             FieldType.BIGINT,
             "活动",
             targetModelTable = "public.crm_event",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     val communications = ModelOne2ManyField(null,
             "communications",
@@ -144,7 +145,7 @@ class Lead:ContextModel("crm_lead","public") {
             FieldType.BIGINT,
             "最近状态",
             targetModelTable = "public.crm_lead_interaction_status",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     val fullAddress by lazy {
             ModelFullAddressField(null,

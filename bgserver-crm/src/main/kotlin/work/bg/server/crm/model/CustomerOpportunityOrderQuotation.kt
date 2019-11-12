@@ -26,6 +26,8 @@
 
 package work.bg.server.crm.model
 
+import dynamic.model.query.mq.FieldForeignKey
+import dynamic.model.query.mq.ForeignKeyAction
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
@@ -64,7 +66,8 @@ class CustomerOpportunityOrderQuotation:
             "tpl_id", dynamic.model.query.mq.FieldType.BIGINT,
             "模板",
             targetModelTable = "public.crm_customer_opportunity_order_quotation_template",
-            targetModelFieldName = "id")
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     val comment= dynamic.model.query.mq.ModelField(null,
             "comment",
