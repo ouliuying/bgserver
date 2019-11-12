@@ -28,7 +28,7 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model("smsSendHistory")
+@Model("smsSendHistory","发送日志")
 class SmsSendHistory:ContextModel("sms_send_history","public") {
     companion object : RefSingleton<SmsSendHistory> {
         override lateinit var ref: SmsSendHistory

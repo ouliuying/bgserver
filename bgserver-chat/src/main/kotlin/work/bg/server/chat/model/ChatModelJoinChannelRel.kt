@@ -24,6 +24,7 @@ package work.bg.server.chat.model
 import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model("chatModelJoinChannelRel")
 class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public") {
@@ -55,6 +56,14 @@ class ChatModelJoinChannelRel:ContextModel("chat_model_join_channel_rel","public
             targetModelTable = "public.chat_channel",
             targetModelFieldName = "id",
             foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 
 
 }

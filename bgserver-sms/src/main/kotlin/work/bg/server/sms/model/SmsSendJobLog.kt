@@ -29,7 +29,7 @@ import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model("smsSendJobLog")
+@Model("smsSendJobLog","提交日志")
 class SmsSendJobLog:ContextModel("sms_send_job_log","public") {
     companion object : RefSingleton<SmsSendJobLog> {
         override lateinit var ref: SmsSendJobLog

@@ -30,7 +30,7 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.storage.FileEntity
 
-@Model("storageEntity")
+@Model("storageEntity","文件")
 class StorageEntity:ContextModel("base_storage_entity","public") {
     companion object: RefSingleton<StorageEntity> {
         override lateinit var ref: StorageEntity

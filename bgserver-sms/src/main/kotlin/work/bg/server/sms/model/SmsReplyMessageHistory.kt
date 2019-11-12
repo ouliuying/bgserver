@@ -29,7 +29,7 @@ import dynamic.model.query.mq.RefSingleton
 import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.model.ContextModel
 
-@Model("smsReplyMessageHistory")
+@Model("smsReplyMessageHistory","回复日志")
 class SmsReplyMessageHistory:ContextModel("sms_reply_message_history",
         "public") {
     companion object : RefSingleton<SmsReplyMessageHistory> {

@@ -24,15 +24,17 @@
 package dynamic.model.query.mq
 
 import dynamic.model.query.mq.model.ModelBase
+import org.apache.commons.logging.LogFactory
 
-class CreateStatement(vararg val fieldValues: dynamic.model.query.mq.FieldValue, val model: ModelBase): dynamic.model.query.mq.ModelExpression(){
-    override fun accept(visitor: dynamic.model.query.mq.ModelExpressionVisitor, parent: dynamic.model.query.mq.ModelExpression?): Boolean {
+class CreateStatement(vararg val fieldValues: FieldValue, val model: ModelBase): dynamic.model.query.mq.ModelExpression(){
+    private  val logger = LogFactory.getLog(javaClass)
+    override fun accept(visitor: ModelExpressionVisitor, parent: ModelExpression?): Boolean {
         visitor.visit(this,parent)
         return true
     }
 
-    override fun render(parent: dynamic.model.query.mq.ModelExpression?): Pair<String, Map<String, dynamic.model.query.mq.FieldValue>>? {
-        var render= dynamic.model.query.mq.ModelCriteriaRender()
+    override fun render(parent: ModelExpression?): Pair<String, Map<String, FieldValue>>? {
+        var render= ModelCriteriaRender()
         this.accept(render,parent)
         return Pair(render.namedSql.toString(),render.namedParameters)
     }

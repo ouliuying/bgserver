@@ -25,9 +25,11 @@ package work.bg.server.product.model
 
 import dynamic.model.query.mq.FieldForeignKey
 import dynamic.model.query.mq.ForeignKeyAction
+import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model(name="productAttributeValue")
 class ProductAttributeValue:ContextModel("product_attribute_value","public") {
@@ -56,4 +58,11 @@ class ProductAttributeValue:ContextModel("product_attribute_value","public") {
             "attr_value_comment",
             dynamic.model.query.mq.FieldType.STRING,
             "值注释")
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

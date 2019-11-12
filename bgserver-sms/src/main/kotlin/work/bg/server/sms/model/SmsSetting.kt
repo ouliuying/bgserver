@@ -22,6 +22,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package work.bg.server.sms.model
 
 import com.google.gson.JsonObject
+import dynamic.model.query.mq.ModelDataObject
 import org.springframework.web.bind.annotation.RequestBody
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
@@ -32,7 +33,7 @@ import work.bg.server.core.ui.ModelView
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
 
-@Model("smsSetting")
+@Model("smsSetting","短信设置")
 class SmsSetting:ContextModel("sms_setting","public") {
     companion object : RefSingleton<SmsSetting> {
         override lateinit var ref: SmsSetting
@@ -105,5 +106,12 @@ class SmsSetting:ContextModel("sms_setting","public") {
             }
         }
         return null
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

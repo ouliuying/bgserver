@@ -32,6 +32,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.billboard.CurrCorpBillboard
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 import kotlin.reflect.KClass
 
 @Model("corpPartnerRel")
@@ -104,5 +105,14 @@ class BaseCorpPartnerRel(table:String,schema:String):ContextModel(table,schema) 
     override fun getModelCreateFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(ModelFieldRequired(this.corp,this.partner,this.partnerRole,advice = "缺少必要的字段"),
                 ModelFieldMustCoexist(partnerRole,isDefaultCorp,advice = "必須选择用户角色"))
+    }
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+
     }
 }

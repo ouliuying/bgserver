@@ -23,11 +23,13 @@
 
 package work.bg.server.crm.model
 
+import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model("crmPartnerEventRel")
 class CrmPartnerEventRel:ContextModel("crm_partner_event_rel","public") {
@@ -70,5 +72,12 @@ class CrmPartnerEventRel:ContextModel("crm_partner_event_rel","public") {
         return arrayOf(
                 ModelFieldUnique(this.event,this.partner,advice = "负责人已经存在！",isolationType = ModelFieldUnique.IsolationType.IN_CORP)
         )
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

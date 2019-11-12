@@ -28,6 +28,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import work.bg.server.core.model.billboard.CurrPartnerBillboard
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model("departmentPartnerRel", "部门")
 class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schema) {
@@ -72,5 +73,12 @@ class DepartmentPartnerRel(table:String,schema:String): ContextModel(table,schem
 
     override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(ModelFieldNotNullOrEmpty(department,advice = "部门必须选择"))
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

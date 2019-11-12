@@ -1087,11 +1087,15 @@
             <ref>
                 <actions>
                     <action>
-                       <group name="main" refType="main|sub"/>
+                        <group name="main" refType="main|sub">
+                            <trigger title="发送" name="doSave"></trigger>
+                        </group>
                     </action>
                 </actions>
             </ref>
+            <field name="smsMobiles" type="singleLineText" style="head"/>
             <field name="sms" type="multiLineText" style="head"/>
+            <field name="mailAddresses" type="singleLineText"/>
             <field name="mail" type="multiLineText"/>
         </view>
     </model>

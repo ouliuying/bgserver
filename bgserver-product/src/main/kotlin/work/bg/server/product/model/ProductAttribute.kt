@@ -30,7 +30,7 @@ import work.bg.server.core.acrule.inspector.ModelFieldUnique
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model(name="productAttribute")
+@Model(name="productAttribute",title = "产品属性")
 class ProductAttribute:ContextModel("product_attribute","public") {
     companion object : RefSingleton<ProductAttribute> {
         override lateinit var ref: ProductAttribute

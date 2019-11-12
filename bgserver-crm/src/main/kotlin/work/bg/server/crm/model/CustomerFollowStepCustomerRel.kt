@@ -25,6 +25,7 @@ package work.bg.server.crm.model
 
 import dynamic.model.query.mq.*
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 
 @Model("customerFollowStepCustomerRel")
@@ -62,5 +63,11 @@ class CustomerFollowStepCustomerRel:ContextModel("crm_customer_follow_step_custo
             defaultValue = 0)
 
     val rate = ModelField(null,"rate",FieldType.DECIMAL,"满意度",defaultValue = 2.5)
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

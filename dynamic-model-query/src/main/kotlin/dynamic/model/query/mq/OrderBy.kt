@@ -31,7 +31,6 @@ class  OrderBy constructor(vararg val fields: OrderField): dynamic.model.query.m
              ASC(0),
              DESC(1)
         }
-
     }
 
     override fun render(parent: dynamic.model.query.mq.ModelExpression?): Pair<String, Map<String, Any?>>? {

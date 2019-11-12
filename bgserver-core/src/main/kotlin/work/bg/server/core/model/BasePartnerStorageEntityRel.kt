@@ -25,6 +25,7 @@ package work.bg.server.core.model
 
 import dynamic.model.query.mq.*
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 import javax.naming.Context
 
 @Model("partnerStorageEntityRel")
@@ -58,4 +59,11 @@ class BasePartnerStorageEntityRel:ContextModel("base_partner_storage_entity_rel"
             "owner_typ",
             FieldType.INT,
             "关系类型")
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

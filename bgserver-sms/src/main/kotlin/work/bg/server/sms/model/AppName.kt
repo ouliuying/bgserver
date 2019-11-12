@@ -29,7 +29,7 @@ class AppName : AppNamePackage {
         return AppPackageManifest("sms",
                 "短信平台", "/svg/sms-app.svg",
                 "短信平台，http://www.c8686.com",
-                "",
+                "sms/sendSms",
                 1)
     }
 }

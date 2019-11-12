@@ -28,7 +28,7 @@ import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
 import javax.servlet.http.HttpSession
 
-@Model("worktable")
+@Model("worktable","工作台")
 class Worktable:ContextModel("worktable","public") {
     companion object : RefSingleton<Worktable> {
         override lateinit var ref: Worktable

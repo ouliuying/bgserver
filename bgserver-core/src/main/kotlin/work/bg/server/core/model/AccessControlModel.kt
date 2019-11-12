@@ -1702,7 +1702,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             return@forEach
                         }
                         if(it.value is ModelDataObject){
-                            if((it.value as ModelDataObject).idFieldValue==null){
+                            if((it.value as ModelDataObject).idFieldValue==null && !(it.value as ModelDataObject).isEmpty()){
                                 (it.value as ModelDataObject).context=modelDataObject.context
                                 var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,
                                         useAccessControl,

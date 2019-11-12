@@ -25,7 +25,7 @@ import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model(name="productUOM")
+@Model(name="productUOM",title = "产品单位")
 class ProductUOM :ContextModel("product_uom","public"){
     companion object : RefSingleton<ProductUOM> {
         override lateinit var ref: ProductUOM

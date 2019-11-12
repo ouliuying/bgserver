@@ -36,12 +36,6 @@
 
             </menuItem>
         </menu>
-        <menu name="customer" app="crm" title="商机管理" icon="/svg/crm-app-oppo.svg">
-            <menuItem title="商机列表" model="customerOpportunity" viewType="list">
-            </menuItem>
-            <menuItem title="创建商机" model="customerOpportunity" viewType="create">
-            </menuItem>
-        </menu>
         <menu name="customer" app="crm" title="客户管理" icon="/svg/crm-app-customer.svg">
             <menuItem title="客户跟进" model="customer" viewType="crmCustomerFollowView">
             </menuItem>
@@ -50,6 +44,14 @@
             <menuItem title="添加客户" model="customer" viewType="create">
             </menuItem>
         </menu>
+
+        <menu name="customer" app="crm" title="商机管理" icon="/svg/crm-app-oppo.svg">
+            <menuItem title="商机列表" model="customerOpportunity" viewType="list">
+            </menuItem>
+            <menuItem title="创建商机" model="customerOpportunity" viewType="create">
+            </menuItem>
+        </menu>
+
         <menu name="customerOpportunityOrderQuotation" app="crm" title="报价管理" icon="/svg/crm-app-quot.svg">
             <menuItem title="报价单" model="customerOpportunityOrderQuotation" viewType="list">
 

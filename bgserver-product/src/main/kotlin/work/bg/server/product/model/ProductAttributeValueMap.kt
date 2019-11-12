@@ -27,6 +27,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dynamic.model.query.mq.FieldForeignKey
 import dynamic.model.query.mq.ForeignKeyAction
+import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
@@ -106,5 +107,12 @@ class ProductAttributeValueMap:ContextModel("product_attribute_value_map",
             }
         }
         return mv
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

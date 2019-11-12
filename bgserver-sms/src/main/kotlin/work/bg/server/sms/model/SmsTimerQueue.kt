@@ -28,7 +28,7 @@ import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model("smsTimerQueue")
+@Model("smsTimerQueue","定时短信")
 class SmsTimerQueue:ContextModel("sms_timer_queue","public") {
     companion object : RefSingleton<SmsTimerQueue> {
         override lateinit var ref: SmsTimerQueue

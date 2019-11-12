@@ -25,7 +25,7 @@ import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model(name="customerOpportunityOrderQuotationTemplate")
+@Model(name="customerOpportunityOrderQuotationTemplate",title = "销售机会报价")
 class CustomerOpportunityOrderQuotationTemplate:  ContextModel("crm_customer_opportunity_order_quotation_template","public")  {
     companion object : RefSingleton<CustomerOpportunityOrderQuotationTemplate> {
         override lateinit var ref: CustomerOpportunityOrderQuotationTemplate

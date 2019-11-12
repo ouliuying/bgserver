@@ -23,6 +23,7 @@
 
 package work.bg.server.crm.model
 
+import dynamic.model.query.mq.ModelDataObject
 import work.bg.server.util.TypeConvert
 import dynamic.model.query.mq.RefSingleton
 import dynamic.model.query.mq.eq
@@ -122,5 +123,11 @@ class CrmCustomerOpportunityOrderProductRel:ContextModel("crm_customer_opportuni
         }
         return Pair(true,null)
     }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
 
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

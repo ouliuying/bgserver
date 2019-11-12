@@ -22,6 +22,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 package work.bg.server.sms.model
 
 import com.google.gson.JsonObject
+import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.RefSingleton
 import dynamic.model.query.mq.eq
 import dynamic.model.web.errorcode.ErrorCode
@@ -140,5 +141,12 @@ class Sms:ContextModel("sms","public") {
             this.smsKafkaClient.pushReplyMsg(xmlData)
         }
         return "success"
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

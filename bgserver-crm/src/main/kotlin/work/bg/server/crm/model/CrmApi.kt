@@ -78,10 +78,10 @@ class CrmApi:ContextModel("crm_api","public") {
         //回款 结束
         ar.errorCode =ErrorCode.SUCCESS
         ar.bag["funnelData"]= arrayOf(
-                mapOf(
-                        "step" to "线索",
-                        "count" to this.getLeadCount(fromDate, toDate,partnerCache)
-                ),
+//                mapOf(
+//                        "step" to "线索",
+//                        "count" to this.getLeadCount(fromDate, toDate,partnerCache)
+//                ),
                 mapOf(
                         "step" to "销售机会",
                         "count" to this.getOpportunityCount(fromDate, toDate,partnerCache)
@@ -145,5 +145,12 @@ class CrmApi:ContextModel("crm_api","public") {
          }
          val ret =   model.rawCount(criteria = criteria,partnerCache = partnerCache,useAccessControl = true)
         return if(ret>0) ret else 1
+    }
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
     }
 }

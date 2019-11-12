@@ -23,8 +23,10 @@
 
 package work.bg.server.crm.model
 
+import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.RefSingleton
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 import work.bg.server.corp.model.DepartmentPartner
 
 @Model("partner","员工")
@@ -65,5 +67,6 @@ class CrmPartner:DepartmentPartner() {
             "发票",
             targetModelTable = "public.crm_customer_order_invoice",
             targetModelFieldName = "accountPartner")
+
 
 }

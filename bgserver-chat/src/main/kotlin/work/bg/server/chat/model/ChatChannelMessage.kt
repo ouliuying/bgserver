@@ -28,7 +28,7 @@ import dynamic.model.query.mq.RefSingleton
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
 
-@Model("chatChannelMessage")
+@Model("chatChannelMessage","通讯信息")
 class ChatChannelMessage:ContextModel("chat_channel_message","public") {
     companion object: RefSingleton<ChatChannelMessage> {
         override lateinit var ref: ChatChannelMessage

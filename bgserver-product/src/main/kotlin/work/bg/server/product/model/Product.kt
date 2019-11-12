@@ -37,7 +37,7 @@ import work.bg.server.product.acrule.bean.ModelCreateProductInnerRecordFieldsVal
 import work.bg.server.product.acrule.bean.ModelEditProductInnerRecordFieldsValueFilterBean
 
 
-@Model(name="product")
+@Model(name="product",title = "产品")
 class Product:ContextModel("product_product","public") {
     @Autowired
     private lateinit var createInnerRecordFieldsValueFilterBean:ModelCreateProductInnerRecordFieldsValueFilterBean

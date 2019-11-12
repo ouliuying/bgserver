@@ -120,10 +120,11 @@ class Lead:ContextModel("crm_lead","public") {
     //最新交流人
     val commPartner = ModelMany2OneField(null,
             "comm_partner_id",
-            FieldType.BIGINT, title = "联系人",
+            FieldType.BIGINT,
+            title = "联系人",
             targetModelTable = "public.base_partner",
             targetModelFieldName = "id",
-            foreignKey = FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.SET_NULL))
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.SET_NULL))
 
     val event = ModelMany2OneField(null,
             "event_id",

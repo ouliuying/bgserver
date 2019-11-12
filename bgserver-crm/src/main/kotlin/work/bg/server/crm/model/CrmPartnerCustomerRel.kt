@@ -26,6 +26,7 @@ package work.bg.server.crm.model
 import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model("crmPartnerCustomerRel")
 class CrmPartnerCustomerRel:ContextModel("crm_partner_customer_rel","public") {
@@ -61,4 +62,11 @@ class CrmPartnerCustomerRel:ContextModel("crm_partner_customer_rel","public") {
             "占有",
             defaultValue = 0,
             comment = "0,默认不占有，1占有")
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

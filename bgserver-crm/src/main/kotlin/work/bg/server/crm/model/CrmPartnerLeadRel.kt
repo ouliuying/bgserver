@@ -23,38 +23,47 @@
 
 package work.bg.server.crm.model
 
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.mq.*
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
 
 @Model("crmPartnerLeadRel")
 class CrmPartnerLeadRel:ContextModel("crm_partner_lead_rel","public") {
     companion object : RefSingleton<CrmPartnerLeadRel> {
         override lateinit var ref: CrmPartnerLeadRel
     }
-    val id= dynamic.model.query.mq.ModelField(null,
+    val id= ModelField(null,
             "id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "标示",
-            primaryKey = dynamic.model.query.mq.FieldPrimaryKey())
+            primaryKey = FieldPrimaryKey())
 
-    val partner= dynamic.model.query.mq.ModelMany2OneField(null,
+    val partner= ModelMany2OneField(null,
             "partner_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "用户",
             targetModelTable = "public.base_partner",
-            targetModelFieldName = "id", foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
+            targetModelFieldName = "id",
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
 
-    val lead= dynamic.model.query.mq.ModelMany2OneField(null,
+    val lead= ModelMany2OneField(null,
             "lead_id",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "客户",
             targetModelTable = "public.crm_lead",
             targetModelFieldName = "id",
-            foreignKey = dynamic.model.query.mq.FieldForeignKey(action = dynamic.model.query.mq.ForeignKeyAction.CASCADE))
-    val ownFlag = dynamic.model.query.mq.ModelField(null,
+            foreignKey = FieldForeignKey(action = ForeignKeyAction.CASCADE))
+    val ownFlag = ModelField(null,
             "ownFlag",
-            dynamic.model.query.mq.FieldType.INT,
+            FieldType.INT,
             "占有",
             defaultValue = 0, comment = "0,默认不占有，1占有")
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
 }

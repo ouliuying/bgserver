@@ -39,6 +39,8 @@ class EventLogField (model: ModelBase?, name:String,
     }
 
     override fun inverse(fieldValueArray: FieldValueArray, partnerCache: PartnerCache?, value: Long?, data: Any?) {
-
+        fieldValueArray.removeIf {
+            it.field.name == this.name
+        }
     }
 }
