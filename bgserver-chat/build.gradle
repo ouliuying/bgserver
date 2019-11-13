@@ -59,7 +59,7 @@ apply plugin: "kotlin"
 apply plugin: "kotlin-allopen"
 apply plugin: "org.jetbrains.kotlin.jvm"
 group 'work.bg.server'
-version '0.0.1-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 allOpen {
