@@ -207,6 +207,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
              const val many2OneDataSetSelect="many2OneDataSetSelect"
              const val many2ManyDataSetSelect = "many2ManyDataSetSelect"
              const val selectModelFromListView = "selectModelFromListView"
+             const val multiSelect  = "multiSelect"
          }
          var title:String=""
          var icon:String=""

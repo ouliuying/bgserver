@@ -1093,9 +1093,9 @@
                     </action>
                 </actions>
             </ref>
-            <field name="smsMobiles" type="singleLineText" style="head"/>
+            <field name="smsMobiles" type="multiSelect" style="head"/>
             <field name="sms" type="multiLineText" style="head"/>
-            <field name="mailAddresses" type="singleLineText"/>
+            <field name="mailAddresses" type="multiSelect"/>
             <field name="mail" type="multiLineText"/>
         </view>
     </model>

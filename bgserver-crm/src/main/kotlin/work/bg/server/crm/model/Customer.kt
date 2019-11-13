@@ -135,7 +135,7 @@ class Customer: ContextModel("crm_customer","public") {
             "contact_address_id",
             FieldType.BIGINT,
             "联系人",
-            targetModelTable = "public.customer_contact_address",
+            targetModelTable = "public.crm_customer_contact_address",
             targetModelFieldName = "customer_id")
 
     var fromLead = ModelOne2OneField(null,

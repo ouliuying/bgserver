@@ -369,7 +369,7 @@ abstract  class ContextModel(tableName:String,schemaName:String):AccessControlMo
             ModelView.ViewType.DETAIL->{
                 return this.fillDetailModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
-            ModelView.ViewType.EDIT->{
+            ModelView.ViewType.EDIT,ModelView.ViewType.MODEL_ACTION->{
                 return this.fillEditModelViewMeta(mv,modelData,viewData,pc,ownerFieldValue,toField,reqData)
             }
             ModelView.ViewType.LIST->{

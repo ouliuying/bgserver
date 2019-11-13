@@ -30,16 +30,16 @@ import java.time.LocalTime
 
 class ModelFieldConvert {
     companion object {
-        fun toTypeValue(field: dynamic.model.query.mq.FieldBase?, value:String?):Any?{
+        fun toTypeValue(field: FieldBase?, value:String?):Any?{
             return when(field?.fieldType){
-                dynamic.model.query.mq.FieldType.INT ->value?.toInt()
-                dynamic.model.query.mq.FieldType.DATE ->if(value=="now()") LocalDate.now() else LocalDate.parse(value)
-                dynamic.model.query.mq.FieldType.DATETIME ->if(value=="now()") LocalDateTime.now() else LocalDateTime.parse(value)
-                dynamic.model.query.mq.FieldType.TIME ->if(value=="now()") LocalTime.now() else LocalTime.parse(value)
-                dynamic.model.query.mq.FieldType.TEXT ->value
-                dynamic.model.query.mq.FieldType.STRING ->value
-                dynamic.model.query.mq.FieldType.BIGINT ->value?.toBigInteger()
-                dynamic.model.query.mq.FieldType.NUMBER ->value?.toBigDecimal()
+                FieldType.INT ->value?.toInt()
+                FieldType.DATE ->if(value=="now()") LocalDate.now() else LocalDate.parse(value)
+                FieldType.DATETIME ->if(value=="now()") LocalDateTime.now() else LocalDateTime.parse(value)
+                FieldType.TIME ->if(value=="now()") LocalTime.now() else LocalTime.parse(value)
+                FieldType.TEXT ->value
+                FieldType.STRING ->value
+                FieldType.BIGINT ->value?.toBigInteger()
+                FieldType.NUMBER ->value?.toBigDecimal()
                 else->null
             }
         }

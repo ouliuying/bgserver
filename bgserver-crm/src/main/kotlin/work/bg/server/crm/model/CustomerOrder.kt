@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.crm.model
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import dynamic.model.query.mq.*
 import org.springframework.web.bind.annotation.RequestBody
@@ -31,12 +32,20 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.ui.ModelView
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.model.ActionResult
+import org.springframework.beans.factory.annotation.Autowired
 import work.bg.server.core.model.field.EventLogField
+import work.bg.server.mail.MailSender
+import work.bg.server.sms.SmsSender
+import work.bg.server.util.TypeConvert
 import java.math.BigInteger
 
 @Model("customerOrder","客户订单")
 class CustomerOrder:
         ContextModel("crm_customer_order","public") {
+    @Autowired
+    private lateinit var smsSender: SmsSender
+    @Autowired
+    private lateinit var mailSender: MailSender
     companion object : RefSingleton<CustomerOrder> {
         override lateinit var ref: CustomerOrder
     }
@@ -132,10 +141,29 @@ class CustomerOrder:
     }
 
     @Action("notifyOrderStepBySmsEmail")
-    fun notifyOrderStepBySmsEmail(@RequestBody modelData: ModelDataObject?,
+    fun notifyOrderStepBySmsEmail(@RequestBody data: JsonObject?,
                                   pc:PartnerCache):ActionResult?{
         var r =ActionResult()
+        val smsMessage = data?.get("sms")?.asString
+        val smsMobiles = data?.get("smsMobiles")?.asJsonArray
+        val mail = data?.get("mail")?.asString
+        val mailAddresses = data?.get("mailAddresses")?.asJsonArray
 
+
+        smsMessage?.let {
+            val mobiles = arrayListOf<String>()
+            smsMobiles?.forEach {
+                mobiles.add(it.toString().substringBefore("(").trim())
+            }
+            this.smsSender.send(mobiles = mobiles,message = smsMessage,repeatFilter = false,useAccessControl = true,partnerCache = pc)
+        }
+        mail?.let {
+            val addresses = arrayListOf<String>()
+            mailAddresses?.forEach {
+                addresses.add(it.toString().substringBefore("(").trim())
+            }
+            this.mailSender.send(addresses,"订单通知",mail)
+        }
         return r
     }
 
@@ -213,4 +241,53 @@ class CustomerOrder:
         this.rawEdit(mo,criteria = null,partnerCache = pc,useAccessControl = useAccessControl)
     }
 
+    override fun fillEditModelViewMeta(mv: ModelView,
+                                       modelData: ModelData?,
+                                       viewData: MutableMap<String, Any>,
+                                       pc: PartnerCache,
+                                       ownerFieldValue: FieldValue?,
+                                       toField: FieldBase?,
+                                       reqData: JsonObject?): ModelView {
+
+         super.fillEditModelViewMeta(mv, modelData, viewData, pc, ownerFieldValue, toField, reqData)
+
+         if(mv.viewType == ModelView.ViewType.MODEL_ACTION){
+            var orderID = TypeConvert.getLong((modelData as ModelDataObject?)?.idFieldValue?.value as Number?)
+            orderID?.let {
+                var order = this.rawRead(this.customer,criteria = eq(this.id,orderID))?.firstOrNull()
+                order?.let {odi->
+                    var customer = odi.getFieldValue(this.customer) as ModelDataObject?
+                    customer?.let { ci->
+                        val customerID = TypeConvert.getLong(ci.idFieldValue?.value as Number?)
+                        val addresses = CustomerContactAddress.ref.rawRead(criteria = eq(CustomerContactAddress.ref.customer,customerID))?.toModelDataObjectArray()
+                        var mobiles = JsonArray()
+                        var emails =JsonArray()
+                        mobiles.add("${ci.getFieldValue(Customer.ref.mobile)}(${ci.getFieldValue(Customer.ref.name)})")
+                        emails.add("${ci.getFieldValue(Customer.ref.email)}(${ci.getFieldValue(Customer.ref.name)})")
+                        addresses?.forEach {addi->
+                            mobiles.add("${addi.getFieldValue(CustomerContactAddress.ref.mobile)}(${addi.getFieldValue(CustomerContactAddress.ref.name)})")
+                            emails.add("${addi.getFieldValue(CustomerContactAddress.ref.email)}(${addi.getFieldValue(CustomerContactAddress.ref.name)})")
+
+                        }
+                        mv.fields.firstOrNull {
+                            it.name == this.smsMobiles.propertyName
+                        }?.let {
+                            val options = JsonObject()
+                            options.add("options",mobiles)
+                            it.meta = options
+                        }
+
+                        mv.fields.firstOrNull {
+                            it.name == this.mailAddresses.propertyName
+                        }?.let {
+                            val options = JsonObject()
+                            options.add("options",emails)
+                            it.meta = options
+                        }
+                    }
+                }
+            }
+        }
+        return mv
+    }
 }
