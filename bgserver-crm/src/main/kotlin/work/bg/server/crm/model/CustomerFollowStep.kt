@@ -72,6 +72,7 @@ class CustomerFollowStep:ContextModel("crm_customer_follow_step","public") {
         val datas = this.rawRead(*fields.toTypedArray(),
                 criteria = null,
                 partnerCache = partnerCache,
+                useAccessControl = true,
                 orderBy = OrderBy(OrderBy.OrderField(this.seqIndex,orderType = OrderBy.Companion.OrderType.DESC)))?.toModelDataObjectArray()
         var ar = ActionResult()
         ar.errorCode = ErrorCode.SUCCESS
@@ -141,6 +142,7 @@ class CustomerFollowStep:ContextModel("crm_customer_follow_step","public") {
         val datas = this.rawRead(*fields.toTypedArray(),
                 criteria = null,
                 partnerCache = partnerCache,
+                useAccessControl = true,
                 orderBy = OrderBy(OrderBy.OrderField(this.seqIndex,orderType = OrderBy.Companion.OrderType.DESC)))?.toModelDataObjectArray()
         datas?.forEach {moIt->
             var stepID = TypeConvert.getLong(moIt.idFieldValue?.value as Number?)

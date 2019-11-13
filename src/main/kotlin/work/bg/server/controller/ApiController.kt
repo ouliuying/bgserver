@@ -24,6 +24,7 @@
 package work.bg.server.controller
 
 import com.google.gson.JsonObject
+import com.rometools.rome.feed.rss.Guid
 import dynamic.model.query.mq.ModelDataObject
 import dynamic.model.query.mq.eq
 import dynamic.model.query.mq.model.AppModel
@@ -34,8 +35,12 @@ import org.springframework.transaction.support.DefaultTransactionDefinition
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import work.bg.server.chat.model.ChatChannel
 import work.bg.server.chat.model.ChatPartner
 import work.bg.server.core.model.*
+import work.bg.server.crm.model.Customer
+import work.bg.server.crm.model.CustomerFollowStep
+import work.bg.server.crm.model.CustomerFollowStepCustomerRel
 import work.bg.server.util.GUID
 import work.bg.server.util.MD5
 import java.util.*
@@ -93,6 +98,7 @@ class ApiController {
             partner.setFieldValue(partnerModel.birthday, Date())
             partner.setFieldValue(partnerModel.createTime,Date())
             partner.setFieldValue(partnerModel.lastModifyTime,Date())
+            partner.setFieldValue(ChatPartner.ref.chatUUID,GUID.randString())
 
             val partnerRoleModel = BasePartnerRole.ref
 
@@ -156,6 +162,7 @@ class ApiController {
                         partnerCorpRoleRel.setFieldValue(BaseCorpPartnerRel.ref.lastModifyCorpID,retCorp.first)
                         val retPartnerCorpRoleRel = BaseCorpPartnerRel.ref.rawCreate(partnerCorpRoleRel)
                         if(retPartnerCorpRoleRel.first!=null && retPartnerCorpRoleRel.first!!>0){
+                            this.initData(retPartner.first!!,retCorp.first!!)
                             retObj.addProperty("errorCode",0)
                             retObj.addProperty("message","注册成功")
                             txManager.commit(status)
@@ -180,4 +187,73 @@ class ApiController {
             retObj.addProperty("message","系统忙，稍后重试！")
             return retObj
         }
+    private fun initData(partnerID:Long,corpID:Long){
+        //add channel
+        var channelObj = ModelDataObject(model = ChatChannel.ref)
+        channelObj.setFieldValue(ChatChannel.ref.name,"全体员工")
+        channelObj.setFieldValue(ChatChannel.ref.uuid,GUID.randString())
+        channelObj.setFieldValue(ChatChannel.ref.defaultFlag,1)
+        channelObj.setFieldValue(ChatChannel.ref.broadcastType,0)
+        channelObj.setFieldValue(ChatChannel.ref.owner,partnerID)
+        channelObj.setFieldValue(ChatChannel.ref.owner,partnerID)
+        channelObj.setFieldValue(ChatChannel.ref.createPartnerID,partnerID)
+        channelObj.setFieldValue(ChatChannel.ref.lastModifyPartnerID,partnerID)
+        channelObj.setFieldValue(ChatChannel.ref.createCorpID,corpID)
+        channelObj.setFieldValue(ChatChannel.ref.lastModifyCorpID,corpID)
+        channelObj.setFieldValue(ChatChannel.ref.lastModifyTime,Date())
+        channelObj.setFieldValue(ChatChannel.ref.createTime,Date())
+        ChatChannel.ref.rawCreate(channelObj)
+        //add customer follow step
+        val steps = arrayOf("潜在机会","需求沟通","报价合同","赢得订单","失败订单")
+        var stepID = 0.toLong()
+        steps.reversed().forEachIndexed { index, s ->
+            var customerFollowStep = ModelDataObject(model = CustomerFollowStep.ref)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.name,s)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.seqIndex,index+1)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.createPartnerID,partnerID)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.lastModifyPartnerID,partnerID)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.createCorpID,corpID)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.lastModifyCorpID,corpID)
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.lastModifyTime,Date())
+            customerFollowStep.setFieldValue(CustomerFollowStep.ref.createTime,Date())
+            var ret = CustomerFollowStep.ref.rawCreate(customerFollowStep)
+            if(ret.first!=null && ret.first!!>0){
+                stepID = ret.first!!
+            }
+        }
+
+        //add customer
+        var customer = ModelDataObject(model = Customer.ref)
+        customer.setFieldValue(Customer.ref.name,"上海星野信息科技有限公司")
+        customer.setFieldValue(Customer.ref.corpName,"上海星野信息科技有限公司")
+        customer.setFieldValue(Customer.ref.isCorp,1)
+        customer.setFieldValue(Customer.ref.mobile,"18621991588")
+        customer.setFieldValue(Customer.ref.sex,1)
+        customer.setFieldValue(Customer.ref.telephone,"400-850-3031")
+        customer.setFieldValue(Customer.ref.email,"bayoujishu001@qq.com")
+        customer.setFieldValue(Customer.ref.website,"https://bg.work")
+        customer.setFieldValue(Customer.ref.comment,"办公系统开发服务商")
+        customer.setFieldValue(Customer.ref.createPartnerID,partnerID)
+        customer.setFieldValue(Customer.ref.lastModifyPartnerID,partnerID)
+        customer.setFieldValue(Customer.ref.createCorpID,corpID)
+        customer.setFieldValue(Customer.ref.lastModifyCorpID,corpID)
+        customer.setFieldValue(Customer.ref.lastModifyTime,Date())
+        customer.setFieldValue(Customer.ref.createTime,Date())
+       var ret = Customer.ref.rawCreate(customer)
+
+        //add follow step customer
+        if(ret.first!=null && ret.first!!>0 && stepID>0){
+            var stepCustomerRel  = ModelDataObject(model = CustomerFollowStepCustomerRel.ref)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.customer,ret.first)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.customerFollowStep,stepID)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.seqIndex,1)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.createPartnerID,partnerID)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.lastModifyPartnerID,partnerID)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.createCorpID,corpID)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.lastModifyCorpID,corpID)
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.lastModifyTime,Date())
+            stepCustomerRel.setFieldValue(CustomerFollowStepCustomerRel.ref.createTime,Date())
+            CustomerFollowStepCustomerRel.ref.rawCreate(stepCustomerRel)
+        }
+    }
 }

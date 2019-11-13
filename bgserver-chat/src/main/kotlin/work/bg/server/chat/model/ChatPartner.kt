@@ -65,21 +65,21 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
 
         }
     }
-    val chatUUID = dynamic.model.query.mq.ModelField(null,
+    val chatUUID = ModelField(null,
             "chat_uuid",
-            dynamic.model.query.mq.FieldType.STRING,
+            FieldType.STRING,
             "通讯UUID",
             defaultValue = ChatGuidBillboard())
 
-    val ownChannels = dynamic.model.query.mq.ModelOne2ManyField(null,
+    val ownChannels = ModelOne2ManyField(null,
             "own_channels",
-            dynamic.model.query.mq.FieldType.BIGINT,
+            FieldType.BIGINT,
             "我的频道",
             targetModelTable = "public.chat_channel",
             targetModelFieldName = "owner")
 
-    val joinChannels = dynamic.model.query.mq.ModelMany2ManyField(null, "join_channels",
-            dynamic.model.query.mq.FieldType.BIGINT,
+    val joinChannels = ModelMany2ManyField(null, "join_channels",
+            FieldType.BIGINT,
             "加入的频道",
             relationModelTable = "public.chat_model_join_channel_rel",
             relationModelFieldName = "join_channel_id",
@@ -94,7 +94,7 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                        session: HttpSession): ActionResult?{
         var md5Password= work.bg.server.util.MD5.hash(password)
         var partner=this.rawRead(criteria = and(eq(this.userName, userName), eq(this.password, md5Password)),
-                attachedFields = arrayOf(dynamic.model.query.mq.AttachedField(this.corps), dynamic.model.query.mq.AttachedField(this.partnerRoles)))
+                attachedFields = arrayOf(AttachedField(this.corps), AttachedField(this.partnerRoles)))
         return when{
             partner!=null->{
                 val firstPartner = partner.firstOrNull()
@@ -105,17 +105,17 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                     val icon = firstPartner?.getFieldValue(this.userIcon) as String?
                     var ar = ActionResult()
                     var corpPartnerRels = (partner.data.firstOrNull()?.
-                            getValue(ConstRelRegistriesField.ref) as dynamic.model.query.mq.ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
-                            as dynamic.model.query.mq.ModelDataArray?
+                            getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?.data?.get(BaseCorpPartnerRel.ref)
+                            as ModelDataArray?
                     corpPartnerRels?.data?.sortByDescending {
-                        (it.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
+                        (it.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject?)?.data?.getValue(BasePartnerRole.ref.isSuper) as Int
                     }
-                    var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject?
-                    var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.partnerRole) as dynamic.model.query.mq.ModelDataObject?
+                    var corpObject=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject?
+                    var partnerRole=corpPartnerRels?.data?.firstOrNull()?.getValue(BaseCorpPartnerRel.ref.partnerRole) as ModelDataObject?
                     var corpID=corpObject?.data?.getValue(BaseCorp.ref.id) as Long?
                     var partnerRoleID = partnerRole?.idFieldValue?.value as Long?
                     var corps=corpPartnerRels?.data?.map {
-                        it.getValue(BaseCorpPartnerRel.ref.corp) as dynamic.model.query.mq.ModelDataObject
+                        it.getValue(BaseCorpPartnerRel.ref.corp) as ModelDataObject
                     }
                     if(corpID!=null && corpID>0){
                         session.setAttribute(SessionTag.SESSION_PARTNER_CACHE_KEY, PartnerCacheKey(id, corpID, devType))
@@ -160,9 +160,9 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
 
     fun getPartnerChannelMeta(partnerID: Long,corpID: Long):String?{
         val chModel = ChatChannel.ref
-        var channels = ChatChannel.ref.rawRead(criteria = or(eq(
+        var channels = ChatChannel.ref.rawRead(criteria = or(and(eq(
                 chModel.defaultFlag,1
-        ),eq(chModel.owner,partnerID),`in`(chModel.id,
+        ),eq(chModel.createCorpID,corpID)),eq(chModel.owner,partnerID),`in`(chModel.id,
                 select(ChatModelJoinChannelRel.ref.joinChannel,
                 fromModel= ChatModelJoinChannelRel.ref)
                 .where(eq(ChatModelJoinChannelRel.ref.joinPartner,partnerID)))))?.toModelDataObjectArray()
@@ -210,13 +210,13 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
 //       return super.afterCreateObject(modelDataObject, useAccessControl, pc)
 //    }
 
-    override fun afterEditObject(modelDataObject: dynamic.model.query.mq.ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
+    override fun afterEditObject(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?): Pair<Boolean, String?> {
         var ret= super.afterEditObject(modelDataObject, useAccessControl, pc)
         val pid = TypeConvert.getLong(modelDataObject.idFieldValue?.value as Number?)
         pid?.let {
             var selfObj = this.rawRead(criteria = eq(this.id,pid))?.firstOrNull()
             if(selfObj!=null && selfObj.getFieldValue(this.chatUUID)==null){
-                selfObj = dynamic.model.query.mq.ModelDataObject(model = this)
+                selfObj = ModelDataObject(model = this)
                 selfObj.setFieldValue(this.chatUUID,UUID.randomUUID().toString())
                 val pd = this.update(selfObj,criteria = eq(this.id,pid))
                 if(pd!=null && pd >0){
