@@ -81,6 +81,7 @@ class ApiController {
             corp.setFieldValue(corpModel.name,corpName)
             corp.setFieldValue(corpModel.address,"公司地址")
             corp.setFieldValue(corpModel.comment,"公司名称")
+
             corp.setFieldValue(corpModel.fax,"021-65720566")
             corp.setFieldValue(corpModel.telephone,"021-65720566")
             corp.setFieldValue(corpModel.website,"https://bg.work")
@@ -91,14 +92,15 @@ class ApiController {
             var partner = ModelDataObject(model = partnerModel)
             partner.setFieldValue(partnerModel.userName,userName)
             partner.setFieldValue(partnerModel.password,password)
+            partner.setFieldValue(partnerModel.mobile,GUID.randString())
             partner.setFieldValue(partnerModel.userIcon,"super_admin_icon")
-            partner.setFieldValue(partnerModel.email,"example@example.com")
+            partner.setFieldValue(partnerModel.email,"${GUID.randString()}@example.com")
             partner.setFieldValue(partnerModel.name,name?:"Administrator")
             partner.setFieldValue((partnerModel as ChatPartner).chatUUID,GUID.randString())
             partner.setFieldValue(partnerModel.birthday, Date())
             partner.setFieldValue(partnerModel.createTime,Date())
             partner.setFieldValue(partnerModel.lastModifyTime,Date())
-            partner.setFieldValue(ChatPartner.ref.chatUUID,GUID.randString())
+           // partner.setFieldValue(ChatPartner.ref.chatUUID,GUID.randString())
 
             val partnerRoleModel = BasePartnerRole.ref
 

@@ -35,9 +35,11 @@ import java.nio.file.Paths
 @Controller
 class  HomeController {
 
-    @RequestMapping("/")
-    fun index(): String{
-        return "index.html"
+    @RequestMapping("/",produces = [MediaType.TEXT_HTML_VALUE])
+    @ResponseBody
+    fun index(): ResponseEntity<*> {
+        val file = UrlResource(Paths.get("static/index.html").toUri())
+        return ResponseEntity.ok().body<Resource>(file);
     }
     @RequestMapping("/xy",produces = [MediaType.TEXT_HTML_VALUE])
     @ResponseBody
