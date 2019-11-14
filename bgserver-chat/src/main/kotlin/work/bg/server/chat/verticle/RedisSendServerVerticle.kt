@@ -55,6 +55,7 @@ class RedisSendServerVerticle:AbstractVerticle() {
                             val msgObj = JsonObject(msgBody)
                             val channelUUID = msgObj.getString(ChatEventBusConstant.CHANNEL_UUID)
                             channelUUID?.let {
+
                                 this.vertx.eventBus().publish("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}$channelUUID",
                                         msgObj)
                             }

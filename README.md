@@ -26,9 +26,21 @@ bg.work是综合性办公框架，
 * 工作台、销售数据统计、销售排行榜
 * 企业内部通讯、频道、内部交流
 * 短信平台 集成[八优短信 http://www.c8686.com](http://www.c8668.com)
-## 界面
+## 界面/功能
 
-![admin screen](static/image/softscreen.png)
+![工作台](static/image/worktable.png)
+
+![crm](static/image/crm.png)
+
+![产品](static/image/product.png)
+
+![企信IM](static/image/qixin.png)
+
+![公司管理](static/image/corp.png)
+
+![财务](static/image/account.png)
+
+![短信](static/image/sms.png)
 
 ## 框架说明
 
