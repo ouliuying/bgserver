@@ -193,7 +193,7 @@ class Lead:ContextModel("crm_lead","public") {
                         mo.setFieldValue(Customer.ref.commPartner,comPartnerID)
                     }
 
-                    val ret = Customer.ref.rawCreate(mo)
+                    val ret = Customer.ref.rawCreate(mo,partnerCache = partnerCache,useAccessControl = true)
                     if(ret.first!=null && ret.first!! > 0.toLong()){
 
                         val partnerRels = CrmPartnerLeadRel.ref.rawRead(criteria = eq(CrmPartnerLeadRel.ref.lead,modelID))?.toModelDataObjectArray()

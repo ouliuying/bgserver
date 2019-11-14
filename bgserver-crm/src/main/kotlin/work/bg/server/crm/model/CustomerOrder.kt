@@ -215,9 +215,9 @@ class CustomerOrder:
                mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
               val ret=  CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
                        oid),useAccessControl,pc)
-               if(ret.first==null){
-                   return Pair(false,"添加失败")
-               }
+//               if(ret.first==null){
+//                   return Pair(false,"添加失败")
+//               }
            }
        }
         else{
@@ -227,9 +227,9 @@ class CustomerOrder:
                mo.setFieldValue(CrmCustomerOpportunityOrderProductRel.ref.customerOrder,modelDataObject.idFieldValue?.value)
                val ret = CrmCustomerOpportunityOrderProductRel.ref.rawEdit(mo,eq(CrmCustomerOpportunityOrderProductRel.ref.customerOpportunity,
                        oid),useAccessControl,pc)
-               if(ret.first==null){
-                   return Pair(false,"添加失败")
-               }
+//               if(ret.first==null){
+//                   return Pair(false,"添加失败")
+//               }
            }
        }
         return Pair(true,null)
