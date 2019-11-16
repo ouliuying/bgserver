@@ -36,6 +36,7 @@ class ModelClientRedis(var redis:Redis,channelMeta:String?) {
     lateinit var chatSession: ModelClientChatSession
     init {
         this.redis.endHandler {
+
             this.reStart()
         }
         this.redis.handler{
@@ -63,9 +64,10 @@ class ModelClientRedis(var redis:Redis,channelMeta:String?) {
         }
     }
     private fun reStart(){
+        this.redis.close()
         this.logger.info("reconnect redis ..")
         val options = RedisOptions()
-        Redis.createClient(ModelClientHub.vertx, options).connect {
+        this.redis = Redis.createClient(ModelClientHub.vertx, options).connect {
             if(it.succeeded()){
                 this.redis = it.result()
                 this.redis.endHandler {

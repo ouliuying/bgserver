@@ -33,6 +33,8 @@ import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import work.bg.server.chat.ChatEventBusConstant
+import work.bg.server.chat.ChatEventBusConstant.CHANNEL_UUID
+import work.bg.server.chat.ChatEventBusConstant.ENSURE_START_CHANNEL_CONSUMER
 import java.lang.Exception
 
 @Component
@@ -40,11 +42,12 @@ class RedisSendServerVerticle:AbstractVerticle() {
     @Value("\${bg.chat.redis.url}")
     private lateinit var redisUrl:String
     private val logger = LogFactory.getLog(javaClass)
+    var redisClient:Redis?=null
     override fun start() {
       this.startSendRedisServer()
     }
     private  fun startSendRedisServer(){
-        Redis.createClient(this.vertx,this.redisUrl).connect {
+        this.redisClient = Redis.createClient(this.vertx,this.redisUrl).connect {
             if(it.succeeded()){
                 it.result()?.let {
                     it.handler {msg->
@@ -53,12 +56,13 @@ class RedisSendServerVerticle:AbstractVerticle() {
                             val msgBody = msg[2].toString()
                             this.logger.trace("real message = ${msgBody}")
                             val msgObj = JsonObject(msgBody)
-                            val channelUUID = msgObj.getString(ChatEventBusConstant.CHANNEL_UUID)
-                            channelUUID?.let {
 
-                                this.vertx.eventBus().publish("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}$channelUUID",
-                                        msgObj)
-                            }
+                                //check channel verticle has started and then publish
+                                this.vertx.eventBus().request<JsonObject>(ENSURE_START_CHANNEL_CONSUMER,msgObj){
+                                    val channelUUID = msgObj.getString(CHANNEL_UUID)
+                                    this.vertx.eventBus().publish("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}$channelUUID",
+                                            msgObj)
+                                }
                         }
                         catch (ex:Exception){
                             this.logger.error(ex.message)
@@ -73,14 +77,17 @@ class RedisSendServerVerticle:AbstractVerticle() {
                         }
                     }
                     it.exceptionHandler {
+                        this.redisClient?.close()
                         this.restartSendRedisServer()
                     }
                 }
             }
             else{
+                this.redisClient?.close()
                 this.restartSendRedisServer()
             }
         }.exceptionHandler {
+            this.redisClient?.close()
             this.restartSendRedisServer()
         }
     }

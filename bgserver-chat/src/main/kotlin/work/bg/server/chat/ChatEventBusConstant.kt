@@ -38,4 +38,5 @@ object ChatEventBusConstant {
     const val INNER_SERVER_CHANNEL_ADDRESS_HEADER = "inner.server.channel."
     const val INNER_SERVER_REDIS_IN_QUEUE_ADDRESS = "inner.server.redis.in.queue"
     const val INNER_SERVER_MESSAGE_REDIS_QUEUE = "inner.server.message.redis.queue"
+    const val ENSURE_START_CHANNEL_CONSUMER = "ensure.start.channel.consumer"
 }

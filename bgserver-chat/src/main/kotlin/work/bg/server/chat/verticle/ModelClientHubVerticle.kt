@@ -50,7 +50,12 @@ class ModelClientHubVerticle: AbstractVerticle() {
                 }
             }
         }
-
+        eb.consumer<JsonObject>(ChatEventBusConstant.ENSURE_START_CHANNEL_CONSUMER).handler{
+            val msg = it.body()
+            ModelClientHub.ensureStartChannel(msg, Handler {msg->
+                it.reply(msg.result())
+            })
+        }
     }
 
     override fun stop() {

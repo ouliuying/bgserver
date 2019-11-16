@@ -84,21 +84,24 @@ class RedisReceiveServerVerticle:AbstractVerticle() {
         val options = redisOptionsOf(
                 endpoint = this.redisUrl
         )
-        Redis.createClient(this.vertx,options).connect {
+       this.redisClient =  Redis.createClient(this.vertx,options).connect {
             if(it.succeeded()){
                 this.redisClient = it.result()
                 this.redisClient?.exceptionHandler {
+                    this.redisClient?.close()
                     this.redisClient=null
                     this.retryCreateRedisClient()
                 }
                 this.logger.trace("receive server connect redis successful!")
             }
             else if(it.failed()){
+                this.redisClient?.close()
                 this.redisClient = null
                 this.retryCreateRedisClient()
                 this.logger.trace("receive server connect redis failed!")
             }
         }.exceptionHandler {
+           this.redisClient?.close()
             this.redisClient=null
             this.retryCreateRedisClient()
         }

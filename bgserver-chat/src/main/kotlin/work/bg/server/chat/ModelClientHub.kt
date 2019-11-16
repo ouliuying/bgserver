@@ -21,6 +21,8 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat
 
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.eq
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
 import io.vertx.core.Handler
@@ -37,8 +39,12 @@ import org.apache.commons.logging.LogFactory
 import java.net.URI
 import org.bouncycastle.crypto.tls.ConnectionEnd.server
 import work.bg.server.chat.ChannelConsumer
+import work.bg.server.chat.ChatEventBusConstant.CHANNEL_UUID
+import work.bg.server.chat.ChatEventBusConstant.CHAT_FROM_UUID
+import work.bg.server.chat.ChatEventBusConstant.CHAT_TO_UUID
 import work.bg.server.chat.ModelClientChatSession
 import work.bg.server.chat.model.ChatPartner
+import work.bg.server.util.TypeConvert
 
 
 object ModelClientHub {
@@ -109,32 +115,45 @@ object ModelClientHub {
                 val defaultFlag = it.getInteger("defaultFlag")
                 val broadcastType = it.getInteger("broadcastType")
                 val icon = it.getString("icon")
-                if(this.channelConsumerMap.containsKey(uuid)){
-                    var ccm = this.channelConsumerMap[uuid]
-                    ccm?.broadcastType=broadcastType
-                    ccm?.channelDefaultFlag = defaultFlag
-                    ccm?.channelName = name
-                    ccm?.icon=icon
-                    ccm?.chatUUIDSet?.add(mccs.chatUUID)
-                    if(ccm?.Consumer?.isRegistered!=true){
-                       ccm?.Consumer = this.vertx.eventBus()
-                               .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${uuid}")
-                               .handler {
-                            this.sendMessageToChannel(uuid,it.body())
-                       }
-                    }
-                }
-                else{
-                    var channelConsumer = ChannelConsumer(id,uuid,name,defaultFlag,broadcastType,icon)
-                    channelConsumer.chatUUIDSet.add(mccs.chatUUID)
-                    channelConsumer.Consumer=this.vertx.eventBus()
-                            .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${uuid}")
-                            .handler{
-                                this.sendMessageToChannel(uuid,it.body())
-                            }
-                    this.channelConsumerMap[uuid]=channelConsumer
-                }
+                val cc = this.ensureStartChannelConsumer(uuid, id, name, defaultFlag, broadcastType, icon)
+                cc?.chatUUIDSet?.add(mccs.chatUUID)
             }
+        }
+    }
+
+    private fun ensureStartChannelConsumer(uuid: String,
+                                           id:Long,
+                                           name:String,
+                                           defaultFlag:Int,
+                                           broadcastType:Int,
+                                           icon:String
+                                   ):ChannelConsumer?{
+        if(this.channelConsumerMap.containsKey(uuid)){
+            var ccm = this.channelConsumerMap[uuid]
+            ccm?.broadcastType=broadcastType
+            ccm?.channelDefaultFlag = defaultFlag
+            ccm?.channelName = name
+            ccm?.icon=icon
+           // ccm?.chatUUIDSet?.add(chatUUID)
+            if(ccm?.Consumer?.isRegistered!=true){
+                ccm?.Consumer = this.vertx.eventBus()
+                        .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${uuid}")
+                        .handler {
+                            this.sendMessageToChannel(uuid,it.body())
+                        }
+            }
+            return ccm
+        }
+        else{
+            var channelConsumer = ChannelConsumer(id,uuid,name,defaultFlag,broadcastType,icon)
+           // channelConsumer.chatUUIDSet.add(chatUUID)
+            channelConsumer.Consumer=this.vertx.eventBus()
+                    .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${uuid}")
+                    .handler{
+                        this.sendMessageToChannel(uuid,it.body())
+                    }
+            this.channelConsumerMap[uuid]=channelConsumer
+            return channelConsumer
         }
     }
 
@@ -201,6 +220,7 @@ object ModelClientHub {
             }
         })
     }
+
     fun removeModelClientChatSession(chatSessionID: String){
         val mccs = this.getModelClientChatSessionBySessionID(chatSessionID,
                 false)
@@ -284,18 +304,82 @@ object ModelClientHub {
                                         this.logger.trace("read channel meta failed")
                                         handler.handle(Future.failedFuture("read channel meta failed"))
                                     }
+                                    onConnect.result()?.close()
                                 })
                             }
                             else{
+                                onConnect.result()?.close()
                                 this.logger.trace("get chat sesion id $chatSessionID relation data failed,cause:${it.cause()}")
                                 handler.handle(Future.failedFuture(it.cause()))
                             }
                         }
                     }
                     else{
+                        onConnect.result()?.close()
                         this.logger.trace("get chat session id $chatSessionID relation data from redis failed,cause: ${onConnect.cause()}")
                         handler.handle(Future.failedFuture(onConnect.cause()))
                     }
          }
     }
+    fun ensureStartChannel(msg: JsonObject,
+                           handler:Handler<AsyncResult<String>>){
+        val channelUUID = msg.getString(CHANNEL_UUID)
+        val fromChatUUID = msg.getString(CHAT_FROM_UUID)
+        val toChatUUID = msg.getString(CHAT_TO_UUID)
+        if(this.channelConsumerMap.containsKey(channelUUID)){
+            var cm = this.channelConsumerMap[channelUUID]
+            cm?.let {
+                if(!cm.Consumer.isRegistered){
+                    cm.Consumer = this.vertx.eventBus()
+                            .consumer<JsonObject>("${ChatEventBusConstant.INNER_SERVER_CHANNEL_ADDRESS_HEADER}${channelUUID}")
+                            .handler {
+                                this.sendMessageToChannel(channelUUID,it.body())
+                            }
+                }
+                if(!it.chatUUIDSet.contains(fromChatUUID) && fromChatUUID.length>1){
+                    it.chatUUIDSet.add(fromChatUUID)
+                }
+                if(!it.chatUUIDSet.contains(toChatUUID) && toChatUUID.length>1){
+                    it.chatUUIDSet.add(toChatUUID)
+                }
+            }
+            handler.handle(Future.succeededFuture("ok"))
+        }
+        else {
+            if (!channelUUID.isNullOrEmpty() && !channelUUID.isNullOrBlank()) {
+                this.vertx.executeBlocking<ModelDataObject?>({ p ->
+                    val cc = work.bg.server.chat.model.ChatChannel.ref.rawRead(criteria = eq(work.bg.server.chat.model.ChatChannel.ref.uuid, channelUUID))?.firstOrNull()
+                    p.tryComplete(cc)
+                },
+                { res ->
+                    res.result()?.let {mdo->
+                        var id = TypeConvert.getLong(mdo.idFieldValue?.value as Number?)
+                        val name = mdo.getFieldValue(work.bg.server.chat.model.ChatChannel.ref.name) as String?
+                        val uuid = mdo.getFieldValue(work.bg.server.chat.model.ChatChannel.ref.uuid) as String?
+                        val defaultFlag = mdo.getFieldValue(work.bg.server.chat.model.ChatChannel.ref.defaultFlag) as Int?
+                        val broadcastType =  mdo.getFieldValue(work.bg.server.chat.model.ChatChannel.ref.broadcastType) as Int?
+                        val icon = mdo.getFieldValue(work.bg.server.chat.model.ChatChannel.ref.icon) as String?
+                        var cm = this.ensureStartChannelConsumer(uuid?:"",
+                                id?:0,
+                                name?:"",
+                                defaultFlag?:0,
+                                broadcastType?:0,icon?:"")
+                        cm?.let {
+                            if(!it.chatUUIDSet.contains(fromChatUUID) && fromChatUUID.length>1){
+                                it.chatUUIDSet.add(fromChatUUID)
+                            }
+                            if(!it.chatUUIDSet.contains(toChatUUID) && toChatUUID.length>1){
+                                it.chatUUIDSet.add(toChatUUID)
+                            }
+                        }
+                    }
+                    handler.handle(Future.succeededFuture("ok"))
+                })
+            }
+            else{
+                handler.handle(Future.succeededFuture("ok"))
+            }
+        }
+    }
+
 }
