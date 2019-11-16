@@ -62,21 +62,26 @@ class Chat:ContextModel("chat","public") {
     fun activeChatSession(@RequestParam("sessionID") sessionID:String):ActionResult?{
         this.logger.info("active session $sessionID")
         var ar =ActionResult()
+        var redisClient:redis.clients.jedis.Jedis?=null
         try {
-            var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
-            var ret = pool.resource.expire(sessionID,1800)
+            redisClient=redis.clients.jedis.Jedis(URI(this.redisUrl),60)
+            var ret = redisClient.expire(sessionID,1800)
             ar.errorCode=ErrorCode.SUCCESS
         }
         catch (ex: Exception){
             ex.printStackTrace()
         }
+        finally {
+            redisClient?.close()
+        }
         return ar
     }
 
     fun getChannelMetaByChatSessionID(chatSessionID:String):String?{
+        var redisClient:redis.clients.jedis.Jedis?=null
         try {
-            var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
-            var ret = pool.resource.hgetAll(chatSessionID)
+            var redisClient= redis.clients.jedis.Jedis(URI(this.redisUrl),60)
+            var ret = redisClient.hgetAll(chatSessionID)
             return ret?.let {
                 val corpID = it["corpID"]?.toLong()
                 val model = it["model"]
@@ -89,6 +94,9 @@ class Chat:ContextModel("chat","public") {
         }
         catch (ex: Exception){
             ex.printStackTrace()
+        }
+        finally {
+            redisClient?.close()
         }
         return null
     }

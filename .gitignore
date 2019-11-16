@@ -23,3 +23,5 @@
 !/**/resources/log/**/*.xml
 !/**/resources/msg/**/*.json
 /static/upload/*
+/private
+/private/*

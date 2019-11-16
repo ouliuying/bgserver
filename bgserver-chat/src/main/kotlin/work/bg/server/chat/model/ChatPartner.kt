@@ -185,10 +185,11 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                                    corpID:Long,
                                    devType:Int,
                                    chatUUID:String):String?{
+        var redisClient:redis.clients.jedis.Jedis?=null
         try {
-            var pool= redis.clients.jedis.JedisPool(URI(this.redisUrl))
+            var redisClient= redis.clients.jedis.Jedis(URI(this.redisUrl),60)
             val chatSessionID = UUID.randomUUID().toString()
-            var ret = pool.resource.hmset(chatSessionID, mapOf(
+            var ret = redisClient.hmset(chatSessionID, mapOf(
                     "modelID" to partnerID.toString(),
                     "corpID" to corpID.toString(),
                     "chatUUID" to chatUUID,
@@ -196,12 +197,17 @@ class ChatPartner: SmsPartner(), ContextVariantInitializer {
                     "devType" to devType.toString()
             ))
             return if(ret.compareTo("ok",true)==0){
-                pool.resource.expire(chatSessionID,1800)
+                redisClient.expire(chatSessionID,1800)
                 return chatSessionID
             } else null
         }
         catch (ex:Exception){
             ex.printStackTrace()
+        }
+        finally {
+            redisClient?.let {
+                it.close()
+            }
         }
         return null
     }
