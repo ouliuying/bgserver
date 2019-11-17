@@ -248,7 +248,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return Pair(ruleCriteria,newQueryFields.toTypedArray())
     }
-    protected  open fun getModelReadAccessFieldFilterRule():ModelReadFieldFilterRule?{
+    open fun getModelReadAccessFieldFilterRule():ModelReadFieldFilterRule?{
         return null
     }
     protected  open fun getModelEditAccessFieldFilterRule():ModelEditRecordFieldsValueFilterRule<*,*>?{

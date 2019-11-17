@@ -115,7 +115,7 @@ object ModelClientHub {
                 val defaultFlag = it.getInteger("defaultFlag")
                 val broadcastType = it.getInteger("broadcastType")
                 val icon = it.getString("icon")
-                val cc = this.ensureStartChannelConsumer(uuid, id, name, defaultFlag, broadcastType, icon)
+                val cc = this.ensureStartChannelConsumer(uuid, id, name, defaultFlag, broadcastType, icon?:"")
                 cc?.chatUUIDSet?.add(mccs.chatUUID)
             }
         }

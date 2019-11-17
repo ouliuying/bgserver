@@ -37,6 +37,9 @@ import org.springframework.util.concurrent.ListenableFutureCallback
 import work.bg.server.chat.ChatEventBusConstant
 import work.bg.server.chat.model.ChatChannelMessage
 import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.eq
+import work.bg.server.chat.model.ChatChannel
+import work.bg.server.util.TypeConvert
 import java.lang.Exception
 
 @Service
@@ -70,10 +73,13 @@ class PersistChatMessage {
                 val msgObj = JsonObject(it)
                 var mo = dynamic.model.query.mq.ModelDataObject(model = ChatChannelMessage.ref)
                 val channelUUID = msgObj.getString(ChatEventBusConstant.CHANNEL_UUID)
+                var channelObj = ChatChannel.ref.rawRead(criteria = eq(ChatChannel.ref.uuid,channelUUID))?.firstOrNull()
+                val channelID =TypeConvert.getLong(channelObj?.idFieldValue?.value as Number?)
                 val fromUUID = msgObj.getString(ChatEventBusConstant.CHAT_FROM_UUID)
                 val toUUID = msgObj.getString(ChatEventBusConstant.CHAT_TO_UUID)
                 val uuid = msgObj.getString(ChatEventBusConstant.CHAT_MESSAGE_UUID)
                 mo.setFieldValue(ChatChannelMessage.ref.channelUUID,channelUUID)
+                mo.setFieldValue(ChatChannelMessage.ref.channelID,channelID)
                 mo.setFieldValue(ChatChannelMessage.ref.fromChatUUID,fromUUID)
                 mo.setFieldValue(ChatChannelMessage.ref.toChatUUID,toUUID)
                 mo.setFieldValue(ChatChannelMessage.ref.uuid,uuid)

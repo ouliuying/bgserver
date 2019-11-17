@@ -21,12 +21,16 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.chat.model
 
-import dynamic.model.query.mq.FieldPrimaryKey
-import dynamic.model.query.mq.FieldType
-import dynamic.model.query.mq.ModelField
-import dynamic.model.query.mq.RefSingleton
+import dynamic.model.query.exception.ModelErrorException
+import dynamic.model.query.mq.*
+import dynamic.model.query.mq.join.JoinModel
+import dynamic.model.query.mq.model.ModelBase
 import work.bg.server.core.model.ContextModel
 import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.acrule.ModelReadFieldFilterRule
+import work.bg.server.core.acrule.ModelReadIsolationRule
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.AccessControlModel
 
 @Model("chatChannelMessage","通讯信息")
 class ChatChannelMessage:ContextModel("chat_channel_message","public") {
@@ -44,6 +48,11 @@ class ChatChannelMessage:ContextModel("chat_channel_message","public") {
             "channel_uuid",
             FieldType.STRING,
             "频道UUID")
+
+    val channelID = ModelField(null,
+            "channel_id",
+            FieldType.BIGINT,
+            "频道ID")
 
     val fromChatUUID = ModelField(null,
             "from_chat_uuid",
@@ -64,4 +73,31 @@ class ChatChannelMessage:ContextModel("chat_channel_message","public") {
             "message",
             FieldType.TEXT,
             "信息")
+
+
+    override fun beforeRead(vararg queryFields: FieldBase, criteria: ModelExpression?, model: ModelBase, useAccessControl: Boolean, partnerCache: PartnerCache?, joinModels: Array<JoinModel>?): Pair<ModelExpression?, Array<FieldBase>> {
+        var ruleCriteria=criteria
+        var newQueryFields = arrayListOf<FieldBase>()
+        if (useAccessControl && partnerCache!=null){
+            var models = arrayListOf<ModelBase>(model)
+            joinModels?.let {
+                it.forEach { sit->
+                    sit.model?.let {
+                        models.add(it)
+                    }
+                }
+            }
+            partnerCache?.let {
+                ruleCriteria = or(`in`(this.channelID, select(ChatChannel.ref.id,fromModel = ChatChannel.ref).where(eq(ChatChannel.ref.owner,it.partnerID))),
+                        `in`(this.channelID, select(ChatModelJoinChannelRel.ref.joinChannel,fromModel =ChatModelJoinChannelRel.ref).where(eq(ChatModelJoinChannelRel.ref.joinPartner,it.partnerID))))
+            }
+        }
+        else if(useAccessControl){
+            throw ModelErrorException("权限错误")
+        }
+        else{
+            newQueryFields.addAll(queryFields)
+        }
+        return Pair(ruleCriteria,newQueryFields.toTypedArray())
+    }
 }
