@@ -516,7 +516,7 @@ class Customer:ContextModel("crm_customer","public"){
 * git clone bgapp
 * 在postgresql 建立数据库(如： bg_work)
 * 在spring.properties中配置相应的redis,kafka,jdbc
-* 运行bgserver,然后在postgresql中执行 初始化脚本 start.sql
+* ~~运行bgserver,然后在postgresql中执行 初始化脚本 start.sql~~,系统自动初始化，然后注册账号
 * 运行bgapp 用户：admin 密码：admin 登录
 
 ### 业务扩展
