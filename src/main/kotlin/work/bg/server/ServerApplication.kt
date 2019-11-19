@@ -50,7 +50,10 @@ import javax.sql.DataSource
     "work.bg.server.worktable.model",
     "work.bg.server.setting.model",
     "work.bg.server.sms.model",
-    "work.bg.server.chat.model"])
+    "work.bg.server.chat.model",
+    "work.bg.server.mail.model",
+    "work.bg.server.admin.model"
+])
 class ServerApplication{
     private val logger = LogFactory.getLog(javaClass)
     init {

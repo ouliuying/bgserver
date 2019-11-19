@@ -175,6 +175,7 @@ dependencies{
         compile project(':bgserver-setting')
         compile project(':bgserver-sms')
         compile project(':bgserver-mail')
+        compile project(':bgserver-admin')
 }
 dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
