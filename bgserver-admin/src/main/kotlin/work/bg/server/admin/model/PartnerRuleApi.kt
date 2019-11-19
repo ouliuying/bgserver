@@ -29,7 +29,7 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.cache.PartnerCache
 import work.bg.server.core.model.ContextModel
 
-@Model("partnerRuleApi","员工权限管理")
+@Model("partnerRuleApi","员工角色权限管理")
 class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
     companion object: RefSingleton<PartnerRuleApi> {
         override lateinit var ref: PartnerRuleApi

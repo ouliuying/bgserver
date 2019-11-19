@@ -29,7 +29,7 @@ class AppName : AppNamePackage {
         return AppPackageManifest("setting",
                 "系统设置", "/svg/setting-app.svg",
                 "系统设置",
-                "",
+                "/admin/partnerRuleApi/list",
                 1)
     }
 }

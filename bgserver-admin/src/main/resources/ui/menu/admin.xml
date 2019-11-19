@@ -22,5 +22,20 @@
   -->
 
 <ui>
-
+   <inherit >
+       <xpath expression="/ui/menu[@app='setting'][@name='main']" op="append" app="setting">
+           <menu name="adminManager" app="admin" title="模型权限设置" icon="/svg/admin-manager-logo.svg">
+               <menuItem title="权限列表" app="admin" model="partnerRuleApi" viewType="list">
+               </menuItem>
+               <menuItem title="添加权限" app="admin" model="partnerRuleApi" viewType="create">
+               </menuItem>
+           </menu>
+           <menu name="adminManager" app="admin" title="界面展现设置" icon="/svg/admin-manager-logo.svg">
+               <menuItem title="展示元素列表" app="admin" model="partnerViewRuleApi" viewType="list">
+               </menuItem>
+               <menuItem title="添加展示元素" app="admin" model="partnerViewRuleApi" viewType="create">
+               </menuItem>
+           </menu>
+       </xpath>
+   </inherit>
 </ui>

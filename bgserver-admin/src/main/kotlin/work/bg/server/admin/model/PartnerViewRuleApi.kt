@@ -23,16 +23,27 @@
 
 package work.bg.server.admin.model
 
-import dynamic.model.query.config.AppNamePackage
-import dynamic.model.query.config.AppPackageManifest
+import dynamic.model.query.mq.ModelDataObject
+import dynamic.model.query.mq.RefSingleton
+import dynamic.model.web.spring.boot.annotation.Model
+import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.model.ContextModel
 
-class AppName : AppNamePackage {
-    override  fun get(): AppPackageManifest {
-        return AppPackageManifest("admin",
-                "系统管理",
-                "/svg/admin-manager-logo.svg",
-                "系统管理",
-                "admin/partnerRuleApi/list",
-                1)
+@Model("partnerViewRuleApi","员工角色视图管理")
+class PartnerViewRuleApi: ContextModel("base_partner_view_rule_api","public") {
+    companion object: RefSingleton<PartnerViewRuleApi> {
+        override lateinit var ref: PartnerViewRuleApi
+    }
+    override fun isDynamic(): Boolean {
+        return true
+    }
+
+    override fun addCreateModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+    }
+
+    override fun addEditModelLog(modelDataObject: ModelDataObject, useAccessControl: Boolean, pc: PartnerCache?) {
+
+
     }
 }
