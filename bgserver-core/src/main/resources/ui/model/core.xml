@@ -332,8 +332,6 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule">
-            </field>
         </view>
 
         <view type="create">
@@ -360,7 +358,6 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule" colSpan="2" type="multiLineText"/>
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
         </view>
@@ -390,8 +387,7 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule" colSpan="2" type="multiLineText">
-            </field>
+
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
         </view>
@@ -421,7 +417,6 @@
                   ]]>
                 </meta>
             </field>
-            <field name="accessControlRule" type="static" colSpan="2"/>
             <field name="partners" style="relation"/>
             <field name="apps" style="relation"/>
         </view>

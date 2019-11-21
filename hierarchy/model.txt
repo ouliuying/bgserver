@@ -12,6 +12,8 @@ work.bg.server.core.model.BasePartnerRole, work.bg.server.core.model.ContextMode
 ============
 work.bg.server.core.model.StorageEntity, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
+work.bg.server.core.model.BasePartnerRoleRule, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
+============
 work.bg.server.core.model.BaseCorpPartnerRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase
 ============
 work.bg.server.core.model.BasePartnerStorageEntityRel, work.bg.server.core.model.ContextModel, work.bg.server.core.model.AccessControlModel, dynamic.model.query.mq.model.ModelBase

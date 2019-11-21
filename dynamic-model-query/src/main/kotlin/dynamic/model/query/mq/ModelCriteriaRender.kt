@@ -31,6 +31,7 @@ import dynamic.model.query.mq.condition.constant.StringExpression
 import dynamic.model.query.mq.join.JoinModel
 import dynamic.model.query.mq.logical.AndExpression
 import dynamic.model.query.mq.logical.OrExpression
+import javax.validation.constraints.Null
 
 class ModelCriteriaRender: ModelExpressionVisitor {
 
@@ -238,17 +239,28 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             var columnName=this.tableColumnNameGenerator.generateColumnName(expression.field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IS)
-            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
-            this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
+            if(expression.value!=null){
+                var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+                this.namedSql.append(namedColumnName)
+                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
+            }
+            else{
+                this.namedSql.append(" null")
+            }
         }
         else{
             var columnName=this.tableColumnNameGenerator.generateColumnName((expression as IsNotExpression).field)
             this.namedSql.append(columnName)
             this.namedSql.append(GRAMMARKEYS.IS_NOT)
-            var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
-            this.namedSql.append(namedColumnName)
-            this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
+            if(expression.value!=null) {
+
+                var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
+                this.namedSql.append(namedColumnName)
+                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.value)
+            }
+            else{
+                this.namedSql.append(" null")
+            }
         }
     }
     private  fun buildLikeExpression(expression: ModelExpression?, parent: ModelExpression?){
@@ -458,10 +470,6 @@ class ModelCriteriaRender: ModelExpressionVisitor {
     }
     private fun buildSelect(select: SelectStatement, parent: ModelExpression?){
 
-//        var hasClosure=select.hasClosure(parent)
-//        if (hasClosure){
-//            this.namedSql.append(GRAMMARKEYS.BRACKET_PREFIX)
-//        }
           if(select.countExpression!=null||select.maxExpressions!=null
                 ||select.minExpressions!=null||select.avgExpressions!=null
                 ||select.sumExpressions!=null){

@@ -65,11 +65,12 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             "public.base_partner",
             "id")
 
-    val accessControlRule = ModelField(null,
+    val accessControlRule = ModelOne2ManyField(null,
             "ac_rule",
-            FieldType.STRING,
+            FieldType.BIGINT,
             "权限配置",
-            defaultValue = "")
+            targetModelTable = "public.base_partner_role_rule",
+            targetModelFieldName = "partner_role_id")
 
     val isSuper= ModelField(null,
             "is_super",
