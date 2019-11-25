@@ -28,11 +28,11 @@ import dynamic.model.web.spring.boot.annotation.Model
 import work.bg.server.core.acrule.inspector.ModelFieldInspector
 import work.bg.server.core.acrule.inspector.ModelFieldUnique
 
-@Model("partnerRoleRule",title = "角色规则")
-class BasePartnerRoleRule:ContextModel("base_partner_role_rule","public") {
+@Model("partnerRoleModelRule",title = "角色模型规则")
+class BasePartnerRoleModelRule:ContextModel("base_partner_role_model_rule","public") {
 
-    companion object: RefSingleton<BasePartnerRoleRule> {
-        override lateinit var ref: BasePartnerRoleRule
+    companion object: RefSingleton<BasePartnerRoleModelRule> {
+        override lateinit var ref: BasePartnerRoleModelRule
     }
 
     val id= ModelField(null,
@@ -51,10 +51,6 @@ class BasePartnerRoleRule:ContextModel("base_partner_role_rule","public") {
             FieldType.STRING,
             "名称")
 
-    val actionType = ModelField(null,
-            "action_typ",
-            FieldType.INT,
-            title = "操作类型")
 
     val partnerRole = ModelMany2OneField(null,
             "partner_role_id",
@@ -68,30 +64,30 @@ class BasePartnerRoleRule:ContextModel("base_partner_role_rule","public") {
             "model_rule",FieldType.STRING,
             title = "模型规则")
 
-    val viewRule = ModelField(null,
-            "view_rule",
-            fieldType = FieldType.STRING,
-            title = "视图规则")
+//    val viewRule = ModelField(null,
+//            "view_rule",
+//            fieldType = FieldType.STRING,
+//            title = "视图规则")
 
     override fun getModelCreateFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
-                ModelFieldUnique(this.actionType,
+                ModelFieldUnique(
                         this.partnerRole,
                         this.app,
                         this.model,
                         isolationType = ModelFieldUnique.IsolationType.IN_CORP,
-                        advice = "在同一角色及操作类型下，应用模型必须唯一")
+                        advice = "在同一角色下，应用模型必须唯一")
         )
     }
 
     override fun getModelEditFieldsInStoreInspectors(): Array<ModelFieldInspector>? {
         return arrayOf(
-                ModelFieldUnique(this.actionType,
+                ModelFieldUnique(
                         this.partnerRole,
                         this.app,
                         this.model,
                         isolationType = ModelFieldUnique.IsolationType.IN_CORP,
-                        advice = "在同一角色及操作类型下，应用模型必须唯一")
+                        advice = "在同一角色下，应用模型必须唯一")
         )
     }
 
@@ -102,12 +98,4 @@ class BasePartnerRoleRule:ContextModel("base_partner_role_rule","public") {
     override fun getModelEditFieldsInspectors(): Array<ModelFieldInspector>? {
         return super.getModelEditFieldsInspectors()
     }
-
-
-   enum class ModelActionType(typ:Int){
-       Create(0),
-       Edit(1),
-       Read(2),
-       Delete(3)
-   }
 }

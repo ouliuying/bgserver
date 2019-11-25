@@ -320,7 +320,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
     open fun rawRead(vararg fields: FieldBase,
                      model:AccessControlModel?=null,
-                     criteria: ModelExpression?,
+                     criteria: ModelExpression?=null,
                      orderBy: OrderBy?=null,
                      pageIndex:Int?=null,
                      pageSize:Int?=null,

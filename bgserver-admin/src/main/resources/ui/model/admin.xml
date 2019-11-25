@@ -37,4 +37,20 @@
         </view>
     </model>
 
+
+    <model name="partnerViewRuleApi" app="admin">
+        <view type="list">
+
+        </view>
+        <view type="edit">
+
+        </view>
+        <view type="create">
+
+        </view>
+        <view type="detail">
+
+        </view>
+    </model>
+
 </ui>

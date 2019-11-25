@@ -142,6 +142,16 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     fun getModelView(app: String,model:String,viewType:String):ModelView?{
         return this.modelViews[app]?.modelViews?.get(model)?.get(viewType)?.createCopy()
     }
+    fun getModelViews(app:String,model:String):Map<String,ModelView>{
+        var views =  this.modelViews[app]?.modelViews?.get(model)
+        var copyViews = mutableMapOf<String,ModelView>()
+        views?.let {
+            it.forEach { t, u ->
+                copyViews[t]=u.createCopy()
+            }
+        }
+        return copyViews
+    }
     fun getViewAction(app:String,model:String,viewType:String,groupName:String):ViewAction?{
         val appVA = this.viewActions[app]
         if(appVA!=null){

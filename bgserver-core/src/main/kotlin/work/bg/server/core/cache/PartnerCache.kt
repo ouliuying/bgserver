@@ -129,7 +129,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         var roleName=partnerRoleObject.data.getValue(BasePartnerRole.ref.name) as String
         var isSuper=(partnerRoleObject.data.getValue(BasePartnerRole.ref.isSuper) as Int)>0
         var name=corpObject.data.getValue(BaseCorp.ref.name) as String
-        var acRuleMeta = partnerRoleObject.data.getValue(BasePartnerRole.ref.accessControlRule) as String?
+        var acRuleMeta = partnerRoleObject.data.getValue(BasePartnerRole.ref.modelRule) as String?
         var  role=CorpPartnerRoleCache(roleID,roleName,isSuper,acRuleMeta)
         return CorpCache(corpID,name, mutableMapOf(role.id to role))
     }
