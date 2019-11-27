@@ -57,7 +57,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
                  title:String,
                  icon:String):Field{
 
-        var f=Field(this,name,style,rowSpan,colSpan,type)
+        var f=Field(this,name,name,style,rowSpan,colSpan,type)
         f.title=title
         if(f.title.isNullOrEmpty()){
             if(name.indexOf(".")>-1){
@@ -191,10 +191,12 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
 
      class Field(private val modelView:ModelView,
                  var name:String,
+                 val fullName:String,
                  val style:String,
                  val rowSpan:Int,
                  val colSpan:Int,
                  val type:String,val subNode:DOMElement?=null){
+
          object Style {
              const val head="head"
              const val subHead = "subHead"
@@ -220,7 +222,7 @@ class ModelView(val app:String?,val model:String?,val viewType:String?) {
          var enable:String?=null
          var source:ModelViewFieldSource?=null
          fun createCopy():Field{
-            val f= Field(this.modelView,name,style,rowSpan,colSpan,type)
+            val f= Field(this.modelView,name,fullName,style,rowSpan,colSpan,type)
             f.title=title
             f.icon=icon
             f.relationData=relationData

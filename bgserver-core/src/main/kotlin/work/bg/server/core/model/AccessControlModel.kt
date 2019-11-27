@@ -2071,7 +2071,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return this.queryCount(statement)
     }
 
-    open fun rawCount(criteria: ModelExpression?, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
+    open fun rawCount(criteria: ModelExpression?=null, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
         val (c,_)=this.beforeRead(criteria = criteria,model = this,useAccessControl = useAccessControl,partnerCache = partnerCache)
         var statement = select(fromModel = this).count().where(c)
         return this.queryCount(statement)

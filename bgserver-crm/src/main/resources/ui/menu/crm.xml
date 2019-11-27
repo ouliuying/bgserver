@@ -45,7 +45,7 @@
             </menuItem>
         </menu>
 
-        <menu name="customer" app="crm" title="商机管理" icon="/svg/crm-app-oppo.svg">
+        <menu name="customerOpportunity" app="crm" title="商机管理" icon="/svg/crm-app-oppo.svg">
             <menuItem title="商机列表" model="customerOpportunity" viewType="list">
             </menuItem>
             <menuItem title="创建商机" model="customerOpportunity" viewType="create">

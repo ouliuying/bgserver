@@ -30,7 +30,7 @@
 
             </menuItem>
             <menuItem title="添加角色" model="partnerRole" viewType="create">
-
+                
             </menuItem>
         </menu>
 

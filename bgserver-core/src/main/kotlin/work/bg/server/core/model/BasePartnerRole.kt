@@ -79,6 +79,14 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             targetModelTable = "public.base_partner_role_model_view_rule",
             targetModelFieldName = "partner_role_id")
 
+    val menuRule = ModelOne2ManyField(null,
+            "menu_rule",
+            FieldType.BIGINT,
+            "菜单权限配置",
+            targetModelTable = "public.base_partner_role_app_menu_rule",
+            targetModelFieldName = "partner_role_id")
+
+
 
     val isSuper= ModelField(null,
             "is_super",

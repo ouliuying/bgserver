@@ -23,6 +23,9 @@ package work.bg.server.core.ui
 
 open class MenuNode(val app:String,val title:String?,val model:String?,val viewType:String?,val icon:String?,var redirectApp:String?=null){
     var children:ArrayList<MenuNode>?=null
+    open val key by lazy {
+         "$app-$model-$viewType"
+    }
     open fun createCopy():MenuNode{
         var mn=MenuNode(this.app,this.title,this.model,this.viewType,this.icon,this.redirectApp)
         mn.children=this.childrenCopy()
@@ -41,6 +44,9 @@ open class MenuNode(val app:String,val title:String?,val model:String?,val viewT
 }
 
 class MenuTree(app:String,val name:String, title:String?,icon:String?):MenuNode(app,title,null,null,icon) {
+   override val key by lazy {
+        "${this.app}-$name"
+    }
     override fun createCopy(): MenuTree {
         var mt=MenuTree(this.app,this.name,this.title,icon)
         mt.children=childrenCopy()

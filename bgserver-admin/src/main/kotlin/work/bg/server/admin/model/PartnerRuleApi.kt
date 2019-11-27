@@ -129,7 +129,32 @@ class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
         return ja
     }
 
-
+    @Action("loadRoleAppModelData")
+    fun loadRoleAppModelData(@RequestBody data:JsonObject?,partnerCache: PartnerCache):ActionResult{
+        var ar =ActionResult()
+        if(partnerCache.currRole?.isSuper == null || !partnerCache.currRole!!.isSuper){
+            return ar
+        }
+        var roleID = data?.get("roleID")?.asLong
+        val app = data?.get("app")?.asString
+        val model = data?.get("model")?.asString
+        if(roleID!=null && app!=null && model!=null){
+           var mo= BasePartnerRoleModelRule.ref.rawRead(criteria = and(eq(BasePartnerRoleModelRule.ref.partnerRole,roleID),
+                    eq(BasePartnerRoleModelRule.ref.app,app),
+                    eq(BasePartnerRoleModelRule.ref.model,model)))?.firstOrNull()
+            mo?.let {rule->
+                var ruleData = JsonObject()
+                ruleData?.addProperty("app",rule.getFieldValue(BasePartnerRoleModelRule.ref.app) as String?)
+                ruleData?.addProperty("model",rule.getFieldValue(BasePartnerRoleModelRule.ref.model) as String?)
+                ruleData?.addProperty("roleID",(rule.getFieldValue(BasePartnerRoleModelRule.ref.partnerRole) as ModelDataObject?)?.idFieldValue?.value as Number?)
+                ruleData?.addProperty("rule",rule.getFieldValue(BasePartnerRoleModelRule.ref.modelRule) as String?)
+                ar.bag["metaData"]= mapOf(
+                        "data" to ruleData
+                )
+            }
+        }
+        return ar
+    }
 
     @Action("loadCreateMeta")
     fun loadCreateMeta(@RequestBody data:JsonObject?,partnerCache: PartnerCache):ActionResult{

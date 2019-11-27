@@ -136,6 +136,9 @@ class UICache:InitializingBean,ApplicationContextAware ,BeanFactoryAware,Resourc
     {
         return this.menuTrees[app]?.menus?.get(menu)?.createCopy()
     }
+    fun getAppMenu(app:String):AppMenuTree?{
+        return this.menuTrees[app]
+    }
     fun getAppModelView(app:String):AppModelView?{
         return this.modelViews[app]
     }
