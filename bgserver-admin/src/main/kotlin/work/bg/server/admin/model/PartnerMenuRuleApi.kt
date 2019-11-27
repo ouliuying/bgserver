@@ -162,23 +162,27 @@ class PartnerMenuRuleApi:ContextModel("base_partner_menu_rule_api","public") {
         var app = data?.get("app")?.asString
         var rule = data?.getAsJsonArray("rule")?: JsonArray()
         var id = data?.get("id")?.asLong
-        if(id!=null){
-
-        }
-        else{
-            if(roleID!=null && app!=null){
-                var mo = ModelDataObject(model = BasePartnerRoleAppMenuRule.ref)
-                mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.partnerRole,roleID)
-                mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.app,app)
-                mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.menuRule,rule.toString())
-                var ret =  BasePartnerRoleAppMenuRule.ref.rawCreate(mo,useAccessControl = true,partnerCache = partnerCache)
-                if(ret.first!=null && ret.first!!>0){
-                    ar.description="添加成功"
-                    return ar
-                }
-                ar.errorCode = ErrorCode.UNKNOW
-                ar.description="提交参数错误或已经存在"
+        if(roleID!=null && app!=null){
+            var mo = ModelDataObject(model = BasePartnerRoleAppMenuRule.ref)
+            if(id!=null && id!!>0){
+                mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.id,id)
             }
+            mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.partnerRole,roleID)
+            mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.app,app)
+            mo.setFieldValue(BasePartnerRoleAppMenuRule.ref.menuRule,rule.toString())
+            var ret = if(id==null || id!!<1) BasePartnerRoleAppMenuRule.ref.rawCreate(mo,useAccessControl = true,partnerCache = partnerCache)
+            else BasePartnerRoleAppMenuRule.ref.rawEdit(mo,useAccessControl = true,partnerCache = partnerCache)
+            if(ret.first!=null && ret.first!!>0){
+                if(id!=null && id!!>0){
+                    ar.description="更新成功"
+                }
+                else{
+                    ar.description="添加成功"
+                }
+                return ar
+            }
+            ar.errorCode = ErrorCode.UNKNOW
+            ar.description="提交参数错误或已经存在"
         }
         return ar
     }

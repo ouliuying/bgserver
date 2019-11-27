@@ -33,10 +33,7 @@ import dynamic.model.web.spring.boot.model.ActionResult
 import dynamic.model.web.spring.boot.model.AppModelWeb
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
-import work.bg.server.core.model.BasePartner
-import work.bg.server.core.model.BasePartnerRole
-import work.bg.server.core.model.BasePartnerRoleModelRule
-import work.bg.server.core.model.ContextModel
+import work.bg.server.core.model.*
 import work.bg.server.corp.model.Department
 import work.bg.server.util.TypeConvert
 
@@ -195,57 +192,72 @@ class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
             return ar
         }
         var id = data?.get("id")?.asLong
-        if(id!=null){
+        var ruleModelObject= ModelDataObject(model=BasePartnerRoleModelRule.ref)
+        val app = data?.get("app")?.asString
+        val model = data?.get("model")?.asString
+        val roleID = data?.get("roleID")?.asLong
+        if(app!=null && model!=null && roleID!=null && this.appModelExist(app,model) && this.roleExist(roleID, partnerCache)){
 
-        }
-        else {
-            var ruleModelObject= ModelDataObject(model=BasePartnerRoleModelRule.ref)
-            val app = data?.get("app")?.asString
-            val model = data?.get("model")?.asString
-            val roleID = data?.get("roleID")?.asLong
-            if(app!=null && model!=null && roleID!=null && this.appModelExist(app,model) && this.roleExist(roleID, partnerCache)){
-                ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.app, app)
-                ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.model, model)
-                ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.partnerRole, roleID)
-                val ruleJa = JsonArray()
-                data?.getAsJsonArray("accessTypes")?.forEach { acIt ->
-                    acIt.asJsonObject.get("accessType")?.asString?.let {
-                        val acObj = acIt.asJsonObject
-                        var mrObj = JsonObject()
-                        mrObj.addProperty("accessType",it)
-                        mrObj.addProperty("enable", acObj.get("enable")?.asBoolean ?: true)
-                        mrObj.addProperty("isolocation", acObj.get("isolocation")?.asString ?: "corp")
-                        mrObj.add("targetDepartments", acObj.getAsJsonArray("departments") ?: JsonArray())
-                        if(it!="delete"){
-                            mrObj.add("disableFields", acObj.getAsJsonArray("disableFields") ?: JsonArray())
-                        }
-                        mrObj.add("targetRoles", acObj.getAsJsonArray("roles") ?: JsonArray())
-                        mrObj.add("targetPartners", acObj.getAsJsonArray("partners") ?: JsonArray())
-                        mrObj.add("rules", acObj.getAsJsonArray("rules") ?: JsonArray())
-                        mrObj.addProperty("criteria", acObj.get("criteria")?.asString ?: "")
-                        mrObj.addProperty("overrideCriteria", acObj.get("overrideCriteria")?.asString ?: "")
-                        ruleJa.add(mrObj)
+            if(this.appModelExistInStore(roleID,app,model,id)){
+                ar.errorCode=ErrorCode.UNKNOW
+                ar.description="已经存在"
+                return ar
+            }
+
+            if(id!=null && id!!>0){
+                ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.id, id)
+            }
+            ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.app, app)
+            ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.model, model)
+            ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.partnerRole, roleID)
+            val ruleJa = JsonArray()
+            data?.getAsJsonArray("accessTypes")?.forEach { acIt ->
+                acIt.asJsonObject.get("accessType")?.asString?.let {
+                    val acObj = acIt.asJsonObject
+                    var mrObj = JsonObject()
+                    mrObj.addProperty("accessType",it)
+                    mrObj.addProperty("enable", acObj.get("enable")?.asBoolean ?: true)
+                    mrObj.addProperty("isolocation", acObj.get("isolocation")?.asString ?: "corp")
+                    mrObj.add("targetDepartments", acObj.getAsJsonArray("departments") ?: JsonArray())
+                    if(it!="delete"){
+                        mrObj.add("disableFields", acObj.getAsJsonArray("disableFields") ?: JsonArray())
                     }
+                    mrObj.add("targetRoles", acObj.getAsJsonArray("roles") ?: JsonArray())
+                    mrObj.add("targetPartners", acObj.getAsJsonArray("partners") ?: JsonArray())
+                    mrObj.add("rules", acObj.getAsJsonArray("rules") ?: JsonArray())
+                    mrObj.addProperty("criteria", acObj.get("criteria")?.asString ?: "")
+                    mrObj.addProperty("overrideCriteria", acObj.get("overrideCriteria")?.asString ?: "")
+                    ruleJa.add(mrObj)
                 }
-                ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.modelRule, ruleJa.toString())
+            }
+            ruleModelObject.setFieldValue(BasePartnerRoleModelRule.ref.modelRule, ruleJa.toString())
 
-                var ret = BasePartnerRoleModelRule.ref.safeCreate(ruleModelObject,
-                        useAccessControl = true,
-                        partnerCache = partnerCache)
-                if(ret.first!=null && ret.first!!>0){
-                    ar.errorCode = ErrorCode.SUCCESS
-                    ar.description="添加成功"
+            var ret = if(id==null || id!!<1) BasePartnerRoleModelRule.ref.safeCreate(ruleModelObject,
+                    useAccessControl = true,
+                    partnerCache = partnerCache)
+            else BasePartnerRoleModelRule.ref.safeEdit(ruleModelObject,
+                    useAccessControl = true,
+                    partnerCache = partnerCache)
+
+            if(ret.first!=null && ret.first!!>0){
+                ar.errorCode = ErrorCode.SUCCESS
+                if(id!=null && id!!>0){
+                    ar.description="更新成功"
                 }
                 else{
-                    ar.errorCode = ErrorCode.UNKNOW
-                    ar.description=ret.second?:"添加失败"
+                    ar.description="添加成功"
                 }
             }
             else{
-                ar.errorCode =ErrorCode.UNKNOW
-                ar.description="针对此模型的设置已经存在，不能添加"
+                ar.errorCode = ErrorCode.UNKNOW
+                ar.description=ret.second?:"添加失败"
             }
         }
+        else{
+            ar.errorCode =ErrorCode.UNKNOW
+            ar.description="针对此模型的设置已经存在，不能添加"
+        }
+
         return ar
     }
     protected  fun roleExist(roleID:Long,partnerCache: PartnerCache):Boolean{
@@ -268,6 +280,19 @@ class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
             return false
         }
         return true
+    }
+
+    protected  fun appModelExistInStore(roleID: Long,app:String,model:String,id:Long?):Boolean{
+        var ret = if(id==null||id!!<1) BasePartnerRoleModelRule.ref.rawCount(
+                criteria = and(eq(BasePartnerRoleModelRule.ref.app,app),
+                        eq(BasePartnerRoleModelRule.ref.model,model),
+                        eq(BasePartnerRoleModelRule.ref.partnerRole,roleID)))
+        else BasePartnerRoleModelRule.ref.rawCount(
+                criteria = and(eq(BasePartnerRoleModelRule.ref.app,app),
+                        eq(BasePartnerRoleModelRule.ref.model,model), notEq(
+                        BasePartnerRoleModelRule.ref.id,id
+                ), eq(BasePartnerRoleModelRule.ref.partnerRole,roleID)))
+        return ret>0
     }
     @Action("loadPartnerRulePage")
     fun loadPartnerRulePage(@RequestBody data:JsonObject?,partnerCache: PartnerCache):ActionResult{

@@ -25,10 +25,7 @@ package work.bg.server.admin.model
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import dynamic.model.query.mq.ModelDataObject
-import dynamic.model.query.mq.RefSingleton
-import dynamic.model.query.mq.and
-import dynamic.model.query.mq.eq
+import dynamic.model.query.mq.*
 import dynamic.model.web.errorcode.ErrorCode
 import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
@@ -184,11 +181,17 @@ class PartnerViewRuleApi: ContextModel("base_partner_view_rule_api","public") {
         }
         return true
     }
-    protected  fun appModelExistInStore(app:String,model:String):Boolean{
-      var ret = BasePartnerRoleModelViewRule.ref.rawCount(
+    protected  fun appModelExistInStore(roleID: Long,app:String,model:String,id:Long?):Boolean{
+      var ret = if(id==null||id!!<1) BasePartnerRoleModelViewRule.ref.rawCount(
               criteria = and(eq(BasePartnerRoleModelViewRule.ref.app,app),
-                      eq(BasePartnerRoleModelViewRule.ref.model,model))
-      )
+                      eq(BasePartnerRoleModelViewRule.ref.model,model),
+                      eq(BasePartnerRoleModelViewRule.ref.partnerRole,roleID)))
+        else BasePartnerRoleModelViewRule.ref.rawCount(
+              criteria = and(eq(BasePartnerRoleModelViewRule.ref.app,app),
+                      eq(BasePartnerRoleModelViewRule.ref.model,model),
+                      eq(BasePartnerRoleModelViewRule.ref.partnerRole,roleID),
+                      notEq(BasePartnerRoleModelViewRule.ref.id,id)
+              ))
         return ret>0
     }
     @Action("saveModelViewRule")
@@ -203,78 +206,82 @@ class PartnerViewRuleApi: ContextModel("base_partner_view_rule_api","public") {
         val model = data?.get("model")?.asString
         val roleID = data?.get("roleID")?.asLong
         if(app!=null && model!=null && roleID!=null && this.roleExist(roleID, partnerCache)&& this.appModelExist(app,model)){
-            if(id!=null){
-
+            if(this.appModelExistInStore(roleID,app,model,id)){
+                ar.errorCode=ErrorCode.UNKNOW
+                ar.description="已经存在"
+                return ar
             }
-            else{
-                if(this.appModelExistInStore(app,model)){
-                    ar.errorCode=ErrorCode.UNKNOW
-                    ar.description="已经存在"
-                    return ar
-                }
-                var mo = ModelDataObject(model = BasePartnerRoleModelViewRule.ref)
-                mo.setFieldValue(BasePartnerRoleModelViewRule.ref.model,model)
-                mo.setFieldValue(BasePartnerRoleModelViewRule.ref.app,app)
-                mo.setFieldValue(BasePartnerRoleModelViewRule.ref.partnerRole,roleID)
-                var viewRules = JsonArray()
-                var views = data?.getAsJsonArray("views")
-                views?.let {
-                    it.forEach { it ->
-                        val viewRule = JsonObject()
-                        val viewObj = it as JsonObject
-                        val enable = viewObj.get("enable")?.asBoolean
-                        viewRule.addProperty("enable", enable==null || enable)
-                        viewRule.addProperty("viewType",viewObj.get("viewType")?.asString)
-                        val fields = viewObj.get("fields")?.asJsonArray
-                        val fieldRules=JsonArray()
-                        fields?.let {
-                            it.forEach {fit->
-                                val fOjb = fit as JsonObject
-                                val name = fOjb.get("name")?.asString
-                                val visible = fOjb.get("visible")?.asBoolean
-                                val exp = fOjb.get("exp")?.asString?:""
-                                if(name!=null){
+            var mo = ModelDataObject(model = BasePartnerRoleModelViewRule.ref)
+            if(id!=null && id!!>0){
+                mo.setFieldValue(BasePartnerRoleModelViewRule.ref.id,id)
+            }
+            mo.setFieldValue(BasePartnerRoleModelViewRule.ref.model,model)
+            mo.setFieldValue(BasePartnerRoleModelViewRule.ref.app,app)
+            mo.setFieldValue(BasePartnerRoleModelViewRule.ref.partnerRole,roleID)
+            var viewRules = JsonArray()
+            var views = data?.getAsJsonArray("views")
+            views?.let {
+                it.forEach { it ->
+                    val viewRule = JsonObject()
+                    val viewObj = it as JsonObject
+                    val enable = viewObj.get("enable")?.asBoolean
+                    viewRule.addProperty("enable", enable==null || enable)
+                    viewRule.addProperty("viewType",viewObj.get("viewType")?.asString)
+                    val fields = viewObj.get("fields")?.asJsonArray
+                    val fieldRules=JsonArray()
+                    fields?.let {
+                        it.forEach {fit->
+                            val fOjb = fit as JsonObject
+                            val name = fOjb.get("name")?.asString
+                            val visible = fOjb.get("visible")?.asBoolean
+                            val exp = fOjb.get("exp")?.asString?:""
+                            if(name!=null){
+                                    var j = JsonObject()
+                                    j.addProperty("visible",visible!=false)
+                                    j.addProperty("exp",exp.trim())
+                                    j.addProperty("name",name)
+                                    fieldRules.add(j)
+                            }
+                        }
+                    }
+                    viewRule.add("fields",fieldRules)
+
+                    val triggers = viewObj.get("triggers")?.asJsonArray
+                    val triggerRules=JsonArray()
+                    triggers?.let {
+                        it.forEach {tit->
+                            val tOjb = tit as JsonObject
+                            val name = tOjb.get("name")?.asString
+                            val visible = tOjb.get("visible")?.asBoolean
+                            val exp = tOjb.get("exp")?.asString?:""
+                            if(name!=null){
+                                var groupTrigger = name.split("/")
+                                if(groupTrigger.count()==2){
                                         var j = JsonObject()
                                         j.addProperty("visible",visible!=false)
                                         j.addProperty("exp",exp.trim())
-                                        j.addProperty("name",name)
-                                        fieldRules.add(j)
+                                        j.addProperty("group",groupTrigger[0])
+                                        j.addProperty("trigger",groupTrigger[1])
+                                        triggerRules.add(j)
                                 }
                             }
                         }
-                        viewRule.add("fields",fieldRules)
-
-                        val triggers = viewObj.get("triggers")?.asJsonArray
-                        val triggerRules=JsonArray()
-                        triggers?.let {
-                            it.forEach {tit->
-                                val tOjb = tit as JsonObject
-                                val name = tOjb.get("name")?.asString
-                                val visible = tOjb.get("visible")?.asBoolean
-                                val exp = tOjb.get("exp")?.asString?:""
-                                if(name!=null){
-                                    var groupTrigger = name.split("/")
-                                    if(groupTrigger.count()==2){
-                                            var j = JsonObject()
-                                            j.addProperty("visible",visible!=false)
-                                            j.addProperty("exp",exp.trim())
-                                            j.addProperty("group",groupTrigger[0])
-                                            j.addProperty("trigger",groupTrigger[1])
-                                            triggerRules.add(j)
-                                    }
-                                }
-                            }
-                        }
-                        viewRule.add("triggers",triggerRules)
-                        viewRules.add(viewRule)
                     }
+                    viewRule.add("triggers",triggerRules)
+                    viewRules.add(viewRule)
                 }
-                mo.setFieldValue(BasePartnerRoleModelViewRule.ref.viewRule,viewRules.toString())
-               var ret =  BasePartnerRoleModelViewRule.ref.rawCreate(mo,useAccessControl = true,partnerCache = partnerCache)
-                if(ret.first!=null && ret.first!!>0){
+            }
+            mo.setFieldValue(BasePartnerRoleModelViewRule.ref.viewRule,viewRules.toString())
+           var ret = if(id==null || id!!<1) BasePartnerRoleModelViewRule.ref.rawCreate(mo,useAccessControl = true,partnerCache = partnerCache)
+            else BasePartnerRoleModelViewRule.ref.rawEdit(mo,useAccessControl = true,partnerCache = partnerCache)
+            if(ret.first!=null && ret.first!!>0){
+                if(id!=null && id!!>0){
+                    ar.description=" 更新成功"
+                }
+                else{
                     ar.description="添加成功"
-                    return ar
                 }
+                return ar
             }
         }
         ar.errorCode = ErrorCode.UNKNOW
