@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.config.ActionType
 import dynamic.model.query.mq.*
 import org.springframework.stereotype.Component
 import work.bg.server.core.acrule.ModelEditRecordFieldsValueCheckRule
@@ -31,7 +32,7 @@ import work.bg.server.core.model.AccessControlModel
 class ModelEditFieldsBelongToPartnerCheckBean: ModelEditRecordFieldsValueCheckRule<ModelExpression?,String> {
     private lateinit var _config:String
     override fun invoke(modelData: ModelDataObject, partnerCache: PartnerCache, criteria: ModelExpression?): Pair<Boolean, String> {
-        if(!partnerCache.checkEditBelongToPartner(modelData.model!!)){
+        if(!partnerCache.checkACModelOwnerRelation(modelData.model!! as AccessControlModel,ActionType.EDIT)){
             return Pair(true,"")
         }
         var targetFieldValues = dynamic.model.query.mq.FieldValueArray()

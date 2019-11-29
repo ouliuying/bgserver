@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.config.ActionType
 import dynamic.model.query.mq.ModelExpression
 import dynamic.model.query.mq.and
 import dynamic.model.query.mq.eq
@@ -42,7 +43,7 @@ class ModelDeleteFieldsBelongToPartnerCheckBean: ModelDeleteAccessControlRule<Mo
     override fun invoke(modelData: dynamic.model.query.mq.ModelDataObject,
                         partnerCache: PartnerCache,
                         criteria: ModelExpression?): Pair<Boolean, String> {
-        if(!partnerCache.checkEditBelongToPartner(modelData.model!!)){
+        if(!partnerCache.checkACModelOwnerRelation(modelData.model!! as AccessControlModel,ActionType.DELETE)){
             return Pair(true,"")
         }
         val idFV = modelData.idFieldValue

@@ -217,7 +217,7 @@ class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
                     var mrObj = JsonObject()
                     mrObj.addProperty("accessType",it)
                     mrObj.addProperty("enable", acObj.get("enable")?.asBoolean ?: true)
-                    mrObj.addProperty("isolocation", acObj.get("isolocation")?.asString ?: "corp")
+                    mrObj.addProperty("isolation", acObj.get("isolation")?.asString ?: "corp")
                     mrObj.add("targetDepartments", acObj.getAsJsonArray("departments") ?: JsonArray())
                     if(it!="delete"){
                         mrObj.add("disableFields", acObj.getAsJsonArray("disableFields") ?: JsonArray())

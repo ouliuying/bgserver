@@ -65,12 +65,12 @@ class BasePartnerRole(table:String,schema:String):ContextModel(table,schema) {
             "public.base_partner",
             "id")
 
-    val modelRule = ModelOne2ManyField(null,
-            "model_rule",
-            FieldType.BIGINT,
-            "模型权限配置",
-            targetModelTable = "public.base_partner_role_model_rule",
-            targetModelFieldName = "partner_role_id")
+//    val modelRule = ModelOne2ManyField(null,
+//            "model_rule",
+//            FieldType.BIGINT,
+//            "模型权限配置",
+//            targetModelTable = "public.base_partner_role_model_rule",
+//            targetModelFieldName = "partner_role_id")
 
     val viewRule = ModelOne2ManyField(null,
             "view_rule",

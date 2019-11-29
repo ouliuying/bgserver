@@ -21,6 +21,7 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.acrule.bean
 
+import dynamic.model.query.config.ActionType
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -42,7 +43,7 @@ class ModelReadPartnerIsolationBean:ModelReadIsolationRule<ModelExpression> {
         }
 
     override fun invoke(model: ModelBase, partnerCache: PartnerCache, criteria: ModelExpression?): ModelExpression? {
-        if(!partnerCache.checkReadBelongToPartner(model)){
+        if(!partnerCache.checkACModelOwnerRelation(model as AccessControlModel,ActionType.READ)){
             return null
         }
         if((model as AccessControlModel).corpIsolationFields()!=null)

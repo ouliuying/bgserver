@@ -194,9 +194,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         partnerCache: PartnerCache?=null,
                         joinModels:Array<dynamic.model.query.mq.join.JoinModel>?=null):Pair<ModelExpression?,Array<FieldBase>>{
         var ruleCriteria=criteria
-        var newQueryFields = arrayListOf<FieldBase>()
+        val newQueryFields = arrayListOf<FieldBase>()
         if (useAccessControl && partnerCache!=null){
-            var models = arrayListOf<ModelBase>(model)
+            val models = arrayListOf<ModelBase>(model)
             joinModels?.let {
                 it.forEach { sit->
                     sit.model?.let {
@@ -204,21 +204,27 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
             }
-            ruleCriteria = this.readCorpIsolation(model,partnerCache,ruleCriteria)
+
+            var acModelRuleCriteria = null as ModelExpression?
             models.forEach {
-                if(partnerCache.checkReadBelongToPartner(model)){
-                    ruleCriteria = this.readPartnerIsolation(model,partnerCache,ruleCriteria)
-                    val isolationRules = partnerCache.getModelReadAccessControlRules<ModelReadIsolationRule<*>>(this)
-                    isolationRules?.forEach {
-                        ruleCriteria = it(this,partnerCache,ruleCriteria)
-                    }
-                    ruleCriteria=smartReconcileCriteria(ruleCriteria)
+                val mc = partnerCache?.getReadAccessControlCriteria(model as AccessControlModel)
+                acModelRuleCriteria = if(acModelRuleCriteria!=null){
+                    if(mc!=null) and(acModelRuleCriteria!!,mc!!)
+                    else acModelRuleCriteria
                 }
+                else mc
             }
+
+            ruleCriteria = if(acModelRuleCriteria!=null){
+                if(ruleCriteria!=null) and(acModelRuleCriteria!!,ruleCriteria) else acModelRuleCriteria
+            } else{
+                this.readCorpIsolation(model,partnerCache!!,ruleCriteria)
+            }
+
 
             queryFields.forEach { fit->
                 fit.model?.let {
-                    var filters = partnerCache.getModelReadAccessControlRules<ModelReadFieldFilterRule>(it) as MutableList?
+                    var filters = partnerCache?.getModelReadAccessControlRules<ModelReadFieldFilterRule>(it) as MutableList?
                     val modelSelfFieldFilterRule = (it as AccessControlModel).getModelReadAccessFieldFilterRule()
                     modelSelfFieldFilterRule?.let {
                         if(filters!=null){
@@ -231,12 +237,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                     if(filters!=null){
                         for (f in (filters as MutableList)){
-                            if(f(fit,partnerCache,null).first){
+                            if(f(fit,partnerCache!!,null).first){
                                 return@forEach
                             }
                         }
                     }
-                    newQueryFields.add(fit)
+
+                    if(partnerCache!!.canReadModelField(fit,it as AccessControlModel)){
+                        newQueryFields.add(fit)
+                    }
                 }
             }
         }
@@ -248,6 +257,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         return Pair(ruleCriteria,newQueryFields.toTypedArray())
     }
+
+    open fun createRoleRuleCriteria(partnerCache: PartnerCache?,actionType: ActionType):ModelExpression?{
+        return null
+    }
     open fun getModelReadAccessFieldFilterRule():ModelReadFieldFilterRule?{
         return null
     }
@@ -257,24 +270,33 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun getModelCreateAccessFieldFilterRule():ModelCreateRecordFieldsValueFilterRule<*>?{
         return null
     }
-    open fun filterAcModelFields(fields:Array<FieldBase>, model:ModelBase, partnerCache: PartnerCache?):Array<FieldBase>{
-        if(partnerCache!=null){
-            var rFields = arrayListOf<FieldBase>()
-            val rule=partnerCache.getModelRule(model.meta.appName,model.meta.name)
-            rule?.let {
-                fields.forEach {f->
-                    val fr = it.fieldRules[f.propertyName]
-                    if(fr!=null){
-                        if(fr.readAction.enable!="false"){
-                            rFields.add(f)
-                        }
-                    }
-                }
-                return rFields.toArray() as Array<FieldBase>
-            }
-        }
-        return fields
+
+
+    open fun createModelRuleCustomCriteria(criteria:String?,
+                                           partnerCache: PartnerCache):Pair<Boolean,ModelExpression?>{
+        return Pair(false,null)
     }
+
+    open fun createModelRuleTargetPartnerCriteria(targetPartners:ArrayList<Long>,
+                                                  partnerCache: PartnerCache):Pair<Boolean,ModelExpression?>{
+        return Pair(false,null)
+    }
+
+    open fun createModelRuleIsolationCriteria(isolation:String,
+                                              partnerCache: PartnerCache):Pair<Boolean,ModelExpression?>{
+        return Pair(false,null)
+    }
+
+    open fun createModelRuleTargetDepartmentCriteria(targetDepartments:ArrayList<Long>,
+                                                     partnerCache: PartnerCache):Pair<Boolean,ModelExpression?>{
+        return Pair(false,null)
+    }
+
+    open fun createModelRuleTargetRoleCriteria(targetRoles:ArrayList<Long>,
+                                               partnerCache: PartnerCache):Pair<Boolean,ModelExpression?>{
+        return Pair(false,null)
+    }
+
     private fun sortFields(model:ModelBase, targetFields:ArrayList<FieldBase>,
                            fs:ArrayList<FieldBase>,
                            o2ofs:ArrayList<FieldBase>,
@@ -309,7 +331,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         fs.add(it)
                     }
                     else{
-                        var rFd= (model as AccessControlModel).getRelationFieldTo(it)
+                        val rFd= (model as AccessControlModel).getRelationFieldTo(it)
                         rFd?.let{
                             sortFields(model, arrayListOf(rFd),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
                         }
@@ -344,9 +366,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return null
         }
 
-        var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
+        val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.readAction.enable=="false"){
+            if(!it.readAction.enable){
                 return null
             }
         }
@@ -358,8 +380,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         var ownerMany2OneFields = ArrayList<ModelMany2OneField>()
         if(fields.isEmpty()){
             var pFields= model.fields.getAllPersistFields().values.toTypedArray()
-            if(partnerCache!=null){
-                pFields=this.filterAcModelFields(pFields,model=this,partnerCache=partnerCache)
+            if(useAccessControl){
+                pFields=partnerCache!!.getAcModelFields(pFields,model=this,acType = ActionType.READ)
             }
             pFields.let {
                 sortFields(model, arrayListOf(*pFields),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
@@ -368,8 +390,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         else{
             var pFields: Array<FieldBase>?= fields as Array<FieldBase>?
             pFields = if(useAccessControl){
-               // partnerCache?.acFilterReadFields(fields as Array<FieldBase>)
-                pFields
+                 partnerCache!!.getAcModelFields(fields as Array<FieldBase>,model=this,acType = ActionType.READ)
             } else fields
             pFields?.let {
                 sortFields(model, arrayListOf(*pFields),fs,o2ofs,o2mfs,m2ofs,m2mfs,ownerMany2OneFields)
@@ -394,13 +415,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             it.getFullName()
         }.toTypedArray()))
 
-        var joinModels= arrayListOf<dynamic.model.query.mq.join.JoinModel>()
+        val joinModels= arrayListOf<dynamic.model.query.mq.join.JoinModel>()
         var modelRelationMatcher = ModelRelationMatcher()
         o2ofs.forEach {
-            var mf=this.getTargetModelField(it)
+            val mf=this.getTargetModelField(it)
             if(mf!=null){
                 if(useAccessControl){
-                    var o2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    val o2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(o2oFields!=null){
                         fs.addAll(o2oFields)
                     }
@@ -411,9 +432,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 else{
                     fs.addAll(mf.first.fields.getAllPersistFields(true).values.toTypedArray())
                 }
-                var o2oFd= it as ModelOne2OneField
+                val o2oFd= it as ModelOne2OneField
                 if(o2oFd.isVirtualField){
-                    var idf=o2oFd.model?.fields?.getIdField()
+                    val idf=o2oFd.model?.fields?.getIdField()
                     modelRelationMatcher.addMatchData(model,o2oFd, mf.first, mf.second,idf)
                     joinModels.add(leftJoin(mf.first, eq(mf.second, idf)))
                 }
@@ -425,10 +446,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
 
         m2ofs.forEach{
-            var mf=this.getTargetModelField(it)
+            val mf=this.getTargetModelField(it)
             if(mf!=null){
                 if(useAccessControl){
-                    var m2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    val m2oFields= mf.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(mf?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(m2oFields!=null){
                         fs.addAll(m2oFields)
                     }
@@ -456,7 +477,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 newOrderBy= model.fields.getDefaultOrderBy()
             }
         }
-        var (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
+        val (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
                 criteria=criteria,
                 model=this,
                 useAccessControl = useAccessControl,
@@ -474,7 +495,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         mDataArray?.model=model
         mDataArray=this.reconstructSingleRelationModelRecordSet(mDataArray,modelRelationMatcher)
 
-        var rmfs= mutableMapOf<String,MutableList<AttachedField>>()
+        val rmfs= mutableMapOf<String,MutableList<AttachedField>>()
         m2mfs.forEach {
             val field=it.field as RefRelationField
             if(field.relationModelTable!=null){
@@ -482,14 +503,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     rmfs[field.relationModelTable!!]?.add(it)
                 }
                 else{
-                    var mlst= mutableListOf<AttachedField>()
+                    val mlst= mutableListOf<AttachedField>()
                     mlst.add(it)
                     rmfs[field.relationModelTable!!]=mlst
                 }
             }
         }
 
-        var to2mfs=ArrayList<AttachedField>()
+        val to2mfs=ArrayList<AttachedField>()
         to2mfs.addAll(o2mfs)
 
 //        to2mfs.forEach {
@@ -510,10 +531,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         attachedFields?.forEach {
             if(it.field is Many2ManyField){
-                var rrf=it.field as RefRelationField
+                val rrf=it.field as RefRelationField
                 if(rrf.relationModelTable!=null){
                     if(rmfs.containsKey(rrf.relationModelTable!!)){
-                        var fList=rmfs[rrf.relationModelTable!!]
+                        val fList=rmfs[rrf.relationModelTable!!]
                         if(fList!!.filter {rt-> (rt.field as FieldBase).getFullName()==(rrf as FieldBase).getFullName() }.count()<1){
                             fList.add(it)
                         }
@@ -525,14 +546,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         }
                     }
                     else{
-                        var mlst= mutableListOf<AttachedField>()
+                        val mlst= mutableListOf<AttachedField>()
                         mlst.add(it)
                         rmfs[rrf.relationModelTable!!]=mlst
                     }
                 }
             }
             else if(it.field is One2ManyField){
-                var rtf= it.field
+                val rtf= it.field
                 if(o2mfs.filter { rt-> (rt.field as FieldBase).getFullName()==(it.field as FieldBase).getFullName() }.count()<1)
                 {
                     o2mfs.add(it)
@@ -549,28 +570,22 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         rmfs.forEach {
             modelRelationMatcher = ModelRelationMatcher()
-            var rmf=model.getRelationModelField(it.value.first().field as FieldBase)
-            var idField= model.fields.getIdField()
-            var rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
-            var subSelect=select(idField!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
-            var rtFields=ArrayList<FieldBase>()
+            val rmf=model.getRelationModelField(it.value.first().field as FieldBase)
+            val idField= model.fields.getIdField()
+            val rIDField=rmf?.first?.fields?.getFieldByTargetField(idField)
+            val subSelect=select(idField!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
+            val rtFields=ArrayList<FieldBase>()
             rtFields.addAll(rmf?.first?.fields?.getAllPersistFields(true)?.values!!)
             modelRelationMatcher.addMatchData(model,idField, rmf.first,rIDField)
-            var joinModels=ArrayList<dynamic.model.query.mq.join.JoinModel>()
+            val joinModels=ArrayList<dynamic.model.query.mq.join.JoinModel>()
             it.value.forEach allField@{rrf->
                 val relationMF = model.getRelationModelField(rrf.field as FieldBase)?:return@allField
                 val targetMF= model.getTargetModelField(rrf.field as FieldBase)?:return@allField
-                var jField= relationMF.first.fields.getFieldByTargetField(targetMF.second) ?:return@allField
+                val jField= relationMF.first.fields.getFieldByTargetField(targetMF.second) ?:return@allField
                 if(useAccessControl){
                     //var rmfFields=partnerCache?.acFilterReadFields(sRmf?.first?.fields?.getAllPersistFields()?.values?.toTypedArray()!!)
-                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
-                    if(targetMFFields!=null){
-                        //rtFields.addAll(rmfFields)
-                        rtFields.addAll(targetMFFields)
-                    }
-                    else{
-                        return@allField
-                    }
+                    val targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
+                    rtFields.addAll(targetMFFields)
                 }else{
                     rtFields.addAll(targetMF.first.fields.getAllPersistFields(true).values)
                 }
@@ -586,9 +601,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
 
-            var rOrderBy=null as OrderBy?
-            var rOffset=null as Int?
-            var rLimit=null as Int?
+            val rOrderBy=null as OrderBy?
+            val rOffset=null as Int?
+            val rLimit=null as Int?
             //todo add support pagesize every field
 //            var selfField=it.value.first() as ModelField
 //            if(relationPaging && (selfField is PagingField)){
@@ -596,13 +611,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //                rOffset=0
 //                rLimit=selfField.pageSize
 //            }
-            var attachedCriteriaArr=it.value.filter {
+            val attachedCriteriaArr=it.value.filter {
                 af->
                 af.criteria!=null
             }.stream().map { x->x.criteria }.toList()
             var subCriteria = selectIn(rIDField!!,subSelect)
             if(attachedCriteriaArr.count()>0){
-                var mLst= mutableListOf<ModelExpression>()
+                val mLst= mutableListOf<ModelExpression>()
                 attachedCriteriaArr.forEach {mIt->
                     mLst.add(mIt!!)
                 }
@@ -611,21 +626,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
 
-            var (readCriteria,postFS) = (rmf.first as AccessControlModel).beforeRead(*rtFields.toTypedArray(),
+            val (readCriteria,postFS) = (rmf.first as AccessControlModel).beforeRead(*rtFields.toTypedArray(),
                     criteria=subCriteria,
                     model= rmf.first,
                     useAccessControl = useAccessControl,
                     partnerCache = partnerCache,
                     joinModels = joinModels.toTypedArray())
 
-            var mrDataArray=(rmf.first as AccessControlModel).query(*postFS,
+            val mrDataArray=(rmf.first as AccessControlModel).query(*postFS,
                     fromModel= rmf.first,
                     joinModels=joinModels.toTypedArray(),
                     criteria=readCriteria,
                     orderBy = rOrderBy,
                     offset = rOffset,
                     limit = rLimit)
-            var fieldArr=it.value.stream().map { x->x.field }.toList() as List<FieldBase>
+            val fieldArr=it.value.stream().map { x->x.field }.toList() as List<FieldBase>
             mDataArray=reconstructMultipleRelationModelRecordSet(model,
                     fieldArr.toTypedArray(),
                     mDataArray,rmf.first,
@@ -637,13 +652,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         o2mfs.forEach {
             modelRelationMatcher = ModelRelationMatcher()
-            var targetMF=this.getTargetModelField(it.field as FieldBase)
+            val targetMF=this.getTargetModelField(it.field as FieldBase)
             if(targetMF!=null){
-                var subSelect=select(model.fields.getIdField()!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
+                val subSelect=select(model.fields.getIdField()!!,fromModel = model).where(readCriteria).orderBy(newOrderBy).offset(offset).limit(limit)
 
-                var rOrderBy=null as OrderBy?
-                var rOffset=null as Int?
-                var rLimit=null as Int?
+                val rOrderBy=null as OrderBy?
+                val rOffset=null as Int?
+                val rLimit=null as Int?
                 //todo add support pagesize every field
 //                if(relationPaging && (it is PagingField)){
 //                    rOrderBy=targetMF?.first?.fields?.getDefaultOrderBy()
@@ -651,7 +666,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //                    rLimit=it.pageSize
 //                }
                 if(useAccessControl){
-                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
+                    val targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()//partnerCache?.acFilterReadFields(targetMF?.first?.fields?.getAllPersistFields(true)?.values?.toTypedArray()!!)
                     if(targetMFFields!=null){
 
                         modelRelationMatcher.addMatchData(model,it.field as FieldBase, targetMF.first, targetMF.second, model.fields.getIdField())
@@ -660,13 +675,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             subCriteria=and(subCriteria, it.criteria!!)
                         }
 
-                        var (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
+                        val (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
                                 criteria=subCriteria,
                                 model= targetMF.first,
                                 useAccessControl = useAccessControl,
                                 partnerCache = partnerCache)
 
-                        var mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,
+                        val mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,
                                 fromModel= targetMF.first,
                                 criteria=readCriteria,
                                 orderBy = rOrderBy,
@@ -691,14 +706,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     if(it.criteria!=null){
                         subCriteria=and(subCriteria, it.criteria!!)
                     }
-                    var targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
-                    var (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
+                    val targetMFFields= targetMF.first.fields.getAllPersistFields(true).values.toTypedArray()
+                    val (readCriteria,postFS) = (targetMF.first as AccessControlModel).beforeRead(*targetMFFields,
                             criteria=subCriteria,
                             model= targetMF.first,
                             useAccessControl = useAccessControl,
                             partnerCache = partnerCache)
 
-                    var mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,fromModel= targetMF.first,criteria=readCriteria,
+                    val mrDataArray=(targetMF.first as AccessControlModel).query(*postFS,fromModel= targetMF.first,criteria=readCriteria,
                             orderBy = rOrderBy,offset = rOffset,limit = rLimit)
 
                     mDataArray= reconstructMultipleRelationModelRecordSet(model,
@@ -718,8 +733,8 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     ownerMany2OneFields.forEach {m2o->
                         var v = fvs.getValue(m2o)
                         if(v!=null && m2o.targetModelFieldName== ModelReservedKey.idFieldName){
-                            var criteria=eq(model.fields.getIdField()!!,v)
-                            var (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
+                            val criteria=eq(model.fields.getIdField()!!,v)
+                            val (readCriteria,postFS) = this.beforeRead(*fs.toTypedArray(),
                                     criteria=criteria,
                                     model=this,
                                     useAccessControl = useAccessControl,
@@ -797,16 +812,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                                   targetFields:Array<FieldBase>,
                                                                   relDataArray: ModelDataArray?,
                                                                   modelRelationMatcher: ModelRelationMatcher): ModelDataArray?{
-        var mainArray = ModelDataArray(model = model, fields = reqMainArray?.fields)
+        val mainArray = ModelDataArray(model = model, fields = reqMainArray?.fields)
         val idField = model?.fields?.getIdField()?: return reqMainArray
         reqMainArray?.data?.forEach {
-            var mId = it.getValue(idField) as Long
-            var fvs = FieldValueArray()
+            val mId = it.getValue(idField) as Long
+            val fvs = FieldValueArray()
             fvs.addAll(it)
             if(relModel!=null){ //m2m
                 val field = relModel.fields.getFieldByTargetField(idField)
                 val relArray = this.readM2MModelDataArrayFromMultiModelDataArray(relModel,field!!,mId,fields,relDataArray)
-                var mds = (fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?: ModelDataSharedObject()
+                val mds = (fvs.getValue(ConstRelRegistriesField.ref) as ModelDataSharedObject?)?: ModelDataSharedObject()
                 relArray?.let {
                     mds.data[relModel]=relArray
                     fvs.setValue(ConstRelRegistriesField.ref,mds)
@@ -831,19 +846,19 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                               relFields:Array<FieldBase>,
                                                               dataArray: ModelDataArray?): ModelDataArray?{
 
-        var relReadFields = this.getModelFieldsFromMultiDataArray(relModel,dataArray)
-        var relDataArray = ModelDataArray(model = relModel, fields = relReadFields)
+        val relReadFields = this.getModelFieldsFromMultiDataArray(relModel,dataArray)
+        val relDataArray = ModelDataArray(model = relModel, fields = relReadFields)
         field.let {
             dataArray?.data?.filter {
                 (it.getValue(field) as Long)==fieldValue
             }?.forEach {fv->
-                var relFieldValue= this.readOneModelFieldValueFromMultiModelFieldValue(relReadFields,fv)
+                val relFieldValue= this.readOneModelFieldValueFromMultiModelFieldValue(relReadFields,fv)
                 relDataArray.data.add(relFieldValue)
                 relFields.forEach {
-                    var tf = this.getTargetModelField(it)
-                    var tReadFields = this.getModelFieldsFromMultiDataArray(tf?.first,dataArray)
-                    var tFV = this.readOneModelFieldValueFromMultiModelFieldValue(tReadFields,fv)
-                    var rf = this.getRelationModelField(it)
+                    val tf = this.getTargetModelField(it)
+                    val tReadFields = this.getModelFieldsFromMultiDataArray(tf?.first,dataArray)
+                    val tFV = this.readOneModelFieldValueFromMultiModelFieldValue(tReadFields,fv)
+                    val rf = this.getRelationModelField(it)
                     rf?.let {
                         relFieldValue.setValue(rf.second, ModelDataObject(fields = tReadFields, data = tFV, model = tf?.first))
                     }
@@ -853,7 +868,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         return relDataArray
     }
     private fun readOneModelFieldValueFromMultiModelFieldValue(modelFields:ArrayList<FieldBase>, multiModelFieldValue: FieldValueArray): FieldValueArray {
-        var n = FieldValueArray()
+        val n = FieldValueArray()
         modelFields.forEach {
             if(multiModelFieldValue.containFieldKey(it)){
                 n.setValue(it,multiModelFieldValue.getValue(it))
@@ -865,13 +880,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                                               field: FieldBase?,
                                                               fieldValue:Long,
                                                               dataArray: ModelDataArray?): ModelDataArray?{
-        var fields = this.getModelFieldsFromMultiDataArray(model,dataArray)
-        var modelDataArray= ModelDataArray(model = model, fields = fields)
+        val fields = this.getModelFieldsFromMultiDataArray(model,dataArray)
+        val modelDataArray= ModelDataArray(model = model, fields = fields)
         field?.let {
             dataArray?.data?.filter {
                 (it.getValue(field) as Long)==fieldValue
             }?.forEach { fv->
-                var nFv = FieldValueArray()
+                val nFv = FieldValueArray()
                 fields.forEach {
                     val v =fv.getValue(it)
                     nFv.setValue(it,v)
@@ -883,9 +898,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     private  fun getModelFieldsFromMultiDataArray(model:ModelBase?,dataArray: ModelDataArray?):ArrayList<FieldBase>{
-        var fields = arrayListOf<FieldBase>()
+        val fields = arrayListOf<FieldBase>()
          model?.let {
-             var d = dataArray?.data?.firstOrNull()
+             val d = dataArray?.data?.firstOrNull()
              d?.forEach {
                  if(it.field.model!!.isSame(model)){
                      fields.add(it.field)
@@ -896,7 +911,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     private fun setOrReplaceFieldValueArrayItem(fVArr: FieldValueArray, field: FieldBase, value:Any?){
-        var index=fVArr.indexOfFirst {
+        val index=fVArr.indexOfFirst {
             it.field.isSame(field)
         }
         if(index>-1){
@@ -908,9 +923,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
     protected open fun reconstructSingleRelationModelRecordSet(mDataArray: ModelDataArray?,
                                                                modelRelationMatcher: ModelRelationMatcher): ModelDataArray?{
-        var mainModel = mDataArray?.model
-        var mainModelFields=ArrayList<FieldBase>()
-        var subModels= mutableMapOf<ModelBase?, ModelDataObject>()
+        val mainModel = mDataArray?.model
+        val mainModelFields=ArrayList<FieldBase>()
+        val subModels= mutableMapOf<ModelBase?, ModelDataObject>()
         mDataArray?.fields?.forEach {
             if(mainModel!=it.model){
                if(subModels.contains(it.model)){
@@ -918,10 +933,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                }
                else
                {
-                   var fields=ArrayList<FieldBase>()
+                   val fields=ArrayList<FieldBase>()
                    fields.add(it)
-                   var mrDataObject= ModelDataObject(fields = fields, model = it.model)
-                   var mfd=modelRelationMatcher.getRelationMatchField(mainModel,it.model)
+                   val mrDataObject= ModelDataObject(fields = fields, model = it.model)
+                   val mfd=modelRelationMatcher.getRelationMatchField(mainModel,it.model)
                    mrDataObject.fromField=mfd?.fromField
                    subModels[it.model]=mrDataObject
                }
@@ -930,14 +945,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 mainModelFields.add(it)
             }
         }
-        var mainModelDataArray = ModelDataArray(fields = mainModelFields, model = mainModel)
+        val mainModelDataArray = ModelDataArray(fields = mainModelFields, model = mainModel)
         mDataArray?.data?.forEach { fvArr->
-            var mainRecord= FieldValueArray()
+            val mainRecord= FieldValueArray()
             mainModelDataArray.fields?.forEach {mf->
                 //var key= it.getFullName()
                 //mainRecord[it.propertyName]= mit[key]
                 //todo performance
-                var fv=fvArr.firstOrNull {
+                val fv=fvArr.firstOrNull {
                     it.field.isSame(mf)
                 }
                 if(fv!=null){
@@ -945,9 +960,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
             subModels.values.forEach {
-                var subRecord = FieldValueArray()
+                val subRecord = FieldValueArray()
                 it.fields?.forEach {fb->
-                    var fv=fvArr.firstOrNull {sf->
+                    val fv=fvArr.firstOrNull { sf->
                         sf.field.isSame(fb)
                     }
                     if(fv!=null){
@@ -955,7 +970,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
                 mainModelDataArray.fields?.add(it.fromField!!)
-                var cloneModelObject= ModelDataObject(data = subRecord, model = it.model)
+                val cloneModelObject= ModelDataObject(data = subRecord, model = it.model)
                 mainRecord.add(FieldValue(it.fromField!!, cloneModelObject))
             }
             mainModelDataArray.data.add(mainRecord)
@@ -965,16 +980,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     protected open fun getRelationModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
         if((field is Many2ManyField)){
-            var model= this.appModel.getModel((field as RefRelationField).relationModelTable) ?:return null
-            var mField= model.fields.getField((field as RefRelationField).relationModelFieldName) ?:return null
+            val model= this.appModel.getModel((field as RefRelationField).relationModelTable) ?:return null
+            val mField= model.fields.getField((field as RefRelationField).relationModelFieldName) ?:return null
             return Pair(model,mField)
         }
         return null
     }
     protected  open fun getTargetModelField(field: FieldBase):Pair<ModelBase, FieldBase>?{
         if(field is RefTargetField){
-            var model= this.appModel.getModel(field.targetModelTable) ?:return null
-            var mField= model.fields.getField(field.targetModelFieldName) ?:return null
+            val model= this.appModel.getModel(field.targetModelTable) ?:return null
+            val mField= model.fields.getField(field.targetModelFieldName) ?:return null
             return Pair(model,mField)
         }
         return null
@@ -1003,7 +1018,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(modelData.context==null){
                 modelData.createContext()
             }
-            var (id,errMsg)=(modelData.model as AccessControlModel)
+            val (id,errMsg)=(modelData.model as AccessControlModel)
                     .rawCreate(modelData,useAccessControl,partnerCache)
             if(id!=null && id>0){
                 txManager.commit(status)
@@ -1081,7 +1096,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                    null
                 }
                 is FieldValueDependentingRecordBillboard ->{
-                    var ret = value.looked(fvs, ActionType.EDIT)
+                    val ret = value.looked(fvs, ActionType.EDIT)
                     return if(ret.first){
                         FieldValue(field, ret.second)
                     }
@@ -1118,9 +1133,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                       useAccessControl: Boolean=false,
                                       partnerCache:PartnerCache?=null):Pair<Long?,String?>{
         for (d in modelDataArray.data){
-            var obj= ModelDataObject(d, model = modelDataArray.model, fields = modelDataArray.fields)
+            val obj= ModelDataObject(d, model = modelDataArray.model, fields = modelDataArray.fields)
             obj.context=modelDataArray.context
-            var ret=(modelDataArray.model as AccessControlModel).rawCreateObject(obj,useAccessControl,partnerCache)
+            val ret=(modelDataArray.model as AccessControlModel).rawCreateObject(obj,useAccessControl,partnerCache)
             if(ret.first==null|| ret.second!=null){
                 return ret
             }
@@ -1142,19 +1157,19 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     return@forEach
                 }
                 val oit = it as ModelField
-                var fv = modelDataObject.data.firstOrNull { fv->
+                val fv = modelDataObject.data.firstOrNull { fv->
                     fv.field.getFullName() == oit.getFullName()
                 }
                 if (fv == null) {
                     if (oit.defaultValue != null) {
-                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache,modelDataObject.data)
+                        val acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache,modelDataObject.data)
                         acFV?.let {
                             modelDataObject.setFieldValue(acFV.field,acFV.value)
                         }
                     }
                 }
                 else{
-                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache,modelDataObject.data)
+                    val tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache,modelDataObject.data)
                     tFV?.let {
                         modelDataObject.setFieldValue(tFV.field,tFV.value)
                     }
@@ -1162,7 +1177,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
             this.runCreateFieldsInitializeRules(modelDataObject,partnerCache)
-            var ret = this.runCreateFieldsCheckRules(modelDataObject,partnerCache)
+            val ret = this.runCreateFieldsCheckRules(modelDataObject,partnerCache)
             if(!ret.first){
                 return ret
             }
@@ -1181,31 +1196,24 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected  open fun runCreateFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
 
-        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.createAction.enable=="false"){
+            if(!it.createAction.enable){
 
             }
         }
-        modelRule?.fieldRules?.forEach { _, u ->
-            if(u.createAction.enable!="false") {
-                if(u.createAction.setValue!=null){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.setValue,partnerCache))
-                } else if(u.createAction.default!=null && !modelDataObject.hasFieldValue(u.field)){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.createAction.default,partnerCache))
-                }
-            } else{
-                modelDataObject.removeFieldValue(u.field)
-            }
+
+        modelRule?.createAction?.fields?.forEach {
+            modelDataObject.removeFieldValue(it)
         }
 
-        var filterRules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueFilterRule<*>>(model)
+        val filterRules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueFilterRule<*>>(model)
 
         filterRules?.forEach {
             it(modelDataObject,partnerCache,null)
         }
 
-        var filter = this.getModelCreateAccessFieldFilterRule()
+        val filter = this.getModelCreateAccessFieldFilterRule()
         filter?.let {
             it(modelDataObject,partnerCache,null)
         }
@@ -1213,24 +1221,17 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     protected  open fun runEditFieldsFilterRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache){
         val model = modelDataObject.model?:this
-
-        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
-        modelRule?.fieldRules?.forEach { _, u ->
-            if(u.editAction.enable!="false") {
-                if(u.editAction.setValue!=null){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.setValue,partnerCache))
-                } else if(u.editAction.default!=null && !modelDataObject.hasFieldValue(u.field)){
-                    modelDataObject.setFieldValue(u.field,this.getValueFromPartnerContextConstKey(u.editAction.default,partnerCache))
-                }
-            } else{
-                modelDataObject.removeFieldValue(u.field)
-            }
+        val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
+        modelRule?.let {
+           it.editAction.fields.forEach {
+               modelDataObject.removeFieldValue(it)
+           }
         }
-        var fitler = this.getModelEditAccessFieldFilterRule()
+        val fitler = this.getModelEditAccessFieldFilterRule()
         fitler?.let {
             it(modelDataObject,partnerCache,null)
         }
-        var filterRules = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueFilterRule<*,*>>(model)
+        val filterRules = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueFilterRule<*,*>>(model)
 
         filterRules?.forEach {
             it(modelDataObject,partnerCache,null)
@@ -1242,7 +1243,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(value.isNullOrEmpty()){
             return value
         }
-        var ret= partnerCache.getContextValue(value)
+        val ret= partnerCache.getContextValue(value)
         return if(ret.first){
             if(ret.second!=null){
                 ret.second.toString()
@@ -1259,9 +1260,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected open fun runCreateFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
         val model = modelDataObject.model?:this
 
-        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.createAction.enable=="false"){
+            if(!it.createAction.enable){
                 return Pair(false,"没有添加权限")
             }
         }
@@ -1272,7 +1273,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelCreateFieldsChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckRule<*>>(model)
+        val modelCreateFieldsChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckRule<*>>(model)
 
         modelCreateFieldsChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
@@ -1288,7 +1289,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelCreateFieldsInStoreChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckInStoreRule<*>>(model)
+        val modelCreateFieldsInStoreChecks = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueCheckInStoreRule<*>>(model)
         modelCreateFieldsInStoreChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
             if(!ret.first){
@@ -1308,9 +1309,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     protected open fun runEditFieldsCheckRules(modelDataObject: ModelDataObject, partnerCache: PartnerCache):Pair<Boolean,String?>{
         val model = modelDataObject.model?:this
 
-        var modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
+        val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(it.editAction.enable=="false"){
+            if(!it.editAction.enable){
                 return Pair(false,"没有更新权限")
             }
         }
@@ -1320,7 +1321,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelEditFieldsChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckRule<*,String>>(model)
+        val modelEditFieldsChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckRule<*,String>>(model)
 
         modelEditFieldsChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
@@ -1340,7 +1341,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             return ret
         }
 
-        var modelEditFieldsInStoreChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckInStoreRule<*,String>>(model)
+        val modelEditFieldsInStoreChecks = partnerCache.getModelEditAccessControlRules<ModelEditRecordFieldsValueCheckInStoreRule<*,String>>(model)
         modelEditFieldsInStoreChecks?.forEach {
             ret = it(modelDataObject,partnerCache,null)
             if(!ret.first){
@@ -1356,7 +1357,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         this.createRecordSetIsolationFields(modelDataObject,partnerCache)
         this.cuFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
 
-        var rules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueInitializeRule<*>>(model)
+        val rules = partnerCache.getModelCreateAccessControlRules<ModelCreateRecordFieldsValueInitializeRule<*>>(model)
         rules?.forEach {
             it(modelDataObject,partnerCache,null)
         }
@@ -1365,14 +1366,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                         useAccessControl: Boolean=false,
                                         partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
-        var constGetRefField=modelDataObject.data.firstOrNull {
+        val constGetRefField=modelDataObject.data.firstOrNull {
             it.field is ConstGetRecordRefField
         }
 
         if(constGetRefField!=null){
             return if(modelDataObject.context?.refRecordMap?.containsKey(constGetRefField.value as String)!!){
-                var fvc=modelDataObject.context?.refRecordMap?.get(constGetRefField.value as String) as ModelDataObject
-                var idValue= fvc.idFieldValue?.value as Long?
+                val fvc=modelDataObject.context?.refRecordMap?.get(constGetRefField.value as String) as ModelDataObject
+                val idValue= fvc.idFieldValue?.value as Long?
                 if(idValue!=null) {
                     modelDataObject.data.add(FieldValue(modelDataObject.model?.fields?.getIdField()!!, idValue))
                     Pair(idValue,null)
@@ -1385,7 +1386,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
         }
 
-        var ret= this.beforeCreateObject(modelDataObject,useAccessControl,partnerCache)
+        val ret= this.beforeCreateObject(modelDataObject,useAccessControl,partnerCache)
         if(!ret.first){
             return Pair(null,ret.second)
         }
@@ -1404,16 +1405,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     if(it.value is ModelDataObject){
                         if((it.value as ModelDataObject).idFieldValue==null){
                             (it.value as ModelDataObject).context=modelDataObject.context
-                            var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,useAccessControl,partnerCache)
+                            val id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,useAccessControl,partnerCache)
                             if(id==null ||id.second!=null){
                                 return id?:Pair(null,"创建失败")
                             }
-                            var idField= (it.value as ModelDataObject).model?.fields?.getIdField()
+                            val idField= (it.value as ModelDataObject).model?.fields?.getIdField()
                             (it.value as ModelDataObject).data.add(FieldValue(idField!!, id.first))
                         }
                         else if((it.value as ModelDataObject).hasNormalField()){
                             (it.value as ModelDataObject).context=modelDataObject.context
-                            var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawEdit(it.value as ModelDataObject,null,useAccessControl,partnerCache)
+                            val id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawEdit(it.value as ModelDataObject,null,useAccessControl,partnerCache)
                             if(id==null ||id.second!=null){
                                 return id?:Pair(null,"创建失败")
                             }
@@ -1435,7 +1436,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 //        }
 
         return try {
-            var fVCShadow= ModelDataObject(model = modelDataObject.model)
+            val fVCShadow= ModelDataObject(model = modelDataObject.model)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
                 if((it is FunctionField<*,*>)
                         || (it is ModelOne2ManyField)
@@ -1444,21 +1445,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     return@forEach
                 }
                 val oit = it as ModelField
-                var fv = modelDataObject.data.firstOrNull { fv->
+                val fv = modelDataObject.data.firstOrNull { fv->
                     fv.field.getFullName() == oit.getFullName()
                 }
                 if (fv == null) {
                     if (oit.defaultValue != null) {
-                        var acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache, modelDataObject.data)
+                        val acFV=this.getCreateFieldValue(oit, oit.defaultValue,partnerCache, modelDataObject.data)
                             acFV?.let { fVCShadow.data.add(acFV) }
                     }
                 }
                 else{
-                    var tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache, modelDataObject.data)
+                    val tFV=this.getCreateFieldValue(fv.field,fv.value,partnerCache, modelDataObject.data)
                     tFV?.let { fVCShadow.data.add(tFV) }
                 }
             }
-            var nID=this.create(fVCShadow)
+            val nID=this.create(fVCShadow)
             if(nID==null || nID<1){
                 return Pair(null,"创建失败")
             }
@@ -1466,7 +1467,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     modelDataObject.model?.fields?.getIdField()!!,
                     nID
             ))
-            var refField=modelDataObject.data.firstOrNull{
+            val refField=modelDataObject.data.firstOrNull{
                 it.field is ConstSetRecordRefField
             }
             if(refField!=null){
@@ -1477,21 +1478,21 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 when(fv.field){
                     is One2ManyField ->{
                         if(fv.value is ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
-                            var tmf=this.getTargetModelField(fv.field)
+                            val tmf=this.getTargetModelField(fv.field)
                             (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                             (fv.value as ModelDataObject).context=modelDataObject.context
-                            var o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
+                            val o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                             if (o2m==null || o2m.second!=null){
                                 return  Pair(null,o2m?.second?:"创建失败")
                             }
                         }
                         else if(fv.value is ModelDataArray){
-                            var tmf=this.getTargetModelField(fv.field)
+                            val tmf=this.getTargetModelField(fv.field)
                             (fv.value as ModelDataArray).context=modelDataObject.context
                             (fv.value as ModelDataArray).data.forEach {
                                     it.add(FieldValue(tmf?.second!!, nID))
                             }
-                            var ret=this.rawCreateArray(fv.value as ModelDataArray,useAccessControl,partnerCache)
+                            val ret=this.rawCreateArray(fv.value as ModelDataArray,useAccessControl,partnerCache)
                             if(ret.first==null ||ret.second!=null){
                                 return ret
                             }
@@ -1500,10 +1501,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     is One2OneField ->{
                         if((fv.field as One2OneField).isVirtualField){
                             if(fv.value is ModelDataObject && (fv.value as ModelDataObject).idFieldValue==null){
-                                var tmf=this.getTargetModelField(fv.field)
+                                val tmf=this.getTargetModelField(fv.field)
                                 (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, nID))
                                 (fv.value as ModelDataObject).context=modelDataObject.context
-                                var o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
+                                val o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,useAccessControl,partnerCache)
                                 if (o2o==null || o2o.second!=null){
                                     return  Pair(null,"创建失败")
                                 }
@@ -1516,27 +1517,27 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 for( kv in (fv.value as ModelDataSharedObject).data) {
                                     when(kv.value){
                                         is ModelDataObject ->{
-                                            var mfvc= kv.value as ModelDataObject
+                                            val mfvc= kv.value as ModelDataObject
                                             mfvc.context=modelDataObject.context
-                                            var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
+                                            val tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                             if(tField!=null && mfvc.idFieldValue==null){
                                                 mfvc.data.add(FieldValue(tField, nID))
-                                                var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
+                                                val ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                 if(ret==null || ret.second!=null){
                                                     return Pair(null,"创建失败")
                                                 }
                                             }
                                         }
                                         is ModelDataArray ->{
-                                            var mmfvc= kv.value as ModelDataArray
+                                            val mmfvc= kv.value as ModelDataArray
                                             mmfvc.context=modelDataObject.context
                                             for(mkv in mmfvc.data){
-                                                var tField=mmfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
+                                                val tField=mmfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                 if(tField!=null){
                                                     mkv.add(FieldValue(tField, nID))
                                                 }
                                             }
-                                            var ret=rawCreateArray(mmfvc,useAccessControl,partnerCache)
+                                            val ret=rawCreateArray(mmfvc,useAccessControl,partnerCache)
                                             if(ret.first==null ||ret.second!=null){
                                                 return ret
                                             }
@@ -1588,7 +1589,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 return Pair(false,"权限接口没有提供操作用户信息")
             }
             this.cuFieldsProcessProxyModelField(modelDataObject,partnerCache,null)
-            var ret = this.runEditFieldsCheckRules(modelDataObject,partnerCache)
+            val ret = this.runEditFieldsCheckRules(modelDataObject,partnerCache)
             if(!ret.first){
                 return ret
             }
@@ -1628,7 +1629,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         try {
             // var dependingModelFieldValueCollection
             if(modelData.isObject()){
-                var ret= this.rawEdit(modelData.`as`(),
+                val ret= this.rawEdit(modelData.`as`(),
                         criteria=criteria,
                         useAccessControl=useAccessControl,
                         partnerCache = partnerCache)
@@ -1670,15 +1671,15 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                      partnerCache:PartnerCache?=null):Pair<Long?,String?>{
 
 
-        var (result,errorMsg)=this.beforeEditCheck(modelDataObject,useAccessControl = useAccessControl,partnerCache = partnerCache)
+        val (result,errorMsg)=this.beforeEditCheck(modelDataObject,useAccessControl = useAccessControl,partnerCache = partnerCache)
         if(!result){
             return Pair(null,errorMsg)
         }
         return try {
             var tCriteria=criteria
-            var idFV=modelDataObject.idFieldValue
+            val idFV=modelDataObject.idFieldValue
             if(idFV!=null){
-                var idCriteria=eq(idFV.field,idFV.value)
+                val idCriteria=eq(idFV.field,idFV.value)
                 tCriteria= if(tCriteria!=null) {
                     and(tCriteria, idCriteria)
                 } else idCriteria
@@ -1686,7 +1687,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             if(useAccessControl)
             {
-                var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
+                val acCriteria=partnerCache?.getEditAccessControlCriteria(modelDataObject.model as AccessControlModel)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
                         and(tCriteria, acCriteria)
@@ -1704,7 +1705,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                         if(it.value is ModelDataObject){
                             if((it.value as ModelDataObject).idFieldValue==null && !(it.value as ModelDataObject).isEmpty()){
                                 (it.value as ModelDataObject).context=modelDataObject.context
-                                var id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,
+                                val id=((it.value as ModelDataObject).model as AccessControlModel?)?.rawCreate(it.value as ModelDataObject,
                                         useAccessControl,
                                         partnerCache)
                                 if(id==null ||id.second!=null){
@@ -1714,7 +1715,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                             }
                             else if((it.value as ModelDataObject).hasNormalField()){
                                 (it.value as ModelDataObject).context=modelDataObject.context
-                                var ret=((it.value as ModelDataObject).model as AccessControlModel?)?.rawEdit(it.value as ModelDataObject,null,useAccessControl,partnerCache)
+                                val ret=((it.value as ModelDataObject).model as AccessControlModel?)?.rawEdit(it.value as ModelDataObject,null,useAccessControl,partnerCache)
                                 if(ret==null ||ret.second!=null){
                                     return ret?:Pair(null,"更新失败")
                                 }
@@ -1725,7 +1726,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             }
 
 
-            var fVCShadow= ModelDataObject(model = modelDataObject.model, fields = modelDataObject.fields)
+            val fVCShadow= ModelDataObject(model = modelDataObject.model, fields = modelDataObject.fields)
             modelDataObject.model?.fields?.getAllFields()?.values?.forEach {
 
                 if((it is FunctionField<*,*>)
@@ -1738,18 +1739,18 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 if(oit.isIdField()){
                     return@forEach
                 }
-                var fv = modelDataObject.data.firstOrNull { fv->
+                val fv = modelDataObject.data.firstOrNull { fv->
                     fv.field.getFullName() == oit.getFullName()
                 }
                 if (fv != null) {
-                    var acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache,modelDataObject.data)
+                    val acFV=this.getEditFieldValue(fv.field, fv.value,partnerCache,modelDataObject.data)
                     if(acFV!=null){
                         fVCShadow.setFieldValue(acFV.field,acFV.value)
                     }
                 }
                 else{
                     if(oit.defaultValue is FieldValueDependentingRecordBillboard){
-                        var ret = (oit.defaultValue as FieldValueDependentingRecordBillboard).looked(modelDataObject.data, ActionType.EDIT)
+                        val ret = (oit.defaultValue as FieldValueDependentingRecordBillboard).looked(modelDataObject.data, ActionType.EDIT)
                         if(ret.first){
                             fVCShadow.setFieldValue(oit,ret.second)
                         }
@@ -1757,23 +1758,23 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
             }
 
-            var ret=this.update(fVCShadow,criteria = tCriteria)
+            val ret=this.update(fVCShadow,criteria = tCriteria)
             if(ret==null ||ret<1){
                return  Pair(null,"更新失败")
             }
-            var mIDFV=modelDataObject.idFieldValue
+            val mIDFV=modelDataObject.idFieldValue
             if(mIDFV!=null){
                 modelDataObject.data.forEach {
                     fv->
                     when(fv.field){
                         is One2ManyField ->{
                             if(fv.value is ModelDataObject){
-                                var tmf=this.getTargetModelField(fv.field)
+                                val tmf=this.getTargetModelField(fv.field)
                                 if((fv.value as ModelDataObject).idFieldValue==null)
                                 {
                                     (fv.value as ModelDataObject).context=modelDataObject.context
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
-                                    var o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
+                                    val o2m=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
                                             partnerCache)
                                     if (o2m==null || o2m.second!=null){
@@ -1782,7 +1783,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 }
                                 else if((fv.value as ModelDataObject).hasNormalField()){
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    var ret=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
+                                    val ret=(tmf?.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
                                             null,
                                             useAccessControl,
                                             partnerCache)
@@ -1792,13 +1793,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                 }
                             }
                             else if(fv.value is ModelDataArray){
-                                var tmf=this.getTargetModelField(fv.field)
+                                val tmf=this.getTargetModelField(fv.field)
                                 (fv.value as ModelDataArray).data.forEach {
-                                    var tfvc= ModelDataObject(it, (fv.value as ModelDataArray).model)
+                                    val tfvc= ModelDataObject(it, (fv.value as ModelDataArray).model)
                                     if(tfvc.idFieldValue==null){
                                         tfvc.context=modelDataObject.context
                                         tfvc.data.add(FieldValue(tmf?.second!!, mIDFV.value))
-                                        var o2m=(tmf.first as AccessControlModel?)?.rawCreate(tfvc,
+                                        val o2m=(tmf.first as AccessControlModel?)?.rawCreate(tfvc,
                                                 useAccessControl,
                                                 partnerCache)
                                         if (o2m==null || o2m.second!=null){
@@ -1808,7 +1809,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     else if(tfvc.hasNormalField())
                                     {
                                         tfvc.context=modelDataObject.context
-                                        var ret=(tmf?.first as AccessControlModel?)?.rawEdit(tfvc,
+                                        val ret=(tmf?.first as AccessControlModel?)?.rawEdit(tfvc,
                                                 null,
                                                 useAccessControl,
                                                 partnerCache)
@@ -1822,10 +1823,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                        is One2OneField ->{
                             if((fv.field as One2OneField).isVirtualField && (fv.value is ModelDataObject)){
                                 if((fv.value as ModelDataObject).idFieldValue==null){
-                                    var tmf=this.getTargetModelField(fv.field)
+                                    val tmf=this.getTargetModelField(fv.field)
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    var o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
+                                    val o2o=(tmf.first as AccessControlModel?)?.rawCreate(fv.value as ModelDataObject,
                                             useAccessControl,
                                             partnerCache)
                                     if (o2o==null || o2o.second!=null){
@@ -1833,10 +1834,10 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     }
                                 }
                                 else if((fv.value as ModelDataObject).hasNormalField()){
-                                    var tmf=this.getTargetModelField(fv.field)
+                                    val tmf=this.getTargetModelField(fv.field)
                                     (fv.value as ModelDataObject).data.add(FieldValue(tmf?.second!!, mIDFV.value))
                                     (fv.value as ModelDataObject).context=modelDataObject.context
-                                    var o2o=(tmf.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
+                                    val o2o=(tmf.first as AccessControlModel?)?.rawEdit(fv.value as ModelDataObject,
                                             criteria=null,
                                             useAccessControl = useAccessControl,
                                             partnerCache = partnerCache)
@@ -1852,41 +1853,41 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                     for( kv in (fv.value as ModelDataSharedObject).data) {
                                         when(kv.value){
                                             is ModelDataObject ->{
-                                                var mfvc= kv.value as ModelDataObject
+                                                val mfvc= kv.value as ModelDataObject
                                                 mfvc.context=modelDataObject.context
-                                                var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
+                                                val tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                 if(tField!=null && mfvc.idFieldValue==null){
                                                     mfvc.context=modelDataObject.context
                                                     mfvc.data.add(FieldValue(tField, mIDFV.value))
-                                                    var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
+                                                    val ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                     if(ret==null || ret.second!=null){
                                                         return Pair(null,"创建失败")
                                                     }
                                                 }
                                                 else if(mfvc.idFieldValue!=null && mfvc.hasNormalField()){
                                                     mfvc.context=modelDataObject.context
-                                                    var ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
+                                                    val ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
                                                     if(ret==null || ret.second!=null){
                                                         return Pair(null,"更新失败")
                                                     }
                                                 }
                                             }
                                             is ModelDataArray ->{
-                                                var mmfvc= kv.value as ModelDataArray
+                                                val mmfvc= kv.value as ModelDataArray
                                                 for(mkv in mmfvc.data){
-                                                    var mfvc= ModelDataObject(mkv, mmfvc.model)
+                                                    val mfvc= ModelDataObject(mkv, mmfvc.model)
                                                     mfvc.context=modelDataObject.context
-                                                    var tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
+                                                    val tField=mfvc.model?.fields?.getFieldByTargetField(modelDataObject.model?.fields?.getIdField())
                                                     if(tField!=null && mfvc.idFieldValue==null){
                                                         mfvc.data.add(FieldValue(tField, mIDFV.value))
-                                                        var ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
+                                                        val ret=(mfvc.model as AccessControlModel?)?.rawCreate(mfvc,useAccessControl,partnerCache)
                                                         if(ret==null || ret.second!=null){
                                                             return Pair(null,ret?.second)
                                                         }
                                                     }
                                                     else if(mfvc.idFieldValue!=null && mfvc.hasNormalField()){
                                                         mfvc.context=modelDataObject.context
-                                                        var ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
+                                                        val ret=(mfvc.model as AccessControlModel?)?.rawEdit(mfvc,null,useAccessControl,partnerCache)
                                                         if(ret==null || ret.second!=null){
                                                             return Pair(null,"更新失败")
                                                         }
@@ -1904,7 +1905,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                 }
             }
-            var afterRet=this.afterEditObject(modelDataObject,useAccessControl,partnerCache)
+            val afterRet=this.afterEditObject(modelDataObject,useAccessControl,partnerCache)
             if(!afterRet.first){
                 return Pair(0,afterRet.second)
             }
@@ -1933,9 +1934,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                                           partnerCache:PartnerCache?):Pair<Boolean,String?>{
         val model = modelData.model
         model?.let {
-            var modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
+            val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
             modelRule?.let {
-                if(it.deleteAction.enable=="false"){
+                if(!it.deleteAction.enable){
                     return Pair(false,"无删除权限")
                 }
             }
@@ -1946,7 +1947,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
             if(!ret.first){
                 return ret
             }
-            var ruleTypes = partnerCache.getModelDeleteAccessControlRules<ModelDeleteAccessControlRule<*,String>>(model!!)
+            val ruleTypes = partnerCache.getModelDeleteAccessControlRules<ModelDeleteAccessControlRule<*,String>>(model!!)
             ruleTypes?.forEach {
                 ret=it(modelData,partnerCache,null)
                 if(!ret.first){
@@ -1990,7 +1991,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         try {
             // var dependingModelFieldValueCollection
             if(modelData.isObject()){
-                var ret= this.rawDelete(modelData.`as`(),
+                val ret= this.rawDelete(modelData.`as`(),
                         criteria=criteria,
                         useAccessControl=useAccessControl,
                         partnerCache = partnerCache)
@@ -2024,16 +2025,16 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         if(useAccessControl && partnerCache==null){
             return Pair(null,"must login")
         }
-        var (result,errorMsg)=this.beforeDeleteCheck(modelDataObject,criteria = criteria,useAccessControl = useAccessControl,partnerCache = partnerCache)
+        val (result,errorMsg)=this.beforeDeleteCheck(modelDataObject,criteria = criteria,useAccessControl = useAccessControl,partnerCache = partnerCache)
         if(!result){
             return Pair(null,errorMsg)
         }
 
         return try {
             var tCriteria=criteria
-            var idFV=modelDataObject.idFieldValue
+            val idFV=modelDataObject.idFieldValue
             if(idFV!=null){
-                var idCriteria=eq(idFV.field,idFV.value)
+                val idCriteria=eq(idFV.field,idFV.value)
                 tCriteria= if(tCriteria!=null) {
                     and(tCriteria, idCriteria)
                 } else idCriteria
@@ -2041,14 +2042,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
             if(useAccessControl)
             {
-                var acCriteria=null as ModelExpression?//partnerCache?.acGetEditCriteria(modelDataObject.model)
+                val acCriteria=partnerCache?.getDeleteAccessControlCriteria(modelDataObject.model as AccessControlModel)
                 if(acCriteria!=null){
                     tCriteria= if(tCriteria!=null) {
                         and(tCriteria, acCriteria)
                     } else acCriteria
                 }
 
-                var corpIsolationCriteria = deleteCorpIsolationBean(modelDataObject,
+                val corpIsolationCriteria = deleteCorpIsolationBean(modelDataObject,
                         partnerCache = partnerCache!!,
                         criteria=tCriteria)
                 if(corpIsolationCriteria.first && corpIsolationCriteria.second!=null){
@@ -2062,18 +2063,18 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
     }
 
     open fun rawCount(fieldValueArray: FieldValueArray, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
-        var expArr = fieldValueArray.map {
+        val expArr = fieldValueArray.map {
             eq(it.field, it.value)
         }.toTypedArray()
-        var expressions = and(*expArr)
-        var (expressions2,_) = this.beforeRead(criteria = expressions,model=this,useAccessControl = useAccessControl,partnerCache = partnerCache)
-        var statement = select(fromModel = this).count().where(expressions2)
+        val expressions = and(*expArr)
+        val (expressions2,_) = this.beforeRead(criteria = expressions,model=this,useAccessControl = useAccessControl,partnerCache = partnerCache)
+        val statement = select(fromModel = this).count().where(expressions2)
         return this.queryCount(statement)
     }
 
     open fun rawCount(criteria: ModelExpression?=null, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Int{
         val (c,_)=this.beforeRead(criteria = criteria,model = this,useAccessControl = useAccessControl,partnerCache = partnerCache)
-        var statement = select(fromModel = this).count().where(c)
+        val statement = select(fromModel = this).count().where(c)
         return this.queryCount(statement)
     }
     open fun acCount(criteria: ModelExpression?, partnerCache:PartnerCache):Int{
@@ -2082,7 +2083,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
     open fun rawMax(field: FieldBase, criteria: ModelExpression?=null, partnerCache:PartnerCache?=null, useAccessControl: Boolean=false):Long?{
         val (c,_)=this.beforeRead(field,criteria = criteria,model = this,useAccessControl = useAccessControl,partnerCache = partnerCache)
-        var statement = select(fromModel = this).max(dynamic.model.query.mq.aggregation.MaxExpression(field)).where(c)
+        val statement = select(fromModel = this).max(dynamic.model.query.mq.aggregation.MaxExpression(field)).where(c)
         return this.queryMax(statement)
     }
 

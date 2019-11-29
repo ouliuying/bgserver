@@ -21,24 +21,48 @@ t *  *  *he Free Software Foundation, either version 3 of the License.
 
 package work.bg.server.core.cache
 
+import dynamic.model.query.config.ActionType
+import dynamic.model.query.exception.ModelErrorException
+import dynamic.model.query.mq.*
+import dynamic.model.query.mq.model.AppModel
 import dynamic.model.query.mq.model.ModelBase
 import dynamic.model.web.context.ContextType
-import work.bg.server.core.acrule.AccessControlRule
-import work.bg.server.core.acrule.ModelEditAccessControlRule
+import org.apache.commons.logging.LogFactory
 import work.bg.server.core.model.*
 import java.util.concurrent.locks.StampedLock
 import work.bg.server.core.context.ModelExpressionContext
 import work.bg.server.core.ui.*
+import work.bg.server.expression.AtomRuleCriteriaScanner
+import java.lang.Exception
+import kotlin.math.exp
 
 class PartnerCache(partnerData:Map<String,Any?>?,
                    val partnerID:Long?,
                    val corpID:Long?,
                    val roleID:Long?,
                    val devType:Int?):ContextType {
+    private  val logger = LogFactory.getLog(javaClass)
     val modelExpressionContext: ModelExpressionContext = ModelExpressionContext(partnerID, corpID, roleID,devType)
     companion object {
         private val locker=StampedLock()
         private var corps= mutableMapOf<Long,CorpCache>()
+    }
+    private val departmentPartnerRel by lazy {
+        AppModel.ref.models?.find {
+             it.meta.name == "departmentPartnerRel" && it.meta.appName=="corp"
+        }
+    }
+    private val departmentPartnerRelPartnerField by lazy {
+        val model = AppModel.ref.models?.find {
+            it.meta.name == "departmentPartnerRel" && it.meta.appName=="corp"
+        }
+        model?.fields?.getFieldByPropertyName("partner")
+    }
+    private val departmentDepartmentRelDepartmentField by lazy {
+        val model = AppModel.ref.models?.find {
+            it.meta.name == "departmentPartnerRel" && it.meta.appName=="corp"
+        }
+        model?.fields?.getFieldByPropertyName("department")
     }
     init {
         this.buildPartnerCache(partnerData)
@@ -112,16 +136,419 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     inline fun <reified T> getModelDeleteAccessControlRules(model:ModelBase):List<T>?{
         return this.currRole?.getModelDeleteAccessControlRules(model)
     }
-    fun  checkEditBelongToPartner(model:ModelBase):Boolean{
-         val editRule = this.getEditModelRule(model.meta.appName,model.meta.name)
-         return  if(editRule?.checkBelongToPartner!=null) editRule.checkBelongToPartner > 0 else false
+    //安全/超级管理员 权限
+    private  fun createSafeCriteria(model:AccessControlModel):ModelExpression?{
+        if(this.currRole==null){
+            return eq(model.createCorpID,this.corpID)
+        }
+        if(this.currRole?.isSuper!=false){
+            return eq(model.createCorpID,this.corpID)
+        }
+        return null
+    }
+    fun getEditAccessControlCriteria(model:AccessControlModel):ModelExpression?{
+        val safeCriteria = this.createSafeCriteria(model)
+        if(safeCriteria!=null){
+            return safeCriteria
+        }
+
+        val roleCriteria = model.createRoleRuleCriteria(this,ActionType.EDIT)
+        if(roleCriteria!=null){
+            return roleCriteria
+        }
+
+        var mr = this.currRole?.getModelRule(model)
+       mr?.editAction?.let {
+            //maybe cached
+           var criterias = mutableMapOf<String,ModelExpression>()
+           this.createCustomCriteria(it.criteria,model)?.let{cIT->
+               criterias.put("E",cIT)
+           }
+           criterias.put("A",this.createIsolationCriteria(it.isolation,model))
+           this.createTargetPartnerCriteria(it.targetPartners,model)?.let {pIT->
+               criterias.put("D",pIT)
+           }
+           this.createTargetDepartmentCriteria(it.targetDepartments,model)?.let {dIT->
+               criterias.put("C",dIT)
+           }
+           this.createTargetRoleCriteria(it.targetRoles,model)?.let {
+               rIT->
+               criterias.put("B",rIT)
+           }
+           if(it.overrideCriteria!=null){
+                this.createOverrideCriteria(it.overrideCriteria,criterias)?.let {oIT->
+                    return oIT
+                }
+           }
+           return if(criterias.count()>1) and(*criterias.values.toTypedArray()) else  criterias.values.first()
+        }
+        return eq(model.createPartnerID,this.partnerID)
+    }
+    private fun createOverrideCriteria(criteria: String,criteriaItems:Map<String,ModelExpression>):ModelExpression?{
+        var c = AtomRuleCriteriaScanner().scan(criteria)
+        c?.let {
+            try {
+                return this.buildCriteriaFromRawExpressionNode(it,
+                        criteriaItems)
+            }
+            catch (ex:Exception){
+                ex.printStackTrace()
+                this.logger.error(ex.toString())
+            }
+        }
+        return null
+    }
+    private fun buildCriteriaFromRawExpressionNode(expNode:AtomRuleCriteriaScanner.RawExpressionNode
+                                                   ,criteriaItems:Map<String,ModelExpression>):ModelExpression?{
+        if(expNode.operator.isNullOrBlank() || expNode.operator.isNullOrEmpty()){
+            return if(expNode.expression.isNullOrBlank() || expNode.expression.isNullOrEmpty()){
+                this.buildCriteriaFromRawExpressionNode(expNode.children.first(),criteriaItems)
+            } else if(criteriaItems.containsKey(expNode.expression)){
+                criteriaItems[expNode.expression]
+            } else{
+                throw ModelErrorException("不存在条件"+expNode.expression)
+            }
+        }
+        else{
+            val exps = arrayListOf<ModelExpression>()
+            expNode.children.forEach {
+                val cc = this.buildCriteriaFromRawExpressionNode(it,criteriaItems)
+                cc?.let {
+                    exps.add(cc)
+                }
+            }
+            if(expNode.operator==AtomRuleCriteriaScanner.OPERATOR_AND && exps.count()>0){
+                return and(*exps.toTypedArray())
+            }
+            else if(expNode.operator == AtomRuleCriteriaScanner.OPERATOR_OR && exps.count()>0){
+                return or(*exps.toTypedArray())
+            }
+        }
+        return null
+    }
+    private fun createCustomCriteria(criteria:String?,model: AccessControlModel):ModelExpression?{
+        val ret = model.createModelRuleCustomCriteria(criteria,this)
+        if(ret.first){
+            return ret.second
+        }
+        criteria?.let {
+            var c = AtomRuleCriteriaScanner().scan(criteria)
+            c?.let {
+                try{
+                    return this.buildModelCriteriaFromRawExpressionNode(c,model)
+                }
+                catch (ex:Exception){
+                    ex.printStackTrace()
+                    this.logger.error(ex.toString())
+                }
+            }
+        }
+        return null
+    }
+    private fun buildModelCriteriaFromRawExpression(expression:String,
+                                                    model:AccessControlModel):ModelExpression?{
+        var field = null as FieldBase?
+        var operator=""
+        run {
+            model.fields.getAllFields().forEach {sf->
+                val p = Regex("^"+sf.value.propertyName+"([\\s=><!]+)").find(expression,0)?.groupValues
+                p?.let {
+                    if(p.count()>0){
+                        operator=p[0].replace(" ","")
+                        field=sf.value
+                    }
+                }
+            }
+        }
+        field?.let {
+            when(operator){
+                ">"->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return gt(field!!,rV)
+                    }
+                }
+                "<"->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return lt(field!!,rV)
+                    }
+                }
+                "="->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return eq(field!!,rV)
+                    }
+                }
+                ">="->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return gtEq(field!!,rV)
+                    }
+                }
+                "<="->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return ltEq(field!!,rV)
+                    }
+                }
+                "!="->{
+                    val v = expression.substringAfter(operator)
+                    val rV = ModelFieldConvert.toTypeValue(field,v)
+                    rV?.let {
+                        return notEq(field!!,rV)
+                    }
+                }
+                else->{
+
+                }
+            }
+        }
+        return null
+    }
+    private fun buildModelCriteriaFromRawExpressionNode(expNode:AtomRuleCriteriaScanner.RawExpressionNode,
+                                                        model:AccessControlModel):ModelExpression?{
+        if(expNode.operator.isNullOrBlank() || expNode.operator.isNullOrEmpty()){
+            return if(expNode.expression.isNullOrBlank() || expNode.expression.isNullOrEmpty()){
+                this.buildModelCriteriaFromRawExpressionNode(expNode.children.first(),model)
+            } else{
+               this.buildModelCriteriaFromRawExpression(expNode.expression,model)
+            }
+        }
+        else{
+            val exps = arrayListOf<ModelExpression>()
+            expNode.children.forEach {
+                val cc = this.buildModelCriteriaFromRawExpressionNode(it,model)
+                cc?.let {
+                    exps.add(cc)
+                }
+            }
+            if(expNode.operator==AtomRuleCriteriaScanner.OPERATOR_AND && exps.count()>0){
+                return and(*exps.toTypedArray())
+            }
+            else if(expNode.operator == AtomRuleCriteriaScanner.OPERATOR_OR && exps.count()>0){
+                return or(*exps.toTypedArray())
+            }
+        }
+        return null
+    }
+    private fun createIsolationCriteria(isolation:String,model:AccessControlModel):ModelExpression{
+        val ret = model.createModelRuleIsolationCriteria(isolation,this)
+        if(ret.first){
+            return ret.second?:eq(model.createPartnerID,this.partnerID)
+        }
+        return if(isolation=="corp"){
+            eq(model.createCorpID,this.corpID)
+        }
+        else{
+            eq(model.createPartnerID,this.partnerID)
+        }
+    }
+    private fun createTargetPartnerCriteria(targetPartners:ArrayList<Long>,model:AccessControlModel):ModelExpression?{
+        val ret = model.createModelRuleTargetPartnerCriteria(targetPartners,this)
+        if(ret.first){
+            return ret.second
+        }
+        if(targetPartners.count()<1){
+            return null
+        }
+        var tps = targetPartners.clone() as ArrayList<Long>
+        this.partnerID?.let {
+            tps.add(it)
+        }
+        return `in`(model.createPartnerID,tps.toArray())
+    }
+    private fun createTargetDepartmentCriteria(targetDepartments:ArrayList<Long>,
+                                               model:AccessControlModel):ModelExpression?{
+        val ret = model.createModelRuleTargetDepartmentCriteria(targetDepartments,this)
+        if(ret.first){
+            return ret.second
+        }
+
+        if(targetDepartments.count()<1){
+            return null
+        }
+        if(this.departmentPartnerRel!=null &&
+                this.departmentPartnerRelPartnerField!=null &&
+                this.departmentDepartmentRelDepartmentField!=null){
+            val subSelect  = select(this.departmentPartnerRelPartnerField!!,fromModel = this.departmentPartnerRel!!).where(
+                    `in`(this.departmentDepartmentRelDepartmentField!!,targetDepartments.toArray())
+            )
+            return or(eq(model.createPartnerID,this.partnerID),`in`(model.createPartnerID, subSelect))
+        }
+       return null
+    }
+    private fun createTargetRoleCriteria(targetRoles:ArrayList<Long>,
+                                         model:AccessControlModel):ModelExpression?{
+        val ret = model.createModelRuleTargetRoleCriteria(targetRoles,this)
+        if(ret.first){
+            return ret.second
+        }
+        if(targetRoles.count()<1){
+            return null
+        }
+
+        val subSelect  = select(BaseCorpPartnerRel.ref.partner,fromModel = BaseCorpPartnerRel.ref).where(
+                `in`(BaseCorpPartnerRel.ref.partnerRole,targetRoles.toArray())
+        )
+        return or(eq(model.createPartnerID,this.partnerID),`in`(model.createPartnerID, subSelect))
     }
 
-    fun  checkReadBelongToPartner(model:ModelBase):Boolean{
-        val readRule = this.getReadModelRule(model.meta.appName,model.meta.name)
-        return  if(readRule?.checkBelongToPartner!=null) readRule.checkBelongToPartner > 0 else false
+    fun getReadAccessControlCriteria(model:AccessControlModel):ModelExpression?{
+
+        val safeCriteria = this.createSafeCriteria(model)
+        if(safeCriteria!=null){
+            return safeCriteria
+        }
+
+        val roleCriteria = model.createRoleRuleCriteria(this,ActionType.READ)
+        if(roleCriteria!=null){
+            return roleCriteria
+        }
+
+        var mr = this.currRole?.getModelRule(model)
+        mr?.readAction?.let {
+            //maybe cached
+            var criterias = mutableMapOf<String,ModelExpression>()
+            this.createCustomCriteria(it.criteria,model)?.let{cIT->
+                criterias.put("E",cIT)
+            }
+            criterias.put("A",this.createIsolationCriteria(it.isolation,model))
+            this.createTargetPartnerCriteria(it.targetPartners,model)?.let {pIT->
+                criterias.put("D",pIT)
+            }
+            this.createTargetDepartmentCriteria(it.targetDepartments,model)?.let {dIT->
+                criterias.put("C",dIT)
+            }
+            this.createTargetRoleCriteria(it.targetRoles,model)?.let {
+                rIT->
+                criterias.put("B",rIT)
+            }
+            if(it.overrideCriteria!=null){
+                this.createOverrideCriteria(it.overrideCriteria,criterias)?.let {oIT->
+                    return oIT
+                }
+            }
+            return if(criterias.count()>1) and(*criterias.values.toTypedArray()) else  criterias.values.first()
+        }
+        return eq(model.createPartnerID,this.partnerID)
     }
 
+    fun getDeleteAccessControlCriteria(model:AccessControlModel):ModelExpression?{
+        val safeCriteria = this.createSafeCriteria(model)
+        if(safeCriteria!=null){
+            return safeCriteria
+        }
+
+        val roleCriteria = model.createRoleRuleCriteria(this,ActionType.DELETE)
+        if(roleCriteria!=null){
+            return roleCriteria
+        }
+        var mr = this.currRole?.getModelRule(model)
+        mr?.deleteAction?.let {
+            //maybe cached
+            var criterias = mutableMapOf<String,ModelExpression>()
+            this.createCustomCriteria(it.criteria,model)?.let{cIT->
+                criterias.put("E",cIT)
+            }
+            criterias.put("A",this.createIsolationCriteria(it.isolation,model))
+            this.createTargetPartnerCriteria(it.targetPartners,model)?.let {pIT->
+                criterias.put("D",pIT)
+            }
+            this.createTargetDepartmentCriteria(it.targetDepartments,model)?.let {dIT->
+                criterias.put("C",dIT)
+            }
+            this.createTargetRoleCriteria(it.targetRoles,model)?.let {
+                rIT->
+                criterias.put("B",rIT)
+            }
+            if(it.overrideCriteria!=null){
+                this.createOverrideCriteria(it.overrideCriteria,criterias)?.let {oIT->
+                    return oIT
+                }
+            }
+            return if(criterias.count()>1) and(*criterias.values.toTypedArray()) else  criterias.values.first()
+        }
+        return eq(model.createPartnerID,this.partnerID)
+    }
+
+    fun getCreateAccessControlCriteria(model:AccessControlModel):ModelExpression?{
+        return null
+    }
+
+    fun getAcModelFields(fields:Array<FieldBase>,
+                         model:AccessControlModel,
+                         acType:ActionType):Array<FieldBase>{
+        var mr = this.currRole?.getModelRule(model)
+        mr?.let {
+            when (acType) {
+                ActionType.CREATE -> {
+                    return this.removeTargetFields(fields,model,it.readAction.fields)
+                }
+                ActionType.EDIT -> {
+                    return this.removeTargetFields(fields,model,it.editAction.fields)
+                }
+                ActionType.READ -> {
+                    return this.removeTargetFields(fields,model,it.readAction.fields)
+                }
+                else->{
+
+                }
+            }
+        }
+        return fields
+    }
+    fun checkACModelOwnerRelation(model: AccessControlModel,acType: ActionType):Boolean{
+        if(this.currRole?.isSuper!=false){
+            return false
+        }
+        var modelRule  = this.currRole?.getModelRule(model)
+        modelRule?.let {
+            when(acType){
+                ActionType.EDIT->{
+                    return it.editAction.isolation!="corp"
+                }
+                ActionType.READ->{
+                    return it.readAction.isolation!="corp"
+                }
+                ActionType.DELETE->{
+                    return it.deleteAction.isolation!="corp"
+                }
+                ActionType.CREATE->{
+                    return it.createAction.isolation!="corp"
+                }
+            }
+        }
+        return true
+    }
+    fun canReadModelField(field:FieldBase,
+                          model:AccessControlModel):Boolean{
+        val mr = this.currRole?.getModelRule(model)
+        if(mr!=null && field.propertyName in mr.readAction.fields){
+            return false
+        }
+        return true
+    }
+
+    private fun removeTargetFields(targetFields:Array<FieldBase>,
+                                   model:AccessControlModel,
+                                   rmFields: ArrayList<String>):Array<FieldBase>{
+        if(rmFields.count()<1){
+            return targetFields
+        }
+        var res = arrayListOf<FieldBase>()
+        targetFields.forEach {
+            if(it.propertyName !in rmFields){
+                res.add(it)
+            }
+        }
+        return res.toTypedArray()
+    }
     private  fun buildCorpCache(corpID:Long,
                                 corpObject: dynamic.model.query.mq.ModelDataObject,
                                 partnerRoleObject: dynamic.model.query.mq.ModelDataObject):CorpCache{
@@ -129,8 +556,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         var roleName=partnerRoleObject.data.getValue(BasePartnerRole.ref.name) as String
         var isSuper=(partnerRoleObject.data.getValue(BasePartnerRole.ref.isSuper) as Int)>0
         var name=corpObject.data.getValue(BaseCorp.ref.name) as String
-        var acRuleMeta = partnerRoleObject.data.getValue(BasePartnerRole.ref.modelRule) as String?
-        var  role=CorpPartnerRoleCache(roleID,roleName,isSuper,acRuleMeta)
+        var  role=CorpPartnerRoleCache(roleID,roleName,isSuper)
         return CorpCache(corpID,name, mutableMapOf(role.id to role))
     }
 
@@ -165,7 +591,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                     val tag = "$app.$t.$it"
                     val rv=this.currRole?.viewRules?.get(tag)
                     if(rv!=null){
-                        if(rv.enable!="false"){
+                        if(rv.enable){
                             toKeys.add(it)
                         }
                     }
@@ -187,8 +613,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         var menu = UICache.ref.getMenu(app,name)
         if(menu!=null){
             var ruleMenu = menu.createCopy() as MenuTree?
-            val tag = "$app.$name"
-            var mr = this.currRole?.menuRules?.get(tag)
+            var mr = this.currRole?.menuRules?.get(app)
             if(mr!=null){
                 ruleMenu = this.applyMenuRule(ruleMenu,mr) as MenuTree?
             }
@@ -197,92 +622,24 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         return null
     }
 
-
-
-
-    private fun removeMenuChild(menu:MenuNode,app:String,name:String){
-        var index=menu.children?.indexOfFirst {
-            it is MenuTree && it.name==name && it.app == app
-        }
-        if(index!=null && index>-1){
-            menu.children?.removeAt(index)
-        }
-    }
-    private fun removeMenuItemChild(menu:MenuNode,app:String,model:String,viewType:String){
-        var index=menu.children?.indexOfFirst {
-            it is MenuNode
-                    && it !is MenuTree
-                    && it.model==model
-                    && it.viewType==viewType
-                    && it.app == app
-        }
-        if(index!=null && index>-1){
-            menu.children?.removeAt(index)
-        }
-    }
-    private  fun removeMenuChild(menu:MenuNode,index:Int){
-        if(index>-1){
-            menu.children?.removeAt(index)
-        }
-    }
-    private  fun findMenuChildIndex(menu:MenuNode,app:String,name:String):Int?{
-        return menu.children?.indexOfFirst {
-            it is MenuTree && it.name==name && it.app == app
-        }
-    }
-    private fun findMenuItemChildIndex(menu:MenuNode,app:String,model:String,viewType:String):Int?{
-        return menu.children?.indexOfFirst {
-            it is MenuNode
-                    && it !is MenuTree
-                    && it.model==model
-                    && it.viewType==viewType
-                    && it.app == app
-        }
-
-    }
     private fun applyMenuRule(menu: MenuNode?, rule:CorpPartnerRoleCache.MenuRule):MenuNode?{
-        if(menu==null || rule.visible=="false"){
+        if(menu==null){
             return null
         }
-        rule.children.forEach {
-            when(it.type){
-                CorpPartnerRoleCache.MenuRule.MenuType.MENU->{
-                    if(it.visible=="false"){
-                        removeMenuChild(menu,it.app,it.name)
-                    }
-                    else{
-                        var index=findMenuChildIndex(menu,it.app,it.name)
-                        if(index!=null && index>-1){
-                            var subMenuNode= menu.children?.get(index)
-                            var newChild=applyMenuRule(subMenuNode,it)
-                            if(newChild!=null){
-                                menu.children?.set(index,newChild)
-                            }
-                            else{
-                                removeMenuChild(menu,index)
-                            }
-                        }
-                    }
-                }
-                CorpPartnerRoleCache.MenuRule.MenuType.MENU_ITEM->{
-                    if(it.visible=="false"){
-                        removeMenuItemChild(menu,it.app,it.model,it.viewType)
-                    }
-                    else{
-                        var index = findMenuItemChildIndex(menu,it.app,it.model,it.viewType)
-                        if(index!=null && index>-1){
-                            var subMenuNode= menu.children?.get(index)
-                            var newChild=applyMenuRule(subMenuNode,it)
-                            if(newChild!=null){
-                                menu.children?.set(index,newChild)
-                            }
-                            else{
-                                removeMenuChild(menu,index)
-                            }
-                        }
-                    }
-                }
+        if(menu!!.key in rule.filterKeys){
+            return null
+        }
+        var index = menu.children?.indexOfFirst {
+            it.key in rule.filterKeys
+        }
+        while (index!=null && index>-1){
+            menu.children?.removeAt(index)
+            index = menu.children?.indexOfFirst {
+                it.key in rule.filterKeys
             }
+        }
+        menu.children?.forEach {
+            this.applyMenuRule(it,rule)
         }
         return menu
     }
@@ -309,29 +666,24 @@ class PartnerCache(partnerData:Map<String,Any?>?,
             var tgRule = this.getActionGroupRule(tg,
                     refActionGroup.app,
                     refActionGroup.model,
-                    refActionGroup.viewType)?.groupRules?.get(refActionGroup.groupName)
+                    refActionGroup.viewType)
             if(tg!=null){
-                if(tgRule!=null && tgRule.visible == "false") {
-                        return null
-                }
                 var cloneTG = tg.createCopy()
-                if(tgRule!=null){
-                    if(tgRule.visible=="false"){
-                        return null
+                var rmTriggers = arrayListOf<Trigger>()
+                tgRule?.forEach { u->
+                    var t=cloneTG.triggers.firstOrNull {tit->
+                        tit.name==u.triggerName
                     }
-                    tg.enable=tgRule.enable
-
-
-                    tgRule.triggerRules.forEach { t, u ->
-                        var t=cloneTG.triggers.firstOrNull {tit->
-                            tit.name==u.name
+                    if(t!=null){
+                        if(!u.visible){
+                           rmTriggers.add(t)
                         }
-                        if(t!=null){
-                            t.enable= if(t.enable!=null && u.enable!=null) "(${t.enable}) and (${u.enable})" else t.enable?:u.enable
-                            t.visible= if(t.visible!=null && u.visible!=null) "(${t.visible}) and (${u.visible})" else t.visible?:u.visible
+                        else{
+                            t.visible= if(t.visible!=null && u.exp!=null) "(${t.visible}) and (${u.exp})" else t.visible?:u.exp
                         }
                     }
                 }
+                cloneTG.triggers.removeAll(rmTriggers)
                 refActionGroup.triggers.forEach { u->
                     var t=cloneTG.triggers.firstOrNull {tit->
                         tit.name==u.name
@@ -355,54 +707,48 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         }
         return null
     }
-    fun getActionGroupRule(tg:TriggerGroup?,app:String,model:String,viewType:String):CorpPartnerRoleCache.ActionRule?{
+    private fun getActionGroupRule(tg:TriggerGroup?,app:String,model:String,viewType:String):List<CorpPartnerRoleCache.ViewRule.GroupTriggerRule>?{
         if(tg==null){
             return null
         }
-        if(this.currRole?.actionRules!=null){
+        if(this.currRole?.viewRules!=null){
             return this.getActionGroupRuleImp(tg,app,model,viewType)
         }
         return null
     }
-    private fun getActionGroupRuleImp(tg:TriggerGroup,app:String,model:String,viewType:String):CorpPartnerRoleCache.ActionRule?{
+    private fun getActionGroupRuleImp(tg:TriggerGroup,app:String,model:String,viewType:String):List<CorpPartnerRoleCache.ViewRule.GroupTriggerRule>?{
         var tag ="$app.$model.$viewType"
-        var ar= this.currRole?.actionRules?.get(tag)
+        var ar= this.currRole?.viewRules?.get(tag)
         if(ar!=null){
-            return ar
-        }
-        if(app!="*" && model!="*"){
-            return this.getActionGroupRuleImp(tg,"*",model,viewType)
-        }
-        if(app=="*" && model!="*"){
-            return this.getActionGroupRuleImp(tg,"*","*",viewType)
+            return ar?.groupTriggerRules?.filter {
+                it.groupName == tg.name
+            }.toList()
         }
         return null
     }
-    private fun applyViewRule(mv:ModelView?,rule:CorpPartnerRoleCache.ViewRule):ModelView?{
+
+    private fun applyViewRule(mv:ModelView?,
+                              rule:CorpPartnerRoleCache.ViewRule):ModelView?{
         if(mv!=null){
-            if(rule.visible=="false"){
+            if(!rule.enable){
                 return null
             }
-            mv.enable=rule.enable
             rule.fieldRules.forEach {
                var tf= mv.fields.find{f->
                     f.name == it.name
                 }
                 if(tf!=null){
-                    if(it.enable=="false"){
+                    if(!it.visible){
                         mv.fields.remove(tf)
                     }
                     else{
-                        if(it.visible!=null){
+                        if(it.exp!=null){
                             if(tf.visible==null){
-                                tf.visible=it.visible
+                                tf.visible=it.exp
                             }
                             else{
-                                tf.visible="(${tf.visible}) and (${it.visible})"
+                                tf.visible="(${tf.visible}) and (${it.exp})"
                             }
-                        }
-                        if(it.subViewRule!=null){
-                            tf.fieldView=applyViewRule(tf.fieldView,it.subViewRule as CorpPartnerRoleCache.ViewRule)
                         }
                     }
                 }
@@ -410,5 +756,4 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         }
         return mv
     }
-
 }
