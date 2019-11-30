@@ -196,31 +196,12 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         var ruleCriteria=criteria
         val newQueryFields = arrayListOf<FieldBase>()
         if (useAccessControl && partnerCache!=null){
-            val models = arrayListOf<ModelBase>(model)
-            joinModels?.let {
-                it.forEach { sit->
-                    sit.model?.let {
-                        models.add(it)
-                    }
-                }
-            }
-
-            var acModelRuleCriteria = null as ModelExpression?
-            models.forEach {
-                val mc = partnerCache?.getReadAccessControlCriteria(model as AccessControlModel)
-                acModelRuleCriteria = if(acModelRuleCriteria!=null){
-                    if(mc!=null) and(acModelRuleCriteria!!,mc!!)
-                    else acModelRuleCriteria
-                }
-                else mc
-            }
-
-            ruleCriteria = if(acModelRuleCriteria!=null){
-                if(ruleCriteria!=null) and(acModelRuleCriteria!!,ruleCriteria) else acModelRuleCriteria
+            val mc = partnerCache?.getReadAccessControlCriteria(model as AccessControlModel)
+            ruleCriteria = if(mc!=null){
+                if(ruleCriteria!=null) and(mc!!,ruleCriteria) else mc
             } else{
-                this.readCorpIsolation(model,partnerCache!!,ruleCriteria)
+                this.readCorpIsolation(model,partnerCache!!,mc)
             }
-
 
             queryFields.forEach { fit->
                 fit.model?.let {
@@ -237,13 +218,13 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     }
                     if(filters!=null){
                         for (f in (filters as MutableList)){
-                            if(f(fit,partnerCache!!,null).first){
+                            if(f(fit,partnerCache,null).first){
                                 return@forEach
                             }
                         }
                     }
 
-                    if(partnerCache!!.canReadModelField(fit,it as AccessControlModel)){
+                    if(partnerCache.canReadModelField(fit,it as AccessControlModel)){
                         newQueryFields.add(fit)
                     }
                 }
@@ -251,6 +232,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         }
         else if(useAccessControl){
             throw ModelErrorException("权限错误")
+        }
+        else if(partnerCache!=null){
+            ruleCriteria=this.readCorpIsolation(model,partnerCache,ruleCriteria)
         }
         else{
             newQueryFields.addAll(queryFields)
@@ -368,7 +352,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(!it.readAction.enable){
+            if(it.readAction?.enable == false){
                 return null
             }
         }
@@ -1198,7 +1182,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(!it.createAction.enable){
+            if(it.createAction?.enable == false){
 
             }
         }
@@ -1223,7 +1207,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         val model = modelDataObject.model?:this
         val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-           it.editAction.fields.forEach {
+           it.editAction?.fields?.forEach {
                modelDataObject.removeFieldValue(it)
            }
         }
@@ -1262,7 +1246,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(!it.createAction.enable){
+            if(it.createAction?.enable==false){
                 return Pair(false,"没有添加权限")
             }
         }
@@ -1311,7 +1295,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
 
         val modelRule = partnerCache.getModelRule(model.meta.appName,model.meta.name)
         modelRule?.let {
-            if(!it.editAction.enable){
+            if(it.editAction?.enable==false){
                 return Pair(false,"没有更新权限")
             }
         }
@@ -1695,6 +1679,9 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                 }
                 tCriteria= this.editCorpIsolationBean(modelDataObject,partnerCache!!,tCriteria)?.second
             }
+            else if(partnerCache!=null){
+                tCriteria= this.editCorpIsolationBean(modelDataObject,partnerCache,tCriteria)?.second
+            }
 
             modelDataObject.data.forEach {
                 when(it.field){
@@ -1936,7 +1923,7 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
         model?.let {
             val modelRule = partnerCache?.getModelRule(model.meta.appName,model.meta.name)
             modelRule?.let {
-                if(!it.deleteAction.enable){
+                if(it.deleteAction?.enable==false){
                     return Pair(false,"无删除权限")
                 }
             }
@@ -2049,6 +2036,14 @@ abstract  class AccessControlModel(tableName:String,schemaName:String): ModelBas
                     } else acCriteria
                 }
 
+                val corpIsolationCriteria = deleteCorpIsolationBean(modelDataObject,
+                        partnerCache = partnerCache!!,
+                        criteria=tCriteria)
+                if(corpIsolationCriteria.first && corpIsolationCriteria.second!=null){
+                    tCriteria = corpIsolationCriteria.second
+                }
+            }
+            else if(partnerCache!=null){
                 val corpIsolationCriteria = deleteCorpIsolationBean(modelDataObject,
                         partnerCache = partnerCache!!,
                         criteria=tCriteria)

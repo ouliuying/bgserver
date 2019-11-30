@@ -121,6 +121,7 @@ open class AtomRuleCriteriaScanner {
                             }
                             else -> {
                                 expItem.append(test_c)
+                                index++
                             }
                         }
                     } else {
@@ -168,6 +169,7 @@ open class AtomRuleCriteriaScanner {
                     }
                     expItem.append(tempExp[index])
                 }
+                index++
             }
         } while (index < len)
 

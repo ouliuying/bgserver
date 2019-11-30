@@ -122,7 +122,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
             u.modelRules.forEach { t, u ->
 
                 val model = u.model
-                u.createAction.ruleBeans.forEach {
+                u.createAction?.ruleBeans?.forEach {
                     var tag = "${app}.${model}"
                     var bean =  this.createCreateAccessControlRuleBean(it)
                     if(bean!=null && this.modelCreateAccessControlRules.containsKey(tag)){
@@ -133,7 +133,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                         this.modelCreateAccessControlRules[tag] =beans
                     }
                 }
-                u.readAction.ruleBeans.forEach {
+                u.readAction?.ruleBeans?.forEach {
                     var tag = "${app}.${model}"
                     var bean =  this.createReadAccessControlRuleBean(it)
                     if(bean!=null && this.modelReadAccessControlRules.containsKey(tag)){
@@ -145,7 +145,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                     }
                 }
 
-                u.editAction.ruleBeans.forEach {
+                u.editAction?.ruleBeans?.forEach {
                     var tag = "${app}.${model}"
                     var bean =  this.createEditAccessControlRuleBean(it)
                     if(bean!=null && this.modelReadAccessControlRules.containsKey(tag)){
@@ -157,7 +157,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                     }
                 }
 
-                u.deleteAction.ruleBeans.forEach {
+                u.deleteAction?.ruleBeans?.forEach {
                     var tag = "${app}.${model}"
                     var bean =  this.createDeleteAccessControlRuleBean(it)
                     if(bean!=null && this.modelDeleteAccessControlRules.containsKey(tag)){
@@ -305,6 +305,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                 try {
                     val appRule = this.appRules[app]?: AppRule(app)
                     val acJA = this.gson.fromJson(modelRule,JsonArray::class.java)
+                    val appModelRule = ModelRule(model)
+                    appRule.modelRules[model]=appModelRule
                     acJA?.let {
                         acJA.forEach { acIT->
                             val aco = acIT as JsonObject
@@ -365,7 +367,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                                 }
                                 val criteria = aco.get("criteria")?.asString?:""
                                 val overrideCriteria = aco.get("overrideCriteria")?.asString?:""
-                                val appModelRule = ModelRule(model)
+
                                 when(accessType){
                                     "read"->{
                                         appModelRule.readAction = ModelRule.ReadAction(
@@ -410,6 +412,8 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
                             }
                         }
                     }
+
+                    this.appRules[app]=appRule
                 }
                 catch (ex:Exception){
                     ex.printStackTrace()
@@ -425,10 +429,10 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
     class ModelRule(val model:String){
 
-        lateinit var createAction:CreateAction
-        lateinit var readAction: ReadAction
-        lateinit var deleteAction: DeleteAction
-        lateinit var editAction: EditAction
+        var createAction:CreateAction?=null
+        var readAction: ReadAction?=null
+        var deleteAction: DeleteAction?=null
+        var editAction: EditAction?=null
 
         class RuleBean(val name:String,val config:String)
         open class ModelRuleAction(val enable:Boolean,

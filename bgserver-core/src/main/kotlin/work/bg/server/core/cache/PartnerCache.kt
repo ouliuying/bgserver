@@ -34,7 +34,6 @@ import work.bg.server.core.context.ModelExpressionContext
 import work.bg.server.core.ui.*
 import work.bg.server.expression.AtomRuleCriteriaScanner
 import java.lang.Exception
-import kotlin.math.exp
 
 class PartnerCache(partnerData:Map<String,Any?>?,
                    val partnerID:Long?,
@@ -253,8 +252,8 @@ class PartnerCache(partnerData:Map<String,Any?>?,
             model.fields.getAllFields().forEach {sf->
                 val p = Regex("^"+sf.value.propertyName+"([\\s=><!]+)").find(expression,0)?.groupValues
                 p?.let {
-                    if(p.count()>0){
-                        operator=p[0].replace(" ","")
+                    if(p.count()>1){
+                        operator=p[1].replace(" ","")
                         field=sf.value
                     }
                 }
@@ -263,42 +262,42 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         field?.let {
             when(operator){
                 ">"->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return gt(field!!,rV)
                     }
                 }
                 "<"->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return lt(field!!,rV)
                     }
                 }
                 "="->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return eq(field!!,rV)
                     }
                 }
                 ">="->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return gtEq(field!!,rV)
                     }
                 }
                 "<="->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return ltEq(field!!,rV)
                     }
                 }
                 "!="->{
-                    val v = expression.substringAfter(operator)
+                    val v = expression.substringAfter(operator).trim()
                     val rV = ModelFieldConvert.toTypeValue(field,v)
                     rV?.let {
                         return notEq(field!!,rV)
@@ -349,6 +348,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
             eq(model.createPartnerID,this.partnerID)
         }
     }
+
     private fun createTargetPartnerCriteria(targetPartners:ArrayList<Long>,model:AccessControlModel):ModelExpression?{
         val ret = model.createModelRuleTargetPartnerCriteria(targetPartners,this)
         if(ret.first){
@@ -361,8 +361,9 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         this.partnerID?.let {
             tps.add(it)
         }
-        return `in`(model.createPartnerID,tps.toArray())
+        return `in`(model.createPartnerID, tps.toArray())
     }
+
     private fun createTargetDepartmentCriteria(targetDepartments:ArrayList<Long>,
                                                model:AccessControlModel):ModelExpression?{
         val ret = model.createModelRuleTargetDepartmentCriteria(targetDepartments,this)
@@ -383,6 +384,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         }
        return null
     }
+
     private fun createTargetRoleCriteria(targetRoles:ArrayList<Long>,
                                          model:AccessControlModel):ModelExpression?{
         val ret = model.createModelRuleTargetRoleCriteria(targetRoles,this)
@@ -418,7 +420,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
             this.createCustomCriteria(it.criteria,model)?.let{cIT->
                 criterias.put("E",cIT)
             }
-            criterias.put("A",this.createIsolationCriteria(it.isolation,model))
+            criterias["A"] = this.createIsolationCriteria(it.isolation,model)
             this.createTargetPartnerCriteria(it.targetPartners,model)?.let {pIT->
                 criterias.put("D",pIT)
             }
@@ -429,7 +431,7 @@ class PartnerCache(partnerData:Map<String,Any?>?,
                 rIT->
                 criterias.put("B",rIT)
             }
-            if(it.overrideCriteria!=null){
+            if(it.overrideCriteria!=null && !it.overrideCriteria.isNotBlank()){
                 this.createOverrideCriteria(it.overrideCriteria,criterias)?.let {oIT->
                     return oIT
                 }
@@ -488,13 +490,13 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         mr?.let {
             when (acType) {
                 ActionType.CREATE -> {
-                    return this.removeTargetFields(fields,model,it.readAction.fields)
+                    return this.removeTargetFields(fields,model,it.readAction?.fields)
                 }
                 ActionType.EDIT -> {
-                    return this.removeTargetFields(fields,model,it.editAction.fields)
+                    return this.removeTargetFields(fields,model,it.editAction?.fields)
                 }
                 ActionType.READ -> {
-                    return this.removeTargetFields(fields,model,it.readAction.fields)
+                    return this.removeTargetFields(fields,model,it.readAction?.fields)
                 }
                 else->{
 
@@ -509,18 +511,18 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         }
         var modelRule  = this.currRole?.getModelRule(model)
         modelRule?.let {
-            when(acType){
+            return when(acType){
                 ActionType.EDIT->{
-                    return it.editAction.isolation!="corp"
+                    it.editAction?.isolation!="corp"
                 }
                 ActionType.READ->{
-                    return it.readAction.isolation!="corp"
+                    it.readAction?.isolation!="corp"
                 }
                 ActionType.DELETE->{
-                    return it.deleteAction.isolation!="corp"
+                    it.deleteAction?.isolation!="corp"
                 }
                 ActionType.CREATE->{
-                    return it.createAction.isolation!="corp"
+                    it.createAction?.isolation!="corp"
                 }
             }
         }
@@ -529,16 +531,19 @@ class PartnerCache(partnerData:Map<String,Any?>?,
     fun canReadModelField(field:FieldBase,
                           model:AccessControlModel):Boolean{
         val mr = this.currRole?.getModelRule(model)
-        if(mr!=null && field.propertyName in mr.readAction.fields){
-            return false
+        if(mr?.readAction!=null){
+            if(field.propertyName in mr.readAction!!.fields){
+                return false
+            }
         }
+
         return true
     }
 
     private fun removeTargetFields(targetFields:Array<FieldBase>,
                                    model:AccessControlModel,
-                                   rmFields: ArrayList<String>):Array<FieldBase>{
-        if(rmFields.count()<1){
+                                   rmFields: ArrayList<String>?):Array<FieldBase>{
+        if(rmFields==null || rmFields.count()<1){
             return targetFields
         }
         var res = arrayListOf<FieldBase>()
@@ -626,6 +631,9 @@ class PartnerCache(partnerData:Map<String,Any?>?,
         if(menu==null){
             return null
         }
+        if(this.currRole!=null && this.currRole!!.isSuper){
+            return menu
+        }
         if(menu!!.key in rule.filterKeys){
             return null
         }
@@ -646,6 +654,9 @@ class PartnerCache(partnerData:Map<String,Any?>?,
 
     fun getAccessControlModelView(app:String,model:String,viewType:String):ModelView?{
         val mv=UICache.ref.getModelView(app,model,viewType)
+        if(this.currRole!=null && this.currRole!!.isSuper){
+            return mv
+        }
         if(mv!=null){
             var tag="$app.$model.$viewType"
             var vRule=this.currRole?.viewRules?.get(tag)

@@ -38,6 +38,8 @@ import java.sql.ResultSet
 import dynamic.model.query.mq.update as mqUpdate
 import dynamic.model.query.mq.create as mqCreate
 import java.lang.StringBuilder
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
@@ -175,6 +177,15 @@ abstract class ModelBase(val tableName:String,val schemaName:String = "public"){
                         fva.getValue(idField)
                     }
                 }
+            }
+            is Array<*>->{
+                return  listOf(value.toList())
+            }
+            is ArrayList<*>->{
+                return  listOf(value.toTypedArray())
+            }
+            is List<*>->{
+                return listOf(value)
             }
             else-> return value
         }

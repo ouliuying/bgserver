@@ -290,8 +290,19 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             if(expression.valueSet!=null)
             {
                 var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
-                this.namedSql.append(namedColumnName)
-                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
+                //  mysql
+                // postgresql for jdbc array
+                var index = 0
+                expression.valueSet.forEach {
+                    if(index>0){
+                        this.namedSql.append(",${namedColumnName}_in_${index}")
+                    }
+                    else{
+                        this.namedSql.append("${namedColumnName}_in_${index}")
+                    }
+                    this.namedParameters["${ColumnKeyName}_in_${index}"]= FieldValue(expression.field, it)
+                    index++
+                }
             }
             else{
                 this.accept(expression.criteria,expression)
@@ -306,7 +317,20 @@ class ModelCriteriaRender: ModelExpressionVisitor {
             {
                 var (namedColumnName,ColumnKeyName)=this.tableColumnNameGenerator.generateNamedParameter(columnName)
                 this.namedSql.append(namedColumnName)
-                this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
+
+                var index = 0
+                expression.valueSet.forEach {
+                    if(index>0){
+                        this.namedSql.append(",${namedColumnName}_in_${index}")
+                    }
+                    else{
+                        this.namedSql.append("${namedColumnName}_in_${index}")
+                    }
+                    this.namedParameters["${ColumnKeyName}_in_${index}"]= FieldValue(expression.field, it)
+                    index++
+                }
+
+               // this.namedParameters[ColumnKeyName]= FieldValue(expression.field, expression.valueSet)
             }
             else{
                 this.accept(expression.criteria,expression)
