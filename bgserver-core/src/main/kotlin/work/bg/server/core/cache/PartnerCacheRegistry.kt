@@ -62,6 +62,13 @@ class PartnerCacheRegistry{
                             }
                         })
     }
+    fun refreshCorp(corpID:Long){
+        this.partnersCache?.asMap()?.keys?.forEach {
+            if(corpID == it.corpID){
+                this.partnersCache?.refresh(it)
+            }
+        }
+    }
     protected  fun createPartnerCache(partnerKey:PartnerCacheKey): PartnerCache {
 
         try {

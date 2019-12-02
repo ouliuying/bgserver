@@ -246,7 +246,7 @@ class CorpPartnerRoleCache(val id:Long,val name:String,val isSuper:Boolean=false
 
 
     private fun buildViewRule(){
-        val modelDatas = BasePartnerRoleModelViewRule.ref.rawRead(criteria = eq(BasePartnerRoleModelViewRule.ref.id,this.id))?.toModelDataObjectArray()
+        val modelDatas = BasePartnerRoleModelViewRule.ref.rawRead(criteria = eq(BasePartnerRoleModelViewRule.ref.partnerRole,this.id))?.toModelDataObjectArray()
         modelDatas?.forEach {
             var app = it.getFieldValue(BasePartnerRoleModelViewRule.ref.app) as String?
             val model  = it.getFieldValue(BasePartnerRoleModelViewRule.ref.model) as String?

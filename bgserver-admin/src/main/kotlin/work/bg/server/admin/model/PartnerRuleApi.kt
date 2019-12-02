@@ -31,8 +31,10 @@ import dynamic.model.web.spring.boot.annotation.Action
 import dynamic.model.web.spring.boot.annotation.Model
 import dynamic.model.web.spring.boot.model.ActionResult
 import dynamic.model.web.spring.boot.model.AppModelWeb
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import work.bg.server.core.cache.PartnerCache
+import work.bg.server.core.cache.PartnerCacheRegistry
 import work.bg.server.core.model.*
 import work.bg.server.corp.model.Department
 import work.bg.server.util.TypeConvert
@@ -323,6 +325,17 @@ class PartnerRuleApi: ContextModel("base_partner_rule_api","public") {
         }
         ar.bag["totalCount"]=totalCount
         ar.bag["rows"]=rows
+        return ar
+    }
+    @Action("reloadRule")
+    fun reloadRule(partnerCache: PartnerCache):ActionResult{
+        var ar=ActionResult()
+        if(partnerCache.currRole?.isSuper == null || !partnerCache.currRole!!.isSuper){
+            return ar
+        }
+        partnerCache.corpID?.let {
+            partnerCacheRegistry?.refreshCorp(it)
+        }
         return ar
     }
 }
