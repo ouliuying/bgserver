@@ -93,6 +93,8 @@
             <field name="event.name" type="static"/>
             <field name="mobile" type="static"/>
             <field name="fax" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="telephone" type="static"/>
             <field name="email" type="static"/>
             <field name="website" type="static"/>
@@ -141,6 +143,8 @@
             <field name="event.name" type="selectModelFromListView"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
@@ -193,6 +197,8 @@
             <field name="event.name" type="selectModelFromListView"/>
             <field name="mobile" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
@@ -264,6 +270,8 @@
             <field name="event.name" type="static"/>
             <field name="mobile" type="static"/>
             <field name="fax" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="telephone" type="static"/>
             <field name="email" type="static"/>
             <field name="department" type="static"/>
@@ -478,6 +486,8 @@
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="fax" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="commPartner.name" type="static"/>
             <field name="event.name" type="static"/>
             <field name="interactionStatus.name" type="static"/>
@@ -502,6 +512,8 @@
             <field name="corpName" type="singleLineText"/>
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
             <field name="fullAddress" type="chinaFullAddress"/>
             <field name="partners" style="relation"/>
@@ -526,6 +538,8 @@
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="fax" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="fullAddress" type="chinaFullAddress"/>
 
             <field name="partners" style="relation"/>
@@ -573,6 +587,8 @@
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="fax" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="toCustomer" type="static" visible="false"/>
             <field name="fullAddress" type="chinaFullAddressStatic"/>
             <field name="partners" style="relation"/>
@@ -669,6 +685,8 @@
             <field name="name" type="static" style="head"/>
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="email" type="static"/>
             <field name="department" type="static"/>
             <field name="sex" type="enumStatic">
@@ -695,6 +713,8 @@
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
             <field name="sex" type="select">
                 <meta>
@@ -724,6 +744,8 @@
             <field name="mobile" type="singleLineText"/>
             <field name="telephone" type="singleLineText"/>
             <field name="email" type="singleLineText"/>
+            <field name="qq" type="singleLineText"/>
+            <field name="weiXin" type="singleLineText"/>
             <field name="department" type="singleLineText"/>
             <field name="sex" type="select">
                 <meta>
@@ -756,6 +778,8 @@
             <field name="mobile" type="static"/>
             <field name="telephone" type="static"/>
             <field name="email" type="static"/>
+            <field name="qq" type="static"/>
+            <field name="weiXin" type="static"/>
             <field name="department" type="static"/>
             <field name="sex" type="enumStatic">
                 <meta>
@@ -780,7 +804,6 @@
         </div>
     </model>
     <model name="customerOpportunity" app="crm">
-
 
         <view type="searchBox">
             <field name="title" type="criteriaStringEqual">

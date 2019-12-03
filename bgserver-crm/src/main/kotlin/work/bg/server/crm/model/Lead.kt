@@ -79,6 +79,16 @@ class Lead:ContextModel("crm_lead","public") {
             FieldType.STRING,
             title = "传真",
             defaultValue = "")
+    val qq = ModelField(null,
+            "qq",
+            FieldType.STRING,
+            title = "QQ",
+            defaultValue = "")
+    val weiXin = ModelField(null,
+            "wei_xin",
+            FieldType.STRING,
+            title = "微信",
+            defaultValue = "")
     val province = ModelField(null,
             "province",
             FieldType.STRING,
@@ -177,6 +187,8 @@ class Lead:ContextModel("crm_lead","public") {
                     mo.setFieldValue(Customer.ref.mobile,modelData.getFieldValue(this.mobile))
                     mo.setFieldValue(Customer.ref.telephone,modelData.getFieldValue(this.telephone))
                     mo.setFieldValue(Customer.ref.fax,modelData.getFieldValue(this.fax))
+                    mo.setFieldValue(Customer.ref.qq,modelData.getFieldValue(this.qq))
+                    mo.setFieldValue(Customer.ref.weiXin,modelData.getFieldValue(this.weiXin))
                     mo.setFieldValue(Customer.ref.province,modelData.getFieldValue(this.province))
                     mo.setFieldValue(Customer.ref.city,modelData.getFieldValue(this.city))
                     mo.setFieldValue(Customer.ref.district,modelData.getFieldValue(this.district))
@@ -186,7 +198,6 @@ class Lead:ContextModel("crm_lead","public") {
                     eventData?.let {
                         mo.setFieldValue(Customer.ref.event,eventID)
                     }
-
                     val commPartnerObj = modelData.getFieldValue(this.commPartner)
                     val comPartnerID =  ModelDataObject.getModelDataObjectID(commPartnerObj)
                     comPartnerID?.let {

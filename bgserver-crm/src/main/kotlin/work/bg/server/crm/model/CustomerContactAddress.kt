@@ -45,6 +45,16 @@ class CustomerContactAddress:ContextModel("crm_customer_contact_address","public
     val mobile = ModelField(null, "mobile", FieldType.STRING, title = "手机", defaultValue = "")
     val telephone = ModelField(null, "telephone", FieldType.STRING, title = "电话", defaultValue = "")
     val email = ModelField(null, "email", FieldType.STRING, title = "email", defaultValue = "")
+    val qq = ModelField(null,
+            "qq",
+            FieldType.STRING,
+            title = "QQ",
+            defaultValue = "")
+    val weiXin = ModelField(null,
+            "wei_xin",
+            FieldType.STRING,
+            title = "微信",
+            defaultValue = "")
     val department = ModelField(null, "department", FieldType.STRING, title = "部门", defaultValue = "")
     val province = ModelField(null, "province", FieldType.STRING, title = "省", defaultValue = "")
     val city = ModelField(null, "city", FieldType.STRING, title = "市", defaultValue = "")

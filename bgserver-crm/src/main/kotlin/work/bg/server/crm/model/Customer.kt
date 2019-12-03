@@ -81,6 +81,21 @@ class Customer: ContextModel("crm_customer","public") {
             FieldType.STRING,
             title = "传真",
             defaultValue = "")
+
+    //公司属性
+    val qq = ModelField(null,
+            "qq",
+            FieldType.STRING,
+            title = "QQ",
+            defaultValue = "")
+
+    //公司属性
+    val weiXin = ModelField(null,
+            "wei_xin",
+            FieldType.STRING,
+            title = "微信",
+            defaultValue = "")
+
     //通用属性
     val telephone = ModelField(null,
             "telephone",
